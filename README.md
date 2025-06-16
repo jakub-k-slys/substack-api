@@ -2,6 +2,32 @@
 
 A TypeScript client for interacting with the Substack webservice API. This client provides a simple interface to interact with Substack publications, posts, and comments.
 
+[![Documentation Status](https://readthedocs.org/projects/substack-api/badge/?version=latest)](https://substack-api.readthedocs.io/en/latest/?badge=latest)
+
+## Documentation
+
+Full documentation is available at [substack-api.readthedocs.io](https://substack-api.readthedocs.io/).
+
+The documentation includes:
+- Detailed API reference
+- Getting started guide
+- Examples and use cases
+- Development guide
+- Changelog
+
+To build the documentation locally:
+
+```bash
+# Install Sphinx and theme
+pip install sphinx sphinx-rtd-theme myst-parser
+
+# Build the docs
+cd docs
+make html
+```
+
+The built documentation will be available in `docs/build/html`.
+
 ## Installation
 
 ```bash
@@ -11,15 +37,15 @@ npm install substack-api
 ## Usage
 
 ```typescript
-import { SubstackClient } from 'substack-api';
+import { Substack } from 'substack-api';
 
 // Create a client instance for a specific publication
-const client = new SubstackClient({
+const client = new Substack({
   hostname: 'example.substack.com'
 });
 
 // Or use the default client
-const defaultClient = new SubstackClient();
+const defaultClient = new Substack();
 ```
 
 ### Getting Publication Details
@@ -84,12 +110,12 @@ try {
 
 ## API Reference
 
-### SubstackClient
+### Substack
 
 #### Constructor Options
 
 ```typescript
-interface SubstackClientConfig {
+interface SubstackConfig {
   hostname?: string;      // The publication's hostname (e.g., 'example.substack.com')
   apiVersion?: string;    // API version to use (default: 'v1')
 }
