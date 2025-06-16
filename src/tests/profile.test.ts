@@ -263,60 +263,67 @@ describe('Substack Profiles', () => {
       const mockFollowingIds = [254824415, 108855261]
 
       // Mock getFollowingIds call
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockFollowingIds)
-      })
-
-      // Mock first user's profile calls - successful
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({
-          items: [{
-            entity_key: 'user_254824415',
-            type: 'user',
-            context: {
-              type: 'user',
-              timestamp: '2025-06-18T09:25:18.957Z',
-              users: [{
-                id: 254824415,
-                name: 'User 1',
-                handle: 'user1',
-                photo_url: 'https://example.com/photo1.jpg',
-                bio: 'Bio 1',
-                profile_set_up_at: '2025-06-18T09:25:18.957Z',
-                reader_installed_at: '2025-06-18T09:25:18.957Z'
-              }],
-              isFresh: true,
-              source: 'profile',
-              page_rank: 0
-            }
-          }]
+      ;(global.fetch as jest.Mock)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(mockFollowingIds)
         })
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({
-          id: 254824415,
-          name: 'User 1',
-          handle: 'user1',
-          bio: 'Bio 1',
-          photo_url: 'https://example.com/photo1.jpg',
-          publicationUsers: [],
-          userLinks: [],
-          subscriptions: []
-        })
-      })
 
-      // Mock second user's profile calls - failed
-      .mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-        statusText: 'Not Found'
-      })
+        // Mock first user's profile calls - successful
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              items: [
+                {
+                  entity_key: 'user_254824415',
+                  type: 'user',
+                  context: {
+                    type: 'user',
+                    timestamp: '2025-06-18T09:25:18.957Z',
+                    users: [
+                      {
+                        id: 254824415,
+                        name: 'User 1',
+                        handle: 'user1',
+                        photo_url: 'https://example.com/photo1.jpg',
+                        bio: 'Bio 1',
+                        profile_set_up_at: '2025-06-18T09:25:18.957Z',
+                        reader_installed_at: '2025-06-18T09:25:18.957Z'
+                      }
+                    ],
+                    isFresh: true,
+                    source: 'profile',
+                    page_rank: 0
+                  }
+                }
+              ]
+            })
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              id: 254824415,
+              name: 'User 1',
+              handle: 'user1',
+              bio: 'Bio 1',
+              photo_url: 'https://example.com/photo1.jpg',
+              publicationUsers: [],
+              userLinks: [],
+              subscriptions: []
+            })
+        })
+
+        // Mock second user's profile calls - failed
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 404,
+          statusText: 'Not Found'
+        })
 
       const result = await client.getFollowingProfiles()
-      
+
       // Should only include the successful profile
       expect(result).toHaveLength(1)
       expect(result[0].id).toBe(254824415)
@@ -326,47 +333,53 @@ describe('Substack Profiles', () => {
       const mockFollowingIds = [254824415]
 
       // Mock getFollowingIds call
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockFollowingIds)
-      })
-
-      // Mock user profile call - successful
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({
-          items: [{
-            entity_key: 'user_254824415',
-            type: 'user',
-            context: {
-              type: 'user',
-              timestamp: '2025-06-18T09:25:18.957Z',
-              users: [{
-                id: 254824415,
-                name: 'User 1',
-                handle: 'user1',
-                photo_url: 'https://example.com/photo1.jpg',
-                bio: 'Bio 1',
-                profile_set_up_at: '2025-06-18T09:25:18.957Z',
-                reader_installed_at: '2025-06-18T09:25:18.957Z'
-              }],
-              isFresh: true,
-              source: 'profile',
-              page_rank: 0
-            }
-          }]
+      ;(global.fetch as jest.Mock)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(mockFollowingIds)
         })
-      })
 
-      // Mock public profile call - failed
-      .mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-        statusText: 'Not Found'
-      })
+        // Mock user profile call - successful
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              items: [
+                {
+                  entity_key: 'user_254824415',
+                  type: 'user',
+                  context: {
+                    type: 'user',
+                    timestamp: '2025-06-18T09:25:18.957Z',
+                    users: [
+                      {
+                        id: 254824415,
+                        name: 'User 1',
+                        handle: 'user1',
+                        photo_url: 'https://example.com/photo1.jpg',
+                        bio: 'Bio 1',
+                        profile_set_up_at: '2025-06-18T09:25:18.957Z',
+                        reader_installed_at: '2025-06-18T09:25:18.957Z'
+                      }
+                    ],
+                    isFresh: true,
+                    source: 'profile',
+                    page_rank: 0
+                  }
+                }
+              ]
+            })
+        })
+
+        // Mock public profile call - failed
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 404,
+          statusText: 'Not Found'
+        })
 
       const result = await client.getFollowingProfiles()
-      
+
       // Should be empty since the public profile fetch failed
       expect(result).toHaveLength(0)
     })

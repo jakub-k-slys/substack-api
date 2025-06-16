@@ -243,7 +243,7 @@ export class Substack {
   async getFollowingProfiles(): Promise<SubstackFullProfile[]> {
     const userIds = await this.getFollowingIds()
     const profiles: SubstackFullProfile[] = []
-    
+
     for (const id of userIds) {
       try {
         const userProfile = await this.getUserProfile(id)
@@ -256,26 +256,37 @@ export class Substack {
         profiles.push({
           ...publicProfile,
           userProfile: {
-            items: [{
-              entity_key: firstItem.entity_key,
-              type: firstItem.type,
-              context: {
-                type: firstItem.context.type,
-                timestamp: firstItem.context.timestamp,
-                isFresh: firstItem.context.isFresh,
-                source: firstItem.context.source,
-                page_rank: firstItem.context.page_rank,
-                users: [user]
+            originalCursorTimestamp: firstItem.context.timestamp,
+            nextCursor: '',
+            items: [
+              {
+                entity_key: firstItem.entity_key,
+                type: firstItem.type,
+                context: {
+                  type: firstItem.context.type,
+                  timestamp: firstItem.context.timestamp,
+                  isFresh: firstItem.context.isFresh,
+                  source: firstItem.context.source,
+                  page_rank: firstItem.context.page_rank,
+                  users: [user]
+                },
+                publication: null,
+                post: null,
+                comment: null,
+                parentComments: [],
+                canReply: firstItem.canReply,
+                isMuted: firstItem.isMuted,
+                trackingParameters: firstItem.trackingParameters
               }
-            } as any]
-          } as SubstackUserProfile
+            ]
+          }
         })
-      } catch (error) {
+      } catch {
         // Skip profiles that can't be fetched
         continue
       }
     }
-    
+
     return profiles
   }
 
