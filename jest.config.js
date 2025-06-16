@@ -1,10 +1,11 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
-module.exports = {
+export default {
   preset: 'ts-jest',
   testEnvironment: 'node',
   transform: {
     '^.+\\.ts$': ['ts-jest', {
-      tsconfig: 'tsconfig.test.json'
+      tsconfig: 'tsconfig.test.json',
+      useESM: true
     }]
   },
   roots: ['<rootDir>/src'],
@@ -19,5 +20,6 @@ module.exports = {
       lines: 80,
       statements: 80
     }
-  }
-};
+  },
+  extensionsToTreatAsEsm: ['.ts']
+}
