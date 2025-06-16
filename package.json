@@ -33,7 +33,7 @@
   "homepage": "https://github.com/jakub-k-slys/substack-api#readme",
   "devDependencies": {
     "@types/jest": "^30.0.0",
-    "@types/node": "^20.3.2",
+    "@types/node": "^24.0.3",
     "jest": "^30.0.0",
     "ts-jest": "^29.1.0",
     "typescript": "^5.1.3"
