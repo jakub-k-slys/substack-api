@@ -33,7 +33,7 @@ export class Substack {
     this.cookie = `connect.sid=s%3A${config.apiKey}`
   }
 
-  private buildUrl<T extends Record<string, any>>(path: string, params?: T): string {
+  private buildUrl<T extends PaginationParams>(path: string, params?: T): string {
     const url = `${this.baseUrl}/api/${this.apiVersion}${path}`
     if (!params) return url
 
@@ -54,16 +54,12 @@ export class Substack {
       headers: {
         'Content-Type': 'application/json',
         Cookie: this.cookie,
-        ...options.headers,
-      },
+        ...options.headers
+      }
     })
 
     if (!response.ok) {
-      throw new SubstackError(
-        `Request failed: ${response.statusText}`,
-        response.status,
-        response
-      )
+      throw new SubstackError(`Request failed: ${response.statusText}`, response.status, response)
     }
 
     return response.json()

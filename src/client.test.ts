@@ -1,5 +1,11 @@
 import { Substack, SubstackError } from './client'
-import type { SubstackPublication, SubstackPost, SubstackComment, SubstackSearchResult, SubstackConfig } from './types'
+import type {
+  SubstackPublication,
+  SubstackPost,
+  SubstackComment,
+  SubstackSearchResult,
+  SubstackConfig
+} from './types'
 import { describe, expect, it, jest, beforeAll, afterAll, beforeEach } from '@jest/globals'
 
 function createMockResponse<T>(data: T, options: Partial<Response> = {}): Response {
@@ -37,19 +43,25 @@ describe('Substack', () => {
 
     it('should use default hostname and v1 API version when only apiKey provided', () => {
       const client = new Substack({ apiKey: 'test-key' })
-      expect((client as any).baseUrl).toBe('https://substack.com')
-      expect((client as any).apiVersion).toBe('v1')
-      expect((client as any).cookie).toBe('connect.sid=s%3Atest-key')
+      const typedClient = client as unknown as {
+        baseUrl: string
+        apiVersion: string
+        cookie: string
+      }
+      expect(typedClient.baseUrl).toBe('https://substack.com')
+      expect(typedClient.apiVersion).toBe('v1')
+      expect(typedClient.cookie).toBe('connect.sid=s%3Atest-key')
     })
 
     it('should use custom hostname and API version when provided', () => {
-      const client = new Substack({ 
+      const client = new Substack({
         hostname: 'example.substack.com',
         apiVersion: 'v2',
         apiKey: 'test-key'
       })
-      expect((client as any).baseUrl).toBe('https://example.substack.com')
-      expect((client as any).apiVersion).toBe('v2')
+      const typedClient = client as unknown as { baseUrl: string; apiVersion: string }
+      expect(typedClient.baseUrl).toBe('https://example.substack.com')
+      expect(typedClient.apiVersion).toBe('v2')
     })
   })
 
@@ -62,7 +74,7 @@ describe('Substack', () => {
     }
 
     it('should fetch publication details successfully', async () => {
-      (global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+      ;(global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
         createMockResponse(mockPublication)
       )
 
@@ -88,13 +100,11 @@ describe('Substack', () => {
         createMockResponse(null, { ok: false, status: 404, statusText: errorMessage })
       )
 
-      await expect(client.getPublication('test.substack.com'))
-        .rejects
-        .toThrow(SubstackError)
+      await expect(client.getPublication('test.substack.com')).rejects.toThrow(SubstackError)
     })
 
     it('should use baseUrl when no hostname provided', async () => {
-      (global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+      ;(global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
         createMockResponse(mockPublication)
       )
 
@@ -128,7 +138,7 @@ describe('Substack', () => {
     ]
 
     it('should include cookie header in requests', async () => {
-      (global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+      ;(global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
         createMockResponse(mockPosts)
       )
 
@@ -146,7 +156,7 @@ describe('Substack', () => {
     })
 
     it('should fetch posts with pagination', async () => {
-      (global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+      ;(global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
         createMockResponse(mockPosts)
       )
 
@@ -169,7 +179,7 @@ describe('Substack', () => {
     })
 
     it('should fetch posts without pagination', async () => {
-      (global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+      ;(global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
         createMockResponse(mockPosts)
       )
 
@@ -187,20 +197,22 @@ describe('Substack', () => {
   describe('searchPosts', () => {
     const mockSearchResult: SubstackSearchResult = {
       total: 1,
-      results: [{
-        id: 1,
-        title: 'Test Post',
-        slug: 'test-post',
-        post_date: '2023-06-16T12:00:00Z',
-        canonical_url: 'https://test.substack.com/p/test-post',
-        type: 'newsletter',
-        published: true,
-        paywalled: false
-      }]
+      results: [
+        {
+          id: 1,
+          title: 'Test Post',
+          slug: 'test-post',
+          post_date: '2023-06-16T12:00:00Z',
+          canonical_url: 'https://test.substack.com/p/test-post',
+          type: 'newsletter',
+          published: true,
+          paywalled: false
+        }
+      ]
     }
 
     it('should search posts with all parameters', async () => {
-      (global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+      ;(global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
         createMockResponse(mockSearchResult)
       )
 
@@ -234,7 +246,7 @@ describe('Substack', () => {
     })
 
     it('should search posts with minimal parameters', async () => {
-      (global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+      ;(global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
         createMockResponse(mockSearchResult)
       )
 
@@ -250,19 +262,21 @@ describe('Substack', () => {
   })
 
   describe('comments', () => {
-    const mockComments: SubstackComment[] = [{
-      id: 1,
-      body: 'Test comment',
-      created_at: '2023-06-16T12:00:00Z',
-      parent_post_id: 1,
-      author: {
+    const mockComments: SubstackComment[] = [
+      {
         id: 1,
-        name: 'Test User'
+        body: 'Test comment',
+        created_at: '2023-06-16T12:00:00Z',
+        parent_post_id: 1,
+        author: {
+          id: 1,
+          name: 'Test User'
+        }
       }
-    }]
+    ]
 
     it('should fetch comments for a post with pagination', async () => {
-      (global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+      ;(global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
         createMockResponse(mockComments)
       )
 
@@ -285,7 +299,7 @@ describe('Substack', () => {
     })
 
     it('should fetch comments without pagination', async () => {
-      (global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+      ;(global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
         createMockResponse(mockComments)
       )
 
@@ -300,7 +314,7 @@ describe('Substack', () => {
     })
 
     it('should fetch a single comment', async () => {
-      (global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+      ;(global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
         createMockResponse(mockComments[0])
       )
 
