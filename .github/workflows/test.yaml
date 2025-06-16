@@ -43,7 +43,6 @@ jobs:
               run: npm install
             - name: Running test
               run: npm run test
-
             - name: Upload test results
               if: always()
               uses: actions/upload-artifact@v4
@@ -56,14 +55,12 @@ jobs:
             - name: Upload coverage to Codecov
               uses: codecov/codecov-action@v3
               with:
+                token: ${{ secrets.CODECOV_TOKEN }}
                 files: ./coverage/lcov.info
-                fail_ci_if_error: true
-
-            - name: Report Coverage
-              uses: romeovs/lcov-reporter-action@v0.3.1
-              with:
-                lcov-file: ./coverage/lcov.info
-                github-token: ${{ secrets.GITHUB_TOKEN }}
+                flags: unittests
+                name: codecov-umbrella
+                fail_ci_if_error: false
+                verbose: true
     lint:
         name: Running linters
         runs-on: ubuntu-latest
