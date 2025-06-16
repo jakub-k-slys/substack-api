@@ -231,14 +231,29 @@ export interface PublishNoteResponse {
   name: string
   photo_url: string
   reactions: Record<string, number>
-  children: any[]
+  children: SubstackNote['comment'][]
   user_bestseller_tier: number | null
   isFirstFeedCommentByUser: boolean
   reaction_count: number
   restacks: number
   restacked: boolean
   children_count: number
-  attachments: any[]
+  attachments: Array<{
+    id: string
+    type: string
+    imageUrl?: string
+    imageWidth?: number
+    imageHeight?: number
+    explicit: boolean
+    linkMetadata?: {
+      url: string
+      host: string
+      title: string
+      description?: string
+      image?: string
+      original_image?: string
+    }
+  }>
   user_primary_publication?: SubstackPublication
 }
 

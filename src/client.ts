@@ -181,13 +181,17 @@ export class Substack {
         attrs: {
           schemaVersion: 'v1'
         },
-        content: [{
-          type: 'paragraph',
-          content: [{
-            type: 'text',
-            text
-          }]
-        }]
+        content: [
+          {
+            type: 'paragraph',
+            content: [
+              {
+                type: 'text',
+                text
+              }
+            ]
+          }
+        ]
       },
       replyMinimumRole: 'everyone'
     }

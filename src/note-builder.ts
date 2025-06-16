@@ -1,4 +1,4 @@
-import { NoteBodyJson, PublishNoteRequest, PublishNoteResponse } from './types'
+import { PublishNoteRequest, PublishNoteResponse } from './types'
 import { Substack } from './client'
 
 interface TextSegment {
@@ -14,7 +14,10 @@ export class NoteBuilder {
   private paragraphs: Paragraph[] = []
   private currentParagraph: Paragraph = { segments: [] }
 
-  constructor(private readonly client: Substack, text?: string) {
+  constructor(
+    private readonly client: Substack,
+    text?: string
+  ) {
     if (text) {
       this.currentParagraph.segments.push({ text, type: 'simple' })
     }
@@ -64,9 +67,9 @@ export class NoteBuilder {
       allParagraphs.push(this.currentParagraph)
     }
 
-    const content = allParagraphs.map(paragraph => ({
+    const content = allParagraphs.map((paragraph) => ({
       type: 'paragraph' as const,
-      content: paragraph.segments.map(segment => ({
+      content: paragraph.segments.map((segment) => ({
         type: 'text' as const,
         text: segment.text,
         ...(segment.type !== 'simple' && {
