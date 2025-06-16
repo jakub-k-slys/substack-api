@@ -41,7 +41,7 @@ export interface SubstackSearchResult {
   results: SubstackPost[];
 }
 
-export interface SubstackClientConfig {
+export interface SubstackConfig {
   hostname?: string;
   apiVersion?: string;
 }

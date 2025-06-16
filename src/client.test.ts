@@ -1,4 +1,4 @@
-import { SubstackClient, SubstackError } from './client';
+import { Substack, SubstackError } from './client';
 import type { SubstackPublication, SubstackPost, SubstackComment, SubstackSearchResult } from './types';
 import { describe, expect, it, jest, beforeAll, afterAll, beforeEach } from '@jest/globals';
 
@@ -15,7 +15,7 @@ function createMockResponse<T>(data: T, options: Partial<Response> = {}): Respon
   return response;
 }
 
-describe('SubstackClient', () => {
+describe('Substack', () => {
   let globalFetch: typeof global.fetch;
 
   beforeAll(() => {
@@ -32,13 +32,13 @@ describe('SubstackClient', () => {
 
   describe('constructor', () => {
     it('should use default hostname when no config provided', () => {
-      const client = new SubstackClient();
+      const client = new Substack();
       expect((client as any).baseUrl).toBe('https://substack.com');
       expect((client as any).apiVersion).toBe('v1');
     });
 
     it('should use custom hostname and API version when provided', () => {
-      const client = new SubstackClient({ 
+      const client = new Substack({ 
         hostname: 'example.substack.com',
         apiVersion: 'v2'
       });
@@ -60,7 +60,7 @@ describe('SubstackClient', () => {
         createMockResponse(mockPublication)
       );
 
-      const client = new SubstackClient();
+      const client = new Substack();
       const result = await client.getPublication('test.substack.com');
 
       expect(result).toEqual(mockPublication);
@@ -75,7 +75,7 @@ describe('SubstackClient', () => {
         createMockResponse(null, { ok: false, status: 404, statusText: errorMessage })
       );
 
-      const client = new SubstackClient();
+      const client = new Substack();
       await expect(client.getPublication('test.substack.com'))
         .rejects
         .toThrow(SubstackError);
@@ -86,7 +86,7 @@ describe('SubstackClient', () => {
         createMockResponse(mockPublication)
       );
 
-      const client = new SubstackClient({ hostname: 'test.substack.com' });
+      const client = new Substack({ hostname: 'test.substack.com' });
       await client.getPublication();
 
       expect(global.fetch).toHaveBeenCalledWith(
@@ -114,7 +114,7 @@ describe('SubstackClient', () => {
         createMockResponse(mockPosts)
       );
 
-      const client = new SubstackClient({ hostname: 'test.substack.com' });
+      const client = new Substack({ hostname: 'test.substack.com' });
       const result = await client.getPosts({ offset: 0, limit: 10 });
 
       expect(result).toEqual(mockPosts);
@@ -137,7 +137,7 @@ describe('SubstackClient', () => {
         createMockResponse(mockPosts)
       );
 
-      const client = new SubstackClient({ hostname: 'test.substack.com' });
+      const client = new Substack({ hostname: 'test.substack.com' });
       const result = await client.getPosts();
 
       expect(result).toEqual(mockPosts);
@@ -168,7 +168,7 @@ describe('SubstackClient', () => {
         createMockResponse(mockSearchResult)
       );
 
-      const client = new SubstackClient({ hostname: 'test.substack.com' });
+      const client = new Substack({ hostname: 'test.substack.com' });
       const result = await client.searchPosts({
         query: 'test',
         type: 'newsletter',
@@ -202,7 +202,7 @@ describe('SubstackClient', () => {
         createMockResponse(mockSearchResult)
       );
 
-      const client = new SubstackClient({ hostname: 'test.substack.com' });
+      const client = new Substack({ hostname: 'test.substack.com' });
       const result = await client.searchPosts({ query: 'test' });
 
       expect(result).toEqual(mockSearchResult);
@@ -230,7 +230,7 @@ describe('SubstackClient', () => {
         createMockResponse(mockComments)
       );
 
-      const client = new SubstackClient({ hostname: 'test.substack.com' });
+      const client = new Substack({ hostname: 'test.substack.com' });
       const result = await client.getComments(1, { limit: 10, offset: 0 });
 
       expect(result).toEqual(mockComments);
@@ -253,7 +253,7 @@ describe('SubstackClient', () => {
         createMockResponse(mockComments)
       );
 
-      const client = new SubstackClient({ hostname: 'test.substack.com' });
+      const client = new Substack({ hostname: 'test.substack.com' });
       const result = await client.getComments(1);
 
       expect(result).toEqual(mockComments);
@@ -268,7 +268,7 @@ describe('SubstackClient', () => {
         createMockResponse(mockComments[0])
       );
 
-      const client = new SubstackClient({ hostname: 'test.substack.com' });
+      const client = new Substack({ hostname: 'test.substack.com' });
       const result = await client.getComment(1);
 
       expect(result).toEqual(mockComments[0]);

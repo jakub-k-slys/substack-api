@@ -2,7 +2,7 @@ import {
   SubstackPublication,
   SubstackPost,
   SubstackComment,
-  SubstackClientConfig,
+  SubstackConfig,
   SubstackSearchResult,
   PaginationParams,
   SearchParams
@@ -19,11 +19,11 @@ export class SubstackError extends Error {
   }
 }
 
-export class SubstackClient {
+export class Substack {
   private readonly baseUrl: string;
   private readonly apiVersion: string;
 
-  constructor(config: SubstackClientConfig = {}) {
+  constructor(config: SubstackConfig = {}) {
     this.baseUrl = `https://${config.hostname || 'substack.com'}`;
     this.apiVersion = config.apiVersion || 'v1';
   }

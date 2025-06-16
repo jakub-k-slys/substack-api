@@ -1,5 +1,5 @@
 export {
-  SubstackClient,
+  Substack,
   SubstackError
 } from './client';
 
@@ -7,7 +7,7 @@ export type {
   SubstackPublication,
   SubstackPost,
   SubstackComment,
-  SubstackClientConfig,
+  SubstackConfig,
   SubstackSearchResult,
   PaginationParams,
   SearchParams
