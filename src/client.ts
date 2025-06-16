@@ -22,10 +22,15 @@ export class SubstackError extends Error {
 export class Substack {
   private readonly baseUrl: string;
   private readonly apiVersion: string;
+  private readonly cookie: string;
 
-  constructor(config: SubstackConfig = {}) {
+  constructor(config: SubstackConfig) {
+    if (!config.apiKey) {
+      throw new Error('apiKey is required in SubstackConfig');
+    }
     this.baseUrl = `https://${config.hostname || 'substack.com'}`;
     this.apiVersion = config.apiVersion || 'v1';
+    this.cookie = `connect.sid=s%3A${config.apiKey}`;
   }
 
   private buildUrl<T extends Record<string, any>>(path: string, params?: T): string {
@@ -48,6 +53,7 @@ export class Substack {
       ...options,
       headers: {
         'Content-Type': 'application/json',
+        Cookie: this.cookie,
         ...options.headers,
       },
     });
@@ -69,17 +75,7 @@ export class Substack {
    */
   async getPublication(hostname?: string): Promise<SubstackPublication> {
     const url = hostname ? `https://${hostname}` : this.baseUrl;
-    const response = await fetch(`${url}/api/${this.apiVersion}/publication`);
-    
-    if (!response.ok) {
-      throw new SubstackError(
-        `Failed to fetch publication: ${response.statusText}`,
-        response.status,
-        response
-      );
-    }
-
-    return response.json();
+    return this.request<SubstackPublication>(`${url}/api/${this.apiVersion}/publication`);
   }
 
   /**

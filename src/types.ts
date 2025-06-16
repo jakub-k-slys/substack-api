@@ -44,6 +44,7 @@ export interface SubstackSearchResult {
 export interface SubstackConfig {
   hostname?: string;
   apiVersion?: string;
+  apiKey: string;
 }
 
 export interface PaginationParams {

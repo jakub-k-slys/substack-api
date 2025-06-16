@@ -1,5 +1,5 @@
 import { Substack, SubstackError } from './client';
-import type { SubstackPublication, SubstackPost, SubstackComment, SubstackSearchResult } from './types';
+import type { SubstackPublication, SubstackPost, SubstackComment, SubstackSearchResult, SubstackConfig } from './types';
 import { describe, expect, it, jest, beforeAll, afterAll, beforeEach } from '@jest/globals';
 
 function createMockResponse<T>(data: T, options: Partial<Response> = {}): Response {
@@ -31,16 +31,22 @@ describe('Substack', () => {
   });
 
   describe('constructor', () => {
-    it('should use default hostname when no config provided', () => {
-      const client = new Substack();
+    it('should require apiKey in constructor', () => {
+      expect(() => new Substack({} as SubstackConfig)).toThrow();
+    });
+
+    it('should use default hostname and v1 API version when only apiKey provided', () => {
+      const client = new Substack({ apiKey: 'test-key' });
       expect((client as any).baseUrl).toBe('https://substack.com');
       expect((client as any).apiVersion).toBe('v1');
+      expect((client as any).cookie).toBe('connect.sid=s%3Atest-key');
     });
 
     it('should use custom hostname and API version when provided', () => {
       const client = new Substack({ 
         hostname: 'example.substack.com',
-        apiVersion: 'v2'
+        apiVersion: 'v2',
+        apiKey: 'test-key'
       });
       expect((client as any).baseUrl).toBe('https://example.substack.com');
       expect((client as any).apiVersion).toBe('v2');
@@ -60,12 +66,18 @@ describe('Substack', () => {
         createMockResponse(mockPublication)
       );
 
-      const client = new Substack();
+      const client = new Substack({ apiKey: 'test-key' });
       const result = await client.getPublication('test.substack.com');
 
       expect(result).toEqual(mockPublication);
       expect(global.fetch).toHaveBeenCalledWith(
-        'https://test.substack.com/api/v1/publication'
+        'https://test.substack.com/api/v1/publication',
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            'Content-Type': 'application/json',
+            Cookie: 'connect.sid=s%3Atest-key'
+          })
+        })
       );
     });
 
@@ -75,7 +87,7 @@ describe('Substack', () => {
         createMockResponse(null, { ok: false, status: 404, statusText: errorMessage })
       );
 
-      const client = new Substack();
+      const client = new Substack({ apiKey: 'test-key' });
       await expect(client.getPublication('test.substack.com'))
         .rejects
         .toThrow(SubstackError);
@@ -86,11 +98,17 @@ describe('Substack', () => {
         createMockResponse(mockPublication)
       );
 
-      const client = new Substack({ hostname: 'test.substack.com' });
+      const client = new Substack({ hostname: 'test.substack.com', apiKey: 'test-key' });
       await client.getPublication();
 
       expect(global.fetch).toHaveBeenCalledWith(
-        'https://test.substack.com/api/v1/publication'
+        'https://test.substack.com/api/v1/publication',
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            'Content-Type': 'application/json',
+            Cookie: 'connect.sid=s%3Atest-key'
+          })
+        })
       );
     });
   });
@@ -109,12 +127,30 @@ describe('Substack', () => {
       }
     ];
 
+    it('should include cookie header in requests', async () => {
+      (global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+        createMockResponse(mockPosts)
+      );
+
+      const client = new Substack({ hostname: 'test.substack.com', apiKey: 'test-key' });
+      await client.getPosts();
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Cookie: 'connect.sid=s%3Atest-key'
+          })
+        })
+      );
+    });
+
     it('should fetch posts with pagination', async () => {
       (global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
         createMockResponse(mockPosts)
       );
 
-      const client = new Substack({ hostname: 'test.substack.com' });
+      const client = new Substack({ hostname: 'test.substack.com', apiKey: 'test-key' });
       const result = await client.getPosts({ offset: 0, limit: 10 });
 
       expect(result).toEqual(mockPosts);
@@ -137,7 +173,7 @@ describe('Substack', () => {
         createMockResponse(mockPosts)
       );
 
-      const client = new Substack({ hostname: 'test.substack.com' });
+      const client = new Substack({ hostname: 'test.substack.com', apiKey: 'test-key' });
       const result = await client.getPosts();
 
       expect(result).toEqual(mockPosts);
@@ -168,7 +204,7 @@ describe('Substack', () => {
         createMockResponse(mockSearchResult)
       );
 
-      const client = new Substack({ hostname: 'test.substack.com' });
+      const client = new Substack({ hostname: 'test.substack.com', apiKey: 'test-key' });
       const result = await client.searchPosts({
         query: 'test',
         type: 'newsletter',
@@ -202,7 +238,7 @@ describe('Substack', () => {
         createMockResponse(mockSearchResult)
       );
 
-      const client = new Substack({ hostname: 'test.substack.com' });
+      const client = new Substack({ hostname: 'test.substack.com', apiKey: 'test-key' });
       const result = await client.searchPosts({ query: 'test' });
 
       expect(result).toEqual(mockSearchResult);
@@ -230,7 +266,7 @@ describe('Substack', () => {
         createMockResponse(mockComments)
       );
 
-      const client = new Substack({ hostname: 'test.substack.com' });
+      const client = new Substack({ hostname: 'test.substack.com', apiKey: 'test-key' });
       const result = await client.getComments(1, { limit: 10, offset: 0 });
 
       expect(result).toEqual(mockComments);
@@ -253,7 +289,7 @@ describe('Substack', () => {
         createMockResponse(mockComments)
       );
 
-      const client = new Substack({ hostname: 'test.substack.com' });
+      const client = new Substack({ hostname: 'test.substack.com', apiKey: 'test-key' });
       const result = await client.getComments(1);
 
       expect(result).toEqual(mockComments);
@@ -268,7 +304,7 @@ describe('Substack', () => {
         createMockResponse(mockComments[0])
       );
 
-      const client = new Substack({ hostname: 'test.substack.com' });
+      const client = new Substack({ hostname: 'test.substack.com', apiKey: 'test-key' });
       const result = await client.getComment(1);
 
       expect(result).toEqual(mockComments[0]);
