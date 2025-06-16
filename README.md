@@ -1,6 +1,6 @@
 # Substack API
 
-A TypeScript client for interacting with the Substack webservice API.
+A TypeScript client for interacting with the Substack webservice API. This client provides a simple interface to interact with Substack publications, posts, and comments.
 
 ## Installation
 
@@ -13,12 +13,152 @@ npm install substack-api
 ```typescript
 import { SubstackClient } from 'substack-api';
 
-// Create a client instance
-const client = new SubstackClient();
+// Create a client instance for a specific publication
+const client = new SubstackClient({
+  hostname: 'example.substack.com'
+});
 
-// Get publication details
-const publication = await client.getPublication('example.substack.com');
-console.log(publication);
+// Or use the default client
+const defaultClient = new SubstackClient();
+```
+
+### Getting Publication Details
+
+```typescript
+// Get details for a specific publication
+const publication = await client.getPublication();
+
+// Or get details for another publication
+const otherPublication = await client.getPublication('other.substack.com');
+```
+
+### Working with Posts
+
+```typescript
+// Get all posts (with pagination)
+const posts = await client.getPosts({
+  offset: 0,
+  limit: 10
+});
+
+// Get a specific post by slug
+const post = await client.getPost('post-slug');
+
+// Search posts
+const searchResults = await client.searchPosts({
+  query: 'typescript',
+  type: 'newsletter',
+  limit: 10,
+  published_after: '2023-01-01',
+  published_before: '2023-12-31'
+});
+```
+
+### Working with Comments
+
+```typescript
+// Get comments for a post
+const comments = await client.getComments(postId, {
+  offset: 0,
+  limit: 20
+});
+
+// Get a specific comment
+const comment = await client.getComment(commentId);
+```
+
+### Error Handling
+
+The client throws `SubstackError` for API-related errors:
+
+```typescript
+try {
+  const publication = await client.getPublication('nonexistent.substack.com');
+} catch (error) {
+  if (error instanceof SubstackError) {
+    console.error(`API Error: ${error.message}`);
+    console.error(`Status: ${error.status}`);
+  }
+}
+```
+
+## API Reference
+
+### SubstackClient
+
+#### Constructor Options
+
+```typescript
+interface SubstackClientConfig {
+  hostname?: string;      // The publication's hostname (e.g., 'example.substack.com')
+  apiVersion?: string;    // API version to use (default: 'v1')
+}
+```
+
+#### Methods
+
+- `getPublication(hostname?: string): Promise<SubstackPublication>`
+  - Get publication details
+  - Optional hostname parameter to get details for another publication
+
+- `getPosts(params?: PaginationParams): Promise<SubstackPost[]>`
+  - Get posts for the publication
+  - Supports pagination with offset and limit
+
+- `getPost(slug: string): Promise<SubstackPost>`
+  - Get a specific post by its slug
+
+- `searchPosts(params: SearchParams): Promise<SubstackSearchResult>`
+  - Search posts with various filters
+  - Supports pagination, date ranges, and post types
+
+- `getComments(postId: number, params?: PaginationParams): Promise<SubstackComment[]>`
+  - Get comments for a specific post
+  - Supports pagination
+
+- `getComment(commentId: number): Promise<SubstackComment>`
+  - Get a specific comment by ID
+
+### Types
+
+```typescript
+interface PaginationParams {
+  offset?: number;
+  limit?: number;
+}
+
+interface SearchParams extends PaginationParams {
+  query: string;
+  published_before?: string;
+  published_after?: string;
+  type?: 'newsletter' | 'podcast' | 'thread';
+}
+
+interface SubstackPublication {
+  name: string;
+  hostname: string;
+  subdomain: string;
+  logo?: {
+    url: string;
+  };
+  description?: string;
+}
+
+interface SubstackPost {
+  id: number;
+  title: string;
+  subtitle?: string;
+  slug: string;
+  post_date: string;
+  description?: string;
+  audience?: string;
+  canonical_url: string;
+  cover_image?: string;
+  podcast_url?: string;
+  type: 'newsletter' | 'podcast' | 'thread';
+  published: boolean;
+  paywalled: boolean;
+}
 ```
 
 ## Development
