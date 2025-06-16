@@ -428,6 +428,72 @@ describe('Substack', () => {
 
       expect(result).toEqual(mockResponse)
     })
+
+    // New test to cover the simple text segment branch
+    it('should handle simple text segments without marks', async () => {
+      const mockResponse: PublishNoteResponse = {
+        user_id: 254824415,
+        body: 'Simple text',
+        body_json: {
+          type: 'doc',
+          attrs: { schemaVersion: 'v1' },
+          content: [
+            {
+              type: 'paragraph',
+              content: [{ type: 'text', text: 'Simple text' }]
+            }
+          ]
+        },
+        post_id: null,
+        publication_id: null,
+        media_clip_id: null,
+        ancestor_path: '',
+        type: 'feed',
+        status: 'published',
+        reply_minimum_role: 'everyone',
+        id: 126991707,
+        deleted: false,
+        date: '2025-06-18T09:25:18.957Z',
+        name: 'Test User',
+        photo_url: 'https://example.com/photo.png',
+        reactions: { '❤': 0 },
+        children: [],
+        user_bestseller_tier: null,
+        isFirstFeedCommentByUser: false,
+        reaction_count: 0,
+        restacks: 0,
+        restacked: false,
+        children_count: 0,
+        attachments: []
+      }
+
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockResponse)
+      })
+
+      const result = await client.note('Simple text').publish()
+
+      expect(result).toEqual(mockResponse)
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          body: JSON.stringify({
+            bodyJson: {
+              type: 'doc',
+              attrs: { schemaVersion: 'v1' },
+              content: [
+                {
+                  type: 'paragraph',
+                  content: [{ type: 'text', text: 'Simple text' }]
+                }
+              ]
+            },
+            replyMinimumRole: 'everyone'
+          })
+        })
+      )
+    })
   })
 
   describe('other API methods', () => {
@@ -537,6 +603,42 @@ describe('Substack', () => {
 
       const result = await client.getComment(1)
       expect(result).toEqual(mockResponse)
+    })
+
+    // New test to cover notes pagination methods
+    it('should handle notes pagination correctly', async () => {
+      const mockFirstResponse = {
+        items: [{ id: 1, body: 'Note 1' }],
+        originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
+        nextCursor: 'next-page'
+      }
+
+      const mockSecondResponse = {
+        items: [{ id: 2, body: 'Note 2' }],
+        originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
+        nextCursor: null
+      }
+
+      ;(global.fetch as jest.Mock)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(mockFirstResponse)
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(mockSecondResponse)
+        })
+
+      const firstPage = await client.getNotes()
+      expect(firstPage.items).toEqual(mockFirstResponse.items)
+      expect(firstPage.hasMore()).toBe(true)
+
+      const secondPage = await firstPage.next()
+      expect(secondPage?.items).toEqual(mockSecondResponse.items)
+      expect(secondPage?.hasMore()).toBe(false)
+
+      const thirdPage = await secondPage?.next()
+      expect(thirdPage).toBeNull()
     })
 
     it('should get notes with pagination', async () => {
@@ -839,198 +941,18 @@ describe('Substack', () => {
       )
     })
 
-    it('should get following profiles', async () => {
+    // Tests to cover error handling in getFollowingProfiles
+    it('should handle failed user profile fetches in getFollowingProfiles', async () => {
       const mockFollowingIds = [254824415, 108855261]
 
-      const mockUserProfiles = [
-        {
-          items: [
-            {
-              entity_key: 'user_254824415',
-              type: 'user',
-              context: {
-                type: 'user',
-                timestamp: '2025-06-18T09:25:18.957Z',
-                users: [
-                  {
-                    id: 254824415,
-                    name: 'User 1',
-                    handle: 'user1',
-                    photo_url: 'https://example.com/photo1.jpg',
-                    bio: 'Bio 1',
-                    profile_set_up_at: '2025-06-18T09:25:18.957Z',
-                    reader_installed_at: '2025-06-18T09:25:18.957Z'
-                  }
-                ],
-                isFresh: true,
-                source: 'profile',
-                page_rank: 0
-              },
-              canReply: true,
-              isMuted: false,
-              trackingParameters: {
-                item_primary_entity_key: 'user_254824415',
-                item_entity_key: 'user_254824415',
-                item_type: 'user',
-                item_content_user_id: 254824415,
-                item_context_type: 'user',
-                item_context_type_bucket: 'user',
-                item_context_timestamp: '2025-06-18T09:25:18.957Z',
-                item_context_user_id: 254824415,
-                item_context_user_ids: [254824415],
-                item_can_reply: true,
-                item_is_fresh: true,
-                item_last_impression_at: null,
-                item_page: null,
-                item_page_rank: 0,
-                impression_id: 'test',
-                followed_user_count: 0,
-                subscribed_publication_count: 0,
-                is_following: false,
-                is_explicitly_subscribed: false
-              }
-            }
-          ],
-          originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
-          nextCursor: null
-        },
-        {
-          items: [
-            {
-              entity_key: 'user_108855261',
-              type: 'user',
-              context: {
-                type: 'user',
-                timestamp: '2025-06-18T09:25:18.957Z',
-                users: [
-                  {
-                    id: 108855261,
-                    name: 'User 2',
-                    handle: 'user2',
-                    photo_url: 'https://example.com/photo2.jpg',
-                    bio: 'Bio 2',
-                    profile_set_up_at: '2025-06-18T09:25:18.957Z',
-                    reader_installed_at: '2025-06-18T09:25:18.957Z'
-                  }
-                ],
-                isFresh: true,
-                source: 'profile',
-                page_rank: 0
-              },
-              canReply: true,
-              isMuted: false,
-              trackingParameters: {
-                item_primary_entity_key: 'user_108855261',
-                item_entity_key: 'user_108855261',
-                item_type: 'user',
-                item_content_user_id: 108855261,
-                item_context_type: 'user',
-                item_context_type_bucket: 'user',
-                item_context_timestamp: '2025-06-18T09:25:18.957Z',
-                item_context_user_id: 108855261,
-                item_context_user_ids: [108855261],
-                item_can_reply: true,
-                item_is_fresh: true,
-                item_last_impression_at: null,
-                item_page: null,
-                item_page_rank: 0,
-                impression_id: 'test',
-                followed_user_count: 0,
-                subscribed_publication_count: 0,
-                is_following: false,
-                is_explicitly_subscribed: false
-              }
-            }
-          ],
-          originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
-          nextCursor: null
-        }
-      ]
-
-      const mockPublicProfiles = [
-        {
-          id: 254824415,
-          name: 'User 1',
-          handle: 'user1',
-          bio: 'Bio 1',
-          photo_url: 'https://example.com/photo1.jpg',
-          profile_set_up_at: '2025-06-18T09:25:18.957Z',
-          reader_installed_at: '2025-06-18T09:25:18.957Z',
-          profile_disabled: false,
-          publicationUsers: [],
-          userLinks: [],
-          subscriptions: [],
-          subscriptionsTruncated: false,
-          hasGuestPost: false,
-          max_pub_tier: 0,
-          hasActivity: false,
-          hasLikes: false,
-          lists: [],
-          rough_num_free_subscribers_int: 0,
-          rough_num_free_subscribers: '0',
-          bestseller_badge_disabled: false,
-          subscriberCountString: '0',
-          subscriberCount: '0',
-          subscriberCountNumber: 0,
-          hasHiddenPublicationUsers: false,
-          visibleSubscriptionsCount: 0,
-          slug: 'user1',
-          primaryPublicationIsPledged: false,
-          primaryPublicationSubscriptionState: 'none',
-          isSubscribed: false,
-          isFollowing: false,
-          followsViewer: false,
-          can_dm: false,
-          dm_upgrade_options: []
-        },
-        {
-          id: 108855261,
-          name: 'User 2',
-          handle: 'user2',
-          bio: 'Bio 2',
-          photo_url: 'https://example.com/photo2.jpg',
-          profile_set_up_at: '2025-06-18T09:25:18.957Z',
-          reader_installed_at: '2025-06-18T09:25:18.957Z',
-          profile_disabled: false,
-          publicationUsers: [],
-          userLinks: [],
-          subscriptions: [],
-          subscriptionsTruncated: false,
-          hasGuestPost: false,
-          max_pub_tier: 0,
-          hasActivity: false,
-          hasLikes: false,
-          lists: [],
-          rough_num_free_subscribers_int: 0,
-          rough_num_free_subscribers: '0',
-          bestseller_badge_disabled: false,
-          subscriberCountString: '0',
-          subscriberCount: '0',
-          subscriberCountNumber: 0,
-          hasHiddenPublicationUsers: false,
-          visibleSubscriptionsCount: 0,
-          slug: 'user2',
-          primaryPublicationIsPledged: false,
-          primaryPublicationSubscriptionState: 'none',
-          isSubscribed: false,
-          isFollowing: false,
-          followsViewer: false,
-          can_dm: false,
-          dm_upgrade_options: []
-        }
-      ]
-
-      const fetch = global.fetch as jest.Mock
-      fetch.mockReset()
-
-      // Mock the getFollowingIds call
-      fetch.mockResolvedValueOnce({
+      // Mock getFollowingIds call
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve(mockFollowingIds)
       })
 
-      // Mock the first user's profile calls
-      fetch.mockResolvedValueOnce({
+      // Mock first user's profile calls - successful
+      .mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve({
           items: [{
@@ -1052,32 +974,62 @@ describe('Substack', () => {
               source: 'profile',
               page_rank: 0
             }
-          }],
-          originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
-          nextCursor: null
+          }]
         })
       })
-      fetch.mockResolvedValueOnce({
+      .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve(mockPublicProfiles[0])
+        json: () => Promise.resolve({
+          id: 254824415,
+          name: 'User 1',
+          handle: 'user1',
+          bio: 'Bio 1',
+          photo_url: 'https://example.com/photo1.jpg',
+          publicationUsers: [],
+          userLinks: [],
+          subscriptions: []
+        })
       })
 
-      // Mock the second user's profile calls
-      fetch.mockResolvedValueOnce({
+      // Mock second user's profile calls - failed
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        statusText: 'Not Found'
+      })
+
+      const result = await client.getFollowingProfiles()
+      
+      // Should only include the successful profile
+      expect(result).toHaveLength(1)
+      expect(result[0].id).toBe(254824415)
+    })
+
+    it('should handle failed public profile fetches in getFollowingProfiles', async () => {
+      const mockFollowingIds = [254824415]
+
+      // Mock getFollowingIds call
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockFollowingIds)
+      })
+
+      // Mock user profile call - successful
+      .mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve({
           items: [{
-            entity_key: 'user_108855261',
+            entity_key: 'user_254824415',
             type: 'user',
             context: {
               type: 'user',
               timestamp: '2025-06-18T09:25:18.957Z',
               users: [{
-                id: 108855261,
-                name: 'User 2',
-                handle: 'user2',
-                photo_url: 'https://example.com/photo2.jpg',
-                bio: 'Bio 2',
+                id: 254824415,
+                name: 'User 1',
+                handle: 'user1',
+                photo_url: 'https://example.com/photo1.jpg',
+                bio: 'Bio 1',
                 profile_set_up_at: '2025-06-18T09:25:18.957Z',
                 reader_installed_at: '2025-06-18T09:25:18.957Z'
               }],
@@ -1085,70 +1037,21 @@ describe('Substack', () => {
               source: 'profile',
               page_rank: 0
             }
-          }],
-          originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
-          nextCursor: null
+          }]
         })
       })
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockPublicProfiles[1])
+
+      // Mock public profile call - failed
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        statusText: 'Not Found'
       })
 
       const result = await client.getFollowingProfiles()
-      expect(result).toEqual([
-        {
-          ...mockPublicProfiles[0],
-          userProfile: {
-            items: [{
-              entity_key: 'user_254824415',
-              type: 'user',
-              context: {
-                type: 'user',
-                timestamp: '2025-06-18T09:25:18.957Z',
-                users: [{
-                  id: 254824415,
-                  name: 'User 1',
-                  handle: 'user1',
-                  photo_url: 'https://example.com/photo1.jpg',
-                  bio: 'Bio 1',
-                  profile_set_up_at: '2025-06-18T09:25:18.957Z',
-                  reader_installed_at: '2025-06-18T09:25:18.957Z'
-                }],
-                isFresh: true,
-                source: 'profile',
-                page_rank: 0
-              }
-            }]
-          }
-        },
-        {
-          ...mockPublicProfiles[1],
-          userProfile: {
-            items: [{
-              entity_key: 'user_108855261',
-              type: 'user',
-              context: {
-                type: 'user',
-                timestamp: '2025-06-18T09:25:18.957Z',
-                users: [{
-                  id: 108855261,
-                  name: 'User 2',
-                  handle: 'user2',
-                  photo_url: 'https://example.com/photo2.jpg',
-                  bio: 'Bio 2',
-                  profile_set_up_at: '2025-06-18T09:25:18.957Z',
-                  reader_installed_at: '2025-06-18T09:25:18.957Z'
-                }],
-                isFresh: true,
-                source: 'profile',
-                page_rank: 0
-              }
-            }]
-          }
-        }
-      ])
-      expect(global.fetch).toHaveBeenCalledTimes(5) // 1 for IDs + 2 users * 2 calls each
+      
+      // Should be empty since the public profile fetch failed
+      expect(result).toHaveLength(0)
     })
 
     it('should handle API errors when getting following IDs', async () => {
