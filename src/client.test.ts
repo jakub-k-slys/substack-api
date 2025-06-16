@@ -1,5 +1,19 @@
 import { SubstackClient, SubstackError } from './client';
 import type { SubstackPublication, SubstackPost, SubstackComment, SubstackSearchResult } from './types';
+import { describe, expect, it, jest, beforeAll, afterAll, beforeEach } from '@jest/globals';
+
+function createMockResponse<T>(data: T, options: Partial<Response> = {}): Response {
+  const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+  const init = {
+    status: 200,
+    statusText: 'OK',
+    headers: { 'content-type': 'application/json' },
+    ...options
+  };
+  const response = new Response(blob, init);
+  response.json = () => Promise.resolve(data);
+  return response;
+}
 
 describe('SubstackClient', () => {
   let globalFetch: typeof global.fetch;
@@ -13,7 +27,7 @@ describe('SubstackClient', () => {
   });
 
   beforeEach(() => {
-    global.fetch = jest.fn();
+    global.fetch = jest.fn() as jest.MockedFunction<typeof global.fetch>;
   });
 
   describe('constructor', () => {
@@ -42,10 +56,9 @@ describe('SubstackClient', () => {
     };
 
     it('should fetch publication details successfully', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockPublication)
-      });
+      (global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+        createMockResponse(mockPublication)
+      );
 
       const client = new SubstackClient();
       const result = await client.getPublication('test.substack.com');
@@ -58,11 +71,9 @@ describe('SubstackClient', () => {
 
     it('should throw SubstackError when fetch fails', async () => {
       const errorMessage = 'Not Found';
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-        statusText: errorMessage
-      });
+      (global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+        createMockResponse(null, { ok: false, status: 404, statusText: errorMessage })
+      );
 
       const client = new SubstackClient();
       await expect(client.getPublication('test.substack.com'))
@@ -71,10 +82,9 @@ describe('SubstackClient', () => {
     });
 
     it('should use baseUrl when no hostname provided', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockPublication)
-      });
+      (global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+        createMockResponse(mockPublication)
+      );
 
       const client = new SubstackClient({ hostname: 'test.substack.com' });
       await client.getPublication();
@@ -100,10 +110,9 @@ describe('SubstackClient', () => {
     ];
 
     it('should fetch posts with pagination', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockPosts)
-      });
+      (global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+        createMockResponse(mockPosts)
+      );
 
       const client = new SubstackClient({ hostname: 'test.substack.com' });
       const result = await client.getPosts({ offset: 0, limit: 10 });
@@ -124,10 +133,9 @@ describe('SubstackClient', () => {
     });
 
     it('should fetch posts without pagination', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockPosts)
-      });
+      (global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+        createMockResponse(mockPosts)
+      );
 
       const client = new SubstackClient({ hostname: 'test.substack.com' });
       const result = await client.getPosts();
@@ -156,10 +164,9 @@ describe('SubstackClient', () => {
     };
 
     it('should search posts with all parameters', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockSearchResult)
-      });
+      (global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+        createMockResponse(mockSearchResult)
+      );
 
       const client = new SubstackClient({ hostname: 'test.substack.com' });
       const result = await client.searchPosts({
@@ -191,10 +198,9 @@ describe('SubstackClient', () => {
     });
 
     it('should search posts with minimal parameters', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockSearchResult)
-      });
+      (global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+        createMockResponse(mockSearchResult)
+      );
 
       const client = new SubstackClient({ hostname: 'test.substack.com' });
       const result = await client.searchPosts({ query: 'test' });
@@ -220,10 +226,9 @@ describe('SubstackClient', () => {
     }];
 
     it('should fetch comments for a post with pagination', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockComments)
-      });
+      (global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+        createMockResponse(mockComments)
+      );
 
       const client = new SubstackClient({ hostname: 'test.substack.com' });
       const result = await client.getComments(1, { limit: 10, offset: 0 });
@@ -244,10 +249,9 @@ describe('SubstackClient', () => {
     });
 
     it('should fetch comments without pagination', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockComments)
-      });
+      (global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+        createMockResponse(mockComments)
+      );
 
       const client = new SubstackClient({ hostname: 'test.substack.com' });
       const result = await client.getComments(1);
@@ -260,10 +264,9 @@ describe('SubstackClient', () => {
     });
 
     it('should fetch a single comment', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockComments[0])
-      });
+      (global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+        createMockResponse(mockComments[0])
+      );
 
       const client = new SubstackClient({ hostname: 'test.substack.com' });
       const result = await client.getComment(1);
