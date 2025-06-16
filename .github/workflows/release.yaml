@@ -19,12 +19,8 @@ jobs:
             - uses: actions/setup-node@v4
               with:
                   node-version: 20
-            - name: Github registry login
-              uses: docker/login-action@v3
-              with:
-                  registry: ghcr.io
-                  username: ${{ github.actor }}
-                  password: ${{ secrets.GITHUB_TOKEN }}
+            - name: Install
+              run: npm install
             - name: set NODE_AUTH_TOKEN env
               run: echo "NODE_AUTH_TOKEN=${{ secrets.NPM_TOKEN }}" >> $GITHUB_ENV
             - name: set NPM_TOKEN env
