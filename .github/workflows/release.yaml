@@ -39,7 +39,7 @@ jobs:
                   tag_format: ${version}
                   extra_plugins: |
                       @semantic-release/changelog@6.0.0
-                      @semantic-release/npm,
+                      @semantic-release/npm
                       @semantic-release/git
               env:
                   GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
