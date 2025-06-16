@@ -6,6 +6,9 @@ import {
   SubstackSearchResult,
   SubstackNote,
   SubstackNotes,
+  SubstackUserProfile,
+  SubstackPublicProfile,
+  SubstackFullProfile,
   PaginationParams,
   SearchParams,
   PublishNoteRequest,
@@ -174,6 +177,55 @@ export class Substack {
    * Publish a simple note without formatting
    * @param text The text content of the note
    */
+  /**
+   * Get a user's profile by their user ID
+   * @param userId The user's ID
+   */
+  async getUserProfile(userId: number): Promise<SubstackUserProfile> {
+    const url = this.buildUrl(`/reader/feed/profile/${userId}`)
+    return this.request<SubstackUserProfile>(url)
+  }
+
+  /**
+   * Get a user's public profile by their slug
+   * @param slug The user's slug (handle)
+   */
+  async getPublicProfile(slug: string): Promise<SubstackPublicProfile> {
+    const url = this.buildUrl(`/user/${slug}/public_profile`)
+    return this.request<SubstackPublicProfile>(url)
+  }
+
+  /**
+   * Get a user's full profile (public profile + user profile) by their slug
+   * @param slug The user's slug (handle)
+   */
+  async getFullProfileBySlug(slug: string): Promise<SubstackFullProfile> {
+    const publicProfile = await this.getPublicProfile(slug)
+    const userProfile = await this.getUserProfile(publicProfile.id)
+    return {
+      ...publicProfile,
+      userProfile
+    }
+  }
+
+  /**
+   * Get a user's full profile (public profile + user profile) by their ID
+   * @param userId The user's ID
+   */
+  async getFullProfileById(userId: number): Promise<SubstackFullProfile> {
+    const userProfile = await this.getUserProfile(userId)
+    // Get the handle from the first user in the first item's context
+    const handle = userProfile.items[0]?.context.users[0]?.handle
+    if (!handle) {
+      throw new Error('Could not find user handle in profile')
+    }
+    const publicProfile = await this.getPublicProfile(handle)
+    return {
+      ...publicProfile,
+      userProfile
+    }
+  }
+
   async publishNote(text: string): Promise<PublishNoteResponse> {
     const request: PublishNoteRequest = {
       bodyJson: {

@@ -558,5 +558,171 @@ describe('Substack', () => {
       expect(result.items).toEqual(mockResponse.items)
       expect(result.hasMore()).toBe(true)
     })
+
+    it('should get a public profile by slug', async () => {
+      const mockResponse = {
+        id: 282291554,
+        name: 'Jenny Ouyang',
+        handle: 'jennyouyang',
+        bio: 'Test bio',
+        photo_url: 'https://example.com/photo.jpg',
+        publicationUsers: [],
+        userLinks: [],
+        subscriptions: []
+      }
+
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockResponse)
+      })
+
+      const result = await client.getPublicProfile('jennyouyang')
+      expect(result).toEqual(mockResponse)
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://substack.com/api/v1/user/jennyouyang/public_profile',
+        expect.any(Object)
+      )
+    })
+
+    it('should get a full profile by slug', async () => {
+      const mockPublicProfile = {
+        id: 282291554,
+        name: 'Jenny Ouyang',
+        handle: 'jennyouyang',
+        bio: 'Test bio',
+        photo_url: 'https://example.com/photo.jpg',
+        publicationUsers: [],
+        userLinks: [],
+        subscriptions: []
+      }
+
+      const mockUserProfile = {
+        items: [
+          {
+            context: {
+              users: [
+                {
+                  id: 282291554,
+                  name: 'Jenny Ouyang',
+                  handle: 'jennyouyang'
+                }
+              ]
+            }
+          }
+        ],
+        originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
+        nextCursor: null
+      }
+
+      ;(global.fetch as jest.Mock)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(mockPublicProfile)
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(mockUserProfile)
+        })
+
+      const result = await client.getFullProfileBySlug('jennyouyang')
+      expect(result).toEqual({
+        ...mockPublicProfile,
+        userProfile: mockUserProfile
+      })
+      expect(global.fetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should get a full profile by ID', async () => {
+      const mockUserProfile = {
+        items: [
+          {
+            context: {
+              users: [
+                {
+                  id: 282291554,
+                  name: 'Jenny Ouyang',
+                  handle: 'jennyouyang'
+                }
+              ]
+            }
+          }
+        ],
+        originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
+        nextCursor: null
+      }
+
+      const mockPublicProfile = {
+        id: 282291554,
+        name: 'Jenny Ouyang',
+        handle: 'jennyouyang',
+        bio: 'Test bio',
+        photo_url: 'https://example.com/photo.jpg',
+        publicationUsers: [],
+        userLinks: [],
+        subscriptions: []
+      }
+
+      ;(global.fetch as jest.Mock)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(mockUserProfile)
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(mockPublicProfile)
+        })
+
+      const result = await client.getFullProfileById(282291554)
+      expect(result).toEqual({
+        ...mockPublicProfile,
+        userProfile: mockUserProfile
+      })
+      expect(global.fetch).toHaveBeenCalledTimes(2)
+    })
+
+    it('should handle missing handle in user profile when getting full profile by ID', async () => {
+      const mockUserProfile = {
+        items: [
+          {
+            context: {
+              users: []
+            }
+          }
+        ],
+        originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
+        nextCursor: null
+      }
+
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockUserProfile)
+      })
+
+      await expect(client.getFullProfileById(282291554)).rejects.toThrow(
+        'Could not find user handle in profile'
+      )
+    })
+
+    it('should handle API errors when getting public profile', async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        statusText: 'Not Found'
+      })
+
+      await expect(client.getPublicProfile('nonexistent')).rejects.toThrow(
+        'Request failed: Not Found'
+      )
+    })
+
+    it('should handle API errors when getting user profile', async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        statusText: 'Not Found'
+      })
+
+      await expect(client.getUserProfile(999999)).rejects.toThrow('Request failed: Not Found')
+    })
   })
 })
