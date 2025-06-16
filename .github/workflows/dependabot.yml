@@ -1,0 +1,41 @@
+name: Dependabot
+on: pull_request_target
+
+permissions:
+    contents: write
+    pull-requests: write
+
+jobs:
+    auto-approve:
+        name: Approve PR
+        runs-on: ubuntu-latest
+        if: github.actor == 'dependabot[bot]'
+        steps:
+            - name: Dependabot metadata
+              id: metadata
+              uses: dependabot/fetch-metadata@v2
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+            - name: Approve a PR
+              run: gh pr review --approve "$PR_URL"
+              env:
+                  PR_URL: ${{ github.event.pull_request.html_url }}
+                  GH_TOKEN: ${{ secrets.ALL_TOKEN }}
+
+    auto-merge:
+        name: Merge PR
+        needs:
+            - auto-approve
+        runs-on: ubuntu-latest
+        if: github.actor == 'dependabot[bot]'
+        steps:
+          - name: Dependabot metadata
+            id: metadata
+            uses: dependabot/fetch-metadata@v2
+            with:
+                github-token: ${{ secrets.GITHUB_TOKEN }}
+          - name: Enable auto-merge for Dependabot PRs
+            run: gh pr merge --auto --merge "$PR_URL"
+            env:
+                PR_URL: ${{ github.event.pull_request.html_url }}
+                GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
