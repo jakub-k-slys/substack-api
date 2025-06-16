@@ -192,6 +192,56 @@ export class SubstackNotes {
   }
 }
 
+export interface NoteBodyJson {
+  type: 'doc'
+  attrs: {
+    schemaVersion: 'v1'
+  }
+  content: Array<{
+    type: 'paragraph'
+    content: Array<{
+      type: 'text'
+      text: string
+      marks?: Array<{
+        type: 'bold' | 'italic'
+      }>
+    }>
+  }>
+}
+
+export interface PublishNoteRequest {
+  bodyJson: NoteBodyJson
+  replyMinimumRole: 'everyone'
+}
+
+export interface PublishNoteResponse {
+  user_id: number
+  body: string
+  body_json: NoteBodyJson
+  post_id: number | null
+  publication_id: number | null
+  media_clip_id: string | null
+  ancestor_path: string
+  type: 'feed'
+  status: 'published'
+  reply_minimum_role: 'everyone'
+  id: number
+  deleted: boolean
+  date: string
+  name: string
+  photo_url: string
+  reactions: Record<string, number>
+  children: any[]
+  user_bestseller_tier: number | null
+  isFirstFeedCommentByUser: boolean
+  reaction_count: number
+  restacks: number
+  restacked: boolean
+  children_count: number
+  attachments: any[]
+  user_primary_publication?: SubstackPublication
+}
+
 export interface SearchParams extends PaginationParams {
   query: string
   published_before?: string

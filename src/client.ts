@@ -7,8 +7,11 @@ import {
   SubstackNote,
   SubstackNotes,
   PaginationParams,
-  SearchParams
+  SearchParams,
+  PublishNoteRequest,
+  PublishNoteResponse
 } from './types'
+import { NoteBuilder } from './note-builder'
 
 export class SubstackError extends Error {
   constructor(
@@ -140,6 +143,56 @@ export class Substack {
       response.originalCursorTimestamp,
       response.nextCursor
     )
+  }
+
+  /**
+   * Publish a new note on your Substack wall
+   * @param text The text content of the note
+   * @param formatting Optional array of formatting objects specifying bold or italic text ranges
+   * @returns Promise of the published note response
+   */
+  /**
+   * Internal method to publish a note request
+   */
+  async publishNoteRequest(request: PublishNoteRequest): Promise<PublishNoteResponse> {
+    const url = this.buildUrl('/comment/feed')
+    return this.request<PublishNoteResponse>(url, {
+      method: 'POST',
+      body: JSON.stringify(request)
+    })
+  }
+
+  /**
+   * Start building a note with the fluent API
+   * @param text Optional initial text for the first paragraph
+   */
+  note(text?: string): NoteBuilder {
+    return new NoteBuilder(this, text)
+  }
+
+  /**
+   * Publish a simple note without formatting
+   * @param text The text content of the note
+   */
+  async publishNote(text: string): Promise<PublishNoteResponse> {
+    const request: PublishNoteRequest = {
+      bodyJson: {
+        type: 'doc',
+        attrs: {
+          schemaVersion: 'v1'
+        },
+        content: [{
+          type: 'paragraph',
+          content: [{
+            type: 'text',
+            text
+          }]
+        }]
+      },
+      replyMinimumRole: 'everyone'
+    }
+
+    return this.publishNoteRequest(request)
   }
 }
 export * from './types'
