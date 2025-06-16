@@ -215,14 +215,15 @@ export class Substack {
   async getFullProfileById(userId: number): Promise<SubstackFullProfile> {
     const userProfile = await this.getUserProfile(userId)
     // Get the handle from the first user in the first item's context
-    const handle = userProfile.items[0]?.context.users[0]?.handle
-    if (!handle) {
+    const firstItem = userProfile.items?.[0]
+    const user = firstItem?.context?.users?.[0]
+    if (!user?.handle) {
       throw new Error('Could not find user handle in profile')
     }
-    const publicProfile = await this.getPublicProfile(handle)
+    const publicProfile = await this.getPublicProfile(user.handle)
     return {
       ...publicProfile,
-      userProfile
+      userProfile: userProfile
     }
   }
 
@@ -241,7 +242,41 @@ export class Substack {
    */
   async getFollowingProfiles(): Promise<SubstackFullProfile[]> {
     const userIds = await this.getFollowingIds()
-    return Promise.all(userIds.map(id => this.getFullProfileById(id)))
+    const profiles: SubstackFullProfile[] = []
+    
+    for (const id of userIds) {
+      try {
+        const userProfile = await this.getUserProfile(id)
+        const firstItem = userProfile.items?.[0]
+        const user = firstItem?.context?.users?.[0]
+        if (!user?.handle) {
+          continue
+        }
+        const publicProfile = await this.getPublicProfile(user.handle)
+        profiles.push({
+          ...publicProfile,
+          userProfile: {
+            items: [{
+              entity_key: firstItem.entity_key,
+              type: firstItem.type,
+              context: {
+                type: firstItem.context.type,
+                timestamp: firstItem.context.timestamp,
+                isFresh: firstItem.context.isFresh,
+                source: firstItem.context.source,
+                page_rank: firstItem.context.page_rank,
+                users: [user]
+              }
+            } as any]
+          } as SubstackUserProfile
+        })
+      } catch (error) {
+        // Skip profiles that can't be fetched
+        continue
+      }
+    }
+    
+    return profiles
   }
 
   async publishNote(text: string): Promise<PublishNoteResponse> {
