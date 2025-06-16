@@ -226,6 +226,24 @@ export class Substack {
     }
   }
 
+  /**
+   * Get the list of user IDs that the current user follows
+   * @returns Promise of an array of user IDs
+   */
+  async getFollowingIds(): Promise<number[]> {
+    const url = this.buildUrl('/feed/following')
+    return this.request<number[]>(url)
+  }
+
+  /**
+   * Get full profiles of all users that the current user follows
+   * @returns Promise of an array of full profiles
+   */
+  async getFollowingProfiles(): Promise<SubstackFullProfile[]> {
+    const userIds = await this.getFollowingIds()
+    return Promise.all(userIds.map(id => this.getFullProfileById(id)))
+  }
+
   async publishNote(text: string): Promise<PublishNoteResponse> {
     const request: PublishNoteRequest = {
       bodyJson: {

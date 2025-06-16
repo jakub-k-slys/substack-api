@@ -599,14 +599,48 @@ describe('Substack', () => {
       const mockUserProfile = {
         items: [
           {
+            entity_key: 'user_282291554',
+            type: 'user',
             context: {
+              type: 'user',
+              timestamp: '2025-06-18T09:25:18.957Z',
               users: [
                 {
                   id: 282291554,
                   name: 'Jenny Ouyang',
-                  handle: 'jennyouyang'
+                  handle: 'jennyouyang',
+                  photo_url: 'https://example.com/photo.jpg',
+                  bio: 'Test bio',
+                  profile_set_up_at: '2025-06-18T09:25:18.957Z',
+                  reader_installed_at: '2025-06-18T09:25:18.957Z'
                 }
-              ]
+              ],
+              isFresh: true,
+              source: 'profile',
+              page_rank: 0
+            },
+            canReply: true,
+            isMuted: false,
+            trackingParameters: {
+              item_primary_entity_key: 'user_282291554',
+              item_entity_key: 'user_282291554',
+              item_type: 'user',
+              item_content_user_id: 282291554,
+              item_context_type: 'user',
+              item_context_type_bucket: 'user',
+              item_context_timestamp: '2025-06-18T09:25:18.957Z',
+              item_context_user_id: 282291554,
+              item_context_user_ids: [282291554],
+              item_can_reply: true,
+              item_is_fresh: true,
+              item_last_impression_at: null,
+              item_page: null,
+              item_page_rank: 0,
+              impression_id: 'test',
+              followed_user_count: 0,
+              subscribed_publication_count: 0,
+              is_following: false,
+              is_explicitly_subscribed: false
             }
           }
         ],
@@ -636,14 +670,48 @@ describe('Substack', () => {
       const mockUserProfile = {
         items: [
           {
+            entity_key: 'user_282291554',
+            type: 'user',
             context: {
+              type: 'user',
+              timestamp: '2025-06-18T09:25:18.957Z',
               users: [
                 {
                   id: 282291554,
                   name: 'Jenny Ouyang',
-                  handle: 'jennyouyang'
+                  handle: 'jennyouyang',
+                  photo_url: 'https://example.com/photo.jpg',
+                  bio: 'Test bio',
+                  profile_set_up_at: '2025-06-18T09:25:18.957Z',
+                  reader_installed_at: '2025-06-18T09:25:18.957Z'
                 }
-              ]
+              ],
+              isFresh: true,
+              source: 'profile',
+              page_rank: 0
+            },
+            canReply: true,
+            isMuted: false,
+            trackingParameters: {
+              item_primary_entity_key: 'user_282291554',
+              item_entity_key: 'user_282291554',
+              item_type: 'user',
+              item_content_user_id: 282291554,
+              item_context_type: 'user',
+              item_context_type_bucket: 'user',
+              item_context_timestamp: '2025-06-18T09:25:18.957Z',
+              item_context_user_id: 282291554,
+              item_context_user_ids: [282291554],
+              item_can_reply: true,
+              item_is_fresh: true,
+              item_last_impression_at: null,
+              item_page: null,
+              item_page_rank: 0,
+              impression_id: 'test',
+              followed_user_count: 0,
+              subscribed_publication_count: 0,
+              is_following: false,
+              is_explicitly_subscribed: false
             }
           }
         ],
@@ -684,8 +752,38 @@ describe('Substack', () => {
       const mockUserProfile = {
         items: [
           {
+            entity_key: 'user_282291554',
+            type: 'user',
             context: {
-              users: []
+              type: 'user',
+              timestamp: '2025-06-18T09:25:18.957Z',
+              users: [],
+              isFresh: true,
+              source: 'profile',
+              page_rank: 0
+            },
+            canReply: true,
+            isMuted: false,
+            trackingParameters: {
+              item_primary_entity_key: 'user_282291554',
+              item_entity_key: 'user_282291554',
+              item_type: 'user',
+              item_content_user_id: 282291554,
+              item_context_type: 'user',
+              item_context_type_bucket: 'user',
+              item_context_timestamp: '2025-06-18T09:25:18.957Z',
+              item_context_user_id: 282291554,
+              item_context_user_ids: [282291554],
+              item_can_reply: true,
+              item_is_fresh: true,
+              item_last_impression_at: null,
+              item_page: null,
+              item_page_rank: 0,
+              impression_id: 'test',
+              followed_user_count: 0,
+              subscribed_publication_count: 0,
+              is_following: false,
+              is_explicitly_subscribed: false
             }
           }
         ],
@@ -723,6 +821,344 @@ describe('Substack', () => {
       })
 
       await expect(client.getUserProfile(999999)).rejects.toThrow('Request failed: Not Found')
+    })
+
+    it('should get following IDs', async () => {
+      const mockResponse = [254824415, 108855261, 34637]
+
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockResponse)
+      })
+
+      const result = await client.getFollowingIds()
+      expect(result).toEqual(mockResponse)
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://substack.com/api/v1/feed/following',
+        expect.any(Object)
+      )
+    })
+
+    it('should get following profiles', async () => {
+      const mockFollowingIds = [254824415, 108855261]
+
+      const mockUserProfiles = [
+        {
+          items: [
+            {
+              entity_key: 'user_254824415',
+              type: 'user',
+              context: {
+                type: 'user',
+                timestamp: '2025-06-18T09:25:18.957Z',
+                users: [
+                  {
+                    id: 254824415,
+                    name: 'User 1',
+                    handle: 'user1',
+                    photo_url: 'https://example.com/photo1.jpg',
+                    bio: 'Bio 1',
+                    profile_set_up_at: '2025-06-18T09:25:18.957Z',
+                    reader_installed_at: '2025-06-18T09:25:18.957Z'
+                  }
+                ],
+                isFresh: true,
+                source: 'profile',
+                page_rank: 0
+              },
+              canReply: true,
+              isMuted: false,
+              trackingParameters: {
+                item_primary_entity_key: 'user_254824415',
+                item_entity_key: 'user_254824415',
+                item_type: 'user',
+                item_content_user_id: 254824415,
+                item_context_type: 'user',
+                item_context_type_bucket: 'user',
+                item_context_timestamp: '2025-06-18T09:25:18.957Z',
+                item_context_user_id: 254824415,
+                item_context_user_ids: [254824415],
+                item_can_reply: true,
+                item_is_fresh: true,
+                item_last_impression_at: null,
+                item_page: null,
+                item_page_rank: 0,
+                impression_id: 'test',
+                followed_user_count: 0,
+                subscribed_publication_count: 0,
+                is_following: false,
+                is_explicitly_subscribed: false
+              }
+            }
+          ],
+          originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
+          nextCursor: null
+        },
+        {
+          items: [
+            {
+              entity_key: 'user_108855261',
+              type: 'user',
+              context: {
+                type: 'user',
+                timestamp: '2025-06-18T09:25:18.957Z',
+                users: [
+                  {
+                    id: 108855261,
+                    name: 'User 2',
+                    handle: 'user2',
+                    photo_url: 'https://example.com/photo2.jpg',
+                    bio: 'Bio 2',
+                    profile_set_up_at: '2025-06-18T09:25:18.957Z',
+                    reader_installed_at: '2025-06-18T09:25:18.957Z'
+                  }
+                ],
+                isFresh: true,
+                source: 'profile',
+                page_rank: 0
+              },
+              canReply: true,
+              isMuted: false,
+              trackingParameters: {
+                item_primary_entity_key: 'user_108855261',
+                item_entity_key: 'user_108855261',
+                item_type: 'user',
+                item_content_user_id: 108855261,
+                item_context_type: 'user',
+                item_context_type_bucket: 'user',
+                item_context_timestamp: '2025-06-18T09:25:18.957Z',
+                item_context_user_id: 108855261,
+                item_context_user_ids: [108855261],
+                item_can_reply: true,
+                item_is_fresh: true,
+                item_last_impression_at: null,
+                item_page: null,
+                item_page_rank: 0,
+                impression_id: 'test',
+                followed_user_count: 0,
+                subscribed_publication_count: 0,
+                is_following: false,
+                is_explicitly_subscribed: false
+              }
+            }
+          ],
+          originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
+          nextCursor: null
+        }
+      ]
+
+      const mockPublicProfiles = [
+        {
+          id: 254824415,
+          name: 'User 1',
+          handle: 'user1',
+          bio: 'Bio 1',
+          photo_url: 'https://example.com/photo1.jpg',
+          profile_set_up_at: '2025-06-18T09:25:18.957Z',
+          reader_installed_at: '2025-06-18T09:25:18.957Z',
+          profile_disabled: false,
+          publicationUsers: [],
+          userLinks: [],
+          subscriptions: [],
+          subscriptionsTruncated: false,
+          hasGuestPost: false,
+          max_pub_tier: 0,
+          hasActivity: false,
+          hasLikes: false,
+          lists: [],
+          rough_num_free_subscribers_int: 0,
+          rough_num_free_subscribers: '0',
+          bestseller_badge_disabled: false,
+          subscriberCountString: '0',
+          subscriberCount: '0',
+          subscriberCountNumber: 0,
+          hasHiddenPublicationUsers: false,
+          visibleSubscriptionsCount: 0,
+          slug: 'user1',
+          primaryPublicationIsPledged: false,
+          primaryPublicationSubscriptionState: 'none',
+          isSubscribed: false,
+          isFollowing: false,
+          followsViewer: false,
+          can_dm: false,
+          dm_upgrade_options: []
+        },
+        {
+          id: 108855261,
+          name: 'User 2',
+          handle: 'user2',
+          bio: 'Bio 2',
+          photo_url: 'https://example.com/photo2.jpg',
+          profile_set_up_at: '2025-06-18T09:25:18.957Z',
+          reader_installed_at: '2025-06-18T09:25:18.957Z',
+          profile_disabled: false,
+          publicationUsers: [],
+          userLinks: [],
+          subscriptions: [],
+          subscriptionsTruncated: false,
+          hasGuestPost: false,
+          max_pub_tier: 0,
+          hasActivity: false,
+          hasLikes: false,
+          lists: [],
+          rough_num_free_subscribers_int: 0,
+          rough_num_free_subscribers: '0',
+          bestseller_badge_disabled: false,
+          subscriberCountString: '0',
+          subscriberCount: '0',
+          subscriberCountNumber: 0,
+          hasHiddenPublicationUsers: false,
+          visibleSubscriptionsCount: 0,
+          slug: 'user2',
+          primaryPublicationIsPledged: false,
+          primaryPublicationSubscriptionState: 'none',
+          isSubscribed: false,
+          isFollowing: false,
+          followsViewer: false,
+          can_dm: false,
+          dm_upgrade_options: []
+        }
+      ]
+
+      const fetch = global.fetch as jest.Mock
+      fetch.mockReset()
+
+      // Mock the getFollowingIds call
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockFollowingIds)
+      })
+
+      // Mock the first user's profile calls
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({
+          items: [{
+            entity_key: 'user_254824415',
+            type: 'user',
+            context: {
+              type: 'user',
+              timestamp: '2025-06-18T09:25:18.957Z',
+              users: [{
+                id: 254824415,
+                name: 'User 1',
+                handle: 'user1',
+                photo_url: 'https://example.com/photo1.jpg',
+                bio: 'Bio 1',
+                profile_set_up_at: '2025-06-18T09:25:18.957Z',
+                reader_installed_at: '2025-06-18T09:25:18.957Z'
+              }],
+              isFresh: true,
+              source: 'profile',
+              page_rank: 0
+            }
+          }],
+          originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
+          nextCursor: null
+        })
+      })
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockPublicProfiles[0])
+      })
+
+      // Mock the second user's profile calls
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({
+          items: [{
+            entity_key: 'user_108855261',
+            type: 'user',
+            context: {
+              type: 'user',
+              timestamp: '2025-06-18T09:25:18.957Z',
+              users: [{
+                id: 108855261,
+                name: 'User 2',
+                handle: 'user2',
+                photo_url: 'https://example.com/photo2.jpg',
+                bio: 'Bio 2',
+                profile_set_up_at: '2025-06-18T09:25:18.957Z',
+                reader_installed_at: '2025-06-18T09:25:18.957Z'
+              }],
+              isFresh: true,
+              source: 'profile',
+              page_rank: 0
+            }
+          }],
+          originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
+          nextCursor: null
+        })
+      })
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockPublicProfiles[1])
+      })
+
+      const result = await client.getFollowingProfiles()
+      expect(result).toEqual([
+        {
+          ...mockPublicProfiles[0],
+          userProfile: {
+            items: [{
+              entity_key: 'user_254824415',
+              type: 'user',
+              context: {
+                type: 'user',
+                timestamp: '2025-06-18T09:25:18.957Z',
+                users: [{
+                  id: 254824415,
+                  name: 'User 1',
+                  handle: 'user1',
+                  photo_url: 'https://example.com/photo1.jpg',
+                  bio: 'Bio 1',
+                  profile_set_up_at: '2025-06-18T09:25:18.957Z',
+                  reader_installed_at: '2025-06-18T09:25:18.957Z'
+                }],
+                isFresh: true,
+                source: 'profile',
+                page_rank: 0
+              }
+            }]
+          }
+        },
+        {
+          ...mockPublicProfiles[1],
+          userProfile: {
+            items: [{
+              entity_key: 'user_108855261',
+              type: 'user',
+              context: {
+                type: 'user',
+                timestamp: '2025-06-18T09:25:18.957Z',
+                users: [{
+                  id: 108855261,
+                  name: 'User 2',
+                  handle: 'user2',
+                  photo_url: 'https://example.com/photo2.jpg',
+                  bio: 'Bio 2',
+                  profile_set_up_at: '2025-06-18T09:25:18.957Z',
+                  reader_installed_at: '2025-06-18T09:25:18.957Z'
+                }],
+                isFresh: true,
+                source: 'profile',
+                page_rank: 0
+              }
+            }]
+          }
+        }
+      ])
+      expect(global.fetch).toHaveBeenCalledTimes(5) // 1 for IDs + 2 users * 2 calls each
+    })
+
+    it('should handle API errors when getting following IDs', async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        statusText: 'Unauthorized'
+      })
+
+      await expect(client.getFollowingIds()).rejects.toThrow('Request failed: Unauthorized')
     })
   })
 })
