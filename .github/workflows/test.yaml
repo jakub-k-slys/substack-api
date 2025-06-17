@@ -8,7 +8,7 @@ on:
             - main
 jobs:
     build:
-        name: Running tests
+        name: Running build
         runs-on: ubuntu-latest
         strategy:
             fail-fast: false
@@ -43,3 +43,23 @@ jobs:
               run: npm install
             - name: Running test
               run: npm run test
+    lint:
+        name: Running linters
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                ci-env:
+                    - '1'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+            - name: Install
+              run: npm install
+            - name: Running linter
+              run: npm run lint
+            - name: Running format
+              run: npm run format:check

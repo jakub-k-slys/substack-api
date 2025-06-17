@@ -6,7 +6,7 @@ import {
   SubstackSearchResult,
   PaginationParams,
   SearchParams
-} from './types';
+} from './types'
 
 export class SubstackError extends Error {
   constructor(
@@ -14,33 +14,38 @@ export class SubstackError extends Error {
     public readonly status?: number,
     public readonly response?: Response
   ) {
-    super(message);
-    this.name = 'SubstackError';
+    super(message)
+    this.name = 'SubstackError'
   }
 }
 
 export class Substack {
-  private readonly baseUrl: string;
-  private readonly apiVersion: string;
+  private readonly baseUrl: string
+  private readonly apiVersion: string
+  private readonly cookie: string
 
-  constructor(config: SubstackConfig = {}) {
-    this.baseUrl = `https://${config.hostname || 'substack.com'}`;
-    this.apiVersion = config.apiVersion || 'v1';
+  constructor(config: SubstackConfig) {
+    if (!config.apiKey) {
+      throw new Error('apiKey is required in SubstackConfig')
+    }
+    this.baseUrl = `https://${config.hostname || 'substack.com'}`
+    this.apiVersion = config.apiVersion || 'v1'
+    this.cookie = `connect.sid=s%3A${config.apiKey}`
   }
 
-  private buildUrl<T extends Record<string, any>>(path: string, params?: T): string {
-    const url = `${this.baseUrl}/api/${this.apiVersion}${path}`;
-    if (!params) return url;
+  private buildUrl<T extends PaginationParams>(path: string, params?: T): string {
+    const url = `${this.baseUrl}/api/${this.apiVersion}${path}`
+    if (!params) return url
 
-    const searchParams = new URLSearchParams();
+    const searchParams = new URLSearchParams()
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined) {
-        searchParams.append(key, value.toString());
+        searchParams.append(key, value.toString())
       }
-    });
+    })
 
-    const queryString = searchParams.toString();
-    return queryString ? `${url}?${queryString}` : url;
+    const queryString = searchParams.toString()
+    return queryString ? `${url}?${queryString}` : url
   }
 
   private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
@@ -48,19 +53,16 @@ export class Substack {
       ...options,
       headers: {
         'Content-Type': 'application/json',
-        ...options.headers,
-      },
-    });
+        Cookie: this.cookie,
+        ...options.headers
+      }
+    })
 
     if (!response.ok) {
-      throw new SubstackError(
-        `Request failed: ${response.statusText}`,
-        response.status,
-        response
-      );
+      throw new SubstackError(`Request failed: ${response.statusText}`, response.status, response)
     }
 
-    return response.json();
+    return response.json()
   }
 
   /**
@@ -68,18 +70,8 @@ export class Substack {
    * @param hostname Optional hostname override
    */
   async getPublication(hostname?: string): Promise<SubstackPublication> {
-    const url = hostname ? `https://${hostname}` : this.baseUrl;
-    const response = await fetch(`${url}/api/${this.apiVersion}/publication`);
-    
-    if (!response.ok) {
-      throw new SubstackError(
-        `Failed to fetch publication: ${response.statusText}`,
-        response.status,
-        response
-      );
-    }
-
-    return response.json();
+    const url = hostname ? `https://${hostname}` : this.baseUrl
+    return this.request<SubstackPublication>(`${url}/api/${this.apiVersion}/publication`)
   }
 
   /**
@@ -87,8 +79,8 @@ export class Substack {
    * @param params Pagination parameters
    */
   async getPosts(params: PaginationParams = {}): Promise<SubstackPost[]> {
-    const url = this.buildUrl('/posts', params);
-    return this.request<SubstackPost[]>(url);
+    const url = this.buildUrl('/posts', params)
+    return this.request<SubstackPost[]>(url)
   }
 
   /**
@@ -96,8 +88,8 @@ export class Substack {
    * @param slug The post's slug
    */
   async getPost(slug: string): Promise<SubstackPost> {
-    const url = this.buildUrl(`/posts/${slug}`);
-    return this.request<SubstackPost>(url);
+    const url = this.buildUrl(`/posts/${slug}`)
+    return this.request<SubstackPost>(url)
   }
 
   /**
@@ -105,8 +97,8 @@ export class Substack {
    * @param params Search parameters
    */
   async searchPosts(params: SearchParams): Promise<SubstackSearchResult> {
-    const url = this.buildUrl('/search', params);
-    return this.request<SubstackSearchResult>(url);
+    const url = this.buildUrl('/search', params)
+    return this.request<SubstackSearchResult>(url)
   }
 
   /**
@@ -115,8 +107,8 @@ export class Substack {
    * @param params Pagination parameters
    */
   async getComments(postId: number, params: PaginationParams = {}): Promise<SubstackComment[]> {
-    const url = this.buildUrl(`/posts/${postId}/comments`, params);
-    return this.request<SubstackComment[]>(url);
+    const url = this.buildUrl(`/posts/${postId}/comments`, params)
+    return this.request<SubstackComment[]>(url)
   }
 
   /**
@@ -124,9 +116,9 @@ export class Substack {
    * @param commentId The comment ID
    */
   async getComment(commentId: number): Promise<SubstackComment> {
-    const url = this.buildUrl(`/comments/${commentId}`);
-    return this.request<SubstackComment>(url);
+    const url = this.buildUrl(`/comments/${commentId}`)
+    return this.request<SubstackComment>(url)
   }
 }
 
-export * from './types';
+export * from './types'

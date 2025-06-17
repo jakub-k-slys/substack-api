@@ -1,7 +1,4 @@
-export {
-  Substack,
-  SubstackError
-} from './client';
+export { Substack, SubstackError } from './client'
 
 export type {
   SubstackPublication,
@@ -11,4 +8,4 @@ export type {
   SubstackSearchResult,
   PaginationParams,
   SearchParams
-} from './types';
+} from './types'
