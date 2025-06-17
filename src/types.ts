@@ -136,10 +136,33 @@ export interface SubstackNote {
     user_bestseller_tier?: number | null
     user_primary_publication?: SubstackPublication
   }
-  parentComments: Array<any>
+  parentComments: Array<SubstackNote['comment']>
   canReply: boolean
   isMuted: boolean
-  trackingParameters: Record<string, any>
+  trackingParameters: {
+    item_primary_entity_key: string
+    item_entity_key: string
+    item_type: string
+    item_comment_id?: number
+    item_post_id?: number
+    item_publication_id?: number
+    item_content_user_id: number
+    item_context_type: string
+    item_context_type_bucket: string
+    item_context_timestamp: string
+    item_context_user_id: number
+    item_context_user_ids: number[]
+    item_can_reply: boolean
+    item_is_fresh: boolean
+    item_last_impression_at: string | null
+    item_page: number | null
+    item_page_rank: number
+    impression_id: string
+    followed_user_count: number
+    subscribed_publication_count: number
+    is_following: boolean
+    is_explicitly_subscribed: boolean
+  }
 }
 
 export class SubstackNotes {

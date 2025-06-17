@@ -142,5 +142,4 @@ export class Substack {
     )
   }
 }
-
 export * from './types'
