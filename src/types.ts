@@ -170,7 +170,7 @@ export class SubstackNotes {
     private readonly client: Substack,
     public readonly items: SubstackNote[],
     private readonly originalCursorTimestamp: string,
-    private readonly nextCursor: string
+    private readonly nextCursor: string | null
   ) {}
 
   /**

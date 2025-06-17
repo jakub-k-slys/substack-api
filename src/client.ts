@@ -131,7 +131,7 @@ export class Substack {
     const response = await this.request<{
       items: SubstackNote[]
       originalCursorTimestamp: string
-      nextCursor: string
+      nextCursor: string | null
     }>(url)
     
     return new SubstackNotes(
