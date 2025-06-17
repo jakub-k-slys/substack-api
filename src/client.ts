@@ -133,7 +133,7 @@ export class Substack {
       originalCursorTimestamp: string
       nextCursor: string | null
     }>(url)
-    
+
     return new SubstackNotes(
       this,
       response.items,
