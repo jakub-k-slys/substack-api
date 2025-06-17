@@ -4,6 +4,8 @@ import {
   SubstackComment,
   SubstackConfig,
   SubstackSearchResult,
+  SubstackNote,
+  SubstackNotes,
   PaginationParams,
   SearchParams
 } from './types'
@@ -118,6 +120,26 @@ export class Substack {
   async getComment(commentId: number): Promise<SubstackComment> {
     const url = this.buildUrl(`/comments/${commentId}`)
     return this.request<SubstackComment>(url)
+  }
+
+  /**
+   * Get Notes for the logged in user
+   * @param params Pagination parameters
+   */
+  async getNotes(params: PaginationParams = {}): Promise<SubstackNotes> {
+    const url = this.buildUrl('/notes', params)
+    const response = await this.request<{
+      items: SubstackNote[]
+      originalCursorTimestamp: string
+      nextCursor: string
+    }>(url)
+    
+    return new SubstackNotes(
+      this,
+      response.items,
+      response.originalCursorTimestamp,
+      response.nextCursor
+    )
   }
 }
 
