@@ -6,9 +6,15 @@ import {
   SubstackSearchResult,
   SubstackNote,
   SubstackNotes,
+  SubstackUserProfile,
+  SubstackPublicProfile,
+  SubstackFullProfile,
   PaginationParams,
-  SearchParams
+  SearchParams,
+  PublishNoteRequest,
+  PublishNoteResponse
 } from './types'
+import { NoteBuilder } from './note-builder'
 
 export class SubstackError extends Error {
   constructor(
@@ -140,6 +146,173 @@ export class Substack {
       response.originalCursorTimestamp,
       response.nextCursor
     )
+  }
+
+  /**
+   * Publish a new note on your Substack wall
+   * @param text The text content of the note
+   * @param formatting Optional array of formatting objects specifying bold or italic text ranges
+   * @returns Promise of the published note response
+   */
+  /**
+   * Internal method to publish a note request
+   */
+  async publishNoteRequest(request: PublishNoteRequest): Promise<PublishNoteResponse> {
+    const url = this.buildUrl('/comment/feed')
+    return this.request<PublishNoteResponse>(url, {
+      method: 'POST',
+      body: JSON.stringify(request)
+    })
+  }
+
+  /**
+   * Start building a note with the fluent API
+   * @param text Optional initial text for the first paragraph
+   */
+  note(text?: string): NoteBuilder {
+    return new NoteBuilder(this, text)
+  }
+
+  /**
+   * Publish a simple note without formatting
+   * @param text The text content of the note
+   */
+  /**
+   * Get a user's profile by their user ID
+   * @param userId The user's ID
+   */
+  async getUserProfile(userId: number): Promise<SubstackUserProfile> {
+    const url = this.buildUrl(`/reader/feed/profile/${userId}`)
+    return this.request<SubstackUserProfile>(url)
+  }
+
+  /**
+   * Get a user's public profile by their slug
+   * @param slug The user's slug (handle)
+   */
+  async getPublicProfile(slug: string): Promise<SubstackPublicProfile> {
+    const url = this.buildUrl(`/user/${slug}/public_profile`)
+    return this.request<SubstackPublicProfile>(url)
+  }
+
+  /**
+   * Get a user's full profile (public profile + user profile) by their slug
+   * @param slug The user's slug (handle)
+   */
+  async getFullProfileBySlug(slug: string): Promise<SubstackFullProfile> {
+    const publicProfile = await this.getPublicProfile(slug)
+    const userProfile = await this.getUserProfile(publicProfile.id)
+    return {
+      ...publicProfile,
+      userProfile
+    }
+  }
+
+  /**
+   * Get a user's full profile (public profile + user profile) by their ID
+   * @param userId The user's ID
+   */
+  async getFullProfileById(userId: number): Promise<SubstackFullProfile> {
+    const userProfile = await this.getUserProfile(userId)
+    // Get the handle from the first user in the first item's context
+    const firstItem = userProfile.items?.[0]
+    const user = firstItem?.context?.users?.[0]
+    if (!user?.handle) {
+      throw new Error('Could not find user handle in profile')
+    }
+    const publicProfile = await this.getPublicProfile(user.handle)
+    return {
+      ...publicProfile,
+      userProfile: userProfile
+    }
+  }
+
+  /**
+   * Get the list of user IDs that the current user follows
+   * @returns Promise of an array of user IDs
+   */
+  async getFollowingIds(): Promise<number[]> {
+    const url = this.buildUrl('/feed/following')
+    return this.request<number[]>(url)
+  }
+
+  /**
+   * Get full profiles of all users that the current user follows
+   * @returns Promise of an array of full profiles
+   */
+  async getFollowingProfiles(): Promise<SubstackFullProfile[]> {
+    const userIds = await this.getFollowingIds()
+    const profiles: SubstackFullProfile[] = []
+
+    for (const id of userIds) {
+      try {
+        const userProfile = await this.getUserProfile(id)
+        const firstItem = userProfile.items?.[0]
+        const user = firstItem?.context?.users?.[0]
+        if (!user?.handle) {
+          continue
+        }
+        const publicProfile = await this.getPublicProfile(user.handle)
+        profiles.push({
+          ...publicProfile,
+          userProfile: {
+            originalCursorTimestamp: firstItem.context.timestamp,
+            nextCursor: '',
+            items: [
+              {
+                entity_key: firstItem.entity_key,
+                type: firstItem.type,
+                context: {
+                  type: firstItem.context.type,
+                  timestamp: firstItem.context.timestamp,
+                  isFresh: firstItem.context.isFresh,
+                  source: firstItem.context.source,
+                  page_rank: firstItem.context.page_rank,
+                  users: [user]
+                },
+                publication: null,
+                post: null,
+                comment: null,
+                parentComments: [],
+                canReply: firstItem.canReply,
+                isMuted: firstItem.isMuted,
+                trackingParameters: firstItem.trackingParameters
+              }
+            ]
+          }
+        })
+      } catch {
+        // Skip profiles that can't be fetched
+        continue
+      }
+    }
+
+    return profiles
+  }
+
+  async publishNote(text: string): Promise<PublishNoteResponse> {
+    const request: PublishNoteRequest = {
+      bodyJson: {
+        type: 'doc',
+        attrs: {
+          schemaVersion: 'v1'
+        },
+        content: [
+          {
+            type: 'paragraph',
+            content: [
+              {
+                type: 'text',
+                text
+              }
+            ]
+          }
+        ]
+      },
+      replyMinimumRole: 'everyone'
+    }
+
+    return this.publishNoteRequest(request)
   }
 }
 export * from './types'
