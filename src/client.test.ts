@@ -328,4 +328,100 @@ describe('Substack', () => {
       )
     })
   })
+
+  describe('getNotes', () => {
+    const mockNotes = {
+      items: [
+        {
+          entity_key: 'c-123',
+          type: 'comment',
+          comment: {
+            id: 123,
+            body: 'Test note',
+            date: '2025-06-17T13:34:54.416Z'
+          }
+        }
+      ],
+      originalCursorTimestamp: '2025-06-17T13:34:54.416Z',
+      nextCursor: 'next-cursor-token'
+    }
+
+    it('should fetch notes successfully', async () => {
+      ;(global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+        createMockResponse(mockNotes)
+      )
+
+      const client = new Substack({ hostname: 'test.substack.com', apiKey: 'test-key' })
+      const result = await client.getNotes()
+
+      expect(result.items).toEqual(mockNotes.items)
+      expect(result.hasMore()).toBe(true)
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://test.substack.com/api/v1/notes',
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Cookie: 'connect.sid=s%3Atest-key'
+          })
+        })
+      )
+    })
+
+    it('should fetch next page of notes', async () => {
+      const nextPageNotes = {
+        items: [
+          {
+            entity_key: 'c-124',
+            type: 'comment',
+            comment: {
+              id: 124,
+              body: 'Another note',
+              date: '2025-06-17T13:35:54.416Z'
+            }
+          }
+        ],
+        originalCursorTimestamp: '2025-06-17T13:35:54.416Z',
+        nextCursor: null
+      }
+
+      ;(global.fetch as jest.MockedFunction<typeof global.fetch>)
+        .mockResolvedValueOnce(createMockResponse(mockNotes))
+        .mockResolvedValueOnce(createMockResponse(nextPageNotes))
+
+      const client = new Substack({ hostname: 'test.substack.com', apiKey: 'test-key' })
+      const firstPage = await client.getNotes()
+      const secondPage = await firstPage.next()
+
+      expect(secondPage).not.toBeNull()
+      expect(secondPage!.items).toEqual(nextPageNotes.items)
+      expect(secondPage!.hasMore()).toBe(false)
+      expect(global.fetch).toHaveBeenLastCalledWith(
+        expect.stringContaining('cursor=next-cursor-token'),
+        expect.any(Object)
+      )
+    })
+
+    it('should handle notes with pagination parameters', async () => {
+      ;(global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+        createMockResponse(mockNotes)
+      )
+
+      const client = new Substack({ hostname: 'test.substack.com', apiKey: 'test-key' })
+      await client.getNotes({ limit: 10 })
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining('limit=10'),
+        expect.any(Object)
+      )
+    })
+
+    it('should throw SubstackError when fetch fails', async () => {
+      const client = new Substack({ apiKey: 'test-key' })
+      const errorMessage = 'Not Found'
+      ;(global.fetch as jest.MockedFunction<typeof global.fetch>).mockResolvedValueOnce(
+        createMockResponse(null, { ok: false, status: 404, statusText: errorMessage })
+      )
+
+      await expect(client.getNotes()).rejects.toThrow(SubstackError)
+    })
+  })
 })
