@@ -1,239 +1,64 @@
 # Substack API
 
-A TypeScript client for interacting with the Substack webservice API. This client provides a simple interface to interact with Substack publications, posts, and comments.
-
+[![npm version](https://badge.fury.io/js/substack-api.svg)](https://badge.fury.io/js/substack-api)
 [![Documentation Status](https://readthedocs.org/projects/substack-api/badge/?version=latest)](https://substack-api.readthedocs.io/en/latest/?badge=latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
 
-## Documentation
+A TypeScript client for interacting with the Substack webservice API. This library provides a clean, type-safe interface to fetch publication details, posts, comments, and perform searches across Substack publications.
 
-Full documentation is available at [substack-api.readthedocs.io](https://substack-api.readthedocs.io/).
+## Features
 
-The documentation includes:
-- Detailed API reference
-- Getting started guide
-- Examples and use cases
-- Development guide
-- Changelog
+- 🔍 **Publication Management** - Fetch publication details and metadata
+- 📝 **Post Operations** - Get posts, search by criteria, and access individual posts
+- 💬 **Comment System** - Retrieve comments and comment threads
+- 📄 **Pagination Support** - Built-in pagination for all list operations
+- 🛡️ **TypeScript First** - Full type safety with comprehensive type definitions
+- ⚡ **Error Handling** - Comprehensive error handling with custom error types
+- 🔧 **Configurable** - Support for different API versions and custom configurations
 
-To build the documentation locally:
+## Quick Start
 
-```bash
-# Install Sphinx and theme
-pip install sphinx sphinx-rtd-theme myst-parser
-
-# Build the docs
-cd docs
-make html
-```
-
-The built documentation will be available in `docs/build/html`.
-
-## Installation
+Install the package:
 
 ```bash
 npm install substack-api
 ```
 
-## Usage
+Basic usage:
 
 ```typescript
 import { Substack } from 'substack-api';
 
-// Create a client instance for a specific publication
+// Create a client for a specific publication
 const client = new Substack({
   hostname: 'example.substack.com'
 });
 
-// Or use the default client
-const defaultClient = new Substack();
-```
-
-### Getting Publication Details
-
-```typescript
-// Get details for a specific publication
+// Get publication details
 const publication = await client.getPublication();
 
-// Or get details for another publication
-const otherPublication = await client.getPublication('other.substack.com');
-```
+// Fetch recent posts
+const posts = await client.getPosts({ limit: 5 });
 
-### Working with Posts
-
-```typescript
-// Get all posts (with pagination)
-const posts = await client.getPosts({
-  offset: 0,
-  limit: 10
-});
-
-// Get a specific post by slug
-const post = await client.getPost('post-slug');
-
-// Search posts
-const searchResults = await client.searchPosts({
+// Search for posts
+const results = await client.searchPosts({
   query: 'typescript',
-  type: 'newsletter',
-  limit: 10,
-  published_after: '2023-01-01',
-  published_before: '2023-12-31'
+  type: 'newsletter'
 });
 ```
 
-### Working with Comments
+## Documentation
 
-```typescript
-// Get comments for a post
-const comments = await client.getComments(postId, {
-  offset: 0,
-  limit: 20
-});
+📚 **[Read the full documentation →](https://substack-api.readthedocs.io/)**
 
-// Get a specific comment
-const comment = await client.getComment(commentId);
-```
+The documentation includes:
 
-### Error Handling
-
-The client throws `SubstackError` for API-related errors:
-
-```typescript
-try {
-  const publication = await client.getPublication('nonexistent.substack.com');
-} catch (error) {
-  if (error instanceof SubstackError) {
-    console.error(`API Error: ${error.message}`);
-    console.error(`Status: ${error.status}`);
-  }
-}
-```
-
-## API Reference
-
-### Substack
-
-#### Constructor Options
-
-```typescript
-interface SubstackConfig {
-  hostname?: string;      // The publication's hostname (e.g., 'example.substack.com')
-  apiVersion?: string;    // API version to use (default: 'v1')
-}
-```
-
-#### Methods
-
-- `getPublication(hostname?: string): Promise<SubstackPublication>`
-  - Get publication details
-  - Optional hostname parameter to get details for another publication
-
-- `getPosts(params?: PaginationParams): Promise<SubstackPost[]>`
-  - Get posts for the publication
-  - Supports pagination with offset and limit
-
-- `getPost(slug: string): Promise<SubstackPost>`
-  - Get a specific post by its slug
-
-- `searchPosts(params: SearchParams): Promise<SubstackSearchResult>`
-  - Search posts with various filters
-  - Supports pagination, date ranges, and post types
-
-- `getComments(postId: number, params?: PaginationParams): Promise<SubstackComment[]>`
-  - Get comments for a specific post
-  - Supports pagination
-
-- `getComment(commentId: number): Promise<SubstackComment>`
-  - Get a specific comment by ID
-
-### Types
-
-```typescript
-interface PaginationParams {
-  offset?: number;
-  limit?: number;
-}
-
-interface SearchParams extends PaginationParams {
-  query: string;
-  published_before?: string;
-  published_after?: string;
-  type?: 'newsletter' | 'podcast' | 'thread';
-}
-
-interface SubstackPublication {
-  name: string;
-  hostname: string;
-  subdomain: string;
-  logo?: {
-    url: string;
-  };
-  description?: string;
-}
-
-interface SubstackPost {
-  id: number;
-  title: string;
-  subtitle?: string;
-  slug: string;
-  post_date: string;
-  description?: string;
-  audience?: string;
-  canonical_url: string;
-  cover_image?: string;
-  podcast_url?: string;
-  type: 'newsletter' | 'podcast' | 'thread';
-  published: boolean;
-  paywalled: boolean;
-}
-```
-
-## Development
-
-### Setup
-
-```bash
-# Install dependencies
-npm install
-
-# Run tests
-npm test
-
-# Build the package
-npm run build
-```
-
-### Testing
-
-The project uses Jest for testing. Run the test suite with:
-
-```bash
-npm test
-```
-
-Or in watch mode:
-
-```bash
-npm run test:watch
-```
-
-### Building
-
-To build the package:
-
-```bash
-npm run build
-```
-
-This will create the compiled JavaScript files in the `dist` directory.
-
-## Publishing
-
-Before publishing, make sure to:
-
-1. Update the version in `package.json`
-2. Run tests: `npm test`
-3. Build the package: `npm run build`
-4. Publish to npm: `npm publish`
+- **[Installation Guide](https://substack-api.readthedocs.io/en/latest/installation.html)** - Detailed installation instructions
+- **[Quickstart Tutorial](https://substack-api.readthedocs.io/en/latest/quickstart.html)** - Get up and running quickly
+- **[API Reference](https://substack-api.readthedocs.io/en/latest/api-reference.html)** - Complete API documentation
+- **[Examples](https://substack-api.readthedocs.io/en/latest/examples.html)** - Real-world usage examples
+- **[Development Guide](https://substack-api.readthedocs.io/en/latest/development.html)** - Contributing and development setup
 
 ## License
 
