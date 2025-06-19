@@ -30,6 +30,7 @@ yarn-error.log*
 # Test coverage
 coverage/
 .nyc_output/
+junit.xml
 
 # Environment variables
 .env
