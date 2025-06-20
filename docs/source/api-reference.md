@@ -30,34 +30,6 @@ const client = new Substack({
 });
 ```
 
-## Publication Methods
-
-### getPublication
-
-```typescript
-getPublication(hostname?: string): Promise<SubstackPublication>
-```
-
-Retrieves detailed information about a Substack publication, including its name, description, logo, and metadata.
-
-**Parameters:**
-- `hostname` (optional): Override the default hostname to get details for a different publication
-
-**Returns:**
-- Promise resolving to a `SubstackPublication` object containing publication metadata
-
-**Example:**
-```typescript
-// Get details for the configured publication
-const publication = await client.getPublication();
-console.log(`Publication: ${publication.name}`);
-console.log(`Description: ${publication.description}`);
-
-// Get details for a different publication
-const otherPub = await client.getPublication('anotherpub.substack.com');
-console.log(`Other publication: ${otherPub.name}`);
-```
-
 ## Post Methods
 
 ### getPosts
@@ -603,31 +575,6 @@ Configuration options for the Substack client.
 - `hostname`: The publication's hostname (optional, defaults to 'substack.com')
 - `apiVersion`: API version to use (optional, defaults to 'v1')
 - `apiKey`: Your Substack API key (required for authentication)
-
-### Publication Types
-
-#### SubstackPublication
-
-```typescript
-interface SubstackPublication {
-  name: string;
-  hostname: string;
-  subdomain: string;
-  logo?: {
-    url: string;
-  };
-  description?: string;
-}
-```
-
-Represents a Substack publication with its basic metadata.
-
-**Properties:**
-- `name`: The publication's display name
-- `hostname`: The full hostname (e.g., 'example.substack.com')
-- `subdomain`: The subdomain part only (e.g., 'example')
-- `logo`: Optional logo information with URL
-- `description`: Optional publication description
 
 ### Post Types
 

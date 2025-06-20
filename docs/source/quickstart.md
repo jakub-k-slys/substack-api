@@ -47,20 +47,6 @@ const client = new Substack({
 });
 ```
 
-## Working with Publications
-
-Get publication details:
-
-```typescript
-// Get details for your configured publication
-const publication = await client.getPublication();
-console.log(`Publication: ${publication.name}`);
-console.log(`Description: ${publication.description}`);
-
-// Or get details for another publication
-const otherPublication = await client.getPublication('other.substack.com');
-```
-
 ## Working with Posts
 
 Get posts with pagination:
@@ -207,7 +193,7 @@ The client uses a custom `SubstackError` class for API-related errors:
 import { SubstackError } from 'substack-api';
 
 try {
-  const publication = await client.getPublication('nonexistent.substack.com');
+  const posts = await client.getPosts({ limit: 1000 }); // This will likely fail
 } catch (error) {
   if (error instanceof SubstackError) {
     console.error(`API Error: ${error.message}`);
@@ -277,14 +263,9 @@ async function substackDashboard(hostname: string, apiKey: string) {
   const client = new Substack({ hostname, apiKey });
 
   try {
-    // Get publication details
-    const publication = await client.getPublication();
-    console.log(`📊 Dashboard for: ${publication.name}`);
-    console.log(`Description: ${publication.description}\n`);
-
     // Get recent posts with engagement
     const posts = await client.getPosts({ limit: 5 });
-    console.log(`📝 Recent Posts (${posts.length}):`);
+    console.log(`📊 Dashboard - Recent Posts (${posts.length}):\n`);
     
     for (const post of posts) {
       console.log(`\n  ${post.title}`);

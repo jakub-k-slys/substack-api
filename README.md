@@ -35,9 +35,6 @@ const client = new Substack({
   hostname: 'example.substack.com'
 });
 
-// Get publication details
-const publication = await client.getPublication();
-
 // Fetch recent posts
 const posts = await client.getPosts({ limit: 5 });
 
