@@ -31,6 +31,7 @@ yarn-error.log*
 coverage/
 .nyc_output/
 junit.xml
+junit-e2e.xml
 
 # Environment variables
 .env
