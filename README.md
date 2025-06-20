@@ -60,6 +60,26 @@ The documentation includes:
 - **[Examples](https://substack-api.readthedocs.io/en/latest/examples.html)** - Real-world usage examples
 - **[Development Guide](https://substack-api.readthedocs.io/en/latest/development.html)** - Contributing and development setup
 
+## Testing
+
+The project includes comprehensive testing:
+
+- **Unit Tests**: Fast, isolated tests for individual components
+- **End-to-End Tests**: Integration tests against real Substack servers
+
+```bash
+# Run unit tests
+npm test
+
+# Run E2E tests (requires API credentials)
+npm run test:e2e
+
+# Run all tests
+npm run test:all
+```
+
+For E2E tests, copy `.env.example` to `.env` and add your Substack API credentials.
+
 ## License
 
 MIT

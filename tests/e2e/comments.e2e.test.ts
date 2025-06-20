@@ -16,7 +16,7 @@ describe('E2E: Comment Operations', () => {
     if (!global.E2E_CONFIG.hasCredentials) {
       return
     }
-    
+
     client = new Substack({
       apiKey: global.E2E_CONFIG.apiKey!,
       hostname: global.E2E_CONFIG.hostname
@@ -27,7 +27,7 @@ describe('E2E: Comment Operations', () => {
     try {
       // First get a post to get comments for
       const posts = await client.getPosts({ limit: 5 })
-      
+
       if (posts.length === 0) {
         console.log('Skipping comment test - no posts available')
         return
@@ -38,9 +38,9 @@ describe('E2E: Comment Operations', () => {
       for (const post of posts) {
         try {
           const comments = await client.getComments(post.id, { limit: 5 })
-          
+
           expect(Array.isArray(comments)).toBe(true)
-          
+
           if (comments.length > 0) {
             commentsFound = true
             const comment = comments[0]
@@ -58,7 +58,7 @@ describe('E2E: Comment Operations', () => {
             expect(typeof comment.author.name).toBe('string')
             break
           }
-        } catch (error) {
+        } catch {
           // This post might not have comments or comments might not be accessible
           continue
         }
@@ -75,7 +75,7 @@ describe('E2E: Comment Operations', () => {
   skipIfNoCredentials()('should fetch comments with pagination', async () => {
     try {
       const posts = await client.getPosts({ limit: 5 })
-      
+
       if (posts.length === 0) {
         console.log('Skipping comment pagination test - no posts available')
         return
@@ -86,16 +86,16 @@ describe('E2E: Comment Operations', () => {
         try {
           const firstPage = await client.getComments(post.id, { limit: 2 })
           const secondPage = await client.getComments(post.id, { limit: 2, offset: 2 })
-          
+
           expect(Array.isArray(firstPage)).toBe(true)
           expect(Array.isArray(secondPage)).toBe(true)
-          
+
           // If both pages have content, they should be different
           if (firstPage.length > 0 && secondPage.length > 0) {
             expect(firstPage[0].id).not.toBe(secondPage[0].id)
           }
           break
-        } catch (error) {
+        } catch {
           continue
         }
       }
@@ -108,7 +108,7 @@ describe('E2E: Comment Operations', () => {
     try {
       // First get a comment to get its ID
       const posts = await client.getPosts({ limit: 5 })
-      
+
       if (posts.length === 0) {
         console.log('Skipping specific comment test - no posts available')
         return
@@ -118,11 +118,11 @@ describe('E2E: Comment Operations', () => {
       for (const post of posts) {
         try {
           const comments = await client.getComments(post.id, { limit: 1 })
-          
+
           if (comments.length > 0) {
             const commentId = comments[0].id
             const comment = await client.getComment(commentId)
-            
+
             expect(comment).toBeDefined()
             expect(comment.id).toBe(commentId)
             expect(comment.body).toBeDefined()
@@ -130,7 +130,7 @@ describe('E2E: Comment Operations', () => {
             commentFound = true
             break
           }
-        } catch (error) {
+        } catch {
           continue
         }
       }

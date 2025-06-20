@@ -81,3 +81,32 @@ jobs:
               run: npm run lint
             - name: Running format
               run: npm run format:check
+    e2e:
+        name: Running E2E tests
+        runs-on: ubuntu-latest
+        if: github.repository == 'jakub-k-slys/substack-api' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        strategy:
+            fail-fast: false
+            matrix:
+                ci-env:
+                    - '1'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+            - name: Install
+              run: npm install
+            - name: Running E2E tests
+              run: npm run test:e2e
+              env:
+                SUBSTACK_API_KEY: ${{ secrets.SUBSTACK_API_KEY }}
+                SUBSTACK_HOSTNAME: ${{ secrets.SUBSTACK_HOSTNAME }}
+            - name: Upload E2E test results
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                name: e2e-test-results
+                path: |
+                  junit-e2e.xml

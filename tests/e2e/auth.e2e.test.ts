@@ -16,7 +16,7 @@ describe('E2E: Authentication & Publication Access', () => {
     if (!global.E2E_CONFIG.hasCredentials) {
       return
     }
-    
+
     client = new Substack({
       apiKey: global.E2E_CONFIG.apiKey!,
       hostname: global.E2E_CONFIG.hostname
@@ -25,7 +25,7 @@ describe('E2E: Authentication & Publication Access', () => {
 
   skipIfNoCredentials()('should authenticate and get publication details', async () => {
     const publication = await client.getPublication()
-    
+
     expect(publication).toBeDefined()
     expect(publication.name).toBeDefined()
     expect(publication.hostname).toBeDefined()
@@ -42,7 +42,7 @@ describe('E2E: Authentication & Publication Access', () => {
     }
 
     const publication = await client.getPublication(global.E2E_CONFIG.hostname)
-    
+
     expect(publication).toBeDefined()
     expect(publication.hostname).toBe(global.E2E_CONFIG.hostname)
   })

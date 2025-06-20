@@ -16,30 +16,30 @@ describe('E2E: User Profile Operations', () => {
     if (!global.E2E_CONFIG.hasCredentials) {
       return
     }
-    
+
     client = new Substack({
       apiKey: global.E2E_CONFIG.apiKey!,
       hostname: global.E2E_CONFIG.hostname
     })
   })
-  
+
   skipIfNoCredentials()('should fetch user profile by ID', async () => {
     try {
       // Use a common user ID for testing (this is a generic approach)
       // In real scenarios, you'd get this from other API calls
       const testUserId = 1 // Generic user ID for testing
       const profile = await client.getUserProfile(testUserId)
-      
+
       expect(profile).toBeDefined()
       expect(profile.items).toBeDefined()
       expect(Array.isArray(profile.items)).toBe(true)
-      
+
       if (profile.items.length > 0) {
         const item = profile.items[0]
         expect(item.context).toBeDefined()
         expect(item.context.users).toBeDefined()
         expect(Array.isArray(item.context.users)).toBe(true)
-        
+
         if (item.context.users.length > 0) {
           const user = item.context.users[0]
           expect(user.id).toBeDefined()
@@ -59,7 +59,7 @@ describe('E2E: User Profile Operations', () => {
       // Use a common public profile slug for testing
       const testSlug = 'hamish' // Example public slug
       const profile = await client.getPublicProfile(testSlug)
-      
+
       expect(profile).toBeDefined()
       expect(profile.id).toBeDefined()
       expect(profile.name).toBeDefined()
@@ -74,9 +74,9 @@ describe('E2E: User Profile Operations', () => {
   skipIfNoCredentials()('should fetch following profiles', async () => {
     try {
       const followingProfiles = await client.getFollowingProfiles()
-      
+
       expect(Array.isArray(followingProfiles)).toBe(true)
-      
+
       if (followingProfiles.length > 0) {
         const profile = followingProfiles[0]
         expect(profile.id).toBeDefined()

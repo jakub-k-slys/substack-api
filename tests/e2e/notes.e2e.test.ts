@@ -16,7 +16,7 @@ describe('E2E: Notes Operations', () => {
     if (!global.E2E_CONFIG.hasCredentials) {
       return
     }
-    
+
     client = new Substack({
       apiKey: global.E2E_CONFIG.apiKey!,
       hostname: global.E2E_CONFIG.hostname
@@ -26,19 +26,19 @@ describe('E2E: Notes Operations', () => {
   skipIfNoCredentials()('should fetch notes for authenticated user', async () => {
     try {
       const notes = await client.getNotes({ limit: 5 })
-      
+
       expect(notes).toBeDefined()
       expect(notes.items).toBeDefined()
       expect(Array.isArray(notes.items)).toBe(true)
       expect(notes.items.length).toBeLessThanOrEqual(5)
-      
+
       if (notes.items.length > 0) {
         const note = notes.items[0]
         expect(note.entity_key).toBeDefined()
         expect(note.context).toBeDefined()
         expect(typeof note.entity_key).toBe('string')
         expect(typeof note.context).toBe('object')
-        
+
         // Check if note has a comment (which would have the actual content)
         if (note.comment) {
           expect(note.comment.id).toBeDefined()
@@ -58,11 +58,11 @@ describe('E2E: Notes Operations', () => {
   skipIfNoCredentials()('should handle notes pagination', async () => {
     try {
       const firstPage = await client.getNotes({ limit: 2 })
-      
+
       expect(firstPage).toBeDefined()
       expect(firstPage.hasMore).toBeDefined()
       expect(typeof firstPage.hasMore()).toBe('boolean')
-      
+
       if (firstPage.hasMore()) {
         const secondPage = await firstPage.next()
         expect(secondPage).toBeDefined()
