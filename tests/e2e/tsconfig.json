@@ -2,7 +2,8 @@
   "extends": "../../tsconfig.test.json",
   "compilerOptions": {
     "types": ["jest", "node"],
-    "typeRoots": ["../../node_modules/@types", "."]
+    "typeRoots": ["../../node_modules/@types", "."],
+    "rootDir": "../../"
   },
   "include": [
     "./**/*",
