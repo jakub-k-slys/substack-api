@@ -22,8 +22,8 @@ export interface SubstackPost {
   cover_image?: string
   podcast_url?: string
   type: 'newsletter' | 'podcast' | 'thread'
-  published: boolean
-  paywalled: boolean
+  published?: boolean
+  paywalled?: boolean
 }
 
 export interface SubstackComment {
