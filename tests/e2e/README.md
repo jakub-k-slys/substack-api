@@ -12,7 +12,7 @@ E2E tests are designed to:
 
 ## Test Structure
 
-- `auth.e2e.test.ts` - Authentication and publication access tests
+- `auth.e2e.test.ts` - Authentication and API access tests
 - `publication.e2e.test.ts` - Publication data retrieval tests
 - `notes.e2e.test.ts` - Notes operations tests
 - `profiles.e2e.test.ts` - User profile tests
