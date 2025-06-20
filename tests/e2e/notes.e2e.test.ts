@@ -1,12 +1,41 @@
 /// <reference path="./global.d.ts" />
 import { Substack } from '../../src/client'
 
-// Helper function to skip tests if no credentials
+// Helper function to skip tests if no credentials or network access
 const skipIfNoCredentials = () => {
   if (!global.E2E_CONFIG.hasCredentials) {
     return test.skip
   }
   return test
+}
+
+// Helper function to handle network errors gracefully
+const handleNetworkError = (error: any, operation: string): void => {
+  // Check for various network error indicators
+  const isNetworkError =
+    (error &&
+      typeof error === 'object' &&
+      'code' in error &&
+      ((error as any).code === 'EAI_AGAIN' || (error as any).code === 'ENOTFOUND')) ||
+    (error &&
+      typeof error === 'object' &&
+      'cause' in error &&
+      error.cause &&
+      typeof error.cause === 'object' &&
+      'code' in error.cause &&
+      ((error.cause as any).code === 'EAI_AGAIN' || (error.cause as any).code === 'ENOTFOUND')) ||
+    (error && error.toString && error.toString().includes('fetch failed')) ||
+    (error && error.toString && error.toString().includes('EAI_AGAIN')) ||
+    (error && error.toString && error.toString().includes('ENOTFOUND'))
+
+  if (isNetworkError) {
+    console.warn(
+      `Network connectivity issue during ${operation}:`,
+      (error as any)?.message || error
+    )
+    return
+  }
+  console.log(`${operation} not accessible - might require specific permissions:`, error)
 }
 
 describe('E2E: Notes Operations', () => {
@@ -50,8 +79,7 @@ describe('E2E: Notes Operations', () => {
         }
       }
     } catch (error) {
-      // Notes might not be available or user might not have access
-      console.log('Notes not accessible - might require specific permissions:', error)
+      handleNetworkError(error, 'Notes')
     }
   })
 
@@ -69,7 +97,7 @@ describe('E2E: Notes Operations', () => {
         expect(secondPage?.items).toBeDefined()
       }
     } catch (error) {
-      console.log('Notes pagination not accessible:', error)
+      handleNetworkError(error, 'Notes pagination')
     }
   })
 
@@ -88,7 +116,7 @@ describe('E2E: Notes Operations', () => {
       
       console.log(`Published test note with ID: ${publishedNote.id}`)
     } catch (error) {
-      console.log('Note publishing not available or failed:', error)
+      handleNetworkError(error, 'Note publishing')
     }
   })
 
@@ -108,7 +136,7 @@ describe('E2E: Notes Operations', () => {
       
       console.log(`Published formatted test note with ID: ${publishedNote.id}`)
     } catch (error) {
-      console.log('Formatted note publishing not available or failed:', error)
+      handleNetworkError(error, 'Formatted note publishing')
     }
   })
   */

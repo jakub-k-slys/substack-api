@@ -9,6 +9,35 @@ const skipIfNoCredentials = () => {
   return test
 }
 
+// Helper function to handle network errors gracefully
+const handleNetworkError = (error: any, operation: string): void => {
+  // Check for various network error indicators
+  const isNetworkError =
+    (error &&
+      typeof error === 'object' &&
+      'code' in error &&
+      ((error as any).code === 'EAI_AGAIN' || (error as any).code === 'ENOTFOUND')) ||
+    (error &&
+      typeof error === 'object' &&
+      'cause' in error &&
+      error.cause &&
+      typeof error.cause === 'object' &&
+      'code' in error.cause &&
+      ((error.cause as any).code === 'EAI_AGAIN' || (error.cause as any).code === 'ENOTFOUND')) ||
+    (error && error.toString && error.toString().includes('fetch failed')) ||
+    (error && error.toString && error.toString().includes('EAI_AGAIN')) ||
+    (error && error.toString && error.toString().includes('ENOTFOUND'))
+
+  if (isNetworkError) {
+    console.warn(
+      `Network connectivity issue during ${operation}:`,
+      (error as any)?.message || error
+    )
+    return
+  }
+  console.log(`${operation} not accessible:`, error)
+}
+
 describe('E2E: Comment Operations', () => {
   let client: Substack
 
@@ -68,7 +97,7 @@ describe('E2E: Comment Operations', () => {
         console.log('No comments found in available posts')
       }
     } catch (error) {
-      console.log('Comments not accessible:', error)
+      handleNetworkError(error, 'Comments')
     }
   })
 
@@ -100,7 +129,7 @@ describe('E2E: Comment Operations', () => {
         }
       }
     } catch (error) {
-      console.log('Comment pagination not accessible:', error)
+      handleNetworkError(error, 'Comment pagination')
     }
   })
 
@@ -139,7 +168,7 @@ describe('E2E: Comment Operations', () => {
         console.log('No comments found to test specific comment fetch')
       }
     } catch (error) {
-      console.log('Specific comment fetch not accessible:', error)
+      handleNetworkError(error, 'Specific comment fetch')
     }
   })
 

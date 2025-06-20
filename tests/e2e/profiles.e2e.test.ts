@@ -1,12 +1,41 @@
 /// <reference path="./global.d.ts" />
 import { Substack } from '../../src/client'
 
-// Helper function to skip tests if no credentials
+// Helper function to skip tests if no credentials or network access
 const skipIfNoCredentials = () => {
   if (!global.E2E_CONFIG.hasCredentials) {
     return test.skip
   }
   return test
+}
+
+// Helper function to handle network errors gracefully
+const handleNetworkError = (error: any, operation: string): void => {
+  // Check for various network error indicators
+  const isNetworkError =
+    (error &&
+      typeof error === 'object' &&
+      'code' in error &&
+      ((error as any).code === 'EAI_AGAIN' || (error as any).code === 'ENOTFOUND')) ||
+    (error &&
+      typeof error === 'object' &&
+      'cause' in error &&
+      error.cause &&
+      typeof error.cause === 'object' &&
+      'code' in error.cause &&
+      ((error.cause as any).code === 'EAI_AGAIN' || (error.cause as any).code === 'ENOTFOUND')) ||
+    (error && error.toString && error.toString().includes('fetch failed')) ||
+    (error && error.toString && error.toString().includes('EAI_AGAIN')) ||
+    (error && error.toString && error.toString().includes('ENOTFOUND'))
+
+  if (isNetworkError) {
+    console.warn(
+      `Network connectivity issue during ${operation}:`,
+      (error as any)?.message || error
+    )
+    return
+  }
+  console.log(`${operation} not accessible:`, error)
 }
 
 describe('E2E: User Profile Operations', () => {
@@ -49,8 +78,7 @@ describe('E2E: User Profile Operations', () => {
         }
       }
     } catch (error) {
-      // User profile might not be accessible or user might not exist
-      console.log('User profile not accessible:', error)
+      handleNetworkError(error, 'User profile')
     }
   })
 
@@ -66,8 +94,7 @@ describe('E2E: User Profile Operations', () => {
       expect(typeof profile.id).toBe('number')
       expect(typeof profile.name).toBe('string')
     } catch (error) {
-      // Public profile might not exist or not be accessible
-      console.log('Public profile not accessible:', error)
+      handleNetworkError(error, 'Public profile')
     }
   })
 
@@ -85,8 +112,7 @@ describe('E2E: User Profile Operations', () => {
         expect(typeof profile.name).toBe('string')
       }
     } catch (error) {
-      // Following profiles might require specific permissions
-      console.log('Following profiles not accessible:', error)
+      handleNetworkError(error, 'Following profiles')
     }
   })
 
