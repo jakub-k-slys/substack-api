@@ -28,6 +28,10 @@ const handleNetworkError = (error: any, operation: string): void => {
     (error && error.toString && error.toString().includes('EAI_AGAIN')) ||
     (error && error.toString && error.toString().includes('ENOTFOUND'))
 
+  // Check for endpoint not available (some features may not be supported)
+  const isEndpointNotFound =
+    error && typeof error === 'object' && 'status' in error && (error as any).status === 404
+
   if (isNetworkError) {
     console.warn(
       `Network connectivity issue during ${operation}:`,
@@ -35,6 +39,15 @@ const handleNetworkError = (error: any, operation: string): void => {
     )
     return
   }
+
+  if (isEndpointNotFound) {
+    console.warn(
+      `Endpoint not available for ${operation} - this feature may not be supported:`,
+      (error as any)?.message || error
+    )
+    return
+  }
+
   throw error
 }
 
