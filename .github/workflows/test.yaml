@@ -84,7 +84,7 @@ jobs:
     e2e:
         name: Running E2E tests
         runs-on: ubuntu-latest
-        if: github.repository == 'jakub-k-slys/substack-api' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.repository == 'jakub-k-slys/substack-api' && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'pull_request')
         strategy:
             fail-fast: false
             matrix:
