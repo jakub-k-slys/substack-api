@@ -10,40 +10,6 @@ describe('Substack Content', () => {
     global.fetch = jest.fn()
   })
 
-  describe('publication', () => {
-    it('should get publication details', async () => {
-      const mockResponse = {
-        name: 'Test Publication',
-        hostname: 'test.substack.com',
-        subdomain: 'test'
-      }
-
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockResponse)
-      })
-
-      const result = await client.getPublication()
-      expect(result).toEqual(mockResponse)
-    })
-
-    it('should get publication details with custom hostname', async () => {
-      const mockResponse = {
-        name: 'Test Publication',
-        hostname: 'custom.com',
-        subdomain: 'test'
-      }
-
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockResponse)
-      })
-
-      const result = await client.getPublication('custom.com')
-      expect(result).toEqual(mockResponse)
-    })
-  })
-
   describe('posts', () => {
     it('should get posts with pagination', async () => {
       const mockResponse = [

@@ -23,29 +23,6 @@ const defaultClient = new Substack({
 
 ## Publication Examples
 
-### Get Publication Details
-
-```typescript
-async function getPublicationInfo() {
-  try {
-    // Get details for configured publication
-    const publication = await client.getPublication();
-    console.log('Publication:', publication.name);
-    console.log('Description:', publication.description);
-    
-    if (publication.logo?.url) {
-      console.log('Logo URL:', publication.logo.url);
-    }
-    
-    // Get details for another publication
-    const other = await client.getPublication('other.substack.com');
-    console.log('Other publication:', other.name);
-  } catch (error) {
-    console.error('Error:', error.message);
-  }
-}
-```
-
 ## Post Management Examples
 
 ### List Recent Posts
@@ -399,8 +376,8 @@ async function robustAPICall<T>(operation: () => Promise<T>): Promise<T | null> 
 }
 
 // Usage example
-async function safeGetPublication(hostname: string) {
-  return robustAPICall(() => client.getPublication(hostname));
+async function safeGetPosts() {
+  return robustAPICall(() => client.getPosts({ limit: 10 }));
 }
 ```
 
@@ -484,9 +461,6 @@ class SubstackDashboard {
   
   async getDashboardData() {
     try {
-      // Get publication info
-      const publication = await this.client.getPublication();
-      
       // Get recent posts with engagement metrics
       const posts = await this.client.getPosts({ limit: 5 });
       const postsWithComments = await Promise.all(
@@ -507,7 +481,6 @@ class SubstackDashboard {
       const followingIds = await this.client.getFollowingIds();
       
       return {
-        publication,
         recentPosts: postsWithComments,
         recentNotes: notes.items,
         followingCount: followingIds.length,
