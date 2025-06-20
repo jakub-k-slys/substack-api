@@ -1,5 +1,4 @@
 import {
-  SubstackPublication,
   SubstackPost,
   SubstackComment,
   SubstackConfig,
@@ -71,15 +70,6 @@ export class Substack {
     }
 
     return response.json()
-  }
-
-  /**
-   * Get publication details
-   * @param hostname Optional hostname override
-   */
-  async getPublication(hostname?: string): Promise<SubstackPublication> {
-    const url = hostname ? `https://${hostname}` : this.baseUrl
-    return this.request<SubstackPublication>(`${url}/api/${this.apiVersion}/publication`)
   }
 
   /**

@@ -47,8 +47,8 @@ const client = new Substack();
 
 async function test() {
   try {
-    const publication = await client.getPublication('example.substack.com');
-    console.log('Successfully connected to:', publication.name);
+    const posts = await client.getPosts({ limit: 1 });
+    console.log('Successfully connected - found posts:', posts.length);
   } catch (error) {
     console.error('Error:', error.message);
   }
