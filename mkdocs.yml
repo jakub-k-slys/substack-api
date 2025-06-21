@@ -1,0 +1,5 @@
+site_name: Substack API
+theme:
+  name: material
+plugins:
+  - search
