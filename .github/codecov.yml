@@ -1,0 +1,14 @@
+coverage:
+    status:
+        patch: true
+        project:
+            default:
+                target: auto
+                threshold: 10%
+    range: 60..80
+    round: down
+    precision: 2
+ignore:
+    - docs
+comment:
+    layout: diff, files
