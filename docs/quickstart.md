@@ -49,15 +49,19 @@ const client = new Substack({
 
 ## Working with Posts
 
-Get posts with pagination:
+Get posts with async iteration:
 
 ```typescript
-// Get recent posts
-const posts = await client.getPosts({
-  offset: 0,
-  limit: 10
-});
+// Get recent posts using async iteration
+for await (const post of client.getPosts({ limit: 10 })) {
+  console.log(`${post.title} - ${new Date(post.post_date).toLocaleDateString()}`);
+}
 
+// Collect posts into an array if needed
+const posts = [];
+for await (const post of client.getPosts({ limit: 10 })) {
+  posts.push(post);
+}
 console.log(`Found ${posts.length} posts`);
 posts.forEach(post => {
   console.log(`- ${post.title} (${post.type})`);
@@ -193,7 +197,11 @@ The client uses a custom `SubstackError` class for API-related errors:
 import { SubstackError } from 'substack-api';
 
 try {
-  const posts = await client.getPosts({ limit: 1000 }); // This will likely fail
+  // Try to get a very large number of posts
+  const posts = [];
+  for await (const post of client.getPosts({ limit: 1000 })) {
+    posts.push(post);
+  }
 } catch (error) {
   if (error instanceof SubstackError) {
     console.error(`API Error: ${error.message}`);
@@ -241,7 +249,11 @@ const config: SubstackConfig = {
 // Type-safe function
 async function getTypedPosts(): Promise<SubstackPost[]> {
   const client = new Substack(config);
-  return client.getPosts({ limit: 10 });
+  const posts = [];
+  for await (const post of client.getPosts({ limit: 10 })) {
+    posts.push(post);
+  }
+  return posts;
 }
 
 // Type guards
@@ -264,7 +276,10 @@ async function substackDashboard(hostname: string, apiKey: string) {
 
   try {
     // Get recent posts with engagement
-    const posts = await client.getPosts({ limit: 5 });
+    const posts = [];
+    for await (const post of client.getPosts({ limit: 5 })) {
+      posts.push(post);
+    }
     console.log(`📊 Dashboard - Recent Posts (${posts.length}):\n`);
     
     for (const post of posts) {

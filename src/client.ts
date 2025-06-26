@@ -11,7 +11,9 @@ import {
   SearchParams,
   PublishNoteRequest,
   PublishNoteResponse,
-  NotesIteratorOptions
+  NotesIteratorOptions,
+  PostsIteratorOptions,
+  CommentsIteratorOptions
 } from './types'
 import { NoteBuilder } from './note-builder'
 
@@ -73,12 +75,56 @@ export class Substack {
   }
 
   /**
-   * Get posts for the publication
-   * @param params Pagination parameters
+   * Get posts for the publication with automatic pagination
+   * @param options Iterator options including limit for total posts to retrieve
+   * @returns AsyncIterable of individual posts
    */
-  async getPosts(params: PaginationParams = {}): Promise<SubstackPost[]> {
-    const url = this.buildUrl('/posts', params)
-    return this.request<SubstackPost[]>(url)
+  async *getPosts(options: PostsIteratorOptions = {}): AsyncIterable<SubstackPost> {
+    let offset = 0
+    let totalFetched = 0
+    const pageSize = 20 // Default page size for API calls
+
+    while (true) {
+      // Check if we've reached the limit before making another API call
+      if (options.limit && totalFetched >= options.limit) {
+        return
+      }
+
+      // Calculate how many items to request for this page
+      let requestLimit = pageSize
+      if (options.limit) {
+        const remaining = options.limit - totalFetched
+        requestLimit = Math.min(pageSize, remaining)
+      }
+
+      // Build pagination params for the API call
+      const params: PaginationParams = { offset, limit: requestLimit }
+      const url = this.buildUrl('/posts', params)
+
+      const response = await this.request<SubstackPost[]>(url)
+
+      // If no posts returned, we've reached the end
+      if (response.length === 0) {
+        break
+      }
+
+      // Yield each post from the current page
+      for (const post of response) {
+        if (options.limit && totalFetched >= options.limit) {
+          return
+        }
+        yield post
+        totalFetched++
+      }
+
+      // If we got fewer posts than requested from the API, we've reached the end
+      // This happens when the API has no more data to return
+      if (response.length < requestLimit) {
+        break
+      }
+
+      offset += response.length
+    }
   }
 
   /**
@@ -100,13 +146,60 @@ export class Substack {
   }
 
   /**
-   * Get comments for a specific post
+   * Get comments for a specific post with automatic pagination
    * @param postId The post ID
-   * @param params Pagination parameters
+   * @param options Iterator options including limit for total comments to retrieve
+   * @returns AsyncIterable of individual comments
    */
-  async getComments(postId: number, params: PaginationParams = {}): Promise<SubstackComment[]> {
-    const url = this.buildUrl(`/posts/${postId}/comments`, params)
-    return this.request<SubstackComment[]>(url)
+  async *getComments(
+    postId: number,
+    options: CommentsIteratorOptions = {}
+  ): AsyncIterable<SubstackComment> {
+    let offset = 0
+    let totalFetched = 0
+    const pageSize = 20 // Default page size for API calls
+
+    while (true) {
+      // Check if we've reached the limit before making another API call
+      if (options.limit && totalFetched >= options.limit) {
+        return
+      }
+
+      // Calculate how many items to request for this page
+      let requestLimit = pageSize
+      if (options.limit) {
+        const remaining = options.limit - totalFetched
+        requestLimit = Math.min(pageSize, remaining)
+      }
+
+      // Build pagination params for the API call
+      const params: PaginationParams = { offset, limit: requestLimit }
+      const url = this.buildUrl(`/posts/${postId}/comments`, params)
+
+      const response = await this.request<SubstackComment[]>(url)
+
+      // If no comments returned, we've reached the end
+      if (response.length === 0) {
+        break
+      }
+
+      // Yield each comment from the current page
+      for (const comment of response) {
+        if (options.limit && totalFetched >= options.limit) {
+          return
+        }
+        yield comment
+        totalFetched++
+      }
+
+      // If we got fewer comments than requested from the API, we've reached the end
+      // This happens when the API has no more data to return
+      if (response.length < requestLimit) {
+        break
+      }
+
+      offset += response.length
+    }
   }
 
   /**

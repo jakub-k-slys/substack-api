@@ -41,24 +41,28 @@ describe('Substack', () => {
         json: () => Promise.resolve([])
       })
 
-      await client.getPosts({ offset: 10, limit: 20 })
+      // Start iteration to trigger the request
+      const iterator = client.getPosts({ limit: 20 })[Symbol.asyncIterator]()
+      await iterator.next()
 
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('?offset=10&limit=20'),
+        expect.stringContaining('?offset=0&limit=20'),
         expect.any(Object)
       )
     })
 
-    it('should handle undefined query parameters', async () => {
+    it('should handle pagination correctly', async () => {
       ;(global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve([])
       })
 
-      await client.getPosts({ offset: undefined, limit: 20 })
+      // Start iteration to trigger the request
+      const iterator = client.getPosts({ limit: 10 })[Symbol.asyncIterator]()
+      await iterator.next()
 
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.not.stringContaining('offset'),
+        expect.stringContaining('?offset=0&limit=10'),
         expect.any(Object)
       )
     })

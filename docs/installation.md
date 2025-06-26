@@ -47,7 +47,10 @@ const client = new Substack();
 
 async function test() {
   try {
-    const posts = await client.getPosts({ limit: 1 });
+    const posts = [];
+    for await (const post of client.getPosts({ limit: 1 })) {
+      posts.push(post);
+    }
     console.log('Successfully connected - found posts:', posts.length);
   } catch (error) {
     console.error('Error:', error.message);
