@@ -203,41 +203,39 @@ Notes are short-form posts that appear on users' feeds, similar to social media 
 ### getNotes
 
 ```typescript
-getNotes(params?: PaginationParams): Promise<SubstackNotes>
+getNotes(options?: NotesIteratorOptions): AsyncIterable<SubstackNote>
 ```
 
-Retrieves notes from the authenticated user's feed with cursor-based pagination.
+Retrieves notes from the authenticated user's feed with automatic pagination handling. Returns an async iterable that yields individual notes, making pagination transparent to the developer.
 
 **Parameters:**
-- `params` (optional): Pagination parameters
-  - `cursor`: Cursor for pagination (use the nextCursor from previous response)
-  - `limit`: Maximum number of items to return
+- `options` (optional): Iterator options
+  - `limit`: Maximum total number of notes to retrieve across all pages
 
 **Returns:**
-- Promise resolving to a `SubstackNotes` object with pagination support
+- `AsyncIterable<SubstackNote>` - An async iterable that yields individual notes
 
 **Example:**
 ```typescript
-// Get recent notes
-const notes = await client.getNotes({ limit: 10 });
-console.log(`Found ${notes.items.length} notes`);
-
-notes.items.forEach(note => {
+// ✅ Async iteration (preferred for streaming large sets)
+for await (const note of client.getNotes()) {
   if (note.comment) {
     console.log(`${note.context.users[0].name}: ${note.comment.body}`);
     console.log(`Posted: ${new Date(note.comment.date).toLocaleDateString()}`);
   }
-});
-
-// Paginate through all notes
-let currentNotes = notes;
-while (currentNotes.hasMore()) {
-  console.log('Loading more notes...');
-  currentNotes = await currentNotes.next();
-  if (currentNotes) {
-    console.log(`Loaded ${currentNotes.items.length} more notes`);
-  }
 }
+
+// Limit the total number of notes
+for await (const note of client.getNotes({ limit: 50 })) {
+  console.log(`Note: ${note.comment?.body || 'No content'}`);
+}
+
+// Collect notes into an array if needed
+const recentNotes = [];
+for await (const note of client.getNotes({ limit: 10 })) {
+  recentNotes.push(note);
+}
+console.log(`Collected ${recentNotes.length} recent notes`);
 ```
 
 ### publishNote
@@ -693,27 +691,18 @@ interface SubstackNote {
 
 Represents a note (short-form post) in the Substack feed. Notes are complex objects that can contain various types of content including text, images, and links.
 
-#### SubstackNotes
+#### NotesIteratorOptions
 
 ```typescript
-class SubstackNotes {
-  constructor(
-    private readonly client: Substack,
-    public readonly items: SubstackNote[],
-    private readonly originalCursorTimestamp: string,
-    private readonly nextCursor: string | null
-  );
-
-  async next(): Promise<SubstackNotes | null>;
-  hasMore(): boolean;
+interface NotesIteratorOptions {
+  limit?: number; // Total number of notes to retrieve across all pages
 }
 ```
 
-A paginated collection of notes with cursor-based pagination support.
+Options for controlling the notes iteration behavior.
 
-**Methods:**
-- `next()`: Fetch the next page of notes
-- `hasMore()`: Check if there are more notes available
+**Properties:**
+- `limit`: Maximum total number of notes to retrieve across all pages. If not specified, all available notes will be retrieved.
 
 ### User Profile Types
 
