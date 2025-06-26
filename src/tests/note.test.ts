@@ -355,7 +355,7 @@ describe('Substack Notes', () => {
   })
 
   describe('notes pagination', () => {
-    it('should handle notes pagination correctly', async () => {
+    it('should handle notes async iteration correctly', async () => {
       const mockFirstResponse = {
         items: [{ id: 1, body: 'Note 1' }],
         originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
@@ -378,16 +378,75 @@ describe('Substack Notes', () => {
           json: () => Promise.resolve(mockSecondResponse)
         })
 
-      const firstPage = await client.getNotes()
-      expect(firstPage.items).toEqual(mockFirstResponse.items)
-      expect(firstPage.hasMore()).toBe(true)
+      const notes: any[] = []
+      for await (const note of client.getNotes()) {
+        notes.push(note)
+      }
 
-      const secondPage = await firstPage.next()
-      expect(secondPage?.items).toEqual(mockSecondResponse.items)
-      expect(secondPage?.hasMore()).toBe(false)
+      expect(notes).toEqual([
+        { id: 1, body: 'Note 1' },
+        { id: 2, body: 'Note 2' }
+      ])
+      expect(global.fetch).toHaveBeenCalledTimes(2)
+    })
 
-      const thirdPage = await secondPage?.next()
-      expect(thirdPage).toBeNull()
+    it('should respect the limit option', async () => {
+      const mockFirstResponse = {
+        items: [
+          { id: 1, body: 'Note 1' },
+          { id: 2, body: 'Note 2' }
+        ],
+        originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
+        nextCursor: 'next-page'
+      }
+
+      const mockSecondResponse = {
+        items: [{ id: 3, body: 'Note 3' }],
+        originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
+        nextCursor: null
+      }
+
+      ;(global.fetch as jest.Mock)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(mockFirstResponse)
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(mockSecondResponse)
+        })
+
+      const notes: any[] = []
+      for await (const note of client.getNotes({ limit: 2 })) {
+        notes.push(note)
+      }
+
+      expect(notes).toEqual([
+        { id: 1, body: 'Note 1' },
+        { id: 2, body: 'Note 2' }
+      ])
+      expect(global.fetch).toHaveBeenCalledTimes(1) // Should stop after first page due to limit
+    })
+
+    it('should handle empty response', async () => {
+      const mockResponse = {
+        items: [],
+        originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
+        nextCursor: null
+      }
+
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockResponse)
+      })
+
+      const notes: any[] = []
+      for await (const note of client.getNotes()) {
+        notes.push(note)
+      }
+
+      expect(notes).toEqual([])
+      expect(global.fetch).toHaveBeenCalledTimes(1)
     })
   })
 })

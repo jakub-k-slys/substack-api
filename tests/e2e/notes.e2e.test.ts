@@ -67,15 +67,20 @@ describe('E2E: Notes Operations', () => {
 
   skipIfNoCredentials()('should fetch notes for authenticated user', async () => {
     try {
-      const notes = await client.getNotes({ limit: 5 })
+      const notes: any[] = []
+      let count = 0
 
-      expect(notes).toBeDefined()
-      expect(notes.items).toBeDefined()
-      expect(Array.isArray(notes.items)).toBe(true)
-      expect(notes.items.length).toBeLessThanOrEqual(5)
+      for await (const note of client.getNotes({ limit: 5 })) {
+        notes.push(note)
+        count++
+        if (count >= 5) break // Safety check
+      }
 
-      if (notes.items.length > 0) {
-        const note = notes.items[0]
+      expect(Array.isArray(notes)).toBe(true)
+      expect(notes.length).toBeLessThanOrEqual(5)
+
+      if (notes.length > 0) {
+        const note = notes[0]
         expect(note.entity_key).toBeDefined()
         expect(note.context).toBeDefined()
         expect(typeof note.entity_key).toBe('string')
@@ -98,16 +103,33 @@ describe('E2E: Notes Operations', () => {
 
   skipIfNoCredentials()('should handle notes pagination', async () => {
     try {
-      const firstPage = await client.getNotes({ limit: 2 })
+      const firstPageNotes: any[] = []
 
-      expect(firstPage).toBeDefined()
-      expect(firstPage.hasMore).toBeDefined()
-      expect(typeof firstPage.hasMore()).toBe('boolean')
+      // Collect first 2 notes
+      for await (const note of client.getNotes({ limit: 2 })) {
+        firstPageNotes.push(note)
+      }
 
-      if (firstPage.hasMore()) {
-        const secondPage = await firstPage.next()
-        expect(secondPage).toBeDefined()
-        expect(secondPage?.items).toBeDefined()
+      expect(Array.isArray(firstPageNotes)).toBe(true)
+      expect(firstPageNotes.length).toBeLessThanOrEqual(2)
+
+      // Test that we can get more notes if available
+      const allNotes: any[] = []
+      let totalCount = 0
+
+      for await (const note of client.getNotes({ limit: 4 })) {
+        allNotes.push(note)
+        totalCount++
+        if (totalCount >= 4) break // Safety check
+      }
+
+      expect(Array.isArray(allNotes)).toBe(true)
+      expect(allNotes.length).toBeLessThanOrEqual(4)
+
+      // If we have enough notes, verify pagination worked
+      if (allNotes.length > firstPageNotes.length) {
+        // Should have more notes in the full list
+        expect(allNotes.length).toBeGreaterThan(firstPageNotes.length)
       }
     } catch (error) {
       handleNetworkError(error, 'Notes pagination')

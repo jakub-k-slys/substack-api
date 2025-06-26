@@ -4,14 +4,14 @@ import {
   SubstackConfig,
   SubstackSearchResult,
   SubstackNote,
-  SubstackNotes,
   SubstackUserProfile,
   SubstackPublicProfile,
   SubstackFullProfile,
   PaginationParams,
   SearchParams,
   PublishNoteRequest,
-  PublishNoteResponse
+  PublishNoteResponse,
+  NotesIteratorOptions
 } from './types'
 import { NoteBuilder } from './note-builder'
 
@@ -119,23 +119,46 @@ export class Substack {
   }
 
   /**
-   * Get Notes for the logged in user
-   * @param params Pagination parameters
+   * Get Notes for the logged in user with automatic pagination
+   * @param options Iterator options including limit for total notes to retrieve
+   * @returns AsyncIterable of individual notes
    */
-  async getNotes(params: PaginationParams = {}): Promise<SubstackNotes> {
-    const url = this.buildUrl('/notes', params)
-    const response = await this.request<{
-      items: SubstackNote[]
-      originalCursorTimestamp: string
-      nextCursor: string | null
-    }>(url)
+  async *getNotes(options: NotesIteratorOptions = {}): AsyncIterable<SubstackNote> {
+    let cursor: string | undefined = undefined
+    let totalFetched = 0
 
-    return new SubstackNotes(
-      this,
-      response.items,
-      response.originalCursorTimestamp,
-      response.nextCursor
-    )
+    while (true) {
+      // Check if we've reached the limit before making another API call
+      if (options.limit && totalFetched >= options.limit) {
+        return
+      }
+
+      // Build pagination params for the API call
+      const params: PaginationParams = { cursor }
+      const url = this.buildUrl('/notes', params)
+
+      const response = await this.request<{
+        items: SubstackNote[]
+        originalCursorTimestamp: string
+        nextCursor: string | null
+      }>(url)
+
+      // Yield each note from the current page
+      for (const note of response.items) {
+        if (options.limit && totalFetched >= options.limit) {
+          return
+        }
+        yield note
+        totalFetched++
+      }
+
+      // Check if there are more pages
+      if (!response.nextCursor) {
+        break
+      }
+
+      cursor = response.nextCursor
+    }
   }
 
   /**
