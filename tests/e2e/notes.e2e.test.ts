@@ -69,7 +69,7 @@ describe('E2E: Notes Operations', () => {
     try {
       const notes: any[] = []
       let count = 0
-      
+
       for await (const note of client.getNotes({ limit: 5 })) {
         notes.push(note)
         count++
@@ -104,30 +104,28 @@ describe('E2E: Notes Operations', () => {
   skipIfNoCredentials()('should handle notes pagination', async () => {
     try {
       const firstPageNotes: any[] = []
-      let count = 0
-      
+
       // Collect first 2 notes
       for await (const note of client.getNotes({ limit: 2 })) {
         firstPageNotes.push(note)
-        count++
       }
 
       expect(Array.isArray(firstPageNotes)).toBe(true)
       expect(firstPageNotes.length).toBeLessThanOrEqual(2)
-      
+
       // Test that we can get more notes if available
       const allNotes: any[] = []
       let totalCount = 0
-      
+
       for await (const note of client.getNotes({ limit: 4 })) {
         allNotes.push(note)
         totalCount++
         if (totalCount >= 4) break // Safety check
       }
-      
+
       expect(Array.isArray(allNotes)).toBe(true)
       expect(allNotes.length).toBeLessThanOrEqual(4)
-      
+
       // If we have enough notes, verify pagination worked
       if (allNotes.length > firstPageNotes.length) {
         // Should have more notes in the full list

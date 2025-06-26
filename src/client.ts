@@ -126,7 +126,7 @@ export class Substack {
   async *getNotes(options: NotesIteratorOptions = {}): AsyncIterable<SubstackNote> {
     let cursor: string | undefined = undefined
     let totalFetched = 0
-    
+
     while (true) {
       // Check if we've reached the limit before making another API call
       if (options.limit && totalFetched >= options.limit) {
@@ -136,7 +136,7 @@ export class Substack {
       // Build pagination params for the API call
       const params: PaginationParams = { cursor }
       const url = this.buildUrl('/notes', params)
-      
+
       const response = await this.request<{
         items: SubstackNote[]
         originalCursorTimestamp: string
@@ -156,7 +156,7 @@ export class Substack {
       if (!response.nextCursor) {
         break
       }
-      
+
       cursor = response.nextCursor
     }
   }

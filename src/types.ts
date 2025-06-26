@@ -1,5 +1,3 @@
-import { Substack } from './client'
-
 export interface SubstackPublication {
   name: string
   hostname: string
@@ -384,7 +382,6 @@ export interface SubstackNote {
     is_explicitly_subscribed: boolean
   }
 }
-
 
 export interface NoteBodyJson {
   type: 'doc'

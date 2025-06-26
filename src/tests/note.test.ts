@@ -392,7 +392,10 @@ describe('Substack Notes', () => {
 
     it('should respect the limit option', async () => {
       const mockFirstResponse = {
-        items: [{ id: 1, body: 'Note 1' }, { id: 2, body: 'Note 2' }],
+        items: [
+          { id: 1, body: 'Note 1' },
+          { id: 2, body: 'Note 2' }
+        ],
         originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
         nextCursor: 'next-page'
       }
