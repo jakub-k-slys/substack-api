@@ -7,5 +7,6 @@ export type {
   SubstackConfig,
   SubstackSearchResult,
   PaginationParams,
-  SearchParams
+  SearchParams,
+  NotesIteratorOptions
 } from './types'

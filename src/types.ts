@@ -55,6 +55,10 @@ export interface PaginationParams {
   cursor?: string
 }
 
+export interface NotesIteratorOptions {
+  limit?: number // Total number of notes to retrieve across all pages
+}
+
 export interface SubstackUserProfile {
   items: Array<{
     entity_key: string
@@ -381,32 +385,6 @@ export interface SubstackNote {
   }
 }
 
-export class SubstackNotes {
-  constructor(
-    private readonly client: Substack,
-    public readonly items: SubstackNote[],
-    private readonly originalCursorTimestamp: string,
-    private readonly nextCursor: string | null
-  ) {}
-
-  /**
-   * Fetch the next batch of notes using the cursor
-   * @returns Promise of the next SubstackNotesResponse, or null if there are no more notes
-   */
-  async next(): Promise<SubstackNotes | null> {
-    if (!this.nextCursor) {
-      return null
-    }
-    return this.client.getNotes({ cursor: this.nextCursor })
-  }
-
-  /**
-   * Check if there are more notes available
-   */
-  hasMore(): boolean {
-    return !!this.nextCursor
-  }
-}
 
 export interface NoteBodyJson {
   type: 'doc'
