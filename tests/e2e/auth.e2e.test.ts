@@ -67,7 +67,10 @@ describe('E2E: Authentication & API Access', () => {
 
   skipIfNoCredentials()('should authenticate and access posts', async () => {
     try {
-      const posts = await client.getPosts({ limit: 1 })
+      const posts = []
+      for await (const post of client.getPosts({ limit: 1 })) {
+        posts.push(post)
+      }
 
       expect(Array.isArray(posts)).toBe(true)
       // Authentication is successful if we can fetch posts without error
@@ -84,7 +87,10 @@ describe('E2E: Authentication & API Access', () => {
     }
 
     try {
-      const posts = await client.getPosts({ limit: 1 })
+      const posts = []
+      for await (const post of client.getPosts({ limit: 1 })) {
+        posts.push(post)
+      }
       expect(Array.isArray(posts)).toBe(true)
       // Authentication successful with custom hostname if posts can be fetched
     } catch (error) {
@@ -100,7 +106,9 @@ describe('E2E: Authentication & API Access', () => {
     })
 
     try {
-      await invalidClient.getPosts()
+      // Try to consume the first item from the async iterator
+      const iterator = invalidClient.getPosts()[Symbol.asyncIterator]()
+      await iterator.next()
       // If this doesn't throw, something is wrong with error handling
       throw new Error('Expected getPosts() to throw an error with invalid credentials')
     } catch (error) {
