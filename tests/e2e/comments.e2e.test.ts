@@ -171,7 +171,10 @@ describe('E2E: Comment Operations', () => {
   skipIfNoCredentials()('should fetch specific comment by ID', async () => {
     try {
       // First get a comment to get its ID
-      const posts = await client.getPosts({ limit: 5 })
+      const posts = []
+      for await (const post of client.getPosts({ limit: 5 })) {
+        posts.push(post)
+      }
 
       if (posts.length === 0) {
         console.log('Skipping specific comment test - no posts available')
@@ -181,7 +184,10 @@ describe('E2E: Comment Operations', () => {
       let commentFound = false
       for (const post of posts) {
         try {
-          const comments = await client.getComments(post.id, { limit: 1 })
+          const comments = []
+          for await (const comment of client.getComments(post.id, { limit: 1 })) {
+            comments.push(comment)
+          }
 
           if (comments.length > 0) {
             const commentId = comments[0].id
