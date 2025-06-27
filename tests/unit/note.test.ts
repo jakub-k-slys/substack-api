@@ -1,5 +1,5 @@
-import { Substack } from '../client'
-import { PublishNoteResponse } from '../types'
+import { Substack } from '../../src/client'
+import { PublishNoteResponse } from '../../src/types'
 
 describe('Substack Notes', () => {
   let client: Substack

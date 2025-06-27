@@ -1,4 +1,4 @@
-import { Substack } from '../client'
+import { Substack } from '../../src/client'
 
 describe('Substack Profiles', () => {
   let client: Substack

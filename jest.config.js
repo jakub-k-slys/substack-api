@@ -8,8 +8,8 @@ export default {
       useESM: true
     }]
   },
-  roots: ['<rootDir>/src'],
-  testMatch: ['**/*.test.ts'],
+  roots: ['<rootDir>/tests'],
+  testMatch: ['**/unit/**/*.test.ts'],
   collectCoverage: true,
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov'],
