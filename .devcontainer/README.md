@@ -13,6 +13,7 @@ This directory contains the development container configuration for the Substack
   - TypeScript - Language support
   - Jest Test Runner - Test debugging and execution
   - Code Spell Checker - Spell checking for code
+  - Auto Rename Tag - HTML/XML tag renaming
 
 ## Quick Start
 
@@ -36,6 +37,7 @@ This directory contains the development container configuration for the Substack
 - **Integrated Testing**: Debug and run tests directly in VS Code
 - **Code Quality**: Pre-configured linting and formatting tools
 - **Development Tasks**: Pre-defined VS Code tasks for common operations
+- **Debug Configurations**: Ready-to-use debug setups for Jest testing
 
 ## Available Tasks
 
@@ -74,3 +76,7 @@ The dev container is configured for optimal performance with:
 - Bind mount for workspace files
 - Proper Node.js user permissions
 - Efficient Docker layer caching
+
+## Configuration
+
+All VS Code settings, tasks, and debug configurations are defined in the `devcontainer.json` file, ensuring they only apply when using the dev container and don't interfere with local VS Code setups.

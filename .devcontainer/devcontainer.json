@@ -23,10 +23,142 @@
       "settings": {
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit",
+          "source.organizeImports": "explicit"
+        },
         "typescript.preferences.includePackageJsonAutoImports": "auto",
+        "typescript.suggest.autoImports": true,
         "eslint.enable": true,
         "eslint.run": "onType",
-        "jest.autoRun": "watch"
+        "eslint.validate": ["typescript", "javascript"],
+        "jest.autoRun": "watch",
+        "jest.showCoverageOnLoad": true,
+        "files.exclude": {
+          "**/node_modules": true,
+          "**/dist": true,
+          "**/coverage": true,
+          "**/.git": true,
+          "**/.DS_Store": true
+        },
+        "search.exclude": {
+          "**/node_modules": true,
+          "**/dist": true,
+          "**/coverage": true
+        },
+        "typescript.preferences.importModuleSpecifier": "relative"
+      },
+      "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+          {
+            "label": "Install Dependencies",
+            "type": "shell",
+            "command": "npm install",
+            "group": "build"
+          },
+          {
+            "label": "Build",
+            "type": "shell",
+            "command": "npm run build",
+            "group": {
+              "kind": "build",
+              "isDefault": true
+            },
+            "problemMatcher": ["$tsc"]
+          },
+          {
+            "label": "Test",
+            "type": "shell",
+            "command": "npm test",
+            "group": {
+              "kind": "test",
+              "isDefault": true
+            }
+          },
+          {
+            "label": "Test Watch",
+            "type": "shell",
+            "command": "npm run test:watch",
+            "group": "test",
+            "isBackground": true
+          },
+          {
+            "label": "Lint",
+            "type": "shell",
+            "command": "npm run lint",
+            "group": "build",
+            "problemMatcher": ["$eslint-stylish"]
+          },
+          {
+            "label": "Format",
+            "type": "shell",
+            "command": "npm run format",
+            "group": "build"
+          },
+          {
+            "label": "E2E Tests",
+            "type": "shell",
+            "command": "npm run test:e2e",
+            "group": "test"
+          }
+        ]
+      },
+      "launch": {
+        "version": "0.2.0",
+        "configurations": [
+          {
+            "name": "Debug Jest Tests",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/node_modules/.bin/jest",
+            "args": ["--runInBand"],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "disableOptimisticBPs": true,
+            "windows": {
+              "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+            },
+            "runtimeArgs": ["--nolazy"],
+            "env": {
+              "NODE_ENV": "test"
+            }
+          },
+          {
+            "name": "Debug Current Jest Test",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/node_modules/.bin/jest",
+            "args": ["--runInBand", "${file}"],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "disableOptimisticBPs": true,
+            "windows": {
+              "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+            },
+            "runtimeArgs": ["--nolazy"],
+            "env": {
+              "NODE_ENV": "test"
+            }
+          },
+          {
+            "name": "Debug E2E Tests",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/node_modules/.bin/jest",
+            "args": ["--config", "jest.e2e.config.js", "--runInBand"],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "disableOptimisticBPs": true,
+            "windows": {
+              "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+            },
+            "runtimeArgs": ["--nolazy"],
+            "env": {
+              "NODE_ENV": "test"
+            }
+          }
+        ]
       }
     }
   },
