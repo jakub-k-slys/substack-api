@@ -12,6 +12,24 @@ This section provides information for developers who want to contribute to the S
 
 ### Getting Started
 
+#### Option 1: Dev Container (Recommended)
+
+For the most consistent development experience, use the provided dev container configuration:
+
+**GitHub Codespaces:**
+1. Click the "Code" button in the GitHub repository
+2. Select "Codespaces" tab  
+3. Click "Create codespace on main"
+4. Dependencies will be installed automatically
+
+**VS Code Remote - Containers:**
+1. Install the "Remote - Containers" extension in VS Code
+2. Clone the repository locally
+3. Open in VS Code and click "Reopen in Container" when prompted
+4. Dependencies will be installed automatically
+
+#### Option 2: Local Development
+
 1. Clone the repository:
    ```bash
    git clone https://github.com/jakub-k-slys/substack-api.git
