@@ -1,14 +1,6 @@
 /// <reference path="./global.d.ts" />
 import { Substack } from '../../src/client'
 
-// Helper function to skip tests if no credentials or network access
-const skipIfNoCredentials = () => {
-  if (!global.E2E_CONFIG.hasCredentials) {
-    return test.skip
-  }
-  return test
-}
-
 // Helper function to handle network errors gracefully
 const handleNetworkError = (error: any, operation: string): void => {
   // Check for various network error indicators
@@ -55,17 +47,14 @@ describe('E2E: Notes Operations', () => {
   let client: Substack
 
   beforeAll(() => {
-    if (!global.E2E_CONFIG.hasCredentials) {
-      return
-    }
-
+    // Credentials are guaranteed to be available due to setup.ts validation
     client = new Substack({
       apiKey: global.E2E_CONFIG.apiKey!,
       hostname: global.E2E_CONFIG.hostname
     })
   })
 
-  skipIfNoCredentials()('should fetch notes for authenticated user', async () => {
+  test('should fetch notes for authenticated user', async () => {
     try {
       const notes: any[] = []
       let count = 0
@@ -101,7 +90,7 @@ describe('E2E: Notes Operations', () => {
     }
   })
 
-  skipIfNoCredentials()('should handle notes pagination', async () => {
+  test('should handle notes pagination', async () => {
     try {
       const firstPageNotes: any[] = []
 
@@ -139,7 +128,7 @@ describe('E2E: Notes Operations', () => {
   // Note: Publishing notes is commented out as it creates real content
   // Uncomment and use with caution in a test environment
   /*
-  skipIfNoCredentials()('should publish a simple note', async () => {
+  test('should publish a simple note', async () => {
     try {
       const testNote = `E2E Test Note - ${new Date().toISOString()}`
       const publishedNote = await client.publishNote(testNote)
@@ -155,7 +144,7 @@ describe('E2E: Notes Operations', () => {
     }
   })
 
-  skipIfNoCredentials()('should publish a formatted note using builder', async () => {
+  test('should publish a formatted note using builder', async () => {
     try {
       const publishedNote = await client
         .note('E2E Test: ')
