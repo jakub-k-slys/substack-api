@@ -45,6 +45,8 @@ export interface SubstackConfig {
   hostname?: string
   apiVersion?: string
   apiKey: string
+  perPage?: number // Default items per page for pagination (default: 25)
+  cacheTTL?: number // Cache TTL in seconds (default: 300)
 }
 
 export interface PaginationParams {

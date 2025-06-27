@@ -5,7 +5,8 @@ describe('Substack Iterator Methods', () => {
 
   beforeEach(() => {
     client = new Substack({
-      apiKey: 'test-api-key'
+      apiKey: 'test-api-key',
+      perPage: 20 // Use old page size for existing tests
     })
     global.fetch = jest.fn()
   })
