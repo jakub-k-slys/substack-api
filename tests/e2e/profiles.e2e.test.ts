@@ -1,14 +1,6 @@
 /// <reference path="./global.d.ts" />
 import { Substack } from '../../src/client'
 
-// Helper function to skip tests if no credentials or network access
-const skipIfNoCredentials = () => {
-  if (!global.E2E_CONFIG.hasCredentials) {
-    return test.skip
-  }
-  return test
-}
-
 // Helper function to handle network errors gracefully
 const handleNetworkError = (error: any, operation: string): void => {
   // Check for various network error indicators
@@ -55,17 +47,14 @@ describe('E2E: User Profile Operations', () => {
   let client: Substack
 
   beforeAll(() => {
-    if (!global.E2E_CONFIG.hasCredentials) {
-      return
-    }
-
+    // Credentials are guaranteed to be available due to setup.ts validation
     client = new Substack({
       apiKey: global.E2E_CONFIG.apiKey!,
       hostname: global.E2E_CONFIG.hostname
     })
   })
 
-  skipIfNoCredentials()('should fetch user profile by ID', async () => {
+  test('should fetch user profile by ID', async () => {
     try {
       // Use a common user ID for testing (this is a generic approach)
       // In real scenarios, you'd get this from other API calls
@@ -95,7 +84,7 @@ describe('E2E: User Profile Operations', () => {
     }
   })
 
-  skipIfNoCredentials()('should fetch public profile by slug', async () => {
+  test('should fetch public profile by slug', async () => {
     try {
       // Use a common public profile slug for testing
       const testSlug = 'hamish' // Example public slug
@@ -111,7 +100,7 @@ describe('E2E: User Profile Operations', () => {
     }
   })
 
-  skipIfNoCredentials()('should fetch following profiles', async () => {
+  test('should fetch following profiles', async () => {
     try {
       const followingProfiles = await client.getFollowingProfiles()
 
@@ -129,7 +118,7 @@ describe('E2E: User Profile Operations', () => {
     }
   })
 
-  skipIfNoCredentials()('should handle non-existent user profile gracefully', async () => {
+  test('should handle non-existent user profile gracefully', async () => {
     try {
       await client.getUserProfile(999999999) // Very unlikely to exist
     } catch (error) {
@@ -138,7 +127,7 @@ describe('E2E: User Profile Operations', () => {
     }
   })
 
-  skipIfNoCredentials()('should handle non-existent public profile gracefully', async () => {
+  test('should handle non-existent public profile gracefully', async () => {
     try {
       await client.getPublicProfile('non-existent-user-slug-12345')
     } catch (error) {

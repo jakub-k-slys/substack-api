@@ -1,14 +1,6 @@
 /// <reference path="./global.d.ts" />
 import { Substack } from '../../src/client'
 
-// Helper function to skip tests if no credentials
-const skipIfNoCredentials = () => {
-  if (!global.E2E_CONFIG.hasCredentials) {
-    return test.skip
-  }
-  return test
-}
-
 // Helper function to handle network errors gracefully
 const handleNetworkError = (error: any, operation: string): void => {
   // Check for various network error indicators
@@ -55,17 +47,14 @@ describe('E2E: Comment Operations', () => {
   let client: Substack
 
   beforeAll(() => {
-    if (!global.E2E_CONFIG.hasCredentials) {
-      return
-    }
-
+    // Credentials are guaranteed to be available due to setup.ts validation
     client = new Substack({
       apiKey: global.E2E_CONFIG.apiKey!,
       hostname: global.E2E_CONFIG.hostname
     })
   })
 
-  skipIfNoCredentials()('should fetch comments for a post', async () => {
+  test('should fetch comments for a post', async () => {
     try {
       // First get a post to get comments for
       const posts = []
@@ -120,7 +109,7 @@ describe('E2E: Comment Operations', () => {
     }
   })
 
-  skipIfNoCredentials()('should fetch comments with pagination', async () => {
+  test('should fetch comments with pagination', async () => {
     try {
       const posts = []
       for await (const post of client.getPosts({ limit: 5 })) {
@@ -168,7 +157,7 @@ describe('E2E: Comment Operations', () => {
     }
   })
 
-  skipIfNoCredentials()('should fetch specific comment by ID', async () => {
+  test('should fetch specific comment by ID', async () => {
     try {
       // First get a comment to get its ID
       const posts = []
@@ -213,7 +202,7 @@ describe('E2E: Comment Operations', () => {
     }
   })
 
-  skipIfNoCredentials()('should handle non-existent comment gracefully', async () => {
+  test('should handle non-existent comment gracefully', async () => {
     try {
       await client.getComment(999999999) // Very unlikely to exist
     } catch (error) {

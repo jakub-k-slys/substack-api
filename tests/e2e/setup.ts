@@ -1,4 +1,5 @@
 import * as dotenv from 'dotenv'
+import { validateE2ECredentials } from './checkEnv'
 
 // Load environment variables from .env file
 dotenv.config()
@@ -12,24 +13,11 @@ declare global {
   }
 }
 
-// Check if we have the required credentials for E2E tests
-const apiKey = process.env.SUBSTACK_API_KEY || process.env.E2E_API_KEY
-const hostname = process.env.SUBSTACK_HOSTNAME || process.env.E2E_HOSTNAME
-
+// Validate credentials and fail early if missing
+// This ensures E2E tests always run and fail explicitly when credentials are missing
+const credentials = validateE2ECredentials()
 global.E2E_CONFIG = {
-  hasCredentials: !!apiKey,
-  apiKey,
-  hostname
-}
-
-// If no credentials are available, skip all E2E tests
-if (!global.E2E_CONFIG.hasCredentials) {
-  console.warn(`
-⚠️  E2E tests will be skipped because SUBSTACK_API_KEY is not set.
-    To run E2E tests, set the following environment variables:
-    - SUBSTACK_API_KEY: Your Substack API key
-    - SUBSTACK_HOSTNAME: (optional) Your Substack hostname
-    
-    You can also create a .env file with these variables.
-  `)
+  hasCredentials: true,
+  apiKey: credentials.SUBSTACK_API_KEY,
+  hostname: credentials.SUBSTACK_HOSTNAME
 }

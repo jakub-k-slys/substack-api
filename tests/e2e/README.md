@@ -45,20 +45,35 @@ npm run test:e2e
 ### Available Commands
 
 ```bash
-# Run all E2E tests
+# Run all tests (unit + E2E) - RECOMMENDED
+npm test
+
+# Run only unit tests
+npm run test:unit
+
+# Run only E2E tests
 npm run test:e2e
 
 # Run E2E tests in watch mode
 npm run test:e2e:watch
 
-# Run both unit and E2E tests
+# Legacy: Run both unit and E2E tests (same as npm test)
 npm run test:all
 ```
 
 ## Test Behavior
 
 ### Without Credentials
-When no API credentials are provided, all E2E tests are automatically skipped with a warning message explaining how to set up credentials.
+When no API credentials are provided, **E2E tests will fail immediately** with a clear error message explaining how to set up credentials. This ensures that missing credentials are caught early in the development process.
+
+**Error message example:**
+```
+❌ Missing required Substack credentials. Set SUBSTACK_API_KEY and SUBSTACK_HOSTNAME.
+
+Required environment variables:
+- SUBSTACK_API_KEY: Your Substack API key (required)
+- SUBSTACK_HOSTNAME: Your Substack hostname (optional)
+```
 
 ### With Credentials
 Tests run against the real Substack API using your provided credentials. Tests are designed to be:
@@ -84,21 +99,15 @@ E2E tests are integrated into the GitHub Actions workflow:
 
 When creating new E2E tests:
 
-1. **Use the conditional pattern**:
+1. **No credential checking needed** - Tests will automatically fail if credentials are missing
+2. **Use standard test() function**:
    ```typescript
-   const skipIfNoCredentials = () => {
-     if (!global.E2E_CONFIG.hasCredentials) {
-       return test.skip
-     }
-     return test
-   }
-   
-   skipIfNoCredentials()('should test something', async () => {
-     // Test implementation
+   test('should test something', async () => {
+     // Test implementation - credentials guaranteed to be available
    })
    ```
 
-2. **Handle errors gracefully**:
+3. **Handle errors gracefully**:
    ```typescript
    try {
      const result = await client.someMethod()
@@ -108,9 +117,9 @@ When creating new E2E tests:
    }
    ```
 
-3. **Avoid creating content** unless absolutely necessary for the test
-4. **Add descriptive logging** for skipped operations
-5. **Follow existing naming conventions**
+4. **Avoid creating content** unless absolutely necessary for the test
+5. **Add descriptive logging** for skipped operations
+6. **Follow existing naming conventions**
 
 ## Debugging
 
