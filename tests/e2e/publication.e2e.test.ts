@@ -67,7 +67,10 @@ describe('E2E: Publication Data Retrieval', () => {
 
   skipIfNoCredentials()('should fetch posts from publication', async () => {
     try {
-      const posts = await client.getPosts({ limit: 5 })
+      const posts = []
+      for await (const post of client.getPosts({ limit: 5 })) {
+        posts.push(post)
+      }
 
       expect(Array.isArray(posts)).toBe(true)
       expect(posts.length).toBeLessThanOrEqual(5)
@@ -94,8 +97,21 @@ describe('E2E: Publication Data Retrieval', () => {
 
   skipIfNoCredentials()('should fetch posts with pagination', async () => {
     try {
-      const firstPage = await client.getPosts({ limit: 2 })
-      const secondPage = await client.getPosts({ limit: 2, offset: 2 })
+      const firstPage = []
+      for await (const post of client.getPosts({ limit: 2 })) {
+        firstPage.push(post)
+      }
+
+      // Get second page by skipping first 2 posts
+      const secondPage = []
+      let skipped = 0
+      for await (const post of client.getPosts({ limit: 4 })) {
+        if (skipped < 2) {
+          skipped++
+          continue
+        }
+        secondPage.push(post)
+      }
 
       expect(Array.isArray(firstPage)).toBe(true)
       expect(Array.isArray(secondPage)).toBe(true)
@@ -112,7 +128,10 @@ describe('E2E: Publication Data Retrieval', () => {
   skipIfNoCredentials()('should fetch specific post by slug', async () => {
     try {
       // First get a post to get its slug
-      const posts = await client.getPosts({ limit: 1 })
+      const posts = []
+      for await (const post of client.getPosts({ limit: 1 })) {
+        posts.push(post)
+      }
 
       if (posts.length === 0) {
         console.log('Skipping post fetch test - no posts available')

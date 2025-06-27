@@ -30,9 +30,10 @@ const defaultClient = new Substack({
 ```typescript
 async function listRecentPosts() {
   try {
-    const posts = await client.getPosts({
-      limit: 10
-    });
+    const posts = [];
+    for await (const post of client.getPosts({ limit: 10 })) {
+      posts.push(post);
+    }
     
     posts.forEach(post => {
       console.log(`${post.title} - ${new Date(post.post_date).toLocaleDateString()}`);
@@ -90,9 +91,10 @@ async function getPostWithComments(slug: string) {
     console.log(`URL: ${post.canonical_url}`);
     
     // Get comments for the post
-    const comments = await client.getComments(post.id, {
-      limit: 10
-    });
+    const comments = [];
+    for await (const comment of client.getComments(post.id, { limit: 10 })) {
+      comments.push(comment);
+    }
     
     console.log(`\nRecent comments (${comments.length}):`);
     comments.forEach(comment => {
@@ -377,7 +379,13 @@ async function robustAPICall<T>(operation: () => Promise<T>): Promise<T | null> 
 
 // Usage example
 async function safeGetPosts() {
-  return robustAPICall(() => client.getPosts({ limit: 10 }));
+  return robustAPICall(async () => {
+    const posts = [];
+    for await (const post of client.getPosts({ limit: 10 })) {
+      posts.push(post);
+    }
+    return posts;
+  });
 }
 ```
 
@@ -418,11 +426,17 @@ const searchParams: SearchParams = {
 // Type-safe function implementations
 async function getPostsWithCommentCounts(): Promise<ExtendedPost[]> {
   const client = new Substack(config);
-  const posts = await client.getPosts({ limit: 10 });
+  const posts = [];
+  for await (const post of client.getPosts({ limit: 10 })) {
+    posts.push(post);
+  }
   
   const extendedPosts: ExtendedPost[] = await Promise.all(
     posts.map(async (post) => {
-      const comments = await client.getComments(post.id, { limit: 1 }); // Just to get count
+      const comments = [];
+      for await (const comment of client.getComments(post.id, { limit: 1 })) {
+        comments.push(comment);
+      }
       return {
         ...post,
         commentsCount: comments.length,
@@ -462,10 +476,19 @@ class SubstackDashboard {
   async getDashboardData() {
     try {
       // Get recent posts with engagement metrics
-      const posts = await this.client.getPosts({ limit: 5 });
+      const posts = [];
+      for await (const post of this.client.getPosts({ limit: 5 })) {
+        posts.push(post);
+      }
       const postsWithComments = await Promise.all(
         posts.map(async (post) => {
-          const comments = await this.client.getComments(post.id, { limit: 100 });
+          const comments = [];
+          for await (const comment of this.client.getComments(post.id, { limit: 100 })) {
+            comments.push(comment);
+          }
+          return { ...post, commentCount: comments.length };
+        })
+      );
           return {
             ...post,
             commentCount: comments.length,

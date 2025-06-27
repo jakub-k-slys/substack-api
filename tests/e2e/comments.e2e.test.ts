@@ -68,7 +68,10 @@ describe('E2E: Comment Operations', () => {
   skipIfNoCredentials()('should fetch comments for a post', async () => {
     try {
       // First get a post to get comments for
-      const posts = await client.getPosts({ limit: 5 })
+      const posts = []
+      for await (const post of client.getPosts({ limit: 5 })) {
+        posts.push(post)
+      }
 
       if (posts.length === 0) {
         console.log('Skipping comment test - no posts available')
@@ -79,7 +82,10 @@ describe('E2E: Comment Operations', () => {
       let commentsFound = false
       for (const post of posts) {
         try {
-          const comments = await client.getComments(post.id, { limit: 5 })
+          const comments = []
+          for await (const comment of client.getComments(post.id, { limit: 5 })) {
+            comments.push(comment)
+          }
 
           expect(Array.isArray(comments)).toBe(true)
 
@@ -116,7 +122,10 @@ describe('E2E: Comment Operations', () => {
 
   skipIfNoCredentials()('should fetch comments with pagination', async () => {
     try {
-      const posts = await client.getPosts({ limit: 5 })
+      const posts = []
+      for await (const post of client.getPosts({ limit: 5 })) {
+        posts.push(post)
+      }
 
       if (posts.length === 0) {
         console.log('Skipping comment pagination test - no posts available')
@@ -126,8 +135,21 @@ describe('E2E: Comment Operations', () => {
       // Try to find a post with enough comments for pagination
       for (const post of posts) {
         try {
-          const firstPage = await client.getComments(post.id, { limit: 2 })
-          const secondPage = await client.getComments(post.id, { limit: 2, offset: 2 })
+          const firstPage = []
+          for await (const comment of client.getComments(post.id, { limit: 2 })) {
+            firstPage.push(comment)
+          }
+
+          // Get second page by getting more comments and skipping first 2
+          const secondPage = []
+          let skipped = 0
+          for await (const comment of client.getComments(post.id, { limit: 4 })) {
+            if (skipped < 2) {
+              skipped++
+              continue
+            }
+            secondPage.push(comment)
+          }
 
           expect(Array.isArray(firstPage)).toBe(true)
           expect(Array.isArray(secondPage)).toBe(true)
@@ -149,7 +171,10 @@ describe('E2E: Comment Operations', () => {
   skipIfNoCredentials()('should fetch specific comment by ID', async () => {
     try {
       // First get a comment to get its ID
-      const posts = await client.getPosts({ limit: 5 })
+      const posts = []
+      for await (const post of client.getPosts({ limit: 5 })) {
+        posts.push(post)
+      }
 
       if (posts.length === 0) {
         console.log('Skipping specific comment test - no posts available')
@@ -159,7 +184,10 @@ describe('E2E: Comment Operations', () => {
       let commentFound = false
       for (const post of posts) {
         try {
-          const comments = await client.getComments(post.id, { limit: 1 })
+          const comments = []
+          for await (const comment of client.getComments(post.id, { limit: 1 })) {
+            comments.push(comment)
+          }
 
           if (comments.length > 0) {
             const commentId = comments[0].id

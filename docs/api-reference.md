@@ -35,35 +35,37 @@ const client = new Substack({
 ### getPosts
 
 ```typescript
-getPosts(params?: PaginationParams): Promise<SubstackPost[]>
+getPosts(options?: PostsIteratorOptions): AsyncIterable<SubstackPost>
 ```
 
-Retrieves a list of posts from the publication, with support for pagination to fetch large datasets efficiently.
+Retrieves posts from the publication with automatic pagination handling. Returns an async iterable that yields individual posts, making pagination transparent to the developer.
 
 **Parameters:**
-- `params` (optional): Pagination parameters
-  - `offset`: Number of items to skip (for pagination)
-  - `limit`: Maximum number of items to return
-  - `cursor`: Cursor for cursor-based pagination
+- `options` (optional): Iterator options
+  - `limit`: Maximum total number of posts to retrieve across all pages
 
 **Returns:**
-- Promise resolving to an array of `SubstackPost` objects
+- `AsyncIterable<SubstackPost>` - An async iterable that yields individual posts
 
 **Example:**
 ```typescript
-// Get the latest 10 posts
-const recentPosts = await client.getPosts({ limit: 10 });
-console.log(`Found ${recentPosts.length} posts`);
-
-// Paginate through posts
-const firstPage = await client.getPosts({ limit: 5, offset: 0 });
-const secondPage = await client.getPosts({ limit: 5, offset: 5 });
-
-// Display post titles
-recentPosts.forEach(post => {
+// ✅ Async iteration (preferred for streaming large sets)
+for await (const post of client.getPosts()) {
   console.log(`${post.title} (${post.type})`);
   console.log(`Published: ${new Date(post.post_date).toLocaleDateString()}`);
-});
+}
+
+// Limit the total number of posts
+for await (const post of client.getPosts({ limit: 50 })) {
+  console.log(`Post: ${post.title}`);
+}
+
+// Collect posts into an array if needed
+const recentPosts = [];
+for await (const post of client.getPosts({ limit: 10 })) {
+  recentPosts.push(post);
+}
+console.log(`Collected ${recentPosts.length} recent posts`);
 ```
 
 ### getPost
@@ -144,33 +146,41 @@ const recentNewsletters = await client.searchPosts({
 ### getComments
 
 ```typescript
-getComments(postId: number, params?: PaginationParams): Promise<SubstackComment[]>
+getComments(postId: number, options?: CommentsIteratorOptions): AsyncIterable<SubstackComment>
 ```
 
-Retrieves comments for a specific post, with pagination support for posts with many comments.
+Retrieves comments for a specific post with automatic pagination handling. Returns an async iterable that yields individual comments, making pagination transparent to the developer.
 
 **Parameters:**
 - `postId`: The numeric ID of the post
-- `params` (optional): Pagination parameters
-  - `offset`: Number of items to skip
-  - `limit`: Maximum number of items to return
+- `options` (optional): Iterator options
+  - `limit`: Maximum total number of comments to retrieve across all pages
 
 **Returns:**
-- Promise resolving to an array of `SubstackComment` objects
+- `AsyncIterable<SubstackComment>` - An async iterable that yields individual comments
 
 **Example:**
 ```typescript
-// Get comments for a post
-const comments = await client.getComments(12345, { limit: 50 });
-console.log(`Found ${comments.length} comments`);
-
-comments.forEach(comment => {
+// ✅ Async iteration (preferred for streaming large sets)
+for await (const comment of client.getComments(12345)) {
   console.log(`${comment.author.name}: ${comment.body.substring(0, 100)}...`);
   console.log(`Posted: ${new Date(comment.created_at).toLocaleDateString()}`);
   if (comment.author.is_admin) {
     console.log('⭐ Admin comment');
   }
-});
+}
+
+// Limit the total number of comments
+for await (const comment of client.getComments(12345, { limit: 20 })) {
+  console.log(`Comment: ${comment.body.substring(0, 50)}...`);
+}
+
+// Collect comments into an array if needed
+const recentComments = [];
+for await (const comment of client.getComments(12345, { limit: 10 })) {
+  recentComments.push(comment);
+}
+console.log(`Collected ${recentComments.length} recent comments`);
 ```
 
 ### getComment
@@ -704,6 +714,37 @@ Options for controlling the notes iteration behavior.
 **Properties:**
 - `limit`: Maximum total number of notes to retrieve across all pages. If not specified, all available notes will be retrieved.
 
+#### PostsIteratorOptions
+
+```typescript
+interface PostsIteratorOptions {
+  limit?: number; // Total number of posts to retrieve across all pages
+}
+```
+
+Options for controlling the posts iteration behavior.
+
+**Properties:**
+- `limit`: Maximum total number of posts to retrieve across all pages. If not specified, all available posts will be retrieved.
+
+#### CommentsIteratorOptions
+
+```typescript
+interface CommentsIteratorOptions {
+  limit?: number; // Total number of comments to retrieve across all pages
+}
+```
+
+Options for controlling the comments iteration behavior.
+
+**Properties:**
+- `limit`: Maximum total number of comments to retrieve across all pages. If not specified, all available comments will be retrieved.
+
+Options for controlling the notes iteration behavior.
+
+**Properties:**
+- `limit`: Maximum total number of notes to retrieve across all pages. If not specified, all available notes will be retrieved.
+
 ### User Profile Types
 
 #### SubstackUserProfile
@@ -888,7 +929,10 @@ Custom error class for API-related errors.
 **Example Usage:**
 ```typescript
 try {
-  const posts = await client.getPosts();
+  const posts = [];
+  for await (const post of client.getPosts()) {
+    posts.push(post);
+  }
 } catch (error) {
   if (error instanceof SubstackError) {
     console.error(`API Error: ${error.message}`);

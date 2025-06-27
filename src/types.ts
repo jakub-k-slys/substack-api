@@ -57,6 +57,14 @@ export interface NotesIteratorOptions {
   limit?: number // Total number of notes to retrieve across all pages
 }
 
+export interface PostsIteratorOptions {
+  limit?: number // Total number of posts to retrieve across all pages
+}
+
+export interface CommentsIteratorOptions {
+  limit?: number // Total number of comments to retrieve across all pages
+}
+
 export interface SubstackUserProfile {
   items: Array<{
     entity_key: string
