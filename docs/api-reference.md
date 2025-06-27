@@ -19,6 +19,8 @@ Creates a new Substack API client instance. The client requires an API key for a
   - `hostname` (optional): The publication's hostname (e.g., 'example.substack.com', default: 'substack.com')
   - `apiVersion` (optional): API version to use (default: 'v1')
   - `apiKey`: Your Substack API key (required)
+  - `perPage` (optional): Default items per page for pagination (default: 25)
+  - `cacheTTL` (optional): Cache TTL in seconds (default: 300)
 
 **Example:**
 ```typescript
@@ -26,7 +28,52 @@ import { Substack } from 'substack-api';
 
 const client = new Substack({
   hostname: 'example.substack.com',
-  apiKey: 'your-api-key-here'
+  apiKey: 'your-api-key-here',
+  perPage: 50, // Custom page size
+  cacheTTL: 600 // Cache for 10 minutes
+});
+```
+
+## Performance Features
+
+### Built-in Caching
+
+The Substack client includes automatic in-memory caching for read-only operations (`GET` requests) to improve performance and reduce API calls.
+
+**Cache Behavior:**
+- **Automatic**: Enabled by default for all read-only methods (`getPosts`, `getNotes`, `getComments`, etc.)
+- **TTL-based**: Cached responses expire after the configured `cacheTTL` (default: 300 seconds)
+- **Key-based**: Uses request URL and method as cache keys
+- **Memory-only**: Cache is stored in memory and doesn't persist across application restarts
+
+**Cache Configuration:**
+```typescript
+const client = new Substack({
+  apiKey: 'your-api-key',
+  cacheTTL: 600 // Cache responses for 10 minutes
+});
+```
+
+**Cache Benefits:**
+- Reduced API calls for repeated requests
+- Faster response times for cached data
+- Automatic cache invalidation via TTL
+- No external dependencies required
+
+### Configurable Pagination
+
+The client uses configurable page sizes for optimal performance:
+
+**Default Behavior:**
+- Default `perPage`: 25 items per API request
+- Automatic pagination continues until all data is retrieved or limit is reached
+- Intelligent request sizing when limits are applied
+
+**Custom Configuration:**
+```typescript
+const client = new Substack({
+  apiKey: 'your-api-key',
+  perPage: 50 // Request 50 items per page instead of 25
 });
 ```
 
@@ -574,6 +621,8 @@ interface SubstackConfig {
   hostname?: string;
   apiVersion?: string;
   apiKey: string;
+  perPage?: number;
+  cacheTTL?: number;
 }
 ```
 
@@ -583,6 +632,8 @@ Configuration options for the Substack client.
 - `hostname`: The publication's hostname (optional, defaults to 'substack.com')
 - `apiVersion`: API version to use (optional, defaults to 'v1')
 - `apiKey`: Your Substack API key (required for authentication)
+- `perPage`: Default items per page for pagination (optional, defaults to 25)
+- `cacheTTL`: Cache TTL in seconds (optional, defaults to 300)
 
 ### Post Types
 

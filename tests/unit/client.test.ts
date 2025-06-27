@@ -116,26 +116,30 @@ describe('Substack', () => {
       })
 
       // Make two POST requests (note publishing)
-      await client.publishNoteRequest({ 
+      await client.publishNoteRequest({
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
-          content: [{
-            type: 'paragraph',
-            content: [{ type: 'text', text: 'test' }]
-          }]
+          content: [
+            {
+              type: 'paragraph',
+              content: [{ type: 'text', text: 'test' }]
+            }
+          ]
         },
         replyMinimumRole: 'everyone'
       })
 
-      await client.publishNoteRequest({ 
+      await client.publishNoteRequest({
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
-          content: [{
-            type: 'paragraph',
-            content: [{ type: 'text', text: 'test2' }]
-          }]
+          content: [
+            {
+              type: 'paragraph',
+              content: [{ type: 'text', text: 'test2' }]
+            }
+          ]
         },
         replyMinimumRole: 'everyone'
       })
@@ -162,7 +166,7 @@ describe('Substack', () => {
       await iterator1.next()
 
       // Wait for cache to expire
-      await new Promise(resolve => setTimeout(resolve, 10))
+      await new Promise((resolve) => global.setTimeout(resolve, 10))
 
       // Second call should not use expired cache
       const iterator2 = shortTTLClient.getPosts({ limit: 1 })[Symbol.asyncIterator]()

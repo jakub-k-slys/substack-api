@@ -76,27 +76,27 @@ export class Substack {
   private getCachedData<T>(cacheKey: string): T | null {
     const entry = this.cache.get(cacheKey)
     if (!entry) return null
-    
+
     if (Date.now() > entry.expiry) {
       this.cache.delete(cacheKey)
       return null
     }
-    
+
     return entry.data
   }
 
   private setCachedData<T>(cacheKey: string, data: T): void {
-    const expiry = Date.now() + (this.cacheTTL * 1000)
+    const expiry = Date.now() + this.cacheTTL * 1000
     this.cache.set(cacheKey, { data, expiry })
   }
 
   private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const method = options.method || 'GET'
     const isReadOnly = method === 'GET'
-    
+
     // Only cache read-only operations
     const cacheKey = isReadOnly ? this.getCacheKey(path, options) : ''
-    
+
     if (isReadOnly) {
       const cached = this.getCachedData<T>(cacheKey)
       if (cached) {
@@ -118,12 +118,12 @@ export class Substack {
     }
 
     const data = await response.json()
-    
+
     // Cache the response for read-only operations
     if (isReadOnly) {
       this.setCachedData(cacheKey, data)
     }
-    
+
     return data
   }
 
