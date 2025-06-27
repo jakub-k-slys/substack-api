@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "jest && jest --config jest.e2e.config.js",
+    "test": "jest",
     "test:unit": "jest",
     "test:watch": "jest --watch",
     "test:e2e": "jest --config jest.e2e.config.js",
