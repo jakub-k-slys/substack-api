@@ -12,7 +12,8 @@ A TypeScript client for interacting with the Substack webservice API. This libra
 - 🔍 **Publication Management** - Fetch publication details and metadata
 - 📝 **Post Operations** - Get posts, search by criteria, and access individual posts
 - 💬 **Comment System** - Retrieve comments and comment threads
-- 📄 **Pagination Support** - Built-in pagination for all list operations
+- 📄 **Smart Pagination** - Built-in pagination with configurable page sizes (default: 25)
+- 🚀 **Built-in Caching** - Automatic in-memory caching with TTL for improved performance
 - 🛡️ **TypeScript First** - Full type safety with comprehensive type definitions
 - ⚡ **Error Handling** - Comprehensive error handling with custom error types
 - 🔧 **Configurable** - Support for different API versions and custom configurations
@@ -32,11 +33,16 @@ import { Substack } from 'substack-api';
 
 // Create a client for a specific publication
 const client = new Substack({
-  hostname: 'example.substack.com'
+  hostname: 'example.substack.com',
+  apiKey: 'your-api-key-here',
+  perPage: 50, // Custom page size
+  cacheTTL: 300 // Cache for 5 minutes
 });
 
 // Fetch recent posts
-const posts = await client.getPosts({ limit: 5 });
+for await (const post of client.getPosts({ limit: 10 })) {
+  console.log(`${post.title} - ${post.post_date}`);
+}
 
 // Search for posts
 const results = await client.searchPosts({

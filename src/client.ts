@@ -28,10 +28,18 @@ export class SubstackError extends Error {
   }
 }
 
+interface CacheEntry<T> {
+  data: T
+  expiry: number
+}
+
 export class Substack {
   private readonly baseUrl: string
   private readonly apiVersion: string
   private readonly cookie: string
+  private readonly perPage: number
+  private readonly cacheTTL: number
+  private readonly cache = new Map<string, CacheEntry<any>>()
 
   constructor(config: SubstackConfig) {
     if (!config.apiKey) {
@@ -40,6 +48,8 @@ export class Substack {
     this.baseUrl = `https://${config.hostname || 'substack.com'}`
     this.apiVersion = config.apiVersion || 'v1'
     this.cookie = `connect.sid=s%3A${config.apiKey}`
+    this.perPage = config.perPage || 25
+    this.cacheTTL = config.cacheTTL || 300 // 300 seconds (5 minutes) default
   }
 
   private buildUrl<T extends PaginationParams>(path: string, params?: T): string {
@@ -57,7 +67,43 @@ export class Substack {
     return queryString ? `${url}?${queryString}` : url
   }
 
+  private getCacheKey(url: string, options?: RequestInit): string {
+    const method = options?.method || 'GET'
+    const body = options?.body || ''
+    return `${method}:${url}:${body}`
+  }
+
+  private getCachedData<T>(cacheKey: string): T | null {
+    const entry = this.cache.get(cacheKey)
+    if (!entry) return null
+
+    if (Date.now() > entry.expiry) {
+      this.cache.delete(cacheKey)
+      return null
+    }
+
+    return entry.data
+  }
+
+  private setCachedData<T>(cacheKey: string, data: T): void {
+    const expiry = Date.now() + this.cacheTTL * 1000
+    this.cache.set(cacheKey, { data, expiry })
+  }
+
   private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
+    const method = options.method || 'GET'
+    const isReadOnly = method === 'GET'
+
+    // Only cache read-only operations
+    const cacheKey = isReadOnly ? this.getCacheKey(path, options) : ''
+
+    if (isReadOnly) {
+      const cached = this.getCachedData<T>(cacheKey)
+      if (cached) {
+        return cached
+      }
+    }
+
     const response = await fetch(path, {
       ...options,
       headers: {
@@ -71,7 +117,14 @@ export class Substack {
       throw new SubstackError(`Request failed: ${response.statusText}`, response.status, response)
     }
 
-    return response.json()
+    const data = await response.json()
+
+    // Cache the response for read-only operations
+    if (isReadOnly) {
+      this.setCachedData(cacheKey, data)
+    }
+
+    return data
   }
 
   /**
@@ -82,7 +135,6 @@ export class Substack {
   async *getPosts(options: PostsIteratorOptions = {}): AsyncIterable<SubstackPost> {
     let offset = 0
     let totalFetched = 0
-    const pageSize = 20 // Default page size for API calls
 
     while (true) {
       // Check if we've reached the limit before making another API call
@@ -91,10 +143,10 @@ export class Substack {
       }
 
       // Calculate how many items to request for this page
-      let requestLimit = pageSize
+      let requestLimit = this.perPage
       if (options.limit) {
         const remaining = options.limit - totalFetched
-        requestLimit = Math.min(pageSize, remaining)
+        requestLimit = Math.min(this.perPage, remaining)
       }
 
       // Build pagination params for the API call
@@ -117,9 +169,9 @@ export class Substack {
         totalFetched++
       }
 
-      // If we got fewer posts than requested from the API, we've reached the end
+      // If we got fewer posts than the API page size, we've reached the end
       // This happens when the API has no more data to return
-      if (response.length < requestLimit) {
+      if (response.length < this.perPage) {
         break
       }
 
@@ -157,7 +209,6 @@ export class Substack {
   ): AsyncIterable<SubstackComment> {
     let offset = 0
     let totalFetched = 0
-    const pageSize = 20 // Default page size for API calls
 
     while (true) {
       // Check if we've reached the limit before making another API call
@@ -166,10 +217,10 @@ export class Substack {
       }
 
       // Calculate how many items to request for this page
-      let requestLimit = pageSize
+      let requestLimit = this.perPage
       if (options.limit) {
         const remaining = options.limit - totalFetched
-        requestLimit = Math.min(pageSize, remaining)
+        requestLimit = Math.min(this.perPage, remaining)
       }
 
       // Build pagination params for the API call
@@ -192,9 +243,9 @@ export class Substack {
         totalFetched++
       }
 
-      // If we got fewer comments than requested from the API, we've reached the end
+      // If we got fewer comments than the API page size, we've reached the end
       // This happens when the API has no more data to return
-      if (response.length < requestLimit) {
+      if (response.length < this.perPage) {
         break
       }
 
