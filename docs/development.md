@@ -34,10 +34,10 @@ This section provides information for developers who want to contribute to the S
 substack-api/
 ├── src/
 │   ├── client.ts        # Main Substack class implementation
-│   ├── tests/           # Unit tests
 │   ├── types.ts         # TypeScript type definitions
 │   └── index.ts         # Public API exports
 ├── tests/
+│   ├── unit/            # Unit tests
 │   └── e2e/             # End-to-end tests
 ├── docs/
 │   └── source/          # Documentation source files
