@@ -1,8 +1,10 @@
 import { OwnProfile } from '../../src/entities/own-profile'
 import { Note } from '../../src/entities/note'
+import type { SubstackFullProfile } from '../../src/types'
+import type { SubstackHttpClient } from '../../src/http-client'
 
 describe('OwnProfile Entity', () => {
-  let mockProfileData: any
+  let mockProfileData: SubstackFullProfile
   let ownProfile: OwnProfile
 
   beforeEach(() => {
@@ -16,15 +18,40 @@ describe('OwnProfile Entity', () => {
       reader_installed_at: '2023-01-01T00:00:00Z',
       profile_disabled: false,
       publicationUsers: [],
-      userLinks: []
-    }
+      userLinks: [],
+      subscriptions: [],
+      subscriptionsTruncated: false,
+      hasGuestPost: false,
+      max_pub_tier: 1,
+      hasActivity: false,
+      hasLikes: false,
+      lists: [],
+      rough_num_free_subscribers_int: 0,
+      rough_num_free_subscribers: '0',
+      bestseller_badge_disabled: false,
+      subscriberCountString: '0',
+      subscriberCount: '0',
+      subscriberCountNumber: 0,
+      hasHiddenPublicationUsers: false,
+      visibleSubscriptionsCount: 0,
+      slug: 'testuser',
+      primaryPublicationIsPledged: false,
+      primaryPublicationSubscriptionState: 'none',
+      isSubscribed: false,
+      isFollowing: false,
+      followsViewer: false,
+      can_dm: false,
+      dm_upgrade_options: []
+    } as SubstackFullProfile
 
     // Mock the legacy client
     const mockClient = {
-      publishNote: jest.fn()
-    }
+      get: jest.fn(),
+      post: jest.fn(),
+      request: jest.fn()
+    } as unknown as jest.Mocked<SubstackHttpClient>
 
-    ownProfile = new OwnProfile(mockProfileData, mockClient as any)
+    ownProfile = new OwnProfile(mockProfileData, mockClient)
   })
 
   it('should inherit from Profile', () => {
@@ -53,10 +80,11 @@ describe('OwnProfile Entity', () => {
     // Mock the post method to return a successful response
     const mockClient = {
       post: jest.fn().mockResolvedValue(mockPost),
-      get: jest.fn()
-    }
+      get: jest.fn(),
+      request: jest.fn()
+    } as unknown as jest.Mocked<SubstackHttpClient>
 
-    const ownProfile = new OwnProfile(mockProfileData, mockClient as any)
+    const ownProfile = new OwnProfile(mockProfileData, mockClient)
     const post = await ownProfile.createPost({
       title: 'Test Post',
       body: 'Test content'
@@ -77,10 +105,11 @@ describe('OwnProfile Entity', () => {
     // Mock failed API response
     const mockClient = {
       post: jest.fn().mockRejectedValue(new Error('API Error')),
-      get: jest.fn()
-    }
+      get: jest.fn(),
+      request: jest.fn()
+    } as unknown as jest.Mocked<SubstackHttpClient>
 
-    const ownProfile = new OwnProfile(mockProfileData, mockClient as any)
+    const ownProfile = new OwnProfile(mockProfileData, mockClient)
 
     await expect(
       ownProfile.createPost({
@@ -100,10 +129,11 @@ describe('OwnProfile Entity', () => {
 
     const mockClient = {
       post: jest.fn().mockResolvedValue(mockNoteResponse),
-      get: jest.fn()
-    }
+      get: jest.fn(),
+      request: jest.fn()
+    } as unknown as jest.Mocked<SubstackHttpClient>
 
-    const ownProfile = new OwnProfile(mockProfileData, mockClient as any)
+    const ownProfile = new OwnProfile(mockProfileData, mockClient)
     const note = await ownProfile.createNote({
       body: 'Test note content'
     })
@@ -120,10 +150,11 @@ describe('OwnProfile Entity', () => {
     // Mock failed API response (fallback to mock)
     const mockClient = {
       post: jest.fn().mockRejectedValue(new Error('API not available')),
-      get: jest.fn()
-    }
+      get: jest.fn(),
+      request: jest.fn()
+    } as unknown as jest.Mocked<SubstackHttpClient>
 
-    const ownProfile = new OwnProfile(mockProfileData, mockClient as any)
+    const ownProfile = new OwnProfile(mockProfileData, mockClient)
     const note = await ownProfile.createNote({
       body: 'Test note content'
     })
@@ -137,10 +168,11 @@ describe('OwnProfile Entity', () => {
     // Mock failed API response (fallback to mock)
     const mockClient = {
       post: jest.fn().mockRejectedValue(new Error('API not available')),
-      get: jest.fn()
-    }
+      get: jest.fn(),
+      request: jest.fn()
+    } as unknown as jest.Mocked<SubstackHttpClient>
 
-    const ownProfile = new OwnProfile(mockProfileData, mockClient as any)
+    const ownProfile = new OwnProfile(mockProfileData, mockClient)
     const note = await ownProfile.createNote({
       body: 'Test note content',
       formatting: [{ start: 0, end: 4, type: 'bold' }]

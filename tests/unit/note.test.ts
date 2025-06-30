@@ -1,15 +1,18 @@
 import { Note } from '../../src/entities/note'
 import { Comment } from '../../src/entities/comment'
+import type { SubstackHttpClient } from '../../src/http-client'
+import type { SubstackNoteComment } from '../../src/types/note-details'
 
 describe('Note Entity', () => {
-  let mockHttpClient: any
+  let mockHttpClient: jest.Mocked<SubstackHttpClient>
   let note: Note
 
   beforeEach(() => {
     mockHttpClient = {
       get: jest.fn(),
-      post: jest.fn()
-    }
+      post: jest.fn(),
+      request: jest.fn()
+    } as unknown as jest.Mocked<SubstackHttpClient>
 
     const mockNoteData = {
       entity_key: '789',
@@ -249,7 +252,7 @@ describe('Note Entity', () => {
           children_count: 0,
           attachments: []
         },
-        parentComments: undefined as any,
+        parentComments: [] as Array<SubstackNoteComment>,
         canReply: true,
         isMuted: false,
         trackingParameters: {
@@ -343,7 +346,7 @@ describe('Note Entity', () => {
             attachments: [],
             post_id: 792
           }
-        ] as any, // Cast to any to allow null in the array during testing
+        ] as Array<SubstackNoteComment>,
         canReply: true,
         isMuted: false,
         trackingParameters: {

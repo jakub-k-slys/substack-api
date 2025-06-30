@@ -1,15 +1,17 @@
 import { Post } from '../../src/entities/post'
 import { Comment } from '../../src/entities/comment'
+import type { SubstackHttpClient } from '../../src/http-client'
 
 describe('Post Entity', () => {
-  let mockHttpClient: any
+  let mockHttpClient: jest.Mocked<SubstackHttpClient>
   let post: Post
 
   beforeEach(() => {
     mockHttpClient = {
       get: jest.fn(),
-      post: jest.fn()
-    }
+      post: jest.fn(),
+      request: jest.fn()
+    } as unknown as jest.Mocked<SubstackHttpClient>
 
     const mockPostData = {
       id: 456,

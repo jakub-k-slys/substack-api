@@ -24,7 +24,7 @@ describe('SubstackClient', () => {
       hostname: 'test.substack.com'
     })
     // Replace the internal http client with our mock
-    ;(client as any).httpClient = mockHttpClient
+    ;(client as unknown as { httpClient: SubstackHttpClient }).httpClient = mockHttpClient
   })
 
   describe('testConnectivity', () => {
@@ -90,7 +90,8 @@ describe('SubstackClient', () => {
       mockHttpClient.get.mockRejectedValue(new Error('Not found'))
 
       await expect(client.profileForSlug('nonexistent')).rejects.toThrow(
-        'Profile with slug \'nonexistent\' not found: Not found'
+        // eslint-disable-next-line quotes
+        "Profile with slug 'nonexistent' not found: Not found"
       )
     })
   })

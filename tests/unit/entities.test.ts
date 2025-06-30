@@ -1,5 +1,6 @@
 import { SubstackClient } from '../../src/substack-client'
 import { Profile, Post, Comment, OwnProfile } from '../../src/entities'
+import type { SubstackHttpClient } from '../../src/http-client'
 
 describe('SubstackClient Entity Model', () => {
   let client: SubstackClient
@@ -71,7 +72,7 @@ describe('SubstackClient Entity Model', () => {
         can_dm: false,
         dm_upgrade_options: []
       }
-      const httpClient = (client as any).httpClient
+      const httpClient = (client as unknown as { httpClient: SubstackHttpClient }).httpClient
       const profile = new Profile(mockData, httpClient)
 
       expect(profile).toBeInstanceOf(Profile)
@@ -89,7 +90,7 @@ describe('SubstackClient Entity Model', () => {
         canonical_url: 'https://example.com/post',
         type: 'newsletter' as const
       }
-      const httpClient = (client as any).httpClient
+      const httpClient = (client as unknown as { httpClient: SubstackHttpClient }).httpClient
       const post = new Post(mockData, httpClient)
 
       expect(post).toBeInstanceOf(Post)
@@ -105,7 +106,7 @@ describe('SubstackClient Entity Model', () => {
         parent_post_id: 456,
         author: { id: 123, name: 'Test User' }
       }
-      const httpClient = (client as any).httpClient
+      const httpClient = (client as unknown as { httpClient: SubstackHttpClient }).httpClient
       const comment = new Comment(mockData, httpClient)
 
       expect(comment).toBeInstanceOf(Comment)

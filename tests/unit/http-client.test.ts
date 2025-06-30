@@ -23,12 +23,15 @@ describe('SubstackHttpClient', () => {
     })
 
     it('should use default hostname when not provided', () => {
-      const clientWithoutHostname = new SubstackHttpClient({ apiKey: 'test-key' } as any)
+      const clientWithoutHostname = new SubstackHttpClient({
+        apiKey: 'test-key',
+        hostname: 'default.substack.com'
+      })
       expect(clientWithoutHostname).toBeDefined()
     })
 
     it('should set up correct base URL and cookie', () => {
-      const clientInstance = client as any
+      const clientInstance = client as unknown as { baseUrl: string; cookie: string }
       expect(clientInstance.baseUrl).toBe('https://test.substack.com')
       expect(clientInstance.cookie).toBe('connect.sid=s%3Atest-api-key')
     })
@@ -40,7 +43,7 @@ describe('SubstackHttpClient', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue(mockResponse)
-      } as any)
+      } as unknown as Response)
 
       const result = await client.request('/test')
 
@@ -58,7 +61,7 @@ describe('SubstackHttpClient', () => {
         ok: false,
         status: 404,
         statusText: 'Not Found'
-      } as any)
+      } as unknown as Response)
 
       await expect(client.request('/test')).rejects.toThrow('HTTP 404: Not Found')
     })
@@ -68,7 +71,7 @@ describe('SubstackHttpClient', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue(mockResponse)
-      } as any)
+      } as unknown as Response)
 
       await client.request('/test', {
         headers: {
@@ -90,7 +93,7 @@ describe('SubstackHttpClient', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue(mockResponse)
-      } as any)
+      } as unknown as Response)
 
       const result = await client.get('/test')
 
@@ -112,7 +115,7 @@ describe('SubstackHttpClient', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue(mockResponse)
-      } as any)
+      } as unknown as Response)
 
       const result = await client.post('/test', postData)
 
@@ -133,7 +136,7 @@ describe('SubstackHttpClient', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue(mockResponse)
-      } as any)
+      } as unknown as Response)
 
       const result = await client.post('/test')
 
