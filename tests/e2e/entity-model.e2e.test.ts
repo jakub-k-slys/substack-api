@@ -38,12 +38,12 @@ describe('SubstackClient Entity Model E2E', () => {
       // Try to get a well-known Substack profile
       // Using a popular profile that should exist
       const profile = await client.profileForSlug('platformer')
-      
+
       expect(profile).toBeInstanceOf(Profile)
       expect(profile.name).toBeTruthy()
       expect(profile.slug).toBe('platformer')
       expect(profile.id).toBeGreaterThan(0)
-      
+
       console.log(`✅ Retrieved profile: ${profile.name} (@${profile.slug})`)
     } catch (error) {
       console.log('ℹ️ Profile lookup not available:', (error as Error).message)
@@ -55,20 +55,20 @@ describe('SubstackClient Entity Model E2E', () => {
     try {
       const followees = []
       let count = 0
-      
+
       for await (const profile of client.followees({ limit: 5 })) {
         followees.push(profile)
         count++
-        
+
         expect(profile).toBeInstanceOf(Profile)
         expect(profile.name).toBeTruthy()
         expect(profile.slug).toBeTruthy()
-        
+
         if (count >= 5) break
       }
-      
+
       console.log(`✅ Retrieved ${followees.length} followee profiles`)
-      
+
       if (followees.length > 0) {
         const firstProfile = followees[0]
         console.log(`First followee: ${firstProfile.name} (@${firstProfile.slug})`)
@@ -82,13 +82,13 @@ describe('SubstackClient Entity Model E2E', () => {
   test('should get own profile', async () => {
     try {
       const ownProfile = await client.ownProfile()
-      
+
       expect(ownProfile.name).toBeTruthy()
       expect(ownProfile.slug).toBeTruthy()
       expect(typeof ownProfile.createNote).toBe('function')
       expect(typeof ownProfile.createPost).toBe('function')
       expect(typeof ownProfile.followers).toBe('function')
-      
+
       console.log(`✅ Retrieved own profile: ${ownProfile.name} (@${ownProfile.slug})`)
     } catch (error) {
       console.log('ℹ️ Own profile not available:', (error as Error).message)
@@ -101,20 +101,20 @@ describe('SubstackClient Entity Model E2E', () => {
       const profile = await client.profileForSlug('platformer')
       const posts = []
       let count = 0
-      
+
       for await (const post of profile.posts({ limit: 3 })) {
         posts.push(post)
         count++
-        
+
         expect(post.title).toBeTruthy()
         expect(post.id).toBeGreaterThan(0)
         expect(post.publishedAt).toBeInstanceOf(Date)
-        
+
         if (count >= 3) break
       }
-      
+
       console.log(`✅ Retrieved ${posts.length} posts from profile`)
-      
+
       if (posts.length > 0) {
         const firstPost = posts[0]
         console.log(`First post: "${firstPost.title}"`)
@@ -129,29 +129,29 @@ describe('SubstackClient Entity Model E2E', () => {
     try {
       // First get a profile
       const profile = await client.profileForSlug('platformer')
-      
+
       // Get a post from the profile
       let testPost = null
       for await (const post of profile.posts({ limit: 5 })) {
         testPost = post
         break
       }
-      
+
       if (testPost) {
         const comments = []
         let count = 0
-        
+
         for await (const comment of testPost.comments({ limit: 3 })) {
           comments.push(comment)
           count++
-          
+
           expect(comment.body).toBeTruthy()
           expect(comment.author.name).toBeTruthy()
           expect(comment.createdAt).toBeInstanceOf(Date)
-          
+
           if (count >= 3) break
         }
-        
+
         console.log(`✅ Retrieved ${comments.length} comments from post "${testPost.title}"`)
       } else {
         console.log('ℹ️ No posts available to test comments')
