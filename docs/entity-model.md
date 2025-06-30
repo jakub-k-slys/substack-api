@@ -92,7 +92,8 @@ for await (const comment of note.comments()) {
 
 ```typescript
 console.log('People you follow:')
-for await (const profile of client.followees({ limit: 20 })) {
+const me = await client.ownProfile()
+for await (const profile of me.followees({ limit: 20 })) {
   console.log(`- ${profile.name} (@${profile.slug})`)
   
   // Get their recent posts

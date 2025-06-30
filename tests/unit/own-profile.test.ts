@@ -209,7 +209,7 @@ describe('OwnProfile Entity', () => {
         }
       ]
     }
-    const mockClient = ownProfile['client'] as jest.Mocked<any>
+    const mockClient = ownProfile['client'] as jest.Mocked<SubstackHttpClient>
     mockClient.get.mockResolvedValue(mockResponse)
 
     const followees = []
@@ -226,7 +226,7 @@ describe('OwnProfile Entity', () => {
 
   it('should handle empty followees response', async () => {
     const mockResponse = { users: [] }
-    const mockClient = ownProfile['client'] as jest.Mocked<any>
+    const mockClient = ownProfile['client'] as jest.Mocked<SubstackHttpClient>
     mockClient.get.mockResolvedValue(mockResponse)
 
     const followees = []
