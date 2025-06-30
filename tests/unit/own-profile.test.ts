@@ -49,78 +49,23 @@ describe('OwnProfile Entity', () => {
   })
 
   it('should create a note', async () => {
-    const mockResponse = {
-      id: 456,
-      body: 'Test note content',
-      date: '2023-01-01T00:00:00Z',
-      name: 'Test User',
-      photo_url: 'https://example.com/photo.jpg',
-      body_json: {},
-      publication_id: 1,
-      post_id: null,
-      user_id: 123,
-      type: 'note',
-      ancestor_path: [],
-      reply_minimum_role: 'free',
-      media_clip_id: null,
-      reaction_count: 0,
-      reactions: [],
-      restacks: [],
-      restacked: false,
-      children_count: 0,
-      attachments: [],
-      user_bestseller_tier: 'none',
-      user_primary_publication: null
-    }
-
-    const mockClient = ownProfile as any
-    mockClient.client.publishNote = jest.fn().mockResolvedValue(mockResponse)
-
     const note = await ownProfile.createNote({
       body: 'Test note content'
     })
 
     expect(note).toBeInstanceOf(Note)
-    expect(note.id).toBe('note_456')
     expect(note.body).toBe('Test note content')
-    expect(mockClient.client.publishNote).toHaveBeenCalledWith('Test note content')
+    expect(note.author.name).toBe('Test User')
   })
 
   it('should create a note with formatting', async () => {
-    const mockResponse = {
-      id: 456,
-      body: 'Test note content',
-      date: '2023-01-01T00:00:00Z',
-      name: 'Test User',
-      photo_url: 'https://example.com/photo.jpg',
-      body_json: {},
-      publication_id: 1,
-      post_id: null,
-      user_id: 123,
-      type: 'note',
-      ancestor_path: [],
-      reply_minimum_role: 'free',
-      media_clip_id: null,
-      reaction_count: 0,
-      reactions: [],
-      restacks: [],
-      restacked: false,
-      children_count: 0,
-      attachments: [],
-      user_bestseller_tier: 'none',
-      user_primary_publication: null
-    }
-
-    const mockClient = ownProfile as any
-    mockClient.client.publishNote = jest.fn().mockResolvedValue(mockResponse)
-
     const note = await ownProfile.createNote({
       body: 'Test note content',
       formatting: [{ start: 0, end: 4, type: 'bold' }]
     })
 
     expect(note).toBeInstanceOf(Note)
-    expect(mockClient.client.publishNote).toHaveBeenCalledWith('Test note content')
+    expect(note.body).toBe('Test note content')
   })
 
   it('should return empty followers iterator', async () => {

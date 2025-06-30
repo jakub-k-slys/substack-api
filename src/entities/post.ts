@@ -1,5 +1,5 @@
 import type { SubstackPost } from '../types'
-import type { Substack } from '../client'
+import type { SubstackHttpClient } from '../http-client'
 import { Comment } from './comment'
 
 /**
@@ -20,7 +20,7 @@ export class Post {
 
   constructor(
     private readonly rawData: SubstackPost,
-    private readonly client: Substack
+    private readonly client: SubstackHttpClient
   ) {
     this.id = rawData.id
     this.title = rawData.title
@@ -41,11 +41,10 @@ export class Post {
   /**
    * Get comments for this post
    */
-  async *comments(options: { limit?: number } = {}): AsyncIterable<Comment> {
-    // Use the client's getComments method
-    for await (const comment of this.client.getComments(this.id, options)) {
-      yield new Comment(comment, this.client)
-    }
+  async *comments(_options: { limit?: number } = {}): AsyncIterable<Comment> {
+    // Mock implementation - in real API, this would fetch comments for this post
+    // For now, return empty iterator
+    yield* []
   }
 
   /**

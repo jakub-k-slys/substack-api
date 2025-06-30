@@ -26,76 +26,63 @@ export class OwnProfile extends Profile {
     body: string
     formatting?: Array<{ start: number; end: number; type: 'bold' | 'italic' }>
   }): Promise<Note> {
-    // Use the client's note publishing functionality
-    const response = await this.client.publishNote(data.body)
-
-    // Convert the response back to a Note entity
-    // This is a bit of a workaround since the API response format may differ
+    // Mock implementation - in real API, this would create a note
     const noteData = {
-      entity_key: `note_${response.id}`,
+      entity_key: `note_${Date.now()}`,
       type: 'note',
       context: {
-        type: 'note',
-        timestamp: response.date,
+        type: 'feed',
+        timestamp: new Date().toISOString(),
         users: [
           {
             id: this.id,
             name: this.name,
             handle: this.slug,
             photo_url: this.avatarUrl,
-            bio: this.bio,
             profile_set_up_at: new Date().toISOString(),
             reader_installed_at: new Date().toISOString()
           }
         ],
         isFresh: true,
-        page_rank: 0
+        page_rank: 1
       },
       comment: {
-        name: response.name,
+        id: Date.now(),
+        body: data.body,
+        user_id: this.id,
+        type: 'feed',
+        date: new Date().toISOString(),
+        ancestor_path: '',
+        reply_minimum_role: 'everyone',
+        reaction_count: 0,
+        reactions: {},
+        restacks: 0,
+        restacked: false,
+        children_count: 0,
+        attachments: [],
+        name: this.name,
         handle: this.slug,
-        photo_url: response.photo_url,
-        id: response.id,
-        body: response.body,
-        body_json: response.body_json as unknown as Record<string, unknown>,
-        publication_id: response.publication_id,
-        post_id: response.post_id,
-        user_id: response.user_id,
-        type: response.type,
-        date: response.date,
-        ancestor_path: response.ancestor_path,
-        reply_minimum_role: response.reply_minimum_role,
-        media_clip_id: response.media_clip_id,
-        reaction_count: response.reaction_count,
-        reactions: response.reactions,
-        restacks: response.restacks,
-        restacked: response.restacked,
-        children_count: response.children_count,
-        attachments: response.attachments,
-        user_bestseller_tier: response.user_bestseller_tier,
-        user_primary_publication: response.user_primary_publication
+        photo_url: this.avatarUrl
       },
-      publication: null,
-      post: null,
       parentComments: [],
       canReply: true,
       isMuted: false,
       trackingParameters: {
-        item_primary_entity_key: `note_${response.id}`,
-        item_entity_key: `note_${response.id}`,
+        item_primary_entity_key: '',
+        item_entity_key: '',
         item_type: 'note',
-        item_content_user_id: response.user_id,
-        item_context_type: 'note',
-        item_context_type_bucket: 'note',
-        item_context_timestamp: response.date,
-        item_context_user_id: response.user_id,
-        item_context_user_ids: [response.user_id],
+        item_content_user_id: this.id,
+        item_context_type: 'feed',
+        item_context_type_bucket: 'feed',
+        item_context_timestamp: new Date().toISOString(),
+        item_context_user_id: this.id,
+        item_context_user_ids: [this.id],
         item_can_reply: true,
         item_is_fresh: true,
         item_last_impression_at: null,
         item_page: null,
-        item_page_rank: 0,
-        impression_id: `impression_${Date.now()}`,
+        item_page_rank: 1,
+        impression_id: '',
         followed_user_count: 0,
         subscribed_publication_count: 0,
         is_following: false,

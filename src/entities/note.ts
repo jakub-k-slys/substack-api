@@ -1,5 +1,5 @@
-import type { SubstackNote } from '../types'
-import type { Substack } from '../client'
+import type { SubstackNote, SubstackNoteComment } from '../types'
+import type { SubstackHttpClient } from '../http-client'
 import { Comment } from './comment'
 
 /**
@@ -19,14 +19,14 @@ export class Note {
 
   constructor(
     private readonly rawData: SubstackNote,
-    private readonly client: Substack
+    private readonly client: SubstackHttpClient
   ) {
     this.id = rawData.entity_key
     this.body = rawData.comment?.body || ''
-    this.likesCount = 0 // TODO: Extract from rawData when available
+    this.likesCount = rawData.comment?.reaction_count || 0
     this.publishedAt = new Date(rawData.context.timestamp)
 
-    // Extract author from the first user in context
+    // Extract author info from context users
     const firstUser = rawData.context.users[0]
     this.author = {
       id: firstUser?.id || 0,
@@ -37,22 +37,22 @@ export class Note {
   }
 
   /**
-   * Get comments for this note
+   * Get parent comments for this note
    */
-  async *comments(_options: { limit?: number } = {}): AsyncIterable<Comment> {
-    // Notes may have comments, but the API structure might be different
-    // For now, return parent comments if available, converting them to SubstackComment format
+  async *comments(): AsyncIterable<Comment> {
+    // Convert parent comments to Comment entities
     for (const parentComment of this.rawData.parentComments || []) {
       if (parentComment) {
         // Convert note comment format to SubstackComment format
+        const comment = parentComment as SubstackNoteComment
         const commentData = {
-          id: parentComment.id,
-          body: parentComment.body,
-          created_at: parentComment.date,
-          parent_post_id: parentComment.post_id || 0,
+          id: comment.id,
+          body: comment.body,
+          created_at: comment.date,
+          parent_post_id: comment.post_id || 0,
           author: {
-            id: parentComment.user_id,
-            name: parentComment.name,
+            id: comment.user_id,
+            name: comment.name,
             is_admin: false // Not available in note comment format
           }
         }
@@ -66,14 +66,16 @@ export class Note {
    */
   async like(): Promise<void> {
     // Implementation will like the note via the client
+    // This requires authentication and proper API endpoints
     throw new Error('Note liking not implemented yet - requires like API')
   }
 
   /**
    * Add a comment to this note
    */
-  async addComment(_data: { body: string }): Promise<Comment> {
-    // Implementation will add comment via the client
-    throw new Error('Comment creation not implemented yet - requires comment creation API')
+  async addComment(_text: string): Promise<Comment> {
+    // Implementation will add a comment via the client
+    // This requires authentication and proper API endpoints
+    throw new Error('Note commenting not implemented yet - requires comment API')
   }
 }

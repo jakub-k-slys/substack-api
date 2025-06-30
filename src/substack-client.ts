@@ -1,37 +1,40 @@
-import { Substack } from './client'
+import { SubstackHttpClient } from './http-client'
 import { Profile, OwnProfile, Post, Note, Comment } from './entities'
-import type { SubstackConfig, SubstackFullProfile } from './types'
+import type {
+  SubstackConfig,
+  SubstackFullProfile,
+  SubstackPost,
+  SubstackNote,
+  SubstackComment
+} from './types'
 
 /**
  * Modern SubstackClient with entity-based API
  */
 export class SubstackClient {
-  private readonly legacyClient: Substack
+  private readonly httpClient: SubstackHttpClient
 
   constructor(config: SubstackConfig) {
-    this.legacyClient = new Substack(config)
+    this.httpClient = new SubstackHttpClient(config)
+  }
+
+  /**
+   * Test API connectivity
+   */
+  async testConnectivity(): Promise<boolean> {
+    try {
+      await this.httpClient.get('/api/v1/reader/user_following')
+      return true
+    } catch {
+      return false
+    }
   }
 
   /**
    * Get the authenticated user's own profile with write capabilities
    */
   async ownProfile(): Promise<OwnProfile> {
-    // Try to get the user's own profile via following list
-    // This is a workaround since there's no direct "me" endpoint
-    try {
-      const followingProfiles = await this.legacyClient.getFollowingProfiles()
-      if (followingProfiles.length > 0) {
-        // For now, we'll assume we can identify our own profile somehow
-        // This is a limitation of the current API structure
-        const firstProfile = followingProfiles[0]
-        return new OwnProfile(firstProfile, this.legacyClient)
-      }
-    } catch {
-      // Continue to fallback
-    }
-
-    // Fallback: create a minimal profile for demonstration
-    // In a real implementation, this would need a proper "me" endpoint
+    // Create a minimal profile for now since we don't have a "me" endpoint
     const mockProfile: SubstackFullProfile = {
       id: 0,
       name: 'Unknown User',
@@ -59,115 +62,81 @@ export class SubstackClient {
       visibleSubscriptionsCount: 0,
       slug: 'unknown',
       primaryPublicationIsPledged: false,
-      primaryPublicationSubscriptionState: 'none',
+      primaryPublicationSubscriptionState: 'not_subscribed',
       isSubscribed: false,
       isFollowing: false,
       followsViewer: false,
       can_dm: false,
-      dm_upgrade_options: [],
-      userProfile: {
-        items: [],
-        originalCursorTimestamp: '',
-        nextCursor: ''
-      }
+      dm_upgrade_options: []
     }
-
-    return new OwnProfile(mockProfile, this.legacyClient)
+    return new OwnProfile(mockProfile, this.httpClient)
   }
 
   /**
    * Get a profile by user ID
    */
   async profileForId(id: string): Promise<Profile> {
-    const numericId = parseInt(id, 10)
-    if (isNaN(numericId)) {
+    if (!/^\d+$/.test(id)) {
       throw new Error('Invalid user ID - must be numeric')
     }
 
     try {
-      const fullProfile = await this.legacyClient.getFullProfileById(numericId)
-      return new Profile(fullProfile, this.legacyClient)
+      const profile = await this.httpClient.get<SubstackFullProfile>(`/api/v1/users/${id}`)
+      return new Profile(profile, this.httpClient)
     } catch {
       throw new Error(`Profile with ID ${id} not found`)
     }
   }
 
   /**
-   * Get a profile by user slug/handle
+   * Get a profile by handle/slug
    */
   async profileForSlug(slug: string): Promise<Profile> {
-    const publicProfile = await this.legacyClient.getPublicProfile(slug)
-    return new Profile(publicProfile, this.legacyClient)
+    const profile = await this.httpClient.get<SubstackFullProfile>(`/api/v1/users/${slug}`)
+    return new Profile(profile, this.httpClient)
   }
 
   /**
-   * Get a post by ID
+   * Get a specific post by ID
    */
   async postForId(id: string): Promise<Post> {
-    // The legacy client uses slug, so we need to handle ID differently
-    // For now, treat the ID as a slug - this is a limitation
-    const post = await this.legacyClient.getPost(id)
-    return new Post(post, this.legacyClient)
+    const post = await this.httpClient.get<SubstackPost>(`/api/v1/posts/${id}`)
+    return new Post(post, this.httpClient)
   }
 
   /**
-   * Get a note by ID
+   * Get a specific note by ID
    */
   async noteForId(id: string): Promise<Note> {
-    // We need to search through notes to find the one with the matching ID
-    // This is inefficient but works with current API structure
-    for await (const note of this.legacyClient.getNotes({ limit: 1000 })) {
-      if (note.entity_key === id) {
-        return new Note(note, this.legacyClient)
-      }
+    try {
+      const note = await this.httpClient.get<SubstackNote>(`/api/v1/notes/${id}`)
+      return new Note(note, this.httpClient)
+    } catch {
+      throw new Error(`Note with ID ${id} not found`)
     }
-    throw new Error(`Note with ID ${id} not found`)
   }
 
   /**
-   * Get a comment by ID
+   * Get a specific comment by ID
    */
   async commentForId(id: string): Promise<Comment> {
-    const numericId = parseInt(id, 10)
-    if (isNaN(numericId)) {
+    if (!/^\d+$/.test(id)) {
       throw new Error('Invalid comment ID - must be numeric')
     }
 
-    const comment = await this.legacyClient.getComment(numericId)
-    return new Comment(comment, this.legacyClient)
+    const comment = await this.httpClient.get<SubstackComment>(`/api/v1/comments/${id}`)
+    return new Comment(comment, this.httpClient)
   }
 
   /**
-   * Get profiles of users that the authenticated user follows
+   * Get users that the authenticated user follows
    */
-  async *followees(options: { limit?: number } = {}): AsyncIterable<Profile> {
-    const followingProfiles = await this.legacyClient.getFollowingProfiles()
-    let count = 0
-
-    for (const profileData of followingProfiles) {
-      if (options.limit && count >= options.limit) {
-        break
-      }
-      yield new Profile(profileData, this.legacyClient)
-      count++
-    }
-  }
-
-  /**
-   * Test connectivity to the Substack API
-   * Returns true if the connection is working, false otherwise
-   */
-  async testConnectivity(): Promise<boolean> {
-    try {
-      // Try a simple API call to test connectivity
-      const posts = []
-      for await (const post of this.legacyClient.getPosts({ limit: 1 })) {
-        posts.push(post)
-        break // Just get one post to test
-      }
-      return true
-    } catch {
-      return false
+  async *followees(): AsyncIterable<Profile> {
+    const response = await this.httpClient.get<{ users: SubstackFullProfile[] }>(
+      '/api/v1/reader/user_following'
+    )
+    for (const user of response.users) {
+      yield new Profile(user, this.httpClient)
     }
   }
 }
