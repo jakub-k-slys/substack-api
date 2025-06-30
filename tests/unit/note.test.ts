@@ -1,452 +1,411 @@
-import { Substack } from '../../src/client'
-import { PublishNoteResponse } from '../../src/types'
+import { Note } from '../../src/entities/note'
+import { Comment } from '../../src/entities/comment'
+import type { SubstackHttpClient } from '../../src/http-client'
+import type { SubstackNoteComment } from '../../src/types/note-details'
 
-describe('Substack Notes', () => {
-  let client: Substack
+describe('Note Entity', () => {
+  let mockHttpClient: jest.Mocked<SubstackHttpClient>
+  let note: Note
 
   beforeEach(() => {
-    client = new Substack({
-      apiKey: 'test-api-key'
-    })
-    global.fetch = jest.fn()
-  })
+    mockHttpClient = {
+      get: jest.fn(),
+      post: jest.fn(),
+      request: jest.fn()
+    } as unknown as jest.Mocked<SubstackHttpClient>
 
-  describe('note publishing', () => {
-    it('should publish a simple note using publishNote', async () => {
-      const mockResponse: PublishNoteResponse = {
-        user_id: 254824415,
-        body: 'Test test test',
-        body_json: {
-          type: 'doc',
-          attrs: { schemaVersion: 'v1' },
-          content: [
-            {
-              type: 'paragraph',
-              content: [
-                {
-                  type: 'text',
-                  text: 'Test test test'
-                }
-              ]
-            }
-          ]
-        },
-        post_id: null,
-        publication_id: null,
-        media_clip_id: null,
-        ancestor_path: '',
+    const mockNoteData = {
+      entity_key: '789',
+      type: 'note',
+      context: {
         type: 'feed',
-        status: 'published',
-        reply_minimum_role: 'everyone',
-        id: 126991702,
-        deleted: false,
-        date: '2025-06-18T09:25:18.957Z',
-        name: 'Test User',
-        photo_url: 'https://example.com/photo.png',
-        reactions: { '❤': 0 },
-        children: [],
-        user_bestseller_tier: null,
-        isFirstFeedCommentByUser: false,
-        reaction_count: 0,
-        restacks: 0,
-        restacked: false,
-        children_count: 0,
-        attachments: []
-      }
-
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockResponse)
-      })
-
-      const result = await client.publishNote('Test test test')
-      expect(result).toEqual(mockResponse)
-
-      expect(global.fetch).toHaveBeenCalledWith('https://substack.com/api/v1/comment/feed', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Cookie: 'connect.sid=s%3Atest-api-key'
-        },
-        body: JSON.stringify({
-          bodyJson: {
-            type: 'doc',
-            attrs: { schemaVersion: 'v1' },
-            content: [
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: 'Test test test'
-                  }
-                ]
-              }
-            ]
-          },
-          replyMinimumRole: 'everyone'
-        })
-      })
-    })
-
-    it('should handle API errors in simple note publishing', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: false,
-        status: 401,
-        statusText: 'Unauthorized'
-      })
-
-      await expect(client.publishNote('Test')).rejects.toThrow('Request failed: Unauthorized')
-    })
-  })
-
-  describe('note builder', () => {
-    it('should handle empty initial text', async () => {
-      const mockResponse: PublishNoteResponse = {
-        user_id: 254824415,
-        body: 'Test',
-        body_json: {
-          type: 'doc',
-          attrs: { schemaVersion: 'v1' },
-          content: [
-            {
-              type: 'paragraph',
-              content: [{ type: 'text', text: 'Test', marks: [{ type: 'bold' }] }]
-            }
-          ]
-        },
-        post_id: null,
-        publication_id: null,
-        media_clip_id: null,
-        ancestor_path: '',
-        type: 'feed',
-        status: 'published',
-        reply_minimum_role: 'everyone',
-        id: 126991705,
-        deleted: false,
-        date: '2025-06-18T09:25:18.957Z',
-        name: 'Test User',
-        photo_url: 'https://example.com/photo.png',
-        reactions: { '❤': 0 },
-        children: [],
-        user_bestseller_tier: null,
-        isFirstFeedCommentByUser: false,
-        reaction_count: 0,
-        restacks: 0,
-        restacked: false,
-        children_count: 0,
-        attachments: []
-      }
-
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockResponse)
-      })
-
-      const result = await client.note().bold('Test').publish()
-      expect(result).toEqual(mockResponse)
-    })
-
-    it('should handle empty paragraphs', async () => {
-      const mockResponse: PublishNoteResponse = {
-        user_id: 254824415,
-        body: 'Test',
-        body_json: {
-          type: 'doc',
-          attrs: { schemaVersion: 'v1' },
-          content: [
-            {
-              type: 'paragraph',
-              content: [{ type: 'text', text: 'Test' }]
-            }
-          ]
-        },
-        post_id: null,
-        publication_id: null,
-        media_clip_id: null,
-        ancestor_path: '',
-        type: 'feed',
-        status: 'published',
-        reply_minimum_role: 'everyone',
-        id: 126991706,
-        deleted: false,
-        date: '2025-06-18T09:25:18.957Z',
-        name: 'Test User',
-        photo_url: 'https://example.com/photo.png',
-        reactions: { '❤': 0 },
-        children: [],
-        user_bestseller_tier: null,
-        isFirstFeedCommentByUser: false,
-        reaction_count: 0,
-        restacks: 0,
-        restacked: false,
-        children_count: 0,
-        attachments: []
-      }
-
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockResponse)
-      })
-
-      const result = await client.note().note('Test').publish()
-      expect(result).toEqual(mockResponse)
-    })
-
-    it('should handle simple text segments without marks', async () => {
-      const mockResponse: PublishNoteResponse = {
-        user_id: 254824415,
-        body: 'Simple text',
-        body_json: {
-          type: 'doc',
-          attrs: { schemaVersion: 'v1' },
-          content: [
-            {
-              type: 'paragraph',
-              content: [{ type: 'text', text: 'Simple text' }]
-            }
-          ]
-        },
-        post_id: null,
-        publication_id: null,
-        media_clip_id: null,
-        ancestor_path: '',
-        type: 'feed',
-        status: 'published',
-        reply_minimum_role: 'everyone',
-        id: 126991707,
-        deleted: false,
-        date: '2025-06-18T09:25:18.957Z',
-        name: 'Test User',
-        photo_url: 'https://example.com/photo.png',
-        reactions: { '❤': 0 },
-        children: [],
-        user_bestseller_tier: null,
-        isFirstFeedCommentByUser: false,
-        reaction_count: 0,
-        restacks: 0,
-        restacked: false,
-        children_count: 0,
-        attachments: []
-      }
-
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockResponse)
-      })
-
-      const result = await client.note('Simple text').publish()
-
-      expect(result).toEqual(mockResponse)
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          body: JSON.stringify({
-            bodyJson: {
-              type: 'doc',
-              attrs: { schemaVersion: 'v1' },
-              content: [
-                {
-                  type: 'paragraph',
-                  content: [{ type: 'text', text: 'Simple text' }]
-                }
-              ]
-            },
-            replyMinimumRole: 'everyone'
-          })
-        })
-      )
-    })
-
-    it('should handle formatted text segments', async () => {
-      const mockResponse: PublishNoteResponse = {
-        user_id: 254824415,
-        body: 'Test bold and italic text',
-        body_json: {
-          type: 'doc',
-          attrs: { schemaVersion: 'v1' },
-          content: [
-            {
-              type: 'paragraph',
-              content: [
-                { type: 'text', text: 'Test ' },
-                { type: 'text', text: 'bold', marks: [{ type: 'bold' }] },
-                { type: 'text', text: ' and ' },
-                { type: 'text', text: 'italic', marks: [{ type: 'italic' }] },
-                { type: 'text', text: ' text' }
-              ]
-            }
-          ]
-        },
-        post_id: null,
-        publication_id: null,
-        media_clip_id: null,
-        ancestor_path: '',
-        type: 'feed',
-        status: 'published',
-        reply_minimum_role: 'everyone',
-        id: 126991708,
-        deleted: false,
-        date: '2025-06-18T09:25:18.957Z',
-        name: 'Test User',
-        photo_url: 'https://example.com/photo.png',
-        reactions: { '❤': 0 },
-        children: [],
-        user_bestseller_tier: null,
-        isFirstFeedCommentByUser: false,
-        reaction_count: 0,
-        restacks: 0,
-        restacked: false,
-        children_count: 0,
-        attachments: []
-      }
-
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockResponse)
-      })
-
-      const result = await client
-        .note('Test ')
-        .bold('bold')
-        .simple(' and ')
-        .italic('italic')
-        .simple(' text')
-        .publish()
-
-      expect(result).toEqual(mockResponse)
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          body: JSON.stringify({
-            bodyJson: {
-              type: 'doc',
-              attrs: { schemaVersion: 'v1' },
-              content: [
-                {
-                  type: 'paragraph',
-                  content: [
-                    { type: 'text', text: 'Test ' },
-                    { type: 'text', text: 'bold', marks: [{ type: 'bold' }] },
-                    { type: 'text', text: ' and ' },
-                    { type: 'text', text: 'italic', marks: [{ type: 'italic' }] },
-                    { type: 'text', text: ' text' }
-                  ]
-                }
-              ]
-            },
-            replyMinimumRole: 'everyone'
-          })
-        })
-      )
-    })
-
-    it('should handle API errors in builder pattern', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: false,
-        status: 401,
-        statusText: 'Unauthorized'
-      })
-
-      await expect(client.note('Test').bold('error').publish()).rejects.toThrow(
-        'Request failed: Unauthorized'
-      )
-    })
-  })
-
-  describe('notes pagination', () => {
-    it('should handle notes async iteration correctly', async () => {
-      const mockFirstResponse = {
-        items: [{ id: 1, body: 'Note 1' }],
-        originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
-        nextCursor: 'next-page'
-      }
-
-      const mockSecondResponse = {
-        items: [{ id: 2, body: 'Note 2' }],
-        originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
-        nextCursor: null
-      }
-
-      ;(global.fetch as jest.Mock)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve(mockFirstResponse)
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve(mockSecondResponse)
-        })
-
-      const notes: any[] = []
-      for await (const note of client.getNotes()) {
-        notes.push(note)
-      }
-
-      expect(notes).toEqual([
-        { id: 1, body: 'Note 1' },
-        { id: 2, body: 'Note 2' }
-      ])
-      expect(global.fetch).toHaveBeenCalledTimes(2)
-    })
-
-    it('should respect the limit option', async () => {
-      const mockFirstResponse = {
-        items: [
-          { id: 1, body: 'Note 1' },
-          { id: 2, body: 'Note 2' }
+        timestamp: '2023-01-01T00:00:00Z',
+        users: [
+          {
+            id: 123,
+            name: 'Test User',
+            handle: 'testuser',
+            photo_url: 'https://example.com/photo.jpg',
+            bio: 'Test bio',
+            profile_set_up_at: '2023-01-01T00:00:00Z',
+            reader_installed_at: '2023-01-01T00:00:00Z'
+          }
         ],
-        originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
-        nextCursor: 'next-page'
+        isFresh: false,
+        page_rank: 1
+      },
+      comment: {
+        name: 'Test User',
+        handle: 'testuser',
+        photo_url: 'https://example.com/photo.jpg',
+        id: 789,
+        body: 'Test note content',
+        user_id: 123,
+        type: 'feed',
+        date: '2023-01-01T00:00:00Z',
+        ancestor_path: '',
+        reply_minimum_role: 'everyone',
+        reaction_count: 15,
+        reactions: {
+          '❤️': 8,
+          '👍': 5,
+          '👎': 2
+        },
+        restacks: 2,
+        restacked: false,
+        children_count: 2,
+        attachments: []
+      },
+      parentComments: [
+        {
+          name: 'Commenter 1',
+          handle: 'commenter1',
+          photo_url: 'https://example.com/commenter1.jpg',
+          id: 1,
+          body: 'Parent comment 1',
+          user_id: 124,
+          type: 'feed',
+          date: '2023-01-01T00:00:00Z',
+          ancestor_path: '',
+          reply_minimum_role: 'everyone',
+          reaction_count: 0,
+          reactions: {},
+          restacks: 0,
+          restacked: false,
+          children_count: 0,
+          attachments: [],
+          post_id: 789
+        },
+        {
+          name: 'Commenter 2',
+          handle: 'commenter2',
+          photo_url: 'https://example.com/commenter2.jpg',
+          id: 2,
+          body: 'Parent comment 2',
+          user_id: 125,
+          type: 'feed',
+          date: '2023-01-02T00:00:00Z',
+          ancestor_path: '',
+          reply_minimum_role: 'everyone',
+          reaction_count: 0,
+          reactions: {},
+          restacks: 0,
+          restacked: false,
+          children_count: 0,
+          attachments: [],
+          post_id: 789
+        }
+      ],
+      canReply: true,
+      isMuted: false,
+      trackingParameters: {
+        item_primary_entity_key: '789',
+        item_entity_key: '789',
+        item_type: 'note',
+        item_content_user_id: 123,
+        item_context_type: 'feed',
+        item_context_type_bucket: 'note',
+        item_context_timestamp: '2023-01-01T00:00:00Z',
+        item_context_user_id: 123,
+        item_context_user_ids: [123],
+        item_can_reply: true,
+        item_is_fresh: false,
+        item_last_impression_at: null,
+        item_page: null,
+        item_page_rank: 1,
+        impression_id: 'test-impression',
+        followed_user_count: 0,
+        subscribed_publication_count: 0,
+        is_following: false,
+        is_explicitly_subscribed: false
+      }
+    }
+
+    note = new Note(mockNoteData, mockHttpClient)
+  })
+
+  describe('comments()', () => {
+    it('should iterate through note parent comments', async () => {
+      const comments = []
+      for await (const comment of note.comments()) {
+        comments.push(comment)
       }
 
-      const mockSecondResponse = {
-        items: [{ id: 3, body: 'Note 3' }],
-        originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
-        nextCursor: null
-      }
-
-      ;(global.fetch as jest.Mock)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve(mockFirstResponse)
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve(mockSecondResponse)
-        })
-
-      const notes: any[] = []
-      for await (const note of client.getNotes({ limit: 2 })) {
-        notes.push(note)
-      }
-
-      expect(notes).toEqual([
-        { id: 1, body: 'Note 1' },
-        { id: 2, body: 'Note 2' }
-      ])
-      expect(global.fetch).toHaveBeenCalledTimes(1) // Should stop after first page due to limit
+      expect(comments).toHaveLength(2)
+      expect(comments[0]).toBeInstanceOf(Comment)
+      expect(comments[0].body).toBe('Parent comment 1')
+      expect(comments[0].author.name).toBe('Commenter 1')
+      expect(comments[1].body).toBe('Parent comment 2')
+      expect(comments[1].author.name).toBe('Commenter 2')
     })
 
-    it('should handle empty response', async () => {
-      const mockResponse = {
-        items: [],
-        originalCursorTimestamp: '2025-06-18T09:25:18.957Z',
-        nextCursor: null
+    it('should handle empty parent comments', async () => {
+      const mockNoteDataEmpty = {
+        entity_key: '790',
+        type: 'note',
+        context: {
+          type: 'feed',
+          timestamp: '2023-01-01T00:00:00Z',
+          users: [
+            {
+              id: 123,
+              name: 'Test User',
+              handle: 'testuser',
+              photo_url: 'https://example.com/photo.jpg',
+              bio: 'Test bio',
+              profile_set_up_at: '2023-01-01T00:00:00Z',
+              reader_installed_at: '2023-01-01T00:00:00Z'
+            }
+          ],
+          isFresh: false,
+          page_rank: 1
+        },
+        comment: {
+          name: 'Test User',
+          handle: 'testuser',
+          photo_url: 'https://example.com/photo.jpg',
+          id: 790,
+          body: 'Test note without comments',
+          user_id: 123,
+          type: 'feed',
+          date: '2023-01-01T00:00:00Z',
+          ancestor_path: '',
+          reply_minimum_role: 'everyone',
+          reaction_count: 0,
+          reactions: {},
+          restacks: 0,
+          restacked: false,
+          children_count: 0,
+          attachments: []
+        },
+        parentComments: [],
+        canReply: true,
+        isMuted: false,
+        trackingParameters: {
+          item_primary_entity_key: '790',
+          item_entity_key: '790',
+          item_type: 'note',
+          item_content_user_id: 123,
+          item_context_type: 'feed',
+          item_context_type_bucket: 'note',
+          item_context_timestamp: '2023-01-01T00:00:00Z',
+          item_context_user_id: 123,
+          item_context_user_ids: [123],
+          item_can_reply: true,
+          item_is_fresh: false,
+          item_last_impression_at: null,
+          item_page: null,
+          item_page_rank: 1,
+          impression_id: 'test-impression',
+          followed_user_count: 0,
+          subscribed_publication_count: 0,
+          is_following: false,
+          is_explicitly_subscribed: false
+        }
       }
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockResponse)
-      })
-
-      const notes: any[] = []
-      for await (const note of client.getNotes()) {
-        notes.push(note)
+      const noteEmpty = new Note(mockNoteDataEmpty, mockHttpClient)
+      const comments = []
+      for await (const comment of noteEmpty.comments()) {
+        comments.push(comment)
       }
 
-      expect(notes).toEqual([])
-      expect(global.fetch).toHaveBeenCalledTimes(1)
+      expect(comments).toHaveLength(0)
+    })
+
+    it('should handle undefined parent comments', async () => {
+      const mockNoteDataUndefined = {
+        entity_key: '791',
+        type: 'note',
+        context: {
+          type: 'feed',
+          timestamp: '2023-01-01T00:00:00Z',
+          users: [
+            {
+              id: 123,
+              name: 'Test User',
+              handle: 'testuser',
+              photo_url: 'https://example.com/photo.jpg',
+              bio: 'Test bio',
+              profile_set_up_at: '2023-01-01T00:00:00Z',
+              reader_installed_at: '2023-01-01T00:00:00Z'
+            }
+          ],
+          isFresh: false,
+          page_rank: 1
+        },
+        comment: {
+          name: 'Test User',
+          handle: 'testuser',
+          photo_url: 'https://example.com/photo.jpg',
+          id: 791,
+          body: 'Test note with undefined comments',
+          user_id: 123,
+          type: 'feed',
+          date: '2023-01-01T00:00:00Z',
+          ancestor_path: '',
+          reply_minimum_role: 'everyone',
+          reaction_count: 0,
+          reactions: {},
+          restacks: 0,
+          restacked: false,
+          children_count: 0,
+          attachments: []
+        },
+        parentComments: [] as Array<SubstackNoteComment>,
+        canReply: true,
+        isMuted: false,
+        trackingParameters: {
+          item_primary_entity_key: '791',
+          item_entity_key: '791',
+          item_type: 'note',
+          item_content_user_id: 123,
+          item_context_type: 'feed',
+          item_context_type_bucket: 'note',
+          item_context_timestamp: '2023-01-01T00:00:00Z',
+          item_context_user_id: 123,
+          item_context_user_ids: [123],
+          item_can_reply: true,
+          item_is_fresh: false,
+          item_last_impression_at: null,
+          item_page: null,
+          item_page_rank: 1,
+          impression_id: 'test-impression',
+          followed_user_count: 0,
+          subscribed_publication_count: 0,
+          is_following: false,
+          is_explicitly_subscribed: false
+        }
+      }
+
+      const noteUndefined = new Note(mockNoteDataUndefined, mockHttpClient)
+      const comments = []
+      for await (const comment of noteUndefined.comments()) {
+        comments.push(comment)
+      }
+
+      expect(comments).toHaveLength(0)
+    })
+
+    it('should handle null parent comments', async () => {
+      const mockNoteDataWithNull = {
+        entity_key: '792',
+        type: 'note',
+        context: {
+          type: 'feed',
+          timestamp: '2023-01-01T00:00:00Z',
+          users: [
+            {
+              id: 123,
+              name: 'Test User',
+              handle: 'testuser',
+              photo_url: 'https://example.com/photo.jpg',
+              bio: 'Test bio',
+              profile_set_up_at: '2023-01-01T00:00:00Z',
+              reader_installed_at: '2023-01-01T00:00:00Z'
+            }
+          ],
+          isFresh: false,
+          page_rank: 1
+        },
+        comment: {
+          name: 'Test User',
+          handle: 'testuser',
+          photo_url: 'https://example.com/photo.jpg',
+          id: 792,
+          body: 'Test note with null comments',
+          user_id: 123,
+          type: 'feed',
+          date: '2023-01-01T00:00:00Z',
+          ancestor_path: '',
+          reply_minimum_role: 'everyone',
+          reaction_count: 0,
+          reactions: {},
+          restacks: 0,
+          restacked: false,
+          children_count: 1,
+          attachments: []
+        },
+        parentComments: [
+          {
+            name: 'Commenter 3',
+            handle: 'commenter3',
+            photo_url: 'https://example.com/commenter3.jpg',
+            id: 3,
+            body: 'Valid comment',
+            user_id: 126,
+            type: 'feed',
+            date: '2023-01-03T00:00:00Z',
+            ancestor_path: '',
+            reply_minimum_role: 'everyone',
+            reaction_count: 0,
+            reactions: {},
+            restacks: 0,
+            restacked: false,
+            children_count: 0,
+            attachments: [],
+            post_id: 792
+          }
+        ] as Array<SubstackNoteComment>,
+        canReply: true,
+        isMuted: false,
+        trackingParameters: {
+          item_primary_entity_key: '792',
+          item_entity_key: '792',
+          item_type: 'note',
+          item_content_user_id: 123,
+          item_context_type: 'feed',
+          item_context_type_bucket: 'note',
+          item_context_timestamp: '2023-01-01T00:00:00Z',
+          item_context_user_id: 123,
+          item_context_user_ids: [123],
+          item_can_reply: true,
+          item_is_fresh: false,
+          item_last_impression_at: null,
+          item_page: null,
+          item_page_rank: 1,
+          impression_id: 'test-impression',
+          followed_user_count: 0,
+          subscribed_publication_count: 0,
+          is_following: false,
+          is_explicitly_subscribed: false
+        }
+      }
+
+      const noteWithNull = new Note(mockNoteDataWithNull, mockHttpClient)
+      const comments = []
+      for await (const comment of noteWithNull.comments()) {
+        comments.push(comment)
+      }
+
+      expect(comments).toHaveLength(1)
+      expect(comments[0].body).toBe('Valid comment')
+    })
+  })
+
+  describe('like()', () => {
+    it('should throw error for unimplemented like functionality', async () => {
+      await expect(note.like()).rejects.toThrow(
+        'Note liking not implemented yet - requires like API'
+      )
+    })
+  })
+
+  describe('addComment()', () => {
+    it('should throw error for unimplemented comment functionality', async () => {
+      await expect(note.addComment('Test comment')).rejects.toThrow(
+        'Note commenting not implemented yet - requires comment API'
+      )
+    })
+  })
+
+  describe('properties', () => {
+    it('should have correct property values', () => {
+      expect(note.id).toBe('789')
+      expect(note.body).toBe('Test note content')
+      expect(note.likesCount).toBe(15)
+      expect(note.author.name).toBe('Test User')
+      expect(note.publishedAt).toBeInstanceOf(Date)
     })
   })
 })

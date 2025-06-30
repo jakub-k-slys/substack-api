@@ -5,6 +5,7 @@ This directory contains end-to-end (E2E) tests that validate the Substack API cl
 ## Overview
 
 E2E tests are designed to:
+
 - Test real integration with Substack API endpoints
 - Validate authentication and authorization
 - Ensure core workflows function correctly
@@ -64,9 +65,11 @@ npm run test:all
 ## Test Behavior
 
 ### Without Credentials
+
 When no API credentials are provided, **E2E tests will fail immediately** with a clear error message explaining how to set up credentials. This ensures that missing credentials are caught early in the development process.
 
 **Error message example:**
+
 ```
 ❌ Missing required Substack credentials. Set SUBSTACK_API_KEY and SUBSTACK_HOSTNAME.
 
@@ -76,13 +79,17 @@ Required environment variables:
 ```
 
 ### With Credentials
+
 Tests run against the real Substack API using your provided credentials. Tests are designed to be:
+
 - **Safe**: Read-only operations that don't create unwanted content
-- **Repeatable**: Can be run multiple times without side effects  
+- **Repeatable**: Can be run multiple times without side effects
 - **Isolated**: Each test is independent and doesn't rely on others
 
 ### Error Handling
+
 Tests gracefully handle various scenarios:
+
 - Missing or invalid credentials
 - Network errors and timeouts
 - API endpoints that may not be available for all account types
@@ -91,6 +98,7 @@ Tests gracefully handle various scenarios:
 ## CI/CD Integration
 
 E2E tests are integrated into the GitHub Actions workflow:
+
 - **Trigger**: Only runs on pushes to the main branch in the main repository
 - **Credentials**: Uses repository secrets for API credentials
 - **Artifacts**: Test results are uploaded as artifacts
@@ -101,6 +109,7 @@ When creating new E2E tests:
 
 1. **No credential checking needed** - Tests will automatically fail if credentials are missing
 2. **Use standard test() function**:
+
    ```typescript
    test('should test something', async () => {
      // Test implementation - credentials guaranteed to be available
@@ -108,6 +117,7 @@ When creating new E2E tests:
    ```
 
 3. **Handle errors gracefully**:
+
    ```typescript
    try {
      const result = await client.someMethod()

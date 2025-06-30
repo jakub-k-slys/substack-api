@@ -1,4 +1,5 @@
-export { Substack, SubstackError } from './client'
+export { SubstackClient } from './substack-client'
+export { Profile, OwnProfile, Post, Note, Comment } from './entities'
 
 export type {
   SubstackPublication,

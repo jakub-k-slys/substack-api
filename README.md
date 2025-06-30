@@ -7,16 +7,45 @@
 
 A TypeScript client for interacting with the Substack webservice API. This library provides a clean, type-safe interface to fetch publication details, posts, comments, and perform searches across Substack publications.
 
+## 🚀 New Entity Model
+
+The library now features a modern, object-oriented entity model alongside the original client:
+
+```typescript
+import { SubstackClient } from 'substack-api';
+
+const client = new SubstackClient({ apiKey: 'your-api-key' });
+
+// Get profiles with fluent navigation
+const profile = await client.profileForSlug('example-user');
+for await (const post of profile.posts({ limit: 5 })) {
+  console.log(`${post.title} by ${post.author.name}`);
+  
+  // Navigate relationships seamlessly
+  for await (const comment of post.comments({ limit: 3 })) {
+    console.log(`  Comment: ${comment.body}`);
+  }
+}
+
+// Test connectivity
+const isConnected = await client.testConnectivity();
+```
+
+**[📖 See Entity Model Documentation](docs/entity-model.md)**
+
 ## Features
 
+- 🏗️ **Modern Entity Model** - New object-oriented API with fluent navigation (`profile.posts()`, `post.comments()`)
+- 🔄 **Async Iterators** - Seamless pagination with `for await` syntax
+- 🛡️ **Type Safety** - Full TypeScript support with entity classes (Profile, Post, Note, Comment)
 - 🔍 **Publication Management** - Fetch publication details and metadata
 - 📝 **Post Operations** - Get posts, search by criteria, and access individual posts
 - 💬 **Comment System** - Retrieve comments and comment threads
 - 📄 **Smart Pagination** - Built-in pagination with configurable page sizes (default: 25)
 - 🚀 **Built-in Caching** - Automatic in-memory caching with TTL for improved performance
-- 🛡️ **TypeScript First** - Full type safety with comprehensive type definitions
 - ⚡ **Error Handling** - Comprehensive error handling with custom error types
 - 🔧 **Configurable** - Support for different API versions and custom configurations
+- 🔐 **Authentication** - Secure API key-based authentication
 
 ## Quick Start
 
@@ -26,29 +55,49 @@ Install the package:
 npm install substack-api
 ```
 
-Basic usage:
+### Entity Model (Recommended)
+
+The new entity model provides fluent navigation and modern async iterator support:
 
 ```typescript
-import { Substack } from 'substack-api';
+import { SubstackClient } from 'substack-api';
 
-// Create a client for a specific publication
-const client = new Substack({
-  hostname: 'example.substack.com',
+const client = new SubstackClient({
   apiKey: 'your-api-key-here',
-  perPage: 50, // Custom page size
-  cacheTTL: 300 // Cache for 5 minutes
+  hostname: 'example.substack.com'
 });
 
-// Fetch recent posts
-for await (const post of client.getPosts({ limit: 10 })) {
-  console.log(`${post.title} - ${post.post_date}`);
+// Get a profile and iterate through posts
+const profile = await client.profileForSlug('example-user');
+for await (const post of profile.posts({ limit: 10 })) {
+  console.log(`${post.title} by ${post.author.name}`);
 }
 
-// Search for posts
-const results = await client.searchPosts({
-  query: 'typescript',
-  type: 'newsletter'
+// Test connectivity
+if (await client.testConnectivity()) {
+  console.log('Connected to Substack API');
+}
+```
+
+### Configuration
+
+The client requires both an API key and hostname:
+
+```typescript
+import { SubstackClient } from 'substack-api';
+
+// Create a client with required configuration
+const client = new SubstackClient({
+  apiKey: 'your-api-key-here',
+  hostname: 'example.substack.com',
+  perPage: 50, // Optional: Custom page size
+  cacheTTL: 300 // Optional: Cache for 5 minutes
 });
+
+// Test connectivity
+if (await client.testConnectivity()) {
+  console.log('Connected to Substack API');
+}
 ```
 
 ## Documentation

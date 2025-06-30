@@ -1,5 +1,5 @@
 import { PublishNoteRequest, PublishNoteResponse } from './types'
-import { Substack } from './client'
+import { SubstackHttpClient } from './http-client'
 
 interface TextSegment {
   text: string
@@ -15,7 +15,7 @@ export class NoteBuilder {
   private currentParagraph: Paragraph = { segments: [] }
 
   constructor(
-    private readonly client: Substack,
+    private readonly client: SubstackHttpClient,
     text?: string
   ) {
     if (text) {
@@ -94,6 +94,6 @@ export class NoteBuilder {
    * Publish the note
    */
   async publish(): Promise<PublishNoteResponse> {
-    return this.client.publishNoteRequest(this.toNoteRequest())
+    return this.client.post<PublishNoteResponse>('/api/v1/notes', this.toNoteRequest())
   }
 }

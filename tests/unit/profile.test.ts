@@ -1,397 +1,482 @@
-import { Substack } from '../../src/client'
+import { Profile } from '../../src/entities/profile'
+import { Post, Note } from '../../src/entities'
+import type { SubstackHttpClient } from '../../src/http-client'
 
-describe('Substack Profiles', () => {
-  let client: Substack
+describe('Profile Entity', () => {
+  let mockHttpClient: jest.Mocked<SubstackHttpClient>
+  let profile: Profile
 
   beforeEach(() => {
-    client = new Substack({
-      apiKey: 'test-api-key'
-    })
-    global.fetch = jest.fn()
+    mockHttpClient = {
+      get: jest.fn(),
+      post: jest.fn(),
+      request: jest.fn()
+    } as unknown as jest.Mocked<SubstackHttpClient>
+
+    const mockProfileData = {
+      id: 123,
+      handle: 'testuser',
+      name: 'Test User',
+      photo_url: 'https://example.com/photo.jpg',
+      bio: 'Test bio',
+      profile_set_up_at: '2023-01-01T00:00:00Z',
+      reader_installed_at: '2023-01-01T00:00:00Z',
+      profile_disabled: false,
+      publicationUsers: [],
+      userLinks: [],
+      subscriptions: [],
+      subscriptionsTruncated: false,
+      hasGuestPost: false,
+      max_pub_tier: 0,
+      hasActivity: false,
+      hasLikes: false,
+      lists: [],
+      rough_num_free_subscribers_int: 0,
+      rough_num_free_subscribers: '0',
+      bestseller_badge_disabled: false,
+      subscriberCountString: '0',
+      subscriberCount: '0',
+      subscriberCountNumber: 0,
+      hasHiddenPublicationUsers: false,
+      visibleSubscriptionsCount: 0,
+      slug: 'testuser',
+      primaryPublicationIsPledged: false,
+      primaryPublicationSubscriptionState: 'not_subscribed',
+      isSubscribed: false,
+      isFollowing: false,
+      followsViewer: false,
+      can_dm: false,
+      dm_upgrade_options: []
+    }
+
+    profile = new Profile(mockProfileData, mockHttpClient)
   })
 
-  describe('public profiles', () => {
-    it('should get a public profile by slug', async () => {
+  describe('posts()', () => {
+    it('should iterate through profile posts', async () => {
       const mockResponse = {
-        id: 282291554,
-        name: 'Jenny Ouyang',
-        handle: 'jennyouyang',
-        bio: 'Test bio',
-        photo_url: 'https://example.com/photo.jpg',
-        publicationUsers: [],
-        userLinks: [],
-        subscriptions: []
+        posts: [
+          {
+            id: 1,
+            title: 'Post 1',
+            slug: 'post-1',
+            post_date: '2023-01-01T00:00:00Z',
+            canonical_url: 'https://example.com/post1',
+            type: 'newsletter' as const
+          },
+          {
+            id: 2,
+            title: 'Post 2',
+            slug: 'post-2',
+            post_date: '2023-01-02T00:00:00Z',
+            canonical_url: 'https://example.com/post2',
+            type: 'newsletter' as const
+          }
+        ]
+      }
+      mockHttpClient.get.mockResolvedValue(mockResponse)
+
+      const posts = []
+      for await (const post of profile.posts({ limit: 2 })) {
+        posts.push(post)
       }
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockResponse)
-      })
-
-      const result = await client.getPublicProfile('jennyouyang')
-      expect(result).toEqual(mockResponse)
-      expect(global.fetch).toHaveBeenCalledWith(
-        'https://substack.com/api/v1/user/jennyouyang/public_profile',
-        expect.any(Object)
-      )
+      expect(posts).toHaveLength(2)
+      expect(posts[0]).toBeInstanceOf(Post)
+      expect(posts[0].title).toBe('Post 1')
+      expect(posts[1].title).toBe('Post 2')
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/users/123/posts')
     })
 
-    it('should handle API errors when getting public profile', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-        statusText: 'Not Found'
-      })
-
-      await expect(client.getPublicProfile('nonexistent')).rejects.toThrow(
-        'Request failed: Not Found'
-      )
-    })
-  })
-
-  describe('user profiles', () => {
-    it('should get a user profile by ID', async () => {
+    it('should handle limit parameter', async () => {
       const mockResponse = {
-        items: [
+        posts: [
           {
-            entity_key: 'user_282291554',
-            type: 'user',
-            context: {
-              type: 'user',
-              timestamp: '2025-06-18T09:25:18.957Z',
-              users: [
-                {
-                  id: 282291554,
-                  name: 'Jenny Ouyang',
-                  handle: 'jennyouyang',
-                  photo_url: 'https://example.com/photo.jpg',
-                  bio: 'Test bio',
-                  profile_set_up_at: '2025-06-18T09:25:18.957Z',
-                  reader_installed_at: '2025-06-18T09:25:18.957Z'
-                }
-              ],
-              isFresh: true,
-              source: 'profile',
-              page_rank: 0
-            }
+            id: 1,
+            title: 'Post 1',
+            slug: 'post-1',
+            post_date: '2023-01-01T00:00:00Z',
+            canonical_url: 'https://example.com/post1',
+            type: 'newsletter' as const
+          },
+          {
+            id: 2,
+            title: 'Post 2',
+            slug: 'post-2',
+            post_date: '2023-01-02T00:00:00Z',
+            canonical_url: 'https://example.com/post2',
+            type: 'newsletter' as const
           }
         ]
       }
+      mockHttpClient.get.mockResolvedValue(mockResponse)
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockResponse)
-      })
+      const posts = []
+      for await (const post of profile.posts({ limit: 1 })) {
+        posts.push(post)
+      }
 
-      const result = await client.getUserProfile(282291554)
-      expect(result).toEqual(mockResponse)
+      expect(posts).toHaveLength(1)
+      expect(posts[0].title).toBe('Post 1')
     })
 
-    it('should handle API errors when getting user profile', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-        statusText: 'Not Found'
-      })
+    it('should handle empty posts response', async () => {
+      const mockResponse = { posts: [] }
+      mockHttpClient.get.mockResolvedValue(mockResponse)
 
-      await expect(client.getUserProfile(999999)).rejects.toThrow('Request failed: Not Found')
+      const posts = []
+      for await (const post of profile.posts()) {
+        posts.push(post)
+      }
+
+      expect(posts).toHaveLength(0)
+    })
+
+    it('should handle missing posts property', async () => {
+      const mockResponse = {}
+      mockHttpClient.get.mockResolvedValue(mockResponse)
+
+      const posts = []
+      for await (const post of profile.posts()) {
+        posts.push(post)
+      }
+
+      expect(posts).toHaveLength(0)
+    })
+
+    it('should handle API error gracefully', async () => {
+      mockHttpClient.get.mockRejectedValue(new Error('API error'))
+
+      const posts = []
+      for await (const post of profile.posts()) {
+        posts.push(post)
+      }
+
+      expect(posts).toHaveLength(0)
     })
   })
 
-  describe('full profiles', () => {
-    it('should get a full profile by slug', async () => {
-      const mockPublicProfile = {
-        id: 282291554,
-        name: 'Jenny Ouyang',
-        handle: 'jennyouyang',
-        bio: 'Test bio',
-        photo_url: 'https://example.com/photo.jpg',
-        publicationUsers: [],
-        userLinks: [],
-        subscriptions: []
-      }
-
-      const mockUserProfile = {
-        items: [
+  describe('notes()', () => {
+    it('should iterate through profile notes', async () => {
+      const mockResponse = {
+        notes: [
           {
-            entity_key: 'user_282291554',
-            type: 'user',
+            entity_key: '1',
+            type: 'note',
             context: {
-              type: 'user',
-              timestamp: '2025-06-18T09:25:18.957Z',
+              type: 'feed',
+              timestamp: '2023-01-01T00:00:00Z',
               users: [
                 {
-                  id: 282291554,
-                  name: 'Jenny Ouyang',
-                  handle: 'jennyouyang',
+                  id: 123,
+                  name: 'Test User',
+                  handle: 'testuser',
                   photo_url: 'https://example.com/photo.jpg',
                   bio: 'Test bio',
-                  profile_set_up_at: '2025-06-18T09:25:18.957Z',
-                  reader_installed_at: '2025-06-18T09:25:18.957Z'
+                  profile_set_up_at: '2023-01-01T00:00:00Z',
+                  reader_installed_at: '2023-01-01T00:00:00Z'
                 }
               ],
-              isFresh: true,
-              source: 'profile',
-              page_rank: 0
+              isFresh: false,
+              page_rank: 1
+            },
+            comment: {
+              name: 'Test User',
+              handle: 'testuser',
+              photo_url: 'https://example.com/photo.jpg',
+              id: 1,
+              body: 'Note 1',
+              user_id: 123,
+              type: 'feed',
+              date: '2023-01-01T00:00:00Z',
+              ancestor_path: '',
+              reply_minimum_role: 'everyone',
+              reaction_count: 0,
+              reactions: {},
+              restacks: 0,
+              restacked: false,
+              children_count: 0,
+              attachments: []
+            },
+            parentComments: [],
+            canReply: true,
+            isMuted: false,
+            trackingParameters: {
+              item_primary_entity_key: '1',
+              item_entity_key: '1',
+              item_type: 'note',
+              item_content_user_id: 123,
+              item_context_type: 'feed',
+              item_context_type_bucket: 'note',
+              item_context_timestamp: '2023-01-01T00:00:00Z',
+              item_context_user_id: 123,
+              item_context_user_ids: [123],
+              item_can_reply: true,
+              item_is_fresh: false,
+              item_last_impression_at: null,
+              item_page: null,
+              item_page_rank: 1,
+              impression_id: 'test-impression',
+              followed_user_count: 0,
+              subscribed_publication_count: 0,
+              is_following: false,
+              is_explicitly_subscribed: false
             }
-          }
-        ]
-      }
-
-      ;(global.fetch as jest.Mock)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve(mockPublicProfile)
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve(mockUserProfile)
-        })
-
-      const result = await client.getFullProfileBySlug('jennyouyang')
-      expect(result).toEqual({
-        ...mockPublicProfile,
-        userProfile: mockUserProfile
-      })
-      expect(global.fetch).toHaveBeenCalledTimes(2)
-    })
-
-    it('should get a full profile by ID', async () => {
-      const mockUserProfile = {
-        items: [
+          },
           {
-            entity_key: 'user_282291554',
-            type: 'user',
+            entity_key: '2',
+            type: 'note',
             context: {
-              type: 'user',
-              timestamp: '2025-06-18T09:25:18.957Z',
+              type: 'feed',
+              timestamp: '2023-01-02T00:00:00Z',
               users: [
                 {
-                  id: 282291554,
-                  name: 'Jenny Ouyang',
-                  handle: 'jennyouyang',
+                  id: 123,
+                  name: 'Test User',
+                  handle: 'testuser',
                   photo_url: 'https://example.com/photo.jpg',
                   bio: 'Test bio',
-                  profile_set_up_at: '2025-06-18T09:25:18.957Z',
-                  reader_installed_at: '2025-06-18T09:25:18.957Z'
+                  profile_set_up_at: '2023-01-01T00:00:00Z',
+                  reader_installed_at: '2023-01-01T00:00:00Z'
                 }
               ],
-              isFresh: true,
-              source: 'profile',
-              page_rank: 0
+              isFresh: false,
+              page_rank: 1
+            },
+            comment: {
+              name: 'Test User',
+              handle: 'testuser',
+              photo_url: 'https://example.com/photo.jpg',
+              id: 2,
+              body: 'Note 2',
+              user_id: 123,
+              type: 'feed',
+              date: '2023-01-02T00:00:00Z',
+              ancestor_path: '',
+              reply_minimum_role: 'everyone',
+              reaction_count: 0,
+              reactions: {},
+              restacks: 0,
+              restacked: false,
+              children_count: 0,
+              attachments: []
+            },
+            parentComments: [],
+            canReply: true,
+            isMuted: false,
+            trackingParameters: {
+              item_primary_entity_key: '2',
+              item_entity_key: '2',
+              item_type: 'note',
+              item_content_user_id: 123,
+              item_context_type: 'feed',
+              item_context_type_bucket: 'note',
+              item_context_timestamp: '2023-01-02T00:00:00Z',
+              item_context_user_id: 123,
+              item_context_user_ids: [123],
+              item_can_reply: true,
+              item_is_fresh: false,
+              item_last_impression_at: null,
+              item_page: null,
+              item_page_rank: 1,
+              impression_id: 'test-impression',
+              followed_user_count: 0,
+              subscribed_publication_count: 0,
+              is_following: false,
+              is_explicitly_subscribed: false
             }
           }
         ]
       }
+      mockHttpClient.get.mockResolvedValue(mockResponse)
 
-      const mockPublicProfile = {
-        id: 282291554,
-        name: 'Jenny Ouyang',
-        handle: 'jennyouyang',
-        bio: 'Test bio',
-        photo_url: 'https://example.com/photo.jpg',
-        publicationUsers: [],
-        userLinks: [],
-        subscriptions: []
+      const notes = []
+      for await (const note of profile.notes({ limit: 2 })) {
+        notes.push(note)
       }
 
-      ;(global.fetch as jest.Mock)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve(mockUserProfile)
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve(mockPublicProfile)
-        })
-
-      const result = await client.getFullProfileById(282291554)
-      expect(result).toEqual({
-        ...mockPublicProfile,
-        userProfile: mockUserProfile
-      })
-      expect(global.fetch).toHaveBeenCalledTimes(2)
+      expect(notes).toHaveLength(2)
+      expect(notes[0]).toBeInstanceOf(Note)
+      expect(notes[0].body).toBe('Note 1')
+      expect(notes[1].body).toBe('Note 2')
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/users/123/notes')
     })
 
-    it('should handle missing handle in user profile when getting full profile by ID', async () => {
-      const mockUserProfile = {
-        items: [
+    it('should handle limit parameter', async () => {
+      const mockResponse = {
+        notes: [
           {
-            entity_key: 'user_282291554',
-            type: 'user',
+            entity_key: '1',
+            type: 'note',
             context: {
-              type: 'user',
-              timestamp: '2025-06-18T09:25:18.957Z',
-              users: [],
-              isFresh: true,
-              source: 'profile',
-              page_rank: 0
+              type: 'feed',
+              timestamp: '2023-01-01T00:00:00Z',
+              users: [
+                {
+                  id: 123,
+                  name: 'Test User',
+                  handle: 'testuser',
+                  photo_url: 'https://example.com/photo.jpg',
+                  bio: 'Test bio',
+                  profile_set_up_at: '2023-01-01T00:00:00Z',
+                  reader_installed_at: '2023-01-01T00:00:00Z'
+                }
+              ],
+              isFresh: false,
+              page_rank: 1
+            },
+            comment: {
+              name: 'Test User',
+              handle: 'testuser',
+              photo_url: 'https://example.com/photo.jpg',
+              id: 1,
+              body: 'Note 1',
+              user_id: 123,
+              type: 'feed',
+              date: '2023-01-01T00:00:00Z',
+              ancestor_path: '',
+              reply_minimum_role: 'everyone',
+              reaction_count: 0,
+              reactions: {},
+              restacks: 0,
+              restacked: false,
+              children_count: 0,
+              attachments: []
+            },
+            parentComments: [],
+            canReply: true,
+            isMuted: false,
+            trackingParameters: {
+              item_primary_entity_key: '1',
+              item_entity_key: '1',
+              item_type: 'note',
+              item_content_user_id: 123,
+              item_context_type: 'feed',
+              item_context_type_bucket: 'note',
+              item_context_timestamp: '2023-01-01T00:00:00Z',
+              item_context_user_id: 123,
+              item_context_user_ids: [123],
+              item_can_reply: true,
+              item_is_fresh: false,
+              item_last_impression_at: null,
+              item_page: null,
+              item_page_rank: 1,
+              impression_id: 'test-impression',
+              followed_user_count: 0,
+              subscribed_publication_count: 0,
+              is_following: false,
+              is_explicitly_subscribed: false
+            }
+          },
+          {
+            entity_key: '2',
+            type: 'note',
+            context: {
+              type: 'feed',
+              timestamp: '2023-01-02T00:00:00Z',
+              users: [
+                {
+                  id: 123,
+                  name: 'Test User',
+                  handle: 'testuser',
+                  photo_url: 'https://example.com/photo.jpg',
+                  bio: 'Test bio',
+                  profile_set_up_at: '2023-01-01T00:00:00Z',
+                  reader_installed_at: '2023-01-01T00:00:00Z'
+                }
+              ],
+              isFresh: false,
+              page_rank: 1
+            },
+            comment: {
+              name: 'Test User',
+              handle: 'testuser',
+              photo_url: 'https://example.com/photo.jpg',
+              id: 2,
+              body: 'Note 2',
+              user_id: 123,
+              type: 'feed',
+              date: '2023-01-02T00:00:00Z',
+              ancestor_path: '',
+              reply_minimum_role: 'everyone',
+              reaction_count: 0,
+              reactions: {},
+              restacks: 0,
+              restacked: false,
+              children_count: 0,
+              attachments: []
+            },
+            parentComments: [],
+            canReply: true,
+            isMuted: false,
+            trackingParameters: {
+              item_primary_entity_key: '2',
+              item_entity_key: '2',
+              item_type: 'note',
+              item_content_user_id: 123,
+              item_context_type: 'feed',
+              item_context_type_bucket: 'note',
+              item_context_timestamp: '2023-01-02T00:00:00Z',
+              item_context_user_id: 123,
+              item_context_user_ids: [123],
+              item_can_reply: true,
+              item_is_fresh: false,
+              item_last_impression_at: null,
+              item_page: null,
+              item_page_rank: 1,
+              impression_id: 'test-impression',
+              followed_user_count: 0,
+              subscribed_publication_count: 0,
+              is_following: false,
+              is_explicitly_subscribed: false
             }
           }
         ]
       }
+      mockHttpClient.get.mockResolvedValue(mockResponse)
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockUserProfile)
-      })
+      const notes = []
+      for await (const note of profile.notes({ limit: 1 })) {
+        notes.push(note)
+      }
 
-      await expect(client.getFullProfileById(282291554)).rejects.toThrow(
-        'Could not find user handle in profile'
-      )
-    })
-  })
-
-  describe('following', () => {
-    it('should get following IDs', async () => {
-      const mockResponse = [254824415, 108855261, 34637]
-
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockResponse)
-      })
-
-      const result = await client.getFollowingIds()
-      expect(result).toEqual(mockResponse)
-      expect(global.fetch).toHaveBeenCalledWith(
-        'https://substack.com/api/v1/feed/following',
-        expect.any(Object)
-      )
+      expect(notes).toHaveLength(1)
+      expect(notes[0].body).toBe('Note 1')
     })
 
-    it('should handle failed user profile fetches in getFollowingProfiles', async () => {
-      const mockFollowingIds = [254824415, 108855261]
+    it('should handle empty notes response', async () => {
+      const mockResponse = { notes: [] }
+      mockHttpClient.get.mockResolvedValue(mockResponse)
 
-      // Mock getFollowingIds call
-      ;(global.fetch as jest.Mock)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve(mockFollowingIds)
-        })
+      const notes = []
+      for await (const note of profile.notes()) {
+        notes.push(note)
+      }
 
-        // Mock first user's profile calls - successful
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              items: [
-                {
-                  entity_key: 'user_254824415',
-                  type: 'user',
-                  context: {
-                    type: 'user',
-                    timestamp: '2025-06-18T09:25:18.957Z',
-                    users: [
-                      {
-                        id: 254824415,
-                        name: 'User 1',
-                        handle: 'user1',
-                        photo_url: 'https://example.com/photo1.jpg',
-                        bio: 'Bio 1',
-                        profile_set_up_at: '2025-06-18T09:25:18.957Z',
-                        reader_installed_at: '2025-06-18T09:25:18.957Z'
-                      }
-                    ],
-                    isFresh: true,
-                    source: 'profile',
-                    page_rank: 0
-                  }
-                }
-              ]
-            })
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              id: 254824415,
-              name: 'User 1',
-              handle: 'user1',
-              bio: 'Bio 1',
-              photo_url: 'https://example.com/photo1.jpg',
-              publicationUsers: [],
-              userLinks: [],
-              subscriptions: []
-            })
-        })
-
-        // Mock second user's profile calls - failed
-        .mockResolvedValueOnce({
-          ok: false,
-          status: 404,
-          statusText: 'Not Found'
-        })
-
-      const result = await client.getFollowingProfiles()
-
-      // Should only include the successful profile
-      expect(result).toHaveLength(1)
-      expect(result[0].id).toBe(254824415)
+      expect(notes).toHaveLength(0)
     })
 
-    it('should handle failed public profile fetches in getFollowingProfiles', async () => {
-      const mockFollowingIds = [254824415]
+    it('should handle missing notes property', async () => {
+      const mockResponse = {}
+      mockHttpClient.get.mockResolvedValue(mockResponse)
 
-      // Mock getFollowingIds call
-      ;(global.fetch as jest.Mock)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve(mockFollowingIds)
-        })
+      const notes = []
+      for await (const note of profile.notes()) {
+        notes.push(note)
+      }
 
-        // Mock user profile call - successful
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              items: [
-                {
-                  entity_key: 'user_254824415',
-                  type: 'user',
-                  context: {
-                    type: 'user',
-                    timestamp: '2025-06-18T09:25:18.957Z',
-                    users: [
-                      {
-                        id: 254824415,
-                        name: 'User 1',
-                        handle: 'user1',
-                        photo_url: 'https://example.com/photo1.jpg',
-                        bio: 'Bio 1',
-                        profile_set_up_at: '2025-06-18T09:25:18.957Z',
-                        reader_installed_at: '2025-06-18T09:25:18.957Z'
-                      }
-                    ],
-                    isFresh: true,
-                    source: 'profile',
-                    page_rank: 0
-                  }
-                }
-              ]
-            })
-        })
-
-        // Mock public profile call - failed
-        .mockResolvedValueOnce({
-          ok: false,
-          status: 404,
-          statusText: 'Not Found'
-        })
-
-      const result = await client.getFollowingProfiles()
-
-      // Should be empty since the public profile fetch failed
-      expect(result).toHaveLength(0)
+      expect(notes).toHaveLength(0)
     })
 
-    it('should handle API errors when getting following IDs', async () => {
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: false,
-        status: 401,
-        statusText: 'Unauthorized'
-      })
+    it('should handle API error gracefully', async () => {
+      mockHttpClient.get.mockRejectedValue(new Error('API error'))
 
-      await expect(client.getFollowingIds()).rejects.toThrow('Request failed: Unauthorized')
+      const notes = []
+      for await (const note of profile.notes()) {
+        notes.push(note)
+      }
+
+      expect(notes).toHaveLength(0)
     })
   })
 })

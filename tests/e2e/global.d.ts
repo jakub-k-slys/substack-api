@@ -4,6 +4,8 @@ declare global {
     apiKey?: string
     hostname?: string
   }
+
+  function getTestCredentials(): { apiKey: string; hostname?: string } | null
 }
 
 export {}
