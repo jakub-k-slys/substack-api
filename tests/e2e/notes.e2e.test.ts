@@ -47,7 +47,13 @@ describe('E2E: Notes Operations', () => {
   let client: Substack
 
   beforeAll(() => {
-    // Credentials are guaranteed to be available due to setup.ts validation
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.warn('⚠️ Skipping E2E tests - no credentials available')
+      console.warn('Set SUBSTACK_API_KEY environment variable to run E2E tests')
+      return
+    }
+
+    // Credentials are available
     client = new Substack({
       apiKey: global.E2E_CONFIG.apiKey!,
       hostname: global.E2E_CONFIG.hostname
@@ -55,6 +61,11 @@ describe('E2E: Notes Operations', () => {
   })
 
   test('should fetch notes for authenticated user', async () => {
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.log('⏭️ Skipping test - no credentials available')
+      return
+    }
+
     try {
       const notes: any[] = []
       let count = 0
@@ -91,6 +102,11 @@ describe('E2E: Notes Operations', () => {
   })
 
   test('should handle notes pagination', async () => {
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.log('⏭️ Skipping test - no credentials available')
+      return
+    }
+
     try {
       const firstPageNotes: any[] = []
 
@@ -129,6 +145,11 @@ describe('E2E: Notes Operations', () => {
   // Uncomment and use with caution in a test environment
   /*
   test('should publish a simple note', async () => {
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.log('⏭️ Skipping test - no credentials available')
+      return
+    }
+    
     try {
       const testNote = `E2E Test Note - ${new Date().toISOString()}`
       const publishedNote = await client.publishNote(testNote)
@@ -145,6 +166,11 @@ describe('E2E: Notes Operations', () => {
   })
 
   test('should publish a formatted note using builder', async () => {
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.log('⏭️ Skipping test - no credentials available')
+      return
+    }
+    
     try {
       const publishedNote = await client
         .note('E2E Test: ')

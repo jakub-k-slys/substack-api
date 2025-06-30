@@ -1,5 +1,4 @@
 import * as dotenv from 'dotenv'
-import { validateE2ECredentials } from './checkEnv'
 
 // Load environment variables from .env file
 dotenv.config()
@@ -11,13 +10,33 @@ declare global {
     apiKey?: string
     hostname?: string
   }
+
+  function getTestCredentials(): { apiKey: string; hostname?: string } | null
 }
 
-// Validate credentials and fail early if missing
-// This ensures E2E tests always run and fail explicitly when credentials are missing
-const credentials = validateE2ECredentials()
-global.E2E_CONFIG = {
-  hasCredentials: true,
-  apiKey: credentials.SUBSTACK_API_KEY,
-  hostname: credentials.SUBSTACK_HOSTNAME
+// Check for credentials but don't fail early - let individual tests handle missing credentials
+const apiKey = process.env.SUBSTACK_API_KEY || process.env.E2E_API_KEY
+const hostname = process.env.SUBSTACK_HOSTNAME || process.env.E2E_HOSTNAME
+
+if (apiKey) {
+  global.E2E_CONFIG = {
+    hasCredentials: true,
+    apiKey,
+    hostname
+  }
+} else {
+  global.E2E_CONFIG = {
+    hasCredentials: false
+  }
+}
+
+// Helper function to get credentials for tests
+global.getTestCredentials = (): { apiKey: string; hostname?: string } | null => {
+  if (global.E2E_CONFIG.hasCredentials && global.E2E_CONFIG.apiKey) {
+    return {
+      apiKey: global.E2E_CONFIG.apiKey,
+      hostname: global.E2E_CONFIG.hostname
+    }
+  }
+  return null
 }

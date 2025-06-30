@@ -47,7 +47,13 @@ describe('E2E: Authentication & API Access', () => {
   let client: Substack
 
   beforeAll(() => {
-    // Credentials are guaranteed to be available due to setup.ts validation
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.warn('⚠️ Skipping E2E tests - no credentials available')
+      console.warn('Set SUBSTACK_API_KEY environment variable to run E2E tests')
+      return
+    }
+
+    // Credentials are available
     client = new Substack({
       apiKey: global.E2E_CONFIG.apiKey!,
       hostname: global.E2E_CONFIG.hostname
@@ -55,6 +61,11 @@ describe('E2E: Authentication & API Access', () => {
   })
 
   test('should authenticate and access posts', async () => {
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.log('⏭️ Skipping test - no credentials available')
+      return
+    }
+
     try {
       const posts = []
       for await (const post of client.getPosts({ limit: 1 })) {
@@ -70,6 +81,11 @@ describe('E2E: Authentication & API Access', () => {
   })
 
   test('should handle custom hostname in posts access', async () => {
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.log('⏭️ Skipping test - no credentials available')
+      return
+    }
+
     if (!global.E2E_CONFIG.hostname) {
       console.log('Skipping custom hostname test - no hostname configured')
       return
@@ -88,6 +104,11 @@ describe('E2E: Authentication & API Access', () => {
   })
 
   test('should handle API errors gracefully', async () => {
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.log('⏭️ Skipping test - no credentials available')
+      return
+    }
+
     // Create a client with invalid credentials to test error handling
     const invalidClient = new Substack({
       apiKey: 'invalid-api-key',

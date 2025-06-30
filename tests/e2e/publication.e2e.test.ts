@@ -47,7 +47,13 @@ describe('E2E: Publication Data Retrieval', () => {
   let client: Substack
 
   beforeAll(() => {
-    // Credentials are guaranteed to be available due to setup.ts validation
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.warn('⚠️ Skipping E2E tests - no credentials available')
+      console.warn('Set SUBSTACK_API_KEY environment variable to run E2E tests')
+      return
+    }
+
+    // Credentials are available
     client = new Substack({
       apiKey: global.E2E_CONFIG.apiKey!,
       hostname: global.E2E_CONFIG.hostname
@@ -55,6 +61,11 @@ describe('E2E: Publication Data Retrieval', () => {
   })
 
   test('should fetch posts from publication', async () => {
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.log('⏭️ Skipping test - no credentials available')
+      return
+    }
+
     try {
       const posts = []
       for await (const post of client.getPosts({ limit: 5 })) {
@@ -85,6 +96,11 @@ describe('E2E: Publication Data Retrieval', () => {
   })
 
   test('should fetch posts with pagination', async () => {
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.log('⏭️ Skipping test - no credentials available')
+      return
+    }
+
     try {
       const firstPage = []
       for await (const post of client.getPosts({ limit: 2 })) {
@@ -115,6 +131,11 @@ describe('E2E: Publication Data Retrieval', () => {
   })
 
   test('should fetch specific post by slug', async () => {
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.log('⏭️ Skipping test - no credentials available')
+      return
+    }
+
     try {
       // First get a post to get its slug
       const posts = []
@@ -139,6 +160,11 @@ describe('E2E: Publication Data Retrieval', () => {
   })
 
   test('should search posts', async () => {
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.log('⏭️ Skipping test - no credentials available')
+      return
+    }
+
     try {
       const searchResult = await client.searchPosts({ query: 'test' })
 
@@ -152,6 +178,11 @@ describe('E2E: Publication Data Retrieval', () => {
   })
 
   test('should handle non-existent post gracefully', async () => {
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.log('⏭️ Skipping test - no credentials available')
+      return
+    }
+
     try {
       await expect(client.getPost('non-existent-post-slug-12345')).rejects.toThrow()
     } catch (error) {

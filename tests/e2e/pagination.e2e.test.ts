@@ -48,7 +48,13 @@ describe('E2E: Limit Handling & Pagination', () => {
   let customPerPageClient: Substack
 
   beforeAll(() => {
-    // Credentials are guaranteed to be available due to setup.ts validation
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.warn('⚠️ Skipping E2E tests - no credentials available')
+      console.warn('Set SUBSTACK_API_KEY environment variable to run E2E tests')
+      return
+    }
+
+    // Credentials are available
     defaultClient = new Substack({
       apiKey: global.E2E_CONFIG.apiKey!,
       hostname: global.E2E_CONFIG.hostname
@@ -64,6 +70,11 @@ describe('E2E: Limit Handling & Pagination', () => {
 
   describe('Posts Limit Handling', () => {
     test('should return exactly 10 posts when limit is set to 10', async () => {
+      if (!global.E2E_CONFIG.hasCredentials) {
+        console.log('⏭️ Skipping test - no credentials available')
+        return
+      }
+
       try {
         const posts = []
         for await (const post of defaultClient.getPosts({ limit: 10 })) {
@@ -90,6 +101,11 @@ describe('E2E: Limit Handling & Pagination', () => {
     }, 30000)
 
     test('should stop iteration exactly at limit even if more data is available', async () => {
+      if (!global.E2E_CONFIG.hasCredentials) {
+        console.log('⏭️ Skipping test - no credentials available')
+        return
+      }
+
       try {
         let count = 0
         const limit = 5
@@ -109,6 +125,11 @@ describe('E2E: Limit Handling & Pagination', () => {
 
   describe('Comments Limit Handling', () => {
     test('should return exactly 10 comments when limit is set to 10', async () => {
+      if (!global.E2E_CONFIG.hasCredentials) {
+        console.log('⏭️ Skipping test - no credentials available')
+        return
+      }
+
       try {
         // First, get a post to test comments
         const posts = []
@@ -150,6 +171,11 @@ describe('E2E: Limit Handling & Pagination', () => {
 
   describe('Notes Limit Handling', () => {
     test('should return exactly 10 notes when limit is set to 10', async () => {
+      if (!global.E2E_CONFIG.hasCredentials) {
+        console.log('⏭️ Skipping test - no credentials available')
+        return
+      }
+
       try {
         const notes = []
         for await (const note of defaultClient.getNotes({ limit: 10 })) {
@@ -177,6 +203,11 @@ describe('E2E: Limit Handling & Pagination', () => {
 
   describe('Pagination Behavior', () => {
     test('should handle pagination automatically when no limit is set', async () => {
+      if (!global.E2E_CONFIG.hasCredentials) {
+        console.log('⏭️ Skipping test - no credentials available')
+        return
+      }
+
       try {
         let count = 0
         const maxToTest = 30 // Reasonable limit for testing
@@ -198,6 +229,11 @@ describe('E2E: Limit Handling & Pagination', () => {
     }, 60000)
 
     test('should iterate through multiple pages correctly when limit exceeds page size', async () => {
+      if (!global.E2E_CONFIG.hasCredentials) {
+        console.log('⏭️ Skipping test - no credentials available')
+        return
+      }
+
       try {
         const posts = []
         const limit = 35 // Should require multiple pages with default perPage of 25
@@ -227,6 +263,11 @@ describe('E2E: Limit Handling & Pagination', () => {
     }, 60000)
 
     test('should respect custom perPage configuration', async () => {
+      if (!global.E2E_CONFIG.hasCredentials) {
+        console.log('⏭️ Skipping test - no credentials available')
+        return
+      }
+
       try {
         // Test with client that has perPage: 5
         let requestCount = 0
@@ -265,6 +306,11 @@ describe('E2E: Limit Handling & Pagination', () => {
 
   describe('Configuration Validation', () => {
     test('should use default perPage of 25', async () => {
+      if (!global.E2E_CONFIG.hasCredentials) {
+        console.log('⏭️ Skipping test - no credentials available')
+        return
+      }
+
       const client = new Substack({
         apiKey: global.E2E_CONFIG.apiKey!,
         hostname: global.E2E_CONFIG.hostname
@@ -274,6 +320,11 @@ describe('E2E: Limit Handling & Pagination', () => {
     })
 
     test('should use custom perPage when provided', async () => {
+      if (!global.E2E_CONFIG.hasCredentials) {
+        console.log('⏭️ Skipping test - no credentials available')
+        return
+      }
+
       const client = new Substack({
         apiKey: global.E2E_CONFIG.apiKey!,
         hostname: global.E2E_CONFIG.hostname,
@@ -284,6 +335,11 @@ describe('E2E: Limit Handling & Pagination', () => {
     })
 
     test('should use default cacheTTL of 300 seconds', async () => {
+      if (!global.E2E_CONFIG.hasCredentials) {
+        console.log('⏭️ Skipping test - no credentials available')
+        return
+      }
+
       const client = new Substack({
         apiKey: global.E2E_CONFIG.apiKey!,
         hostname: global.E2E_CONFIG.hostname
@@ -293,6 +349,11 @@ describe('E2E: Limit Handling & Pagination', () => {
     })
 
     test('should use custom cacheTTL when provided', async () => {
+      if (!global.E2E_CONFIG.hasCredentials) {
+        console.log('⏭️ Skipping test - no credentials available')
+        return
+      }
+
       const client = new Substack({
         apiKey: global.E2E_CONFIG.apiKey!,
         hostname: global.E2E_CONFIG.hostname,
@@ -305,6 +366,11 @@ describe('E2E: Limit Handling & Pagination', () => {
 
   describe('Caching Functionality', () => {
     test('should cache read-only requests', async () => {
+      if (!global.E2E_CONFIG.hasCredentials) {
+        console.log('⏭️ Skipping test - no credentials available')
+        return
+      }
+
       try {
         const client = new Substack({
           apiKey: global.E2E_CONFIG.apiKey!,

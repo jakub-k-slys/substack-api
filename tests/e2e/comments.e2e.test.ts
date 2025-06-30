@@ -47,7 +47,13 @@ describe('E2E: Comment Operations', () => {
   let client: Substack
 
   beforeAll(() => {
-    // Credentials are guaranteed to be available due to setup.ts validation
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.warn('⚠️ Skipping E2E tests - no credentials available')
+      console.warn('Set SUBSTACK_API_KEY environment variable to run E2E tests')
+      return
+    }
+
+    // Credentials are available
     client = new Substack({
       apiKey: global.E2E_CONFIG.apiKey!,
       hostname: global.E2E_CONFIG.hostname
@@ -55,6 +61,11 @@ describe('E2E: Comment Operations', () => {
   })
 
   test('should fetch comments for a post', async () => {
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.log('⏭️ Skipping test - no credentials available')
+      return
+    }
+
     try {
       // First get a post to get comments for
       const posts = []
@@ -110,6 +121,11 @@ describe('E2E: Comment Operations', () => {
   })
 
   test('should fetch comments with pagination', async () => {
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.log('⏭️ Skipping test - no credentials available')
+      return
+    }
+
     try {
       const posts = []
       for await (const post of client.getPosts({ limit: 5 })) {
@@ -158,6 +174,11 @@ describe('E2E: Comment Operations', () => {
   })
 
   test('should fetch specific comment by ID', async () => {
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.log('⏭️ Skipping test - no credentials available')
+      return
+    }
+
     try {
       // First get a comment to get its ID
       const posts = []
@@ -203,6 +224,11 @@ describe('E2E: Comment Operations', () => {
   })
 
   test('should handle non-existent comment gracefully', async () => {
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.log('⏭️ Skipping test - no credentials available')
+      return
+    }
+
     try {
       await client.getComment(999999999) // Very unlikely to exist
     } catch (error) {

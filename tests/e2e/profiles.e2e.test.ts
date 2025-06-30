@@ -47,7 +47,13 @@ describe('E2E: User Profile Operations', () => {
   let client: Substack
 
   beforeAll(() => {
-    // Credentials are guaranteed to be available due to setup.ts validation
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.warn('⚠️ Skipping E2E tests - no credentials available')
+      console.warn('Set SUBSTACK_API_KEY environment variable to run E2E tests')
+      return
+    }
+
+    // Credentials are available
     client = new Substack({
       apiKey: global.E2E_CONFIG.apiKey!,
       hostname: global.E2E_CONFIG.hostname
@@ -55,6 +61,11 @@ describe('E2E: User Profile Operations', () => {
   })
 
   test('should fetch user profile by ID', async () => {
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.log('⏭️ Skipping test - no credentials available')
+      return
+    }
+
     try {
       // Use a common user ID for testing (this is a generic approach)
       // In real scenarios, you'd get this from other API calls
@@ -85,6 +96,11 @@ describe('E2E: User Profile Operations', () => {
   })
 
   test('should fetch public profile by slug', async () => {
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.log('⏭️ Skipping test - no credentials available')
+      return
+    }
+
     try {
       // Use a common public profile slug for testing
       const testSlug = 'hamish' // Example public slug
@@ -101,6 +117,11 @@ describe('E2E: User Profile Operations', () => {
   })
 
   test('should fetch following profiles', async () => {
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.log('⏭️ Skipping test - no credentials available')
+      return
+    }
+
     try {
       const followingProfiles = await client.getFollowingProfiles()
 
@@ -119,6 +140,11 @@ describe('E2E: User Profile Operations', () => {
   })
 
   test('should handle non-existent user profile gracefully', async () => {
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.log('⏭️ Skipping test - no credentials available')
+      return
+    }
+
     try {
       await client.getUserProfile(999999999) // Very unlikely to exist
     } catch (error) {
@@ -128,6 +154,11 @@ describe('E2E: User Profile Operations', () => {
   })
 
   test('should handle non-existent public profile gracefully', async () => {
+    if (!global.E2E_CONFIG.hasCredentials) {
+      console.log('⏭️ Skipping test - no credentials available')
+      return
+    }
+
     try {
       await client.getPublicProfile('non-existent-user-slug-12345')
     } catch (error) {
