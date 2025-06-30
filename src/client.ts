@@ -39,7 +39,7 @@ export class Substack {
   private readonly cookie: string
   private readonly perPage: number
   private readonly cacheTTL: number
-  private readonly cache = new Map<string, CacheEntry<any>>()
+  private readonly cache = new Map<string, CacheEntry<unknown>>()
 
   constructor(config: SubstackConfig) {
     if (!config.apiKey) {
@@ -82,7 +82,7 @@ export class Substack {
       return null
     }
 
-    return entry.data
+    return entry.data as T
   }
 
   private setCachedData<T>(cacheKey: string, data: T): void {
