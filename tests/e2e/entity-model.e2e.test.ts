@@ -13,7 +13,7 @@ describe('SubstackClient Entity Model E2E', () => {
 
     client = new SubstackClient({
       apiKey: global.E2E_CONFIG.apiKey!,
-      hostname: global.E2E_CONFIG.hostname
+      hostname: global.E2E_CONFIG.hostname || 'substack.com'
     })
   })
 
