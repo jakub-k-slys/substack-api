@@ -141,16 +141,4 @@ export class SubstackClient {
     const comment = await this.httpClient.get<SubstackComment>(`/api/v1/comments/${id}`)
     return new Comment(comment, this.httpClient)
   }
-
-  /**
-   * Get users that the authenticated user follows
-   */
-  async *followees(): AsyncIterable<Profile> {
-    const response = await this.httpClient.get<{ users: SubstackFullProfile[] }>(
-      '/api/v1/reader/user_following'
-    )
-    for (const user of response.users) {
-      yield new Profile(user, this.httpClient)
-    }
-  }
 }
