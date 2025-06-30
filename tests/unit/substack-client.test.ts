@@ -209,49 +209,4 @@ describe('SubstackClient', () => {
       expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/comments/999')
     })
   })
-
-  describe('followees', () => {
-    it('should iterate through followees', async () => {
-      const mockResponse = {
-        users: [
-          {
-            id: 1,
-            handle: 'user1',
-            name: 'User One',
-            photo_url: 'https://example.com/user1.jpg'
-          },
-          {
-            id: 2,
-            handle: 'user2',
-            name: 'User Two',
-            photo_url: 'https://example.com/user2.jpg'
-          }
-        ]
-      }
-      mockHttpClient.get.mockResolvedValue(mockResponse)
-
-      const followees = []
-      for await (const profile of client.followees()) {
-        followees.push(profile)
-      }
-
-      expect(followees).toHaveLength(2)
-      expect(followees[0]).toBeInstanceOf(Profile)
-      expect(followees[0].name).toBe('User One')
-      expect(followees[1].name).toBe('User Two')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/user_following')
-    })
-
-    it('should handle empty followees response', async () => {
-      const mockResponse = { users: [] }
-      mockHttpClient.get.mockResolvedValue(mockResponse)
-
-      const followees = []
-      for await (const profile of client.followees()) {
-        followees.push(profile)
-      }
-
-      expect(followees).toHaveLength(0)
-    })
-  })
 })

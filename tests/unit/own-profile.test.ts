@@ -1,5 +1,6 @@
 import { OwnProfile } from '../../src/entities/own-profile'
 import { Note } from '../../src/entities/note'
+import { Profile } from '../../src/entities/profile'
 import type { SubstackFullProfile } from '../../src/types'
 import type { SubstackHttpClient } from '../../src/http-client'
 
@@ -189,5 +190,50 @@ describe('OwnProfile Entity', () => {
     }
 
     expect(followers).toHaveLength(0)
+  })
+
+  it('should iterate through followees', async () => {
+    const mockResponse = {
+      users: [
+        {
+          id: 1,
+          handle: 'user1',
+          name: 'User One',
+          photo_url: 'https://example.com/user1.jpg'
+        },
+        {
+          id: 2,
+          handle: 'user2',
+          name: 'User Two',
+          photo_url: 'https://example.com/user2.jpg'
+        }
+      ]
+    }
+    const mockClient = ownProfile['client'] as jest.Mocked<SubstackHttpClient>
+    mockClient.get.mockResolvedValue(mockResponse)
+
+    const followees = []
+    for await (const profile of ownProfile.followees()) {
+      followees.push(profile)
+    }
+
+    expect(followees).toHaveLength(2)
+    expect(followees[0]).toBeInstanceOf(Profile)
+    expect(followees[0].name).toBe('User One')
+    expect(followees[1].name).toBe('User Two')
+    expect(mockClient.get).toHaveBeenCalledWith('/api/v1/reader/user_following')
+  })
+
+  it('should handle empty followees response', async () => {
+    const mockResponse = { users: [] }
+    const mockClient = ownProfile['client'] as jest.Mocked<SubstackHttpClient>
+    mockClient.get.mockResolvedValue(mockResponse)
+
+    const followees = []
+    for await (const profile of ownProfile.followees()) {
+      followees.push(profile)
+    }
+
+    expect(followees).toHaveLength(0)
   })
 })

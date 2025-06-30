@@ -61,10 +61,11 @@ describe('SubstackClient Entity Model E2E', () => {
     }
 
     try {
+      const ownProfile = await client.ownProfile()
       const followees = []
       let count = 0
 
-      for await (const profile of client.followees()) {
+      for await (const profile of ownProfile.followees()) {
         followees.push(profile)
         count++
 

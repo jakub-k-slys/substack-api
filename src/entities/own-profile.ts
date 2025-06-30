@@ -1,7 +1,7 @@
 import { Profile } from './profile'
 import { Post } from './post'
 import { Note } from './note'
-import type { SubstackPost, SubstackNote } from '../types'
+import type { SubstackPost, SubstackNote, SubstackFullProfile } from '../types'
 
 /**
  * OwnProfile extends Profile with write capabilities for the authenticated user
@@ -129,5 +129,17 @@ export class OwnProfile extends Profile {
     // For now, this is not available in the current API
     // Return empty iterator as placeholder
     yield* []
+  }
+
+  /**
+   * Get users that the authenticated user follows
+   */
+  async *followees(_options: { limit?: number } = {}): AsyncIterable<Profile> {
+    const response = await this.client.get<{ users: SubstackFullProfile[] }>(
+      '/api/v1/reader/user_following'
+    )
+    for (const user of response.users) {
+      yield new Profile(user, this.client)
+    }
   }
 }
