@@ -1,4 +1,9 @@
-import type { SubstackPublicProfile, SubstackFullProfile, SubstackPost } from '../types'
+import type {
+  SubstackPublicProfile,
+  SubstackFullProfile,
+  SubstackPost,
+  SubstackNote
+} from '../types'
 import type { SubstackHttpClient } from '../http-client'
 import { Post } from './post'
 import { Note } from './note'
@@ -36,7 +41,7 @@ export class Profile {
       const response = await this.client.get<{ posts?: SubstackPost[] }>(
         `/api/v1/users/${this.id}/posts`
       )
-      
+
       if (response.posts) {
         let count = 0
         for (const postData of response.posts) {
@@ -57,10 +62,10 @@ export class Profile {
   async *notes(options: { limit?: number } = {}): AsyncIterable<Note> {
     try {
       // Try to fetch notes for this profile
-      const response = await this.client.get<{ notes?: any[] }>(
+      const response = await this.client.get<{ notes?: SubstackNote[] }>(
         `/api/v1/users/${this.id}/notes`
       )
-      
+
       if (response.notes) {
         let count = 0
         for (const noteData of response.notes) {

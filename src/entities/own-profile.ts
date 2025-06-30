@@ -1,7 +1,7 @@
 import { Profile } from './profile'
 import { Post } from './post'
 import { Note } from './note'
-import type { SubstackPost } from '../types'
+import type { SubstackPost, SubstackNote } from '../types'
 
 /**
  * OwnProfile extends Profile with write capabilities for the authenticated user
@@ -48,12 +48,12 @@ export class OwnProfile extends Profile {
         type: 'note' as const
       }
 
-      const response = await this.client.post<any>('/api/v1/notes', noteData)
+      const response = await this.client.post<SubstackNote>('/api/v1/notes', noteData)
       return new Note(response, this.client)
-    } catch (error) {
+    } catch {
       // If the API endpoint doesn't exist, create a mock note
-      console.warn('Note creation API not available, creating mock note')
-      
+      // console.warn('Note creation API not available, creating mock note')
+
       const mockNoteData = {
         entity_key: `note_${Date.now()}`,
         type: 'note',

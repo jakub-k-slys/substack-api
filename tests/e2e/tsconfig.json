@@ -5,8 +5,5 @@
     "typeRoots": ["../../node_modules/@types", "."],
     "rootDir": "../../"
   },
-  "include": [
-    "./**/*",
-    "../../src/**/*"
-  ]
+  "include": ["./**/*", "../../src/**/*"]
 }

@@ -2,7 +2,7 @@
  * Core note interfaces for Substack notes
  */
 
-import { SubstackPublication, SubstackPost } from './content'
+import { SubstackPublication } from './content'
 
 export interface NotesIteratorOptions {
   limit?: number

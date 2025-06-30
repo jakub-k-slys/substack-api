@@ -1,4 +1,4 @@
-import type { SubstackPost } from '../types'
+import type { SubstackPost, SubstackComment } from '../types'
 import type { SubstackHttpClient } from '../http-client'
 import { Comment } from './comment'
 
@@ -44,10 +44,10 @@ export class Post {
   async *comments(options: { limit?: number } = {}): AsyncIterable<Comment> {
     try {
       // Try to fetch comments for this post
-      const response = await this.client.get<{ comments?: any[] }>(
+      const response = await this.client.get<{ comments?: SubstackComment[] }>(
         `/api/v1/posts/${this.id}/comments`
       )
-      
+
       if (response.comments) {
         let count = 0
         for (const commentData of response.comments) {

@@ -81,7 +81,7 @@ describe('OwnProfile Entity', () => {
     }
 
     const ownProfile = new OwnProfile(mockProfileData, mockClient as any)
-    
+
     await expect(
       ownProfile.createPost({
         title: 'Test Post',

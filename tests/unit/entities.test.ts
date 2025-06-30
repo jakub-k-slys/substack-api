@@ -5,7 +5,7 @@ describe('SubstackClient Entity Model', () => {
   let client: SubstackClient
 
   beforeEach(() => {
-    client = new SubstackClient({ 
+    client = new SubstackClient({
       apiKey: 'test-api-key',
       hostname: 'test.substack.com'
     })
