@@ -39,16 +39,91 @@ describe('OwnProfile Entity', () => {
     expect(typeof ownProfile.followers).toBe('function')
   })
 
-  it('should throw error when creating post (not implemented)', async () => {
+  it('should create post when API is available', async () => {
+    // Mock successful API response
+    const mockPost = {
+      id: 123,
+      title: 'Test Post',
+      slug: 'test-post',
+      post_date: '2023-01-01T00:00:00Z',
+      canonical_url: 'https://example.com/post',
+      type: 'newsletter' as const
+    }
+
+    // Mock the post method to return a successful response
+    const mockClient = {
+      post: jest.fn().mockResolvedValue(mockPost),
+      get: jest.fn()
+    }
+
+    const ownProfile = new OwnProfile(mockProfileData, mockClient as any)
+    const post = await ownProfile.createPost({
+      title: 'Test Post',
+      body: 'Test content'
+    })
+
+    expect(post).toBeDefined()
+    expect(post.title).toBe('Test Post')
+    expect(mockClient.post).toHaveBeenCalledWith('/api/v1/posts', {
+      title: 'Test Post',
+      body: 'Test content',
+      subtitle: '',
+      draft: false,
+      type: 'newsletter'
+    })
+  })
+
+  it('should handle post creation failure gracefully', async () => {
+    // Mock failed API response
+    const mockClient = {
+      post: jest.fn().mockRejectedValue(new Error('API Error')),
+      get: jest.fn()
+    }
+
+    const ownProfile = new OwnProfile(mockProfileData, mockClient as any)
+    
     await expect(
       ownProfile.createPost({
         title: 'Test Post',
         body: 'Test content'
       })
-    ).rejects.toThrow('Post creation not implemented yet - requires post creation API')
+    ).rejects.toThrow('Failed to create post: API Error')
   })
 
-  it('should create a note', async () => {
+  it('should create a note via API when available', async () => {
+    // Mock successful API response
+    const mockNoteResponse = {
+      id: 456,
+      body: 'Test note content',
+      created_at: '2023-01-01T00:00:00Z'
+    }
+
+    const mockClient = {
+      post: jest.fn().mockResolvedValue(mockNoteResponse),
+      get: jest.fn()
+    }
+
+    const ownProfile = new OwnProfile(mockProfileData, mockClient as any)
+    const note = await ownProfile.createNote({
+      body: 'Test note content'
+    })
+
+    expect(note).toBeInstanceOf(Note)
+    expect(mockClient.post).toHaveBeenCalledWith('/api/v1/notes', {
+      body: 'Test note content',
+      formatting: [],
+      type: 'note'
+    })
+  })
+
+  it('should create a mock note when API is not available', async () => {
+    // Mock failed API response (fallback to mock)
+    const mockClient = {
+      post: jest.fn().mockRejectedValue(new Error('API not available')),
+      get: jest.fn()
+    }
+
+    const ownProfile = new OwnProfile(mockProfileData, mockClient as any)
     const note = await ownProfile.createNote({
       body: 'Test note content'
     })
@@ -58,7 +133,14 @@ describe('OwnProfile Entity', () => {
     expect(note.author.name).toBe('Test User')
   })
 
-  it('should create a note with formatting', async () => {
+  it('should create a note with formatting when API fails', async () => {
+    // Mock failed API response (fallback to mock)
+    const mockClient = {
+      post: jest.fn().mockRejectedValue(new Error('API not available')),
+      get: jest.fn()
+    }
+
+    const ownProfile = new OwnProfile(mockProfileData, mockClient as any)
     const note = await ownProfile.createNote({
       body: 'Test note content',
       formatting: [{ start: 0, end: 4, type: 'bold' }]

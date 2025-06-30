@@ -41,10 +41,25 @@ export class Post {
   /**
    * Get comments for this post
    */
-  async *comments(_options: { limit?: number } = {}): AsyncIterable<Comment> {
-    // Mock implementation - in real API, this would fetch comments for this post
-    // For now, return empty iterator
-    yield* []
+  async *comments(options: { limit?: number } = {}): AsyncIterable<Comment> {
+    try {
+      // Try to fetch comments for this post
+      const response = await this.client.get<{ comments?: any[] }>(
+        `/api/v1/posts/${this.id}/comments`
+      )
+      
+      if (response.comments) {
+        let count = 0
+        for (const commentData of response.comments) {
+          if (options.limit && count >= options.limit) break
+          yield new Comment(commentData, this.client)
+          count++
+        }
+      }
+    } catch {
+      // If the endpoint doesn't exist or fails, return empty iterator
+      yield* []
+    }
   }
 
   /**

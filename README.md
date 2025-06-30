@@ -45,7 +45,7 @@ const isConnected = await client.testConnectivity();
 - 🚀 **Built-in Caching** - Automatic in-memory caching with TTL for improved performance
 - ⚡ **Error Handling** - Comprehensive error handling with custom error types
 - 🔧 **Configurable** - Support for different API versions and custom configurations
-- 🔄 **Backwards Compatible** - Original `Substack` class still available
+- 🔐 **Authentication** - Secure API key-based authentication
 
 ## Quick Start
 
@@ -63,7 +63,8 @@ The new entity model provides fluent navigation and modern async iterator suppor
 import { SubstackClient } from 'substack-api';
 
 const client = new SubstackClient({
-  apiKey: 'your-api-key-here'
+  apiKey: 'your-api-key-here',
+  hostname: 'example.substack.com'
 });
 
 // Get a profile and iterate through posts
@@ -78,31 +79,25 @@ if (await client.testConnectivity()) {
 }
 ```
 
-### Legacy Client
+### Configuration
 
-The original client is still available for backwards compatibility:
+The client requires both an API key and hostname:
 
 ```typescript
-import { Substack } from 'substack-api';
+import { SubstackClient } from 'substack-api';
 
-// Create a client for a specific publication
-const client = new Substack({
-  hostname: 'example.substack.com',
+// Create a client with required configuration
+const client = new SubstackClient({
   apiKey: 'your-api-key-here',
-  perPage: 50, // Custom page size
-  cacheTTL: 300 // Cache for 5 minutes
+  hostname: 'example.substack.com',
+  perPage: 50, // Optional: Custom page size
+  cacheTTL: 300 // Optional: Cache for 5 minutes
 });
 
-// Fetch recent posts
-for await (const post of client.getPosts({ limit: 10 })) {
-  console.log(`${post.title} - ${post.post_date}`);
+// Test connectivity
+if (await client.testConnectivity()) {
+  console.log('Connected to Substack API');
 }
-
-// Search for posts
-const results = await client.searchPosts({
-  query: 'typescript',
-  type: 'newsletter'
-});
 ```
 
 ## Documentation

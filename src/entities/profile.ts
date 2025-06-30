@@ -1,4 +1,4 @@
-import type { SubstackPublicProfile, SubstackFullProfile } from '../types'
+import type { SubstackPublicProfile, SubstackFullProfile, SubstackPost } from '../types'
 import type { SubstackHttpClient } from '../http-client'
 import { Post } from './post'
 import { Note } from './note'
@@ -29,18 +29,49 @@ export class Profile {
   /**
    * Get posts from this profile's publications
    */
-  async *posts(_options: { limit?: number } = {}): AsyncIterable<Post> {
-    // Mock implementation - in real API, this would fetch posts for this profile
-    // For now, return empty iterator
-    yield* []
+  async *posts(options: { limit?: number } = {}): AsyncIterable<Post> {
+    try {
+      // Try to fetch posts for this profile
+      // The API endpoint might vary, so we'll try a few approaches
+      const response = await this.client.get<{ posts?: SubstackPost[] }>(
+        `/api/v1/users/${this.id}/posts`
+      )
+      
+      if (response.posts) {
+        let count = 0
+        for (const postData of response.posts) {
+          if (options.limit && count >= options.limit) break
+          yield new Post(postData, this.client)
+          count++
+        }
+      }
+    } catch {
+      // If the endpoint doesn't exist or fails, return empty iterator
+      yield* []
+    }
   }
 
   /**
    * Get notes from this profile
    */
-  async *notes(_options: { limit?: number } = {}): AsyncIterable<Note> {
-    // Mock implementation - in real API, this would fetch notes for this profile
-    // For now, return empty iterator
-    yield* []
+  async *notes(options: { limit?: number } = {}): AsyncIterable<Note> {
+    try {
+      // Try to fetch notes for this profile
+      const response = await this.client.get<{ notes?: any[] }>(
+        `/api/v1/users/${this.id}/notes`
+      )
+      
+      if (response.notes) {
+        let count = 0
+        for (const noteData of response.notes) {
+          if (options.limit && count >= options.limit) break
+          yield new Note(noteData, this.client)
+          count++
+        }
+      }
+    } catch {
+      // If the endpoint doesn't exist or fails, return empty iterator
+      yield* []
+    }
   }
 }

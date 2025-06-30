@@ -3,7 +3,7 @@
  */
 
 export interface SubstackConfig {
-  hostname?: string
+  hostname: string
   apiVersion?: string
   apiKey: string
   perPage?: number // Default items per page for pagination (default: 25)

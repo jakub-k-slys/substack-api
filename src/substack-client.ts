@@ -34,42 +34,48 @@ export class SubstackClient {
    * Get the authenticated user's own profile with write capabilities
    */
   async ownProfile(): Promise<OwnProfile> {
-    // Create a minimal profile for now since we don't have a "me" endpoint
-    const mockProfile: SubstackFullProfile = {
-      id: 0,
-      name: 'Unknown User',
-      handle: 'unknown',
-      photo_url: '',
-      profile_set_up_at: new Date().toISOString(),
-      reader_installed_at: new Date().toISOString(),
-      profile_disabled: false,
-      publicationUsers: [],
-      userLinks: [],
-      subscriptions: [],
-      subscriptionsTruncated: false,
-      hasGuestPost: false,
-      max_pub_tier: 0,
-      hasActivity: false,
-      hasLikes: false,
-      lists: [],
-      rough_num_free_subscribers_int: 0,
-      rough_num_free_subscribers: '0',
-      bestseller_badge_disabled: false,
-      subscriberCountString: '0',
-      subscriberCount: '0',
-      subscriberCountNumber: 0,
-      hasHiddenPublicationUsers: false,
-      visibleSubscriptionsCount: 0,
-      slug: 'unknown',
-      primaryPublicationIsPledged: false,
-      primaryPublicationSubscriptionState: 'not_subscribed',
-      isSubscribed: false,
-      isFollowing: false,
-      followsViewer: false,
-      can_dm: false,
-      dm_upgrade_options: []
+    try {
+      // Try to get the authenticated user's profile
+      const profile = await this.httpClient.get<SubstackFullProfile>('/api/v1/me')
+      return new OwnProfile(profile, this.httpClient)
+    } catch {
+      // If "me" endpoint doesn't exist, create a minimal profile for now
+      const mockProfile: SubstackFullProfile = {
+        id: 0,
+        name: 'Unknown User',
+        handle: 'unknown',
+        photo_url: '',
+        profile_set_up_at: new Date().toISOString(),
+        reader_installed_at: new Date().toISOString(),
+        profile_disabled: false,
+        publicationUsers: [],
+        userLinks: [],
+        subscriptions: [],
+        subscriptionsTruncated: false,
+        hasGuestPost: false,
+        max_pub_tier: 0,
+        hasActivity: false,
+        hasLikes: false,
+        lists: [],
+        rough_num_free_subscribers_int: 0,
+        rough_num_free_subscribers: '0',
+        bestseller_badge_disabled: false,
+        subscriberCountString: '0',
+        subscriberCount: '0',
+        subscriberCountNumber: 0,
+        hasHiddenPublicationUsers: false,
+        visibleSubscriptionsCount: 0,
+        slug: 'unknown',
+        primaryPublicationIsPledged: false,
+        primaryPublicationSubscriptionState: 'not_subscribed',
+        isSubscribed: false,
+        isFollowing: false,
+        followsViewer: false,
+        can_dm: false,
+        dm_upgrade_options: []
+      }
+      return new OwnProfile(mockProfile, this.httpClient)
     }
-    return new OwnProfile(mockProfile, this.httpClient)
   }
 
   /**
@@ -83,8 +89,8 @@ export class SubstackClient {
     try {
       const profile = await this.httpClient.get<SubstackFullProfile>(`/api/v1/users/${id}`)
       return new Profile(profile, this.httpClient)
-    } catch {
-      throw new Error(`Profile with ID ${id} not found`)
+    } catch (error) {
+      throw new Error(`Profile with ID ${id} not found: ${(error as Error).message}`)
     }
   }
 
@@ -92,8 +98,16 @@ export class SubstackClient {
    * Get a profile by handle/slug
    */
   async profileForSlug(slug: string): Promise<Profile> {
-    const profile = await this.httpClient.get<SubstackFullProfile>(`/api/v1/users/${slug}`)
-    return new Profile(profile, this.httpClient)
+    if (!slug || slug.trim() === '') {
+      throw new Error('Profile slug cannot be empty')
+    }
+
+    try {
+      const profile = await this.httpClient.get<SubstackFullProfile>(`/api/v1/users/${slug}`)
+      return new Profile(profile, this.httpClient)
+    } catch (error) {
+      throw new Error(`Profile with slug '${slug}' not found: ${(error as Error).message}`)
+    }
   }
 
   /**

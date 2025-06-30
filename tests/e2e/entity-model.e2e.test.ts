@@ -6,9 +6,9 @@ describe('SubstackClient Entity Model E2E', () => {
 
   beforeAll(() => {
     if (!global.E2E_CONFIG.hasCredentials) {
-      console.warn('⚠️ Skipping E2E tests - no credentials available')
-      console.warn('Set SUBSTACK_API_KEY environment variable to run E2E tests')
-      return
+      throw new Error(
+        'E2E tests require credentials. Set SUBSTACK_API_KEY environment variable to run E2E tests.'
+      )
     }
 
     client = new SubstackClient({
@@ -18,11 +18,6 @@ describe('SubstackClient Entity Model E2E', () => {
   })
 
   test('should test connectivity', async () => {
-    if (!global.E2E_CONFIG.hasCredentials) {
-      console.log('⏭️ Skipping test - no credentials available')
-      return
-    }
-
     try {
       const isConnected = await client.testConnectivity()
       // In CI environment with real credentials, this should be true
@@ -42,11 +37,6 @@ describe('SubstackClient Entity Model E2E', () => {
   })
 
   test('should get profile by slug', async () => {
-    if (!global.E2E_CONFIG.hasCredentials) {
-      console.log('⏭️ Skipping test - no credentials available')
-      return
-    }
-
     try {
       // Try to get a well-known Substack profile
       // Using a popular profile that should exist
