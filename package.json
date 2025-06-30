@@ -1,7 +1,6 @@
 {
   "name": "substack-api",
   "version": "0.7.0",
-  "type": "module",
   "description": "TypeScript API client for interacting with Substack webservice",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
