@@ -32,7 +32,7 @@ describe('SubstackClient', () => {
       mockHttpClient.get.mockResolvedValue({})
       const result = await client.testConnectivity()
       expect(result).toBe(true)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/user_following')
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/feed/following')
     })
 
     it('should return false when API is not accessible', async () => {
@@ -44,6 +44,7 @@ describe('SubstackClient', () => {
 
   describe('ownProfile', () => {
     it('should get own profile when authenticated', async () => {
+      const mockSubscription = { user_id: 123 }
       const mockProfile = {
         id: 123,
         name: 'Test User',
@@ -78,13 +79,16 @@ describe('SubstackClient', () => {
         can_dm: false,
         dm_upgrade_options: []
       }
-      mockHttpClient.get.mockResolvedValue(mockProfile)
+      mockHttpClient.get
+        .mockResolvedValueOnce(mockSubscription) // First call to /api/v1/subscription
+        .mockResolvedValueOnce(mockProfile) // Second call to /api/v1/user/{id}/profile
 
       const ownProfile = await client.ownProfile()
       expect(ownProfile).toBeInstanceOf(OwnProfile)
       expect(ownProfile.id).toBe(123)
       expect(ownProfile.name).toBe('Test User')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/me')
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/subscription')
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/123/profile')
     })
 
     it('should throw error when authentication fails', async () => {

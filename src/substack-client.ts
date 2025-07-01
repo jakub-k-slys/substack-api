@@ -23,7 +23,7 @@ export class SubstackClient {
    */
   async testConnectivity(): Promise<boolean> {
     try {
-      await this.httpClient.get('/api/v1/reader/user_following')
+      await this.httpClient.get('/api/v1/feed/following')
       return true
     } catch {
       return false
@@ -36,7 +36,14 @@ export class SubstackClient {
    */
   async ownProfile(): Promise<OwnProfile> {
     try {
-      const profile = await this.httpClient.get<SubstackFullProfile>('/api/v1/me')
+      // Step 1: Get user_id from subscription endpoint
+      const subscription = await this.httpClient.get<{ user_id: number }>('/api/v1/subscription')
+      const userId = subscription.user_id
+
+      // Step 2: Get full profile using the user_id
+      const profile = await this.httpClient.get<SubstackFullProfile>(
+        `/api/v1/user/${userId}/profile`
+      )
       return new OwnProfile(profile, this.httpClient)
     } catch (error) {
       throw new Error(`Failed to get own profile: ${(error as Error).message}`)
