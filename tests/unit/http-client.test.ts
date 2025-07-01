@@ -33,7 +33,7 @@ describe('SubstackHttpClient', () => {
     it('should set up correct base URL and cookie', () => {
       const clientInstance = client as unknown as { baseUrl: string; cookie: string }
       expect(clientInstance.baseUrl).toBe('https://test.substack.com')
-      expect(clientInstance.cookie).toBe('connect.sid=s%3Atest-api-key')
+      expect(clientInstance.cookie).toBe('connect.sid=test-api-key')
     })
   })
 
@@ -49,7 +49,7 @@ describe('SubstackHttpClient', () => {
 
       expect(mockFetch).toHaveBeenCalledWith('https://test.substack.com/test', {
         headers: {
-          Cookie: 'connect.sid=s%3Atest-api-key',
+          Cookie: 'connect.sid=test-api-key',
           'Content-Type': 'application/json'
         }
       })
@@ -99,7 +99,7 @@ describe('SubstackHttpClient', () => {
 
       expect(mockFetch).toHaveBeenCalledWith('https://test.substack.com/test', {
         headers: {
-          Cookie: 'connect.sid=s%3Atest-api-key',
+          Cookie: 'connect.sid=test-api-key',
           'Content-Type': 'application/json'
         }
       })
@@ -123,7 +123,7 @@ describe('SubstackHttpClient', () => {
         method: 'POST',
         body: JSON.stringify(postData),
         headers: {
-          Cookie: 'connect.sid=s%3Atest-api-key',
+          Cookie: 'connect.sid=test-api-key',
           'Content-Type': 'application/json'
         }
       })
@@ -144,7 +144,7 @@ describe('SubstackHttpClient', () => {
         method: 'POST',
         body: undefined,
         headers: {
-          Cookie: 'connect.sid=s%3Atest-api-key',
+          Cookie: 'connect.sid=test-api-key',
           'Content-Type': 'application/json'
         }
       })

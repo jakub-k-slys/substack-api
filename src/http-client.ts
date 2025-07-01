@@ -12,7 +12,7 @@ export class SubstackHttpClient {
       throw new Error('apiKey is required in SubstackConfig')
     }
     this.baseUrl = `https://${config.hostname || 'substack.com'}`
-    this.cookie = `connect.sid=s%3A${config.apiKey}`
+    this.cookie = `connect.sid=${config.apiKey}`
   }
 
   async request<T>(path: string, options: RequestInit = {}): Promise<T> {
