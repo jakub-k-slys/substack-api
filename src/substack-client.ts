@@ -81,11 +81,7 @@ export class SubstackClient {
   /**
    * Get a profile by user ID
    */
-  async profileForId(id: string): Promise<Profile> {
-    if (!/^\d+$/.test(id)) {
-      throw new Error('Invalid user ID - must be numeric')
-    }
-
+  async profileForId(id: number): Promise<Profile> {
     try {
       const profile = await this.httpClient.get<SubstackFullProfile>(`/api/v1/users/${id}`)
       return new Profile(profile, this.httpClient)
