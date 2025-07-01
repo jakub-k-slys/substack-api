@@ -40,10 +40,10 @@ export class Post {
 
   /**
    * Get comments for this post
+   * @throws {Error} When comment retrieval fails or API is unavailable
    */
   async *comments(options: { limit?: number } = {}): AsyncIterable<Comment> {
     try {
-      // Try to fetch comments for this post
       const response = await this.client.get<{ comments?: SubstackComment[] }>(
         `/api/v1/posts/${this.id}/comments`
       )
@@ -56,9 +56,8 @@ export class Post {
           count++
         }
       }
-    } catch {
-      // If the endpoint doesn't exist or fails, return empty iterator
-      yield* []
+    } catch (error) {
+      throw new Error(`Failed to get comments for post ${this.id}: ${(error as Error).message}`)
     }
   }
 

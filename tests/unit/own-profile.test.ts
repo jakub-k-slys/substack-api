@@ -121,11 +121,68 @@ describe('OwnProfile Entity', () => {
   })
 
   it('should create a note via API when available', async () => {
-    // Mock successful API response
+    // Mock successful API response with proper SubstackNote structure
     const mockNoteResponse = {
-      id: 456,
-      body: 'Test note content',
-      created_at: '2023-01-01T00:00:00Z'
+      entity_key: '456',
+      type: 'note',
+      context: {
+        type: 'feed',
+        timestamp: '2023-01-01T00:00:00Z',
+        users: [
+          {
+            id: 123,
+            name: 'Test User',
+            handle: 'testuser',
+            photo_url: 'https://example.com/photo.jpg',
+            profile_set_up_at: '2023-01-01T00:00:00Z',
+            reader_installed_at: '2023-01-01T00:00:00Z'
+          }
+        ],
+        isFresh: false,
+        page_rank: 1
+      },
+      comment: {
+        name: 'Test User',
+        handle: 'testuser',
+        photo_url: 'https://example.com/photo.jpg',
+        id: 456,
+        body: 'Test note content',
+        user_id: 123,
+        type: 'feed',
+        date: '2023-01-01T00:00:00Z',
+        ancestor_path: '',
+        reply_minimum_role: 'everyone',
+        reaction_count: 0,
+        reactions: {},
+        restacks: 0,
+        restacked: false,
+        children_count: 0,
+        attachments: []
+      },
+      parentComments: [],
+      canReply: true,
+      isMuted: false,
+      trackingParameters: {
+        item_primary_entity_key: '456',
+        item_entity_key: '456',
+        item_type: 'note',
+        item_content_user_id: 123,
+        item_context_type: 'feed',
+        item_context_type_bucket: 'note',
+        item_context_timestamp: '2023-01-01T00:00:00Z',
+        item_context_user_id: 123,
+        item_context_user_ids: [123],
+        item_can_reply: true,
+        item_is_fresh: false,
+        item_last_impression_at: null,
+        item_page: null,
+        item_page_rank: 1,
+        impression_id: 'test-impression',
+        followed_user_count: 0,
+        subscribed_publication_count: 0,
+        is_following: false,
+        is_explicitly_subscribed: false
+      }
     }
 
     const mockClient = {
@@ -147,8 +204,8 @@ describe('OwnProfile Entity', () => {
     })
   })
 
-  it('should create a mock note when API is not available', async () => {
-    // Mock failed API response (fallback to mock)
+  it('should throw error when note creation API is not available', async () => {
+    // Mock failed API response
     const mockClient = {
       post: jest.fn().mockRejectedValue(new Error('API not available')),
       get: jest.fn(),
@@ -156,17 +213,16 @@ describe('OwnProfile Entity', () => {
     } as unknown as jest.Mocked<SubstackHttpClient>
 
     const ownProfile = new OwnProfile(mockProfileData, mockClient)
-    const note = await ownProfile.createNote({
-      body: 'Test note content'
-    })
 
-    expect(note).toBeInstanceOf(Note)
-    expect(note.body).toBe('Test note content')
-    expect(note.author.name).toBe('Test User')
+    await expect(
+      ownProfile.createNote({
+        body: 'Test note content'
+      })
+    ).rejects.toThrow('Failed to create note: API not available')
   })
 
-  it('should create a note with formatting when API fails', async () => {
-    // Mock failed API response (fallback to mock)
+  it('should throw error when note creation with formatting fails', async () => {
+    // Mock failed API response
     const mockClient = {
       post: jest.fn().mockRejectedValue(new Error('API not available')),
       get: jest.fn(),
@@ -174,13 +230,13 @@ describe('OwnProfile Entity', () => {
     } as unknown as jest.Mocked<SubstackHttpClient>
 
     const ownProfile = new OwnProfile(mockProfileData, mockClient)
-    const note = await ownProfile.createNote({
-      body: 'Test note content',
-      formatting: [{ start: 0, end: 4, type: 'bold' }]
-    })
 
-    expect(note).toBeInstanceOf(Note)
-    expect(note.body).toBe('Test note content')
+    await expect(
+      ownProfile.createNote({
+        body: 'Test note content',
+        formatting: [{ start: 0, end: 4, type: 'bold' }]
+      })
+    ).rejects.toThrow('Failed to create note: API not available')
   })
 
   it('should return empty followers iterator', async () => {

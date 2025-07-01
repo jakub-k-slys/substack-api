@@ -1,5 +1,5 @@
 import { SubstackClient } from '../../src/substack-client'
-import { Profile, Post, Note, Comment } from '../../src/entities'
+import { Profile, Post, Note, Comment, OwnProfile } from '../../src/entities'
 import { SubstackHttpClient } from '../../src/http-client'
 
 // Mock the http client
@@ -39,6 +39,58 @@ describe('SubstackClient', () => {
       mockHttpClient.get.mockRejectedValue(new Error('Network error'))
       const result = await client.testConnectivity()
       expect(result).toBe(false)
+    })
+  })
+
+  describe('ownProfile', () => {
+    it('should get own profile when authenticated', async () => {
+      const mockProfile = {
+        id: 123,
+        name: 'Test User',
+        handle: 'testuser',
+        photo_url: 'https://example.com/photo.jpg',
+        profile_set_up_at: '2023-01-01T00:00:00Z',
+        reader_installed_at: '2023-01-01T00:00:00Z',
+        profile_disabled: false,
+        publicationUsers: [],
+        userLinks: [],
+        subscriptions: [],
+        subscriptionsTruncated: false,
+        hasGuestPost: false,
+        max_pub_tier: 0,
+        hasActivity: false,
+        hasLikes: false,
+        lists: [],
+        rough_num_free_subscribers_int: 0,
+        rough_num_free_subscribers: '0',
+        bestseller_badge_disabled: false,
+        subscriberCountString: '0',
+        subscriberCount: '0',
+        subscriberCountNumber: 0,
+        hasHiddenPublicationUsers: false,
+        visibleSubscriptionsCount: 0,
+        slug: 'testuser',
+        primaryPublicationIsPledged: false,
+        primaryPublicationSubscriptionState: 'not_subscribed',
+        isSubscribed: false,
+        isFollowing: false,
+        followsViewer: false,
+        can_dm: false,
+        dm_upgrade_options: []
+      }
+      mockHttpClient.get.mockResolvedValue(mockProfile)
+
+      const ownProfile = await client.ownProfile()
+      expect(ownProfile).toBeInstanceOf(OwnProfile)
+      expect(ownProfile.id).toBe(123)
+      expect(ownProfile.name).toBe('Test User')
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/me')
+    })
+
+    it('should throw error when authentication fails', async () => {
+      mockHttpClient.get.mockRejectedValue(new Error('Unauthorized'))
+
+      await expect(client.ownProfile()).rejects.toThrow('Failed to get own profile: Unauthorized')
     })
   })
 

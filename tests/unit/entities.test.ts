@@ -1,5 +1,5 @@
 import { SubstackClient } from '../../src/substack-client'
-import { Profile, Post, Comment, OwnProfile } from '../../src/entities'
+import { Profile, Post, Comment } from '../../src/entities'
 import type { SubstackHttpClient } from '../../src/http-client'
 
 describe('SubstackClient Entity Model', () => {
@@ -23,10 +23,8 @@ describe('SubstackClient Entity Model', () => {
       )
     })
 
-    it('should create own profile', async () => {
-      const ownProfile = await client.ownProfile()
-      expect(ownProfile).toBeInstanceOf(OwnProfile)
-      expect(ownProfile.name).toBe('Unknown User')
+    it('should throw error when getting own profile without proper authentication', async () => {
+      await expect(client.ownProfile()).rejects.toThrow('Failed to get own profile:')
     })
   })
 
