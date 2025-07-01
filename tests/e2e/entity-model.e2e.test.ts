@@ -101,7 +101,7 @@ describe('SubstackClient Entity Model E2E', () => {
       expect(ownProfile.slug).toBeTruthy()
       expect(typeof ownProfile.createNote).toBe('function')
       expect(typeof ownProfile.createPost).toBe('function')
-      expect(typeof ownProfile.followers).toBe('function')
+      expect(typeof ownProfile.followees).toBe('function')
 
       console.log(`✅ Retrieved own profile: ${ownProfile.name} (@${ownProfile.slug})`)
     } catch (error) {

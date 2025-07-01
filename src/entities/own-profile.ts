@@ -56,24 +56,24 @@ export class OwnProfile extends Profile {
   }
 
   /**
-   * Get followers of this profile
-   */
-  async *followers(_options: { limit?: number } = {}): AsyncIterable<Profile> {
-    // Implementation will get followers via the client
-    // For now, this is not available in the current API
-    // Return empty iterator as placeholder
-    yield* []
-  }
-
-  /**
    * Get users that the authenticated user follows
    */
   async *followees(_options: { limit?: number } = {}): AsyncIterable<Profile> {
-    const response = await this.client.get<{ users: SubstackFullProfile[] }>(
-      '/api/v1/reader/user_following'
-    )
-    for (const user of response.users) {
-      yield new Profile(user, this.client)
+    // First, get the list of user IDs that the user follows
+    const followingResponse = await this.client.get<number[]>('/api/v1/feed/following')
+
+    // Then, for each user ID, fetch their detailed profile
+    for (const userId of followingResponse) {
+      try {
+        const profileResponse = await this.client.get<SubstackFullProfile>(
+          `/api/v1/user/${userId}/profile`
+        )
+        yield new Profile(profileResponse, this.client)
+      } catch {
+        // Skip profiles that can't be fetched (e.g., deleted accounts, private profiles)
+        // This ensures the iterator continues working even if some profiles are inaccessible
+        continue
+      }
     }
   }
 }

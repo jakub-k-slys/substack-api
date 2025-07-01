@@ -64,7 +64,7 @@ describe('OwnProfile Entity', () => {
   it('should have additional write methods', () => {
     expect(typeof ownProfile.createPost).toBe('function')
     expect(typeof ownProfile.createNote).toBe('function')
-    expect(typeof ownProfile.followers).toBe('function')
+    expect(typeof ownProfile.followees).toBe('function')
   })
 
   it('should create post when API is available', async () => {
@@ -239,34 +239,96 @@ describe('OwnProfile Entity', () => {
     ).rejects.toThrow('Failed to create note: API not available')
   })
 
-  it('should return empty followers iterator', async () => {
-    const followers = []
-    for await (const follower of ownProfile.followers({ limit: 1 })) {
-      followers.push(follower)
-    }
+  it('should iterate through followees using correct endpoint chain', async () => {
+    // Mock the response from /api/v1/feed/following (returns array of user IDs)
+    const mockFollowingIds = [1, 2]
 
-    expect(followers).toHaveLength(0)
-  })
+    // Mock the responses from /api/v1/user/{id}/profile
+    const mockProfile1 = {
+      id: 1,
+      handle: 'user1',
+      name: 'User One',
+      photo_url: 'https://example.com/user1.jpg',
+      bio: 'Bio for User One',
+      profile_set_up_at: '2023-01-01T00:00:00Z',
+      reader_installed_at: '2023-01-01T00:00:00Z',
+      profile_disabled: false,
+      publicationUsers: [],
+      userLinks: [],
+      subscriptions: [],
+      subscriptionsTruncated: false,
+      hasGuestPost: false,
+      max_pub_tier: 1,
+      hasActivity: false,
+      hasLikes: false,
+      lists: [],
+      rough_num_free_subscribers_int: 0,
+      rough_num_free_subscribers: '0',
+      bestseller_badge_disabled: false,
+      subscriberCountString: '0',
+      subscriberCount: '0',
+      subscriberCountNumber: 0,
+      hasHiddenPublicationUsers: false,
+      visibleSubscriptionsCount: 0,
+      slug: 'user1',
+      primaryPublicationIsPledged: false,
+      primaryPublicationSubscriptionState: 'none',
+      isSubscribed: false,
+      isFollowing: false,
+      followsViewer: false,
+      can_dm: false,
+      dm_upgrade_options: []
+    } as SubstackFullProfile
 
-  it('should iterate through followees', async () => {
-    const mockResponse = {
-      users: [
-        {
-          id: 1,
-          handle: 'user1',
-          name: 'User One',
-          photo_url: 'https://example.com/user1.jpg'
-        },
-        {
-          id: 2,
-          handle: 'user2',
-          name: 'User Two',
-          photo_url: 'https://example.com/user2.jpg'
-        }
-      ]
-    }
+    const mockProfile2 = {
+      id: 2,
+      handle: 'user2',
+      name: 'User Two',
+      photo_url: 'https://example.com/user2.jpg',
+      bio: 'Bio for User Two',
+      profile_set_up_at: '2023-01-01T00:00:00Z',
+      reader_installed_at: '2023-01-01T00:00:00Z',
+      profile_disabled: false,
+      publicationUsers: [],
+      userLinks: [],
+      subscriptions: [],
+      subscriptionsTruncated: false,
+      hasGuestPost: false,
+      max_pub_tier: 1,
+      hasActivity: false,
+      hasLikes: false,
+      lists: [],
+      rough_num_free_subscribers_int: 0,
+      rough_num_free_subscribers: '0',
+      bestseller_badge_disabled: false,
+      subscriberCountString: '0',
+      subscriberCount: '0',
+      subscriberCountNumber: 0,
+      hasHiddenPublicationUsers: false,
+      visibleSubscriptionsCount: 0,
+      slug: 'user2',
+      primaryPublicationIsPledged: false,
+      primaryPublicationSubscriptionState: 'none',
+      isSubscribed: false,
+      isFollowing: false,
+      followsViewer: false,
+      can_dm: false,
+      dm_upgrade_options: []
+    } as SubstackFullProfile
+
     const mockClient = ownProfile['client'] as jest.Mocked<SubstackHttpClient>
-    mockClient.get.mockResolvedValue(mockResponse)
+
+    // Setup mock to return different responses based on the endpoint
+    mockClient.get.mockImplementation((url: string) => {
+      if (url === '/api/v1/feed/following') {
+        return Promise.resolve(mockFollowingIds)
+      } else if (url === '/api/v1/user/1/profile') {
+        return Promise.resolve(mockProfile1)
+      } else if (url === '/api/v1/user/2/profile') {
+        return Promise.resolve(mockProfile2)
+      }
+      return Promise.reject(new Error(`Unexpected URL: ${url}`))
+    })
 
     const followees = []
     for await (const profile of ownProfile.followees()) {
@@ -277,13 +339,17 @@ describe('OwnProfile Entity', () => {
     expect(followees[0]).toBeInstanceOf(Profile)
     expect(followees[0].name).toBe('User One')
     expect(followees[1].name).toBe('User Two')
-    expect(mockClient.get).toHaveBeenCalledWith('/api/v1/reader/user_following')
+
+    // Verify correct API calls were made
+    expect(mockClient.get).toHaveBeenCalledWith('/api/v1/feed/following')
+    expect(mockClient.get).toHaveBeenCalledWith('/api/v1/user/1/profile')
+    expect(mockClient.get).toHaveBeenCalledWith('/api/v1/user/2/profile')
+    expect(mockClient.get).toHaveBeenCalledTimes(3)
   })
 
   it('should handle empty followees response', async () => {
-    const mockResponse = { users: [] }
     const mockClient = ownProfile['client'] as jest.Mocked<SubstackHttpClient>
-    mockClient.get.mockResolvedValue(mockResponse)
+    mockClient.get.mockResolvedValue([]) // Empty array of user IDs
 
     const followees = []
     for await (const profile of ownProfile.followees()) {
@@ -291,5 +357,114 @@ describe('OwnProfile Entity', () => {
     }
 
     expect(followees).toHaveLength(0)
+    expect(mockClient.get).toHaveBeenCalledWith('/api/v1/feed/following')
+    expect(mockClient.get).toHaveBeenCalledTimes(1) // Only the first call should be made
+  })
+
+  it('should handle profile fetch errors gracefully', async () => {
+    // Mock the first call to return user IDs
+    const mockFollowingIds = [1, 2, 3]
+
+    const mockClient = ownProfile['client'] as jest.Mocked<SubstackHttpClient>
+
+    // Setup mock where one profile fetch fails
+    mockClient.get.mockImplementation((url: string) => {
+      if (url === '/api/v1/feed/following') {
+        return Promise.resolve(mockFollowingIds)
+      } else if (url === '/api/v1/user/1/profile') {
+        return Promise.resolve({
+          id: 1,
+          handle: 'user1',
+          name: 'User One',
+          photo_url: 'https://example.com/user1.jpg',
+          bio: 'Bio for User One',
+          profile_set_up_at: '2023-01-01T00:00:00Z',
+          reader_installed_at: '2023-01-01T00:00:00Z',
+          profile_disabled: false,
+          publicationUsers: [],
+          userLinks: [],
+          subscriptions: [],
+          subscriptionsTruncated: false,
+          hasGuestPost: false,
+          max_pub_tier: 1,
+          hasActivity: false,
+          hasLikes: false,
+          lists: [],
+          rough_num_free_subscribers_int: 0,
+          rough_num_free_subscribers: '0',
+          bestseller_badge_disabled: false,
+          subscriberCountString: '0',
+          subscriberCount: '0',
+          subscriberCountNumber: 0,
+          hasHiddenPublicationUsers: false,
+          visibleSubscriptionsCount: 0,
+          slug: 'user1',
+          primaryPublicationIsPledged: false,
+          primaryPublicationSubscriptionState: 'none',
+          isSubscribed: false,
+          isFollowing: false,
+          followsViewer: false,
+          can_dm: false,
+          dm_upgrade_options: []
+        } as SubstackFullProfile)
+      } else if (url === '/api/v1/user/2/profile') {
+        // This one fails (e.g., deleted account)
+        return Promise.reject(new Error('Profile not found'))
+      } else if (url === '/api/v1/user/3/profile') {
+        return Promise.resolve({
+          id: 3,
+          handle: 'user3',
+          name: 'User Three',
+          photo_url: 'https://example.com/user3.jpg',
+          bio: 'Bio for User Three',
+          profile_set_up_at: '2023-01-01T00:00:00Z',
+          reader_installed_at: '2023-01-01T00:00:00Z',
+          profile_disabled: false,
+          publicationUsers: [],
+          userLinks: [],
+          subscriptions: [],
+          subscriptionsTruncated: false,
+          hasGuestPost: false,
+          max_pub_tier: 1,
+          hasActivity: false,
+          hasLikes: false,
+          lists: [],
+          rough_num_free_subscribers_int: 0,
+          rough_num_free_subscribers: '0',
+          bestseller_badge_disabled: false,
+          subscriberCountString: '0',
+          subscriberCount: '0',
+          subscriberCountNumber: 0,
+          hasHiddenPublicationUsers: false,
+          visibleSubscriptionsCount: 0,
+          slug: 'user3',
+          primaryPublicationIsPledged: false,
+          primaryPublicationSubscriptionState: 'none',
+          isSubscribed: false,
+          isFollowing: false,
+          followsViewer: false,
+          can_dm: false,
+          dm_upgrade_options: []
+        } as SubstackFullProfile)
+      }
+      return Promise.reject(new Error(`Unexpected URL: ${url}`))
+    })
+
+    const followees = []
+    for await (const profile of ownProfile.followees()) {
+      followees.push(profile)
+    }
+
+    // Should get 2 profiles (skipping the failed one)
+    expect(followees).toHaveLength(2)
+    expect(followees[0].name).toBe('User One')
+    expect(followees[1].name).toBe('User Three')
+
+    // Verify all API calls were attempted
+    expect(mockClient.get).toHaveBeenCalledWith('/api/v1/feed/following')
+    expect(mockClient.get).toHaveBeenCalledWith('/api/v1/user/1/profile')
+    expect(mockClient.get).toHaveBeenCalledWith('/api/v1/user/2/profile')
+    expect(mockClient.get).toHaveBeenCalledWith('/api/v1/user/3/profile')
+    expect(mockClient.get).toHaveBeenCalledTimes(4)
   })
 })
