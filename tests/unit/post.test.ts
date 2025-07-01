@@ -141,15 +141,15 @@ describe('Post Entity', () => {
       expect(comments).toHaveLength(0)
     })
 
-    it('should handle API error gracefully', async () => {
+    it('should throw error when API fails', async () => {
       mockHttpClient.get.mockRejectedValue(new Error('API error'))
 
       const comments = []
-      for await (const comment of post.comments()) {
-        comments.push(comment)
-      }
-
-      expect(comments).toHaveLength(0)
+      await expect(async () => {
+        for await (const comment of post.comments()) {
+          comments.push(comment)
+        }
+      }).rejects.toThrow('Failed to get comments for post 456: API error')
     })
   })
 
