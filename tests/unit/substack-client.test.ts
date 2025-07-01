@@ -52,7 +52,7 @@ describe('SubstackClient', () => {
       }
       mockHttpClient.get.mockResolvedValue(mockProfile)
 
-      const profile = await client.profileForId('123')
+      const profile = await client.profileForId(123)
       expect(profile).toBeInstanceOf(Profile)
       expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/users/123')
     })
@@ -60,9 +60,23 @@ describe('SubstackClient', () => {
     it('should handle API error for profileForId', async () => {
       mockHttpClient.get.mockRejectedValue(new Error('Not found'))
 
-      await expect(client.profileForId('999')).rejects.toThrow(
+      await expect(client.profileForId(999)).rejects.toThrow(
         'Profile with ID 999 not found: Not found'
       )
+    })
+
+    it('should accept large numeric IDs', async () => {
+      const mockProfile = {
+        id: 9876543210,
+        handle: 'testuser',
+        name: 'Test User',
+        photo_url: 'https://example.com/photo.jpg'
+      }
+      mockHttpClient.get.mockResolvedValue(mockProfile)
+
+      const profile = await client.profileForId(9876543210)
+      expect(profile).toBeInstanceOf(Profile)
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/users/9876543210')
     })
   })
 
