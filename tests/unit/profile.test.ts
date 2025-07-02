@@ -10,7 +10,8 @@ describe('Profile Entity', () => {
     mockHttpClient = {
       get: jest.fn(),
       post: jest.fn(),
-      request: jest.fn()
+      request: jest.fn(),
+      getPerPage: jest.fn().mockReturnValue(25)
     } as unknown as jest.Mocked<SubstackHttpClient>
 
     const mockProfileData = {
@@ -85,7 +86,9 @@ describe('Profile Entity', () => {
       expect(posts[0]).toBeInstanceOf(Post)
       expect(posts[0].title).toBe('Post 1')
       expect(posts[1].title).toBe('Post 2')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/profile/posts?profile_user_id=123')
+      expect(mockHttpClient.get).toHaveBeenCalledWith(
+        '/api/v1/profile/posts?profile_user_id=123&limit=25'
+      )
     })
 
     it('should handle limit parameter', async () => {
@@ -153,6 +156,35 @@ describe('Profile Entity', () => {
       }
 
       expect(posts).toHaveLength(0)
+    })
+
+    it('should use perPage configuration from client', async () => {
+      // Mock a different perPage value
+      mockHttpClient.getPerPage.mockReturnValue(10)
+
+      const mockResponse = {
+        posts: [
+          {
+            id: 1,
+            title: 'Post 1',
+            slug: 'post-1',
+            post_date: '2023-01-01T00:00:00Z',
+            canonical_url: 'https://example.com/post1',
+            type: 'newsletter' as const
+          }
+        ]
+      }
+      mockHttpClient.get.mockResolvedValue(mockResponse)
+
+      const posts = []
+      for await (const post of profile.posts()) {
+        posts.push(post)
+      }
+
+      expect(posts).toHaveLength(1)
+      expect(mockHttpClient.get).toHaveBeenCalledWith(
+        '/api/v1/profile/posts?profile_user_id=123&limit=10'
+      )
     })
   })
 

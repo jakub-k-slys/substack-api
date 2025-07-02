@@ -42,9 +42,12 @@ export class Profile {
    */
   async *posts(options: { limit?: number } = {}): AsyncIterable<Post> {
     try {
-      // Use the correct endpoint for profile posts
+      // Get the perPage configuration from the client
+      const perPageConfig = this.client.getPerPage()
+
+      // Use the correct endpoint for profile posts with limit parameter
       const response = await this.client.get<{ posts?: SubstackPost[] }>(
-        `/api/v1/profile/posts?profile_user_id=${this.id}`
+        `/api/v1/profile/posts?profile_user_id=${this.id}&limit=${perPageConfig}`
       )
 
       if (response.posts) {
