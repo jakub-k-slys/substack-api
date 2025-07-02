@@ -27,13 +27,13 @@ const createMockServer = (): Promise<{ server: Server; port: number; url: string
 
       // Map URLs to sample files
       const samplePath = mapUrlToSampleFile(req.url || '')
-      
+
       if (samplePath) {
         try {
           const sampleData = readFileSync(samplePath, 'utf8')
           res.writeHead(200)
           res.end(sampleData)
-        } catch (error) {
+        } catch {
           console.warn(`Sample file not found: ${samplePath}`)
           res.writeHead(404)
           res.end(JSON.stringify({ error: 'Not Found' }))
@@ -50,7 +50,7 @@ const createMockServer = (): Promise<{ server: Server; port: number; url: string
         reject(new Error('Failed to get server address'))
         return
       }
-      
+
       const port = address.port
       const url = `http://localhost:${port}`
       resolve({ server, port, url })
@@ -63,10 +63,10 @@ const createMockServer = (): Promise<{ server: Server; port: number; url: string
 // Map API URLs to sample file paths
 function mapUrlToSampleFile(url: string): string | null {
   const samplesDir = join(process.cwd(), 'samples', 'api', 'v1')
-  
+
   // Remove query parameters and leading slash
   const cleanUrl = url.split('?')[0].replace(/^\//, '')
-  
+
   // Map common API endpoints to sample files
   const mappings: Record<string, string> = {
     'api/v1/subscription': 'subscription',
@@ -102,12 +102,6 @@ export async function createTestHttpClient() {
 beforeAll(async () => {
   global.INTEGRATION_SERVER = await createMockServer()
   console.log(`Integration test server running on ${global.INTEGRATION_SERVER.url}`)
-})
-
-afterAll(() => {
-  if (global.INTEGRATION_SERVER?.server) {
-    global.INTEGRATION_SERVER.server.close()
-  }
 })
 
 afterAll(() => {
