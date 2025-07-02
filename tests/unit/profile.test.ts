@@ -87,7 +87,7 @@ describe('Profile Entity', () => {
       expect(posts[0].title).toBe('Post 1')
       expect(posts[1].title).toBe('Post 2')
       expect(mockHttpClient.get).toHaveBeenCalledWith(
-        '/api/v1/profile/posts?profile_user_id=123&limit=25'
+        '/api/v1/profile/posts?profile_user_id=123&limit=25&offset=0'
       )
     })
 
@@ -183,7 +183,66 @@ describe('Profile Entity', () => {
 
       expect(posts).toHaveLength(1)
       expect(mockHttpClient.get).toHaveBeenCalledWith(
-        '/api/v1/profile/posts?profile_user_id=123&limit=10'
+        '/api/v1/profile/posts?profile_user_id=123&limit=10&offset=0'
+      )
+    })
+
+    it('should implement pagination with offset for multiple pages', async () => {
+      // Reset the mock to avoid interference from other tests
+      mockHttpClient.get.mockReset()
+      mockHttpClient.getPerPage.mockReturnValue(2) // Set perPage to 2 for this test
+
+      // Mock first page response (full page)
+      const firstPageResponse = {
+        posts: [
+          { id: 1, title: 'Post 1', slug: 'post-1', created_at: '2023-01-01', publication_id: 1 },
+          { id: 2, title: 'Post 2', slug: 'post-2', created_at: '2023-01-02', publication_id: 1 }
+        ]
+      }
+      
+      // Mock second page response (full page)
+      const secondPageResponse = {
+        posts: [
+          { id: 3, title: 'Post 3', slug: 'post-3', created_at: '2023-01-03', publication_id: 1 },
+          { id: 4, title: 'Post 4', slug: 'post-4', created_at: '2023-01-04', publication_id: 1 }
+        ]
+      }
+
+      // Mock third page response (partial page - should trigger end of pagination)
+      const thirdPageResponse = {
+        posts: [
+          { id: 5, title: 'Post 5', slug: 'post-5', created_at: '2023-01-05', publication_id: 1 }
+        ]
+      }
+
+      // Setup sequential responses for pagination
+      mockHttpClient.get
+        .mockResolvedValueOnce(firstPageResponse)  // offset=0, returns 2 posts (full page)
+        .mockResolvedValueOnce(secondPageResponse) // offset=2, returns 2 posts (full page) 
+        .mockResolvedValueOnce(thirdPageResponse)  // offset=4, returns 1 post (partial page - end)
+
+      const posts = []
+      for await (const post of profile.posts()) {
+        posts.push(post)
+      }
+
+      expect(posts).toHaveLength(5)
+      expect(posts[0].title).toBe('Post 1')
+      expect(posts[1].title).toBe('Post 2') 
+      expect(posts[2].title).toBe('Post 3')
+      expect(posts[3].title).toBe('Post 4')
+      expect(posts[4].title).toBe('Post 5')
+
+      // Verify all three API calls were made with correct offsets
+      expect(mockHttpClient.get).toHaveBeenCalledTimes(3)
+      expect(mockHttpClient.get).toHaveBeenNthCalledWith(1, 
+        '/api/v1/profile/posts?profile_user_id=123&limit=2&offset=0'
+      )
+      expect(mockHttpClient.get).toHaveBeenNthCalledWith(2, 
+        '/api/v1/profile/posts?profile_user_id=123&limit=2&offset=2'
+      )
+      expect(mockHttpClient.get).toHaveBeenNthCalledWith(3, 
+        '/api/v1/profile/posts?profile_user_id=123&limit=2&offset=4'
       )
     })
   })

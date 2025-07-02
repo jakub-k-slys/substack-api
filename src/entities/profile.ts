@@ -44,19 +44,33 @@ export class Profile {
     try {
       // Get the perPage configuration from the client
       const perPageConfig = this.client.getPerPage()
+      let offset = 0
+      let totalYielded = 0
 
-      // Use the correct endpoint for profile posts with limit parameter
-      const response = await this.client.get<{ posts?: SubstackPost[] }>(
-        `/api/v1/profile/posts?profile_user_id=${this.id}&limit=${perPageConfig}`
-      )
+      while (true) {
+        // Use the correct endpoint for profile posts with limit and offset parameters
+        const response = await this.client.get<{ posts?: SubstackPost[] }>(
+          `/api/v1/profile/posts?profile_user_id=${this.id}&limit=${perPageConfig}&offset=${offset}`
+        )
 
-      if (response.posts) {
-        let count = 0
-        for (const postData of response.posts) {
-          if (options.limit && count >= options.limit) break
-          yield new Post(postData, this.client)
-          count++
+        if (!response.posts || response.posts.length === 0) {
+          break // No more posts to fetch
         }
+
+        for (const postData of response.posts) {
+          if (options.limit && totalYielded >= options.limit) {
+            return // Stop if we've reached the requested limit
+          }
+          yield new Post(postData, this.client)
+          totalYielded++
+        }
+
+        // If we got fewer posts than requested, we've reached the end
+        if (response.posts.length < perPageConfig) {
+          break
+        }
+
+        offset += perPageConfig
       }
     } catch {
       // If the endpoint doesn't exist or fails, return empty iterator
