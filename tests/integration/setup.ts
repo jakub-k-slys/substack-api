@@ -74,7 +74,6 @@ function mapUrlToSampleFile(url: string): string | null {
     'api/v1/user/282291554/profile': 'user/282291554/profile',
     'api/v1/user/jakubslys/public_profile': 'user/jakubslys/public_profile',
     'api/v1/users/282291554': 'user/282291554/profile',
-    'api/v1/users/jakubslys': 'user/jakubslys/public_profile',
     'api/v1/reader/feed/profile/282291554': 'reader/feed/profile/282291554',
     'api/v1/profile/posts': 'profile/posts?profile_user_id=27968736&limit=50',
     'api/v1/feed/following': 'feed/following'
