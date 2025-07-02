@@ -148,7 +148,7 @@ describe('SubstackClient', () => {
 
       const profile = await client.profileForSlug('testuser')
       expect(profile).toBeInstanceOf(Profile)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/users/testuser')
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/testuser/public_profile')
     })
 
     it('should handle empty slug', async () => {
