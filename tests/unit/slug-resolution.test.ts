@@ -187,7 +187,7 @@ describe('SubstackClient - Slug Resolution', () => {
       }
 
       mockHttpClient.get
-        .mockResolvedValueOnce(mockProfile) // /api/v1/users/456
+        .mockResolvedValueOnce(mockProfile) // /api/v1/user/456/profile
         .mockResolvedValueOnce(mockSubscriptionsResponse) // /api/v1/subscriptions
 
       const profile = await client.profileForId(456)
@@ -195,7 +195,7 @@ describe('SubstackClient - Slug Resolution', () => {
       expect(profile).toBeInstanceOf(Profile)
       expect(profile.slug).toBe('resolved-slug-2') // Should use resolved slug from cache
       expect(profile.url).toBe('https://substack.com/@resolved-slug-2')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/users/456')
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/456/profile')
       expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/subscriptions')
     })
 
@@ -244,9 +244,9 @@ describe('SubstackClient - Slug Resolution', () => {
       }
 
       mockHttpClient.get
-        .mockResolvedValueOnce(mockProfile1) // /api/v1/users/123
+        .mockResolvedValueOnce(mockProfile1) // /api/v1/user/123/profile
         .mockResolvedValueOnce(mockSubscriptionsResponse) // /api/v1/subscriptions (first call)
-        .mockResolvedValueOnce(mockProfile2) // /api/v1/users/456
+        .mockResolvedValueOnce(mockProfile2) // /api/v1/user/456/profile
       // Note: No second call to /api/v1/subscriptions expected
 
       const profile1 = await client.profileForId(123)
@@ -297,7 +297,7 @@ describe('SubstackClient - Slug Resolution', () => {
       }
 
       mockHttpClient.get
-        .mockResolvedValueOnce(mockProfile) // /api/v1/users/999
+        .mockResolvedValueOnce(mockProfile) // /api/v1/user/999/profile
         .mockResolvedValueOnce(mockSubscriptionsResponse) // /api/v1/subscriptions
 
       const profile = await client.profileForId(999)
@@ -343,7 +343,7 @@ describe('SubstackClient - Slug Resolution', () => {
       }
 
       mockHttpClient.get
-        .mockResolvedValueOnce(mockProfile) // /api/v1/users/123
+        .mockResolvedValueOnce(mockProfile) // /api/v1/user/123/profile
         .mockRejectedValueOnce(new Error('Subscriptions unavailable')) // /api/v1/subscriptions fails
 
       const profile = await client.profileForId(123)

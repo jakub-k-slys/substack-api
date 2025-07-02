@@ -110,7 +110,7 @@ describe('SubstackClient', () => {
 
       const profile = await client.profileForId(123)
       expect(profile).toBeInstanceOf(Profile)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/users/123')
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/123/profile')
     })
 
     it('should handle API error for profileForId', async () => {
@@ -132,7 +132,7 @@ describe('SubstackClient', () => {
 
       const profile = await client.profileForId(9876543210)
       expect(profile).toBeInstanceOf(Profile)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/users/9876543210')
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/9876543210/profile')
     })
   })
 

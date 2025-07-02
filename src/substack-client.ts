@@ -123,7 +123,7 @@ export class SubstackClient {
    */
   async profileForId(id: number): Promise<Profile> {
     try {
-      const profile = await this.httpClient.get<SubstackFullProfile>(`/api/v1/users/${id}`)
+      const profile = await this.httpClient.get<SubstackFullProfile>(`/api/v1/user/${id}/profile`)
 
       // Resolve slug from subscriptions cache
       const resolvedSlug = await this.getSlugForUserId(id, profile.handle)
