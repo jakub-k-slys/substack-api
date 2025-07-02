@@ -21,12 +21,14 @@ export class Profile {
 
   constructor(
     protected readonly rawData: SubstackPublicProfile | SubstackFullProfile,
-    protected readonly client: SubstackHttpClient
+    protected readonly client: SubstackHttpClient,
+    resolvedSlug?: string
   ) {
     this.id = rawData.id
-    this.slug = rawData.handle
+    // Use resolved slug from subscriptions cache if available, otherwise fallback to handle
+    this.slug = resolvedSlug || rawData.handle
     this.name = rawData.name
-    this.url = `https://substack.com/@${rawData.handle}`
+    this.url = `https://substack.com/@${this.slug}`
     this.avatarUrl = rawData.photo_url
     this.bio = rawData.bio
   }

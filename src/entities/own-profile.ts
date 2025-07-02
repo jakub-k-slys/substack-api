@@ -68,7 +68,9 @@ export class OwnProfile extends Profile {
         const profileResponse = await this.client.get<SubstackFullProfile>(
           `/api/v1/user/${userId}/profile`
         )
-        yield new Profile(profileResponse, this.client)
+        // Note: This method doesn't have access to the SubstackClient's slug resolution
+        // So we fall back to using the handle from the profile data
+        yield new Profile(profileResponse, this.client, profileResponse.handle)
       } catch {
         // Skip profiles that can't be fetched (e.g., deleted accounts, private profiles)
         // This ensures the iterator continues working even if some profiles are inaccessible
