@@ -55,30 +55,25 @@ describe('SubstackClient Entity Model E2E', () => {
   })
 
   test('should get profile by ID', async () => {
-    try {
-      // Get a profile by slug first to get a known user ID
-      const profileBySlug = await client.profileForSlug('platformer')
-      const userId = profileBySlug.id
+    // Get a profile by slug first to get a known user ID
+    const profileBySlug = await client.profileForSlug('platformer')
+    const userId = profileBySlug.id
 
-      // Now test profileForId with that user ID
-      const profileById = await client.profileForId(userId)
+    // Now test profileForId with that user ID
+    const profileById = await client.profileForId(userId)
 
-      expect(profileById).toBeInstanceOf(Profile)
-      expect(profileById.id).toBe(userId)
-      expect(profileById.name).toBeTruthy()
-      expect(profileById.slug).toBeTruthy()
-      expect(typeof profileById.name).toBe('string')
-      expect(typeof profileById.slug).toBe('string')
+    expect(profileById).toBeInstanceOf(Profile)
+    expect(profileById.id).toBe(userId)
+    expect(profileById.name).toBeTruthy()
+    expect(profileById.slug).toBeTruthy()
+    expect(typeof profileById.name).toBe('string')
+    expect(typeof profileById.slug).toBe('string')
 
-      // The profiles should match
-      expect(profileById.name).toBe(profileBySlug.name)
-      expect(profileById.slug).toBe(profileBySlug.slug)
+    // The profiles should match
+    expect(profileById.name).toBe(profileBySlug.name)
+    expect(profileById.slug).toBe(profileBySlug.slug)
 
-      console.log(`✅ Retrieved profile by ID: ${profileById.name} (ID: ${profileById.id})`)
-    } catch (error) {
-      console.log('ℹ️ Profile by ID lookup not available:', (error as Error).message)
-      // Skip this test if profile lookup isn't available
-    }
+    console.log(`✅ Retrieved profile by ID: ${profileById.name} (ID: ${profileById.id})`)
   })
 
   test('should handle invalid profile ID gracefully', async () => {
