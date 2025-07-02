@@ -14,16 +14,5 @@ export default {
   setupFilesAfterEnv: ['<rootDir>/tests/integration/setup.ts'],
   testTimeout: 10000, // 10 seconds for local HTTP server calls
   collectCoverage: false, // Integration tests don't need coverage
-  extensionsToTreatAsEsm: ['.ts'],
-  reporters: [
-    'default',
-    ['jest-junit', {
-      outputDirectory: '.',
-      outputName: 'junit-integration.xml',
-      classNameTemplate: '{classname}',
-      titleTemplate: '{title}',
-      ancestorSeparator: ' › ',
-      usePathForSuiteName: true
-    }]
-  ]
+  extensionsToTreatAsEsm: ['.ts']
 }
