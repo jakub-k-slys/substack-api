@@ -68,7 +68,7 @@ describe('SubstackClient Entity Model E2E', () => {
 
   test('should get profile by ID', async () => {
     // Get a profile by slug first to get a known user ID
-    const profileBySlug = await client.profileForSlug('platformer')
+    const profileBySlug = await client.profileForSlug('jakubslys')
     const userId = profileBySlug.id
 
     // Now test profileForId with that user ID
