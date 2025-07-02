@@ -1,11 +1,12 @@
 # Quickstart
 
-This guide will help you get started with the Substack API client quickly.
+This guide will help you get started with the Substack API client quickly using the modern entity-based API.
 
 ## Prerequisites
 
 You'll need:
-- A Substack API key for authentication
+- A Substack account with publication access
+- Your connect.sid cookie value for authentication  
 - Node.js 16+ or a modern browser environment
 - TypeScript (recommended) or JavaScript
 
@@ -15,213 +16,230 @@ You'll need:
 npm install substack-api
 ```
 
+## Authentication Setup
+
+The Substack API uses cookie-based authentication. You need to extract your `connect.sid` cookie value:
+
+1. **Login to Substack** in your browser
+2. **Open Developer Tools** (F12 or right-click → "Inspect")
+3. **Go to Application/Storage tab** → Cookies → `https://substack.com`
+4. **Find the `connect.sid` cookie** and copy its value
+5. **Use this value** as your `apiKey` in the client configuration
+
 ## Basic Setup
 
-First, import the library:
+Import the library and create a client:
 
 ```typescript
-import { Substack } from 'substack-api';
+import { SubstackClient } from 'substack-api';
+
+// Create client instance
+const client = new SubstackClient({
+  apiKey: 'your-connect-sid-cookie-value',
+  hostname: 'yoursite.substack.com' // optional, defaults to 'substack.com'
+});
+
+// Test connectivity
+const isConnected = await client.testConnectivity();
+console.log('Connected:', isConnected);
 ```
 
-Create a client instance with your API key:
+**Important:** Never hardcode your cookie value in client-side code. Use environment variables:
 
 ```typescript
-// For a specific publication
-const client = new Substack({
-  hostname: 'example.substack.com',
-  apiKey: 'your-api-key-here'
-});
-
-// Or use the default hostname (substack.com)
-const defaultClient = new Substack({
-  apiKey: 'your-api-key-here'
+const client = new SubstackClient({
+  apiKey: process.env.SUBSTACK_API_KEY!,
+  hostname: process.env.SUBSTACK_HOSTNAME
 });
 ```
 
-**Important:** Never hardcode your API key in client-side code. Use environment variables:
+## Working with Profiles
+
+### Get Your Own Profile
+
+Your authenticated profile has special capabilities for content creation:
 
 ```typescript
-const client = new Substack({
-  hostname: 'example.substack.com',
-  apiKey: process.env.SUBSTACK_API_KEY!
-});
+// Get your own profile with write capabilities
+const myProfile = await client.ownProfile();
+console.log(`Welcome ${myProfile.name}! (@${myProfile.slug})`);
+console.log(`Followers: ${myProfile.followerCount}`);
+
+// Iterate through your posts
+for await (const post of myProfile.posts({ limit: 5 })) {
+  console.log(`📄 "${post.title}" - ${post.publishedAt?.toLocaleDateString()}`);
+  console.log(`  💖 ${post.reactions?.length || 0} reactions`);
+}
+```
+
+### Get Other Profiles
+
+```typescript
+// Get a profile by slug/handle  
+const profile = await client.profileForSlug('example-user');
+console.log(`${profile.name}: ${profile.bio || 'No bio available'}`);
+
+// Get profile by ID
+const profileById = await client.profileForId(12345);
+
+// Iterate through their recent posts
+for await (const post of profile.posts({ limit: 10 })) {
+  console.log(`- ${post.title} by ${post.author.name}`);
+  console.log(`  Published: ${post.publishedAt?.toLocaleDateString()}`);
+}
 ```
 
 ## Working with Posts
 
-Get posts with async iteration:
+### Get and Navigate Posts
 
 ```typescript
-// Get recent posts using async iteration
-for await (const post of client.getPosts({ limit: 10 })) {
-  console.log(`${post.title} - ${new Date(post.post_date).toLocaleDateString()}`);
-}
-
-// Collect posts into an array if needed
-const posts = [];
-for await (const post of client.getPosts({ limit: 10 })) {
-  posts.push(post);
-}
-console.log(`Found ${posts.length} posts`);
-posts.forEach(post => {
-  console.log(`- ${post.title} (${post.type})`);
-  console.log(`  Published: ${new Date(post.post_date).toLocaleDateString()}`);
-  console.log(`  Paywalled: ${post.paywalled ? 'Yes' : 'No'}`);
-});
-```
-
-Get a specific post:
-
-```typescript
-const post = await client.getPost('my-awesome-post');
+// Get a specific post
+const post = await client.postForId('my-awesome-post');
 console.log(`Title: ${post.title}`);
-console.log(`URL: ${post.canonical_url}`);
+console.log(`Author: ${post.author.name}`);
+console.log(`Published: ${post.publishedAt?.toLocaleDateString()}`);
+
+// Navigate to comments with async iteration
+for await (const comment of post.comments({ limit: 5 })) {
+  console.log(`💬 ${comment.author.name}: ${comment.body.substring(0, 100)}...`);
+  console.log(`  👍 ${comment.reactions?.length || 0} reactions`);
+}
+
+// Like a post
+await post.like();
+console.log('Post liked!');
+
+// Add a comment
+const newComment = await post.addComment('Great insights! Thanks for sharing.');
+console.log(`Comment added: ${newComment.id}`);
 ```
 
-Search posts:
+### Content Creation (OwnProfile)
+
+Create posts, notes, and manage content through your authenticated profile:
 
 ```typescript
-const searchResults = await client.searchPosts({
-  query: 'typescript',
-  type: 'newsletter',
-  limit: 10,
-  published_after: '2023-01-01'
+const myProfile = await client.ownProfile();
+
+// Create a draft post
+const draftPost = await myProfile.createPost({
+  title: 'My New Blog Post',
+  body: 'This is the content of my post...',
+  isDraft: true
+});
+console.log(`Draft created: ${draftPost.title}`);
+
+// Publish a post immediately
+const publishedPost = await myProfile.createPost({
+  title: 'Published Post',
+  body: 'This post goes live immediately!',
+  isDraft: false
 });
 
-console.log(`Found ${searchResults.total} posts about TypeScript`);
-searchResults.results.forEach(post => {
-  console.log(`- ${post.title}`);
+// Create a note (short-form content)
+const note = await myProfile.createNote({
+  body: '🚀 Just shipped a new feature! Excited to share what we\'ve been working on.'
 });
-```
-
-## Working with Comments
-
-Get comments for a post:
-
-```typescript
-const comments = await client.getComments(postId, {
-  offset: 0,
-  limit: 20
-});
-
-comments.forEach(comment => {
-  const adminFlag = comment.author.is_admin ? ' [ADMIN]' : '';
-  console.log(`${comment.author.name}${adminFlag}: ${comment.body.substring(0, 100)}...`);
-});
-```
-
-Get a specific comment:
-
-```typescript
-const comment = await client.getComment(commentId);
-console.log(`Comment by ${comment.author.name}: ${comment.body}`);
+console.log(`Note published: ${note.id}`);
 ```
 
 ## Working with Notes
 
-Notes are short-form posts that appear in feeds, similar to social media posts.
-
-Get your notes feed:
+Notes are short-form posts, similar to social media updates:
 
 ```typescript
-const notes = await client.getNotes({ limit: 10 });
+// Get a specific note
+const note = await client.noteForId('note-123');
+console.log(`Note by ${note.author.name}: ${note.body}`);
 
-notes.items.forEach(note => {
-  if (note.comment) {
-    const user = note.context.users[0];
-    console.log(`${user.name}: ${note.comment.body}`);
-  }
-});
+// Like a note  
+await note.like();
 
-// Check if there are more notes
-if (notes.hasMore()) {
-  const moreNotes = await notes.next();
-  console.log(`Loaded ${moreNotes?.items.length} more notes`);
+// Add a comment to a note
+await note.addComment('Interesting perspective!');
+
+// Get your own profile's notes
+const myProfile = await client.ownProfile();
+for await (const note of myProfile.notes({ limit: 10 })) {
+  console.log(`📝 ${note.body.substring(0, 80)}...`);
+  console.log(`  💖 ${note.reactions?.length || 0} reactions`);
 }
 ```
 
-Publish a simple note:
+## Working with Comments
 
 ```typescript
-const response = await client.publishNote('Just discovered something amazing! 🚀');
-console.log(`Note published: ${response.id}`);
+// Get a specific comment
+const comment = await client.commentForId('comment-456');
+console.log(`Comment by ${comment.author.name}: ${comment.body}`);
+
+// Like a comment
+await comment.like();
+
+// Navigate to the parent post
+const parentPost = comment.post;
+if (parentPost) {
+  console.log(`Parent post: ${parentPost.title}`);
+}
 ```
 
-Publish a formatted note:
+## Advanced Usage with Async Iterators
+
+The entity model supports powerful async iteration with automatic pagination:
 
 ```typescript
-const formattedNote = await client
-  .note('🎉 Big announcement!')
-  .note('I just released a new ')
-  .bold('TypeScript library')
-  .simple(' for developers.')
-  .note('Check it out! 💪')
-  .publish();
+// Get all posts from a profile (handles pagination automatically)
+const allPosts = [];
+for await (const post of profile.posts()) {
+  allPosts.push(post);
+  
+  // Process each post
+  console.log(`Processing: ${post.title}`);
+  
+  // You can break early if needed
+  if (allPosts.length >= 50) break;
+}
 
-console.log(`Formatted note published: ${formattedNote.id}`);
-```
+// Custom pagination limits
+for await (const post of profile.posts({ limit: 25 })) {
+  // Process in chunks of 25
+  console.log(post.title);
+}
 
-## Working with User Profiles
-
-Get a user's public profile:
-
-```typescript
-const profile = await client.getPublicProfile('john-doe');
-console.log(`Name: ${profile.name}`);
-console.log(`Handle: @${profile.handle}`);
-console.log(`Subscribers: ${profile.subscriberCountString}`);
-
-// List their publications
-profile.publicationUsers.forEach(pubUser => {
-  console.log(`- ${pubUser.publication.name} (${pubUser.role})`);
-});
-```
-
-Get users you follow:
-
-```typescript
-const followingIds = await client.getFollowingIds();
-console.log(`You follow ${followingIds.length} users`);
-
-const followingProfiles = await client.getFollowingProfiles();
-followingProfiles.forEach(profile => {
-  console.log(`${profile.name} (@${profile.handle}) - ${profile.subscriberCountString} subscribers`);
-});
+// Get all comments for a post
+const postComments = [];
+for await (const comment of post.comments()) {
+  postComments.push(comment);
+}
+console.log(`Total comments: ${postComments.length}`);
 ```
 
 ## Error Handling
 
-The client uses a custom `SubstackError` class for API-related errors:
+Handle errors gracefully with proper error types:
 
 ```typescript
-import { SubstackError } from 'substack-api';
-
 try {
-  // Try to get a very large number of posts
-  const posts = [];
-  for await (const post of client.getPosts({ limit: 1000 })) {
-    posts.push(post);
+  const profile = await client.ownProfile();
+  console.log(`Authenticated as: ${profile.name}`);
+} catch (error) {
+  if (error.message.includes('401')) {
+    console.error('Authentication failed - check your connect.sid cookie');
+  } else if (error.message.includes('404')) {
+    console.error('Resource not found');
+  } else {
+    console.error('Unexpected error:', error.message);
+  }
+}
+
+// Handle network errors during iteration
+try {
+  for await (const post of profile.posts({ limit: 100 })) {
+    console.log(post.title);
   }
 } catch (error) {
-  if (error instanceof SubstackError) {
-    console.error(`API Error: ${error.message}`);
-    console.error(`Status: ${error.status}`);
-    
-    // Handle specific error cases
-    switch (error.status) {
-      case 401:
-        console.error('Check your API key');
-        break;
-      case 404:
-        console.error('Resource not found');
-        break;
-      case 429:
-        console.error('Rate limit exceeded');
-        break;
-    }
-  } else {
-    console.error('Unexpected error:', error);
-  }
+  console.error('Error during pagination:', error.message);
 }
 ```
 
@@ -231,109 +249,111 @@ The library provides full TypeScript support with comprehensive type definitions
 
 ```typescript
 import type { 
-  SubstackPublication,
-  SubstackPost,
-  SubstackComment,
-  SubstackNote,
-  SubstackConfig,
-  SubstackFullProfile
+  SubstackClient,
+  Profile,
+  OwnProfile, 
+  Post,
+  Note,
+  Comment,
+  SubstackConfig
 } from 'substack-api';
 
 // Type-safe configuration
 const config: SubstackConfig = {
-  hostname: 'example.substack.com',
-  apiVersion: 'v1',
-  apiKey: process.env.SUBSTACK_API_KEY!
+  apiKey: process.env.SUBSTACK_API_KEY!,
+  hostname: 'example.substack.com'
 };
 
-// Type-safe function
-async function getTypedPosts(): Promise<SubstackPost[]> {
-  const client = new Substack(config);
-  const posts = [];
-  for await (const post of client.getPosts({ limit: 10 })) {
+// Type-safe functions
+async function getProfilePosts(profile: Profile): Promise<Post[]> {
+  const posts: Post[] = [];
+  for await (const post of profile.posts({ limit: 10 })) {
     posts.push(post);
   }
   return posts;
 }
 
-// Type guards
-function isPaywalledPost(post: SubstackPost): boolean {
-  return post.paywalled === true;
+// Type guards and assertions
+function isOwnProfile(profile: Profile): profile is OwnProfile {
+  return 'createPost' in profile;
+}
+
+const profile = await client.ownProfile();
+if (isOwnProfile(profile)) {
+  // TypeScript knows this is OwnProfile with write capabilities
+  await profile.createNote({ body: 'Hello world!' });
 }
 ```
 
 ## Complete Example
 
-Here's a complete example that demonstrates several features:
+Here's a comprehensive example demonstrating multiple features:
 
 ```typescript
-import { Substack, SubstackError } from 'substack-api';
-import type { SubstackPost } from 'substack-api';
+import { SubstackClient } from 'substack-api';
 
-async function substackDashboard(hostname: string, apiKey: string) {
-  // Create client for specific publication
-  const client = new Substack({ hostname, apiKey });
+async function substackDashboard() {
+  const client = new SubstackClient({
+    apiKey: process.env.SUBSTACK_API_KEY!,
+    hostname: 'example.substack.com'
+  });
 
   try {
+    // Test connectivity
+    const isConnected = await client.testConnectivity();
+    if (!isConnected) {
+      throw new Error('Failed to connect to Substack API');
+    }
+
+    // Get your profile
+    const myProfile = await client.ownProfile();
+    console.log(`📊 Dashboard for ${myProfile.name} (@${myProfile.slug})`);
+    console.log(`👥 Followers: ${myProfile.followerCount}`);
+
     // Get recent posts with engagement
-    const posts = [];
-    for await (const post of client.getPosts({ limit: 5 })) {
-      posts.push(post);
-    }
-    console.log(`📊 Dashboard - Recent Posts (${posts.length}):\n`);
-    
-    for (const post of posts) {
-      console.log(`\n  ${post.title}`);
-      console.log(`  📅 Published: ${new Date(post.post_date).toLocaleDateString()}`);
-      console.log(`  🔗 URL: ${post.canonical_url}`);
-      console.log(`  🔒 Paywalled: ${post.paywalled ? 'Yes' : 'No'}`);
+    console.log(`\n📄 Recent Posts:`);
+    for await (const post of myProfile.posts({ limit: 5 })) {
+      console.log(`\n  "${post.title}"`);
+      console.log(`  📅 ${post.publishedAt?.toLocaleDateString()}`);
+      console.log(`  💖 ${post.reactions?.length || 0} reactions`);
 
-      // Get comment engagement
-      const comments = await client.getComments(post.id, { limit: 3 });
-      console.log(`  💬 Recent comments: ${comments.length}`);
-      
-      comments.forEach(comment => {
-        const adminFlag = comment.author.is_admin ? ' [ADMIN]' : '';
-        console.log(`    - ${comment.author.name}${adminFlag}: ${comment.body.substring(0, 60)}...`);
-      });
-    }
-
-    // Get recent notes
-    console.log(`\n📋 Recent Notes:`);
-    const notes = await client.getNotes({ limit: 3 });
-    notes.items.forEach(note => {
-      if (note.comment) {
-        const user = note.context.users[0];
-        console.log(`  ${user.name}: ${note.comment.body.substring(0, 80)}...`);
+      // Get recent comments
+      const comments = [];
+      for await (const comment of post.comments({ limit: 3 })) {
+        comments.push(comment);
       }
-    });
+      console.log(`  💬 ${comments.length} recent comments`);
+    }
 
-    // Get following statistics
-    const followingIds = await client.getFollowingIds();
-    console.log(`\n👥 Following: ${followingIds.length} users`);
+    // Get and interact with other profiles
+    console.log(`\n👥 Community Interaction:`);
+    const otherProfile = await client.profileForSlug('interesting-writer');
+    console.log(`Found profile: ${otherProfile.name}`);
 
-    // Publish a status update
-    const statusUpdate = await client
-      .note('📊 Dashboard Report')
-      .note(`Published `)
-      .bold(`${posts.length} posts`)
-      .simple(` recently with great engagement!`)
-      .note('🚀 Keep up the great work!')
-      .publish();
+    // Like their recent post
+    for await (const post of otherProfile.posts({ limit: 1 })) {
+      await post.like();
+      console.log(`Liked: "${post.title}"`);
       
-    console.log(`\n✅ Status update published: ${statusUpdate.id}`);
+      // Add a supportive comment
+      await post.addComment('Great insights! Thanks for sharing.');
+      console.log(`Added comment to: "${post.title}"`);
+      break;
+    }
+
+    // Create a status update
+    const statusNote = await myProfile.createNote({
+      body: '🚀 Just published some new content! Exciting times ahead.'
+    });
+    console.log(`\n📝 Status update published: ${statusNote.id}`);
 
   } catch (error) {
-    if (error instanceof SubstackError) {
-      console.error(`❌ API Error (${error.status}): ${error.message}`);
-    } else {
-      console.error('❌ Unexpected error:', error);
-    }
+    console.error('❌ Dashboard error:', error.message);
   }
 }
 
-// Use the example (replace with your actual values)
-substackDashboard('example.substack.com', process.env.SUBSTACK_API_KEY!);
+// Run the dashboard
+substackDashboard();
 ```
 
 ## Environment Setup
@@ -342,7 +362,7 @@ For production use, set up your environment variables:
 
 ```bash
 # .env file
-SUBSTACK_API_KEY=your-api-key-here
+SUBSTACK_API_KEY=your-connect-sid-cookie-value
 SUBSTACK_HOSTNAME=yoursite.substack.com
 ```
 
@@ -351,15 +371,15 @@ SUBSTACK_HOSTNAME=yoursite.substack.com
 import dotenv from 'dotenv';
 dotenv.config();
 
-const client = new Substack({
-  hostname: process.env.SUBSTACK_HOSTNAME,
-  apiKey: process.env.SUBSTACK_API_KEY!
+const client = new SubstackClient({
+  apiKey: process.env.SUBSTACK_API_KEY!,
+  hostname: process.env.SUBSTACK_HOSTNAME
 });
 ```
 
 ## Next Steps
 
-- Check out the [API Reference](api-reference.md) for detailed API documentation
-- See [Examples](examples.md) for more comprehensive usage examples  
+- Check out the [API Reference](api-reference.md) for detailed method documentation
+- See [Entity Model](entity-model.md) for comprehensive entity documentation
+- Review [Examples](examples.md) for more usage patterns  
 - Read about [Development](development.md) if you want to contribute
-- Review the [Installation Guide](installation.md) for advanced setup options

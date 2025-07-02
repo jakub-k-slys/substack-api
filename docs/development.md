@@ -1,14 +1,15 @@
 # Development
 
-This section provides information for developers who want to contribute to the Substack API client library.
+This guide is for developers who want to contribute to the Substack API client library or understand its internal architecture.
 
 ## Development Setup
 
 ### Prerequisites
 
-* Node.js 14 or higher
-* npm or yarn package manager
+* Node.js 16 or higher
+* npm or yarn package manager  
 * Git
+* A Substack account for testing
 
 ### Getting Started
 
@@ -46,26 +47,60 @@ For the most consistent development experience, use the provided dev container c
    npm run build
    ```
 
+### Environment Setup
+
+Create a `.env` file for testing:
+
+```bash
+# .env
+SUBSTACK_API_KEY=your-connect-sid-cookie-value
+SUBSTACK_HOSTNAME=example.substack.com
+```
+
+To get your connect.sid cookie value:
+1. Login to Substack in your browser
+2. Open Developer Tools (F12)
+3. Go to Application/Storage → Cookies → `https://substack.com`
+4. Copy the `connect.sid` value
+
 ## Project Structure
 
 ```text
 substack-api/
 ├── src/
-│   ├── client.ts        # Main Substack class implementation
-│   ├── types.ts         # TypeScript type definitions
-│   └── index.ts         # Public API exports
+│   ├── substack-client.ts    # Main SubstackClient implementation  
+│   ├── http-client.ts        # HTTP client with authentication
+│   ├── entities/             # Entity classes (Profile, Post, Note, Comment)
+│   │   ├── profile.ts
+│   │   ├── own-profile.ts  
+│   │   ├── post.ts
+│   │   ├── note.ts
+│   │   └── comment.ts
+│   ├── types/               # TypeScript type definitions
+│   │   ├── api-types.ts
+│   │   ├── entity-types.ts
+│   │   └── config-types.ts
+│   ├── note-builder.ts      # Helper for building formatted notes
+│   └── index.ts             # Public API exports
 ├── tests/
-│   ├── unit/            # Unit tests
-│   └── e2e/             # End-to-end tests
-├── docs/
-│   └── source/          # Documentation source files
-├── dist/               # Compiled JavaScript files
-├── .env.example         # Environment variables template
-├── jest.config.js       # Jest configuration for unit tests
-├── jest.e2e.config.js   # Jest configuration for E2E tests
-├── package.json         # Project configuration
-├── tsconfig.json        # TypeScript configuration
-└── README.md            # Project overview
+│   ├── unit/                # Unit tests for individual components
+│   ├── integration/         # Integration tests for entity interactions
+│   └── e2e/                 # End-to-end tests with real API
+├── docs/                    # Comprehensive documentation
+│   ├── api-reference.md     # Complete API documentation
+│   ├── entity-model.md      # Entity model guide
+│   ├── examples.md          # Real-world usage examples
+│   ├── quickstart.md        # Getting started guide
+│   └── ...
+├── samples/                 # Sample applications and scripts
+├── dist/                    # Compiled JavaScript files
+├── .env.example             # Environment variables template
+├── jest.config.js           # Jest configuration for unit tests
+├── jest.integration.config.js # Jest configuration for integration tests
+├── jest.e2e.config.js       # Jest configuration for E2E tests
+├── package.json             # Project configuration
+├── tsconfig.json            # TypeScript configuration
+└── README.md                # Project overview
 ```
 
 ## Development Workflow
@@ -83,21 +118,44 @@ This will:
 2. Compile TypeScript files
 3. Generate type definitions
 
-### Testing
+### Testing Strategy
 
-Run the test suite:
+The project uses a comprehensive 3-tier testing strategy:
+
+#### 1. Unit Tests (`npm test`)
+- **Purpose**: Test individual components in isolation
+- **Location**: `tests/unit/`
+- **Speed**: Very fast (< 1 second)
+- **Scope**: Functions, classes, utilities
+- **Mocking**: Heavy use of mocks for external dependencies
 
 ```bash
-npm test
+npm test              # Run all unit tests
+npm run test:watch    # Run in watch mode for development
 ```
 
-Run tests in watch mode during development:
+#### 2. Integration Tests (`npm run test:integration`)
+- **Purpose**: Test component interactions and entity relationships
+- **Location**: `tests/integration/`
+- **Speed**: Fast (few seconds)
+- **Scope**: Entity navigation, async iteration, error handling
+- **Mocking**: Mock HTTP layer, real entity logic
 
 ```bash
-npm run test:watch
+npm run test:integration          # Run integration tests
+npm run test:integration:watch    # Watch mode
 ```
 
-The project uses Jest for testing. Test files are located next to the files they test with a `.test.ts` suffix.
+#### 3. End-to-End Tests (`npm run test:e2e`)
+- **Purpose**: Validate against real Substack API
+- **Location**: `tests/e2e/`
+- **Speed**: Slower (network dependent)
+- **Scope**: Full workflow validation, API compatibility
+- **Mocking**: No mocks - real API calls
+
+```bash
+npm run test:e2e     # Run E2E tests (requires credentials)
+```
 
 ### End-to-End Testing
 
@@ -105,31 +163,40 @@ The project includes end-to-end (E2E) tests that validate integration with the r
 
 #### Setting Up E2E Tests
 
-1. **Set up credentials**: Create a `.env` file in the project root with your Substack API credentials:
+1. **Set up credentials**: Create a `.env` file in the project root with your Substack credentials:
 
    ```bash
    # Copy the example file
    cp .env.example .env
    ```
 
-   Edit the `.env` file and add your credentials:
+   Edit the `.env` file and add your connect.sid cookie:
 
    ```bash
-   SUBSTACK_API_KEY=your-api-key-here
+   SUBSTACK_API_KEY=your-connect-sid-cookie-value
    SUBSTACK_HOSTNAME=yoursite.substack.com  # optional
    ```
 
    **Important**: Never commit your `.env` file to version control. It's already included in `.gitignore`.
 
-2. **Obtain API credentials**: You'll need a valid Substack API key from your Substack account. Check the Substack documentation for how to obtain API credentials.
+2. **Obtain credentials**: Get your connect.sid cookie value:
+   - Login to Substack in your browser
+   - Open Developer Tools (F12)  
+   - Go to Application/Storage → Cookies → `https://substack.com`
+   - Copy the `connect.sid` value
 
 #### Running E2E Tests
 
-Run all E2E tests:
-
 ```bash
-npm run test:e2e
+npm run test:e2e              # Run all E2E tests
+npm run test:e2e -- --testNamePattern="Profile" # Run specific tests
 ```
+
+E2E tests are designed to be:
+- **Safe**: Read-only operations where possible, minimal writes
+- **Isolated**: Each test cleans up after itself
+- **Conditional**: Skip gracefully when credentials are unavailable
+- **Respectful**: Include delays to avoid overwhelming the API
 
 Run E2E tests in watch mode:
 
