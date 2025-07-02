@@ -53,6 +53,31 @@ describe('SubstackClient Integration Tests', () => {
         expect(profile.bio).toContain('Ever wonder how Uber matches rides')
         expect(profile.bio).toBeTruthy()
       })
+
+      test('should handle profileForSlug method use case workflow', async () => {
+        // Integration test covering full profileForSlug workflow
+        const testSlug = 'jakubslys'
+
+        const profile = await client.profileForSlug(testSlug)
+
+        // Validate the profile object structure and content
+        expect(profile).toBeInstanceOf(Profile)
+        expect(profile.slug).toBe(testSlug)
+        expect(profile.name).toBeDefined()
+        expect(profile.id).toBeGreaterThan(0)
+        expect(typeof profile.name).toBe('string')
+        expect(typeof profile.slug).toBe('string')
+        expect(typeof profile.id).toBe('number')
+
+        // Validate that bio exists and is meaningful
+        expect(profile.bio).toBeTruthy()
+        expect(profile.bio?.length).toBeGreaterThan(0)
+
+        // Test that the profile can be used for further operations
+        expect(typeof profile.posts).toBe('function')
+
+        console.log(`✅ Profile workflow validated for ${profile.name} (@${profile.slug})`)
+      })
     })
 
     describe('ownProfile', () => {
