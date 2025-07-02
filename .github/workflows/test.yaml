@@ -26,7 +26,7 @@ jobs:
             - name: Running build
               run: npm run build
     test:
-        name: Running tests
+        name: Running unit tests
         runs-on: ubuntu-latest
         strategy:
             fail-fast: false
@@ -41,13 +41,13 @@ jobs:
                   node-version: 20
             - name: Install
               run: npm install
-            - name: Running test
-              run: npm run test
+            - name: Running unit tests
+              run: npm run test:unit
             - name: Upload test results
               if: always()
               uses: actions/upload-artifact@v4
               with:
-                name: test-results
+                name: unit-test-results
                 path: |
                   coverage/
                   junit.xml
@@ -61,6 +61,31 @@ jobs:
                 name: codecov-umbrella
                 fail_ci_if_error: false
                 verbose: true
+    integration:
+        name: Running integration tests
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                ci-env:
+                    - '1'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+            - name: Install
+              run: npm install
+            - name: Running integration tests
+              run: npm run test:integration
+            - name: Upload integration test results
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                name: integration-test-results
+                path: |
+                  junit-integration.xml
     lint:
         name: Running linters
         runs-on: ubuntu-latest

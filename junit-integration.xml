@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="16" failures="0" errors="0" time="2.745">
+  <testsuite name="Sample Data Validation Integration Tests" errors="0" failures="0" skipped="0" timestamp="2025-07-02T10:26:05" time="2.155" tests="8">
+    <testcase classname="Sample Data Validation Integration Tests › sample file structure validation" name="should validate all sample files are valid JSON" time="0.028">
+    </testcase>
+    <testcase classname="Sample Data Validation Integration Tests › sample file structure validation" name="should validate subscription sample has required fields" time="0.001">
+    </testcase>
+    <testcase classname="Sample Data Validation Integration Tests › sample file structure validation" name="should validate subscriptions sample has required structure" time="0.01">
+    </testcase>
+    <testcase classname="Sample Data Validation Integration Tests › sample file structure validation" name="should validate profile samples have required fields" time="0.005">
+    </testcase>
+    <testcase classname="Sample Data Validation Integration Tests › data consistency validation" name="should validate user IDs are consistent across samples" time="0.002">
+    </testcase>
+    <testcase classname="Sample Data Validation Integration Tests › data consistency validation" name="should validate publication references are consistent" time="0.022">
+    </testcase>
+    <testcase classname="Sample Data Validation Integration Tests › sample data realism" name="should have realistic publication data" time="0.01">
+    </testcase>
+    <testcase classname="Sample Data Validation Integration Tests › sample data realism" name="should have realistic subscription states" time="0.009">
+    </testcase>
+  </testsuite>
+  <testsuite name="Sample Data Integration Tests" errors="0" failures="0" skipped="0" timestamp="2025-07-02T10:26:05" time="2.174" tests="8">
+    <testcase classname="Sample Data Integration Tests › subscription data structure" name="should parse subscription sample correctly" time="0.007">
+    </testcase>
+    <testcase classname="Sample Data Integration Tests › subscription data structure" name="should parse subscriptions list sample correctly" time="0.013">
+    </testcase>
+    <testcase classname="Sample Data Integration Tests › user profile data structure" name="should parse user profile sample correctly" time="0.002">
+    </testcase>
+    <testcase classname="Sample Data Integration Tests › user profile data structure" name="should parse public profile sample correctly" time="0.003">
+    </testcase>
+    <testcase classname="Sample Data Integration Tests › Profile entity integration" name="should create Profile entity from public profile sample" time="0.003">
+    </testcase>
+    <testcase classname="Sample Data Integration Tests › complex data structures" name="should handle publication with comprehensive metadata" time="0.017">
+    </testcase>
+    <testcase classname="Sample Data Integration Tests › complex data structures" name="should maintain referential integrity between entities" time="0.009">
+    </testcase>
+    <testcase classname="Sample Data Integration Tests › HTTP server integration" name="should have integration server available" time="0">
+    </testcase>
+  </testsuite>
+</testsuites>
