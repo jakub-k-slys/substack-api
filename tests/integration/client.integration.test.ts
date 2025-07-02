@@ -1,45 +1,20 @@
 import { SubstackClient } from '../../src/substack-client'
-import { SubstackHttpClient } from '../../src/http-client'
 import { Profile, OwnProfile } from '../../src/entities'
 
 describe('SubstackClient Integration Tests', () => {
   let client: SubstackClient
-  let mockHttpClient: SubstackHttpClient
 
   beforeEach(() => {
-    // Create a mock HTTP client that points to our integration server
-    mockHttpClient = new (class extends SubstackHttpClient {
-      constructor() {
-        super({ hostname: 'test.com', apiKey: 'test-key' })
-      }
+    // Create client configured to use our local test server
+    // Extract hostname and port from the integration server URL
+    const url = new URL(global.INTEGRATION_SERVER.url)
+    const hostname = `${url.hostname}:${url.port}`
 
-      async request<T>(path: string, options: RequestInit = {}): Promise<T> {
-        // Redirect requests to our integration server
-        const url = `${global.INTEGRATION_SERVER.url}${path}`
-        const response = await fetch(url, {
-          headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-          },
-          ...options
-        })
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-        }
-
-        return response.json()
-      }
-    })()
-
-    // Create client with mock HTTP client
     client = new SubstackClient({
-      hostname: 'test.com',
-      apiKey: 'test-key'
+      hostname: hostname,
+      apiKey: 'test-key',
+      protocol: 'http' // Use HTTP for local test server
     })
-
-    // Replace the internal http client with our mock
-    ;(client as unknown as { httpClient: SubstackHttpClient }).httpClient = mockHttpClient
   })
 
   describe('testConnectivity', () => {
