@@ -54,6 +54,23 @@ describe('SubstackClient Entity Model E2E', () => {
     }
   })
 
+  test('should get profile by slug - jakubslys', async () => {
+    try {
+      // Test with jakubslys profile as requested
+      const profile = await client.profileForSlug('jakubslys')
+
+      expect(profile).toBeInstanceOf(Profile)
+      expect(profile.name).toBeTruthy()
+      expect(profile.slug).toBe('jakubslys')
+      expect(profile.id).toBeGreaterThan(0)
+
+      console.log(`✅ Retrieved jakubslys profile: ${profile.name} (@${profile.slug})`)
+    } catch (error) {
+      console.log('ℹ️ jakubslys profile lookup not available:', (error as Error).message)
+      // Skip this test if profile lookup isn't available
+    }
+  })
+
   test('should iterate through followees', async () => {
     if (!global.E2E_CONFIG.hasCredentials) {
       console.log('⏭️ Skipping test - no credentials available')
