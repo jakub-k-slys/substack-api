@@ -19,7 +19,7 @@ export interface SubstackSubscription {
   is_founding: boolean
   is_favorite: boolean
   podcast_rss_token: string
-  email_settings: Record<string, any> | null
+  email_settings: Record<string, unknown> | null
   section_podcasts_enabled: string[] | null
 }
 

@@ -56,7 +56,6 @@ export class SubstackClient {
         if (publication.author_id) {
           // Use subdomain as the slug, or custom_domain if the publication is not on substack
           const slug = publication.author_handle || undefined
-          
           if (slug) {
             mapping.set(publication.author_id, slug)
             console.log(`Mapped user_id ${publication.author_id} to slug: ${slug}`)

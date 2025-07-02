@@ -34,71 +34,65 @@ describe('SubstackClient - Slug Resolution', () => {
 
   describe('slug resolution via subscriptions cache', () => {
     const mockSubscriptionsResponse: SubstackSubscriptionsResponse = {
-      subscriptions: [
+      subscriptions: [],
+      publicationUsers: [],
+      publications: [
         {
-          user_id: 123,
           id: 1,
-          visibility: 'public',
-          membership_state: 'active',
-          is_founding: false,
+          name: 'Test Publication',
+          subdomain: 'test',
+          custom_domain: null,
+          is_on_substack: true,
+          author_id: 123,
           author_handle: 'resolved-slug-1',
-          publication: {
-            id: 1,
-            name: 'Test Publication',
-            subdomain: 'test',
-            logo_url: 'https://example.com/logo.png',
-            author_id: 123,
-            primary_user_id: 123,
-            theme_var_background_pop: '#ffffff',
-            created_at: '2023-01-01T00:00:00Z',
-            community_enabled: false,
-            invite_only: false,
-            payments_state: 'disabled',
-            explicit: false,
-            homepage_type: 'newsletter',
-            is_personal_mode: false,
-            custom_domain_optional: false,
-            author: {
-              id: 123,
-              name: 'Test Author',
-              handle: 'test-author',
-              photo_url: 'https://example.com/photo.jpg',
-              profile_set_up_at: '2023-01-01T00:00:00Z',
-              reader_installed_at: '2023-01-01T00:00:00Z'
-            }
+          created_at: '2023-01-01T00:00:00Z',
+          logo_url: 'https://example.com/logo.png',
+          cover_photo_url: 'https://example.com/cover.jpg',
+          twitter_screen_name: 'test_publication',
+          community_enabled: false,
+          copyright: '© 2023 Test Publication',
+          founding_subscription_benefits: [],
+          paid_subscription_benefits: [],
+          free_subscription_benefits: [],
+          stripe_user_id: 'stripe_123',
+          stripe_country: 'US',
+          payments_state: 'enabled',
+          language: 'en',
+          email_from_name: 'Test Publication',
+          homepage_type: 'newsletter',
+          theme: {
+            background_pop_color: '#ffffff',
+            web_bg_color: '#f8f9fa',
+            cover_bg_color: null
           }
         },
         {
-          user_id: 456,
           id: 2,
-          visibility: 'public',
-          membership_state: 'active',
-          is_founding: false,
+          name: 'Another Publication',
+          subdomain: 'another',
+          custom_domain: null,
+          is_on_substack: true,
+          author_id: 456,
           author_handle: 'resolved-slug-2',
-          publication: {
-            id: 2,
-            name: 'Another Publication',
-            subdomain: 'another',
-            logo_url: 'https://example.com/logo2.png',
-            author_id: 456,
-            primary_user_id: 456,
-            theme_var_background_pop: '#ffffff',
-            created_at: '2023-01-01T00:00:00Z',
-            community_enabled: false,
-            invite_only: false,
-            payments_state: 'disabled',
-            explicit: false,
-            homepage_type: 'newsletter',
-            is_personal_mode: false,
-            custom_domain_optional: false,
-            author: {
-              id: 456,
-              name: 'Another Author',
-              handle: 'another-author',
-              photo_url: 'https://example.com/photo2.jpg',
-              profile_set_up_at: '2023-01-01T00:00:00Z',
-              reader_installed_at: '2023-01-01T00:00:00Z'
-            }
+          created_at: '2023-01-01T00:00:00Z',
+          logo_url: 'https://example.com/logo2.png',
+          cover_photo_url: 'https://example.com/cover2.jpg',
+          twitter_screen_name: 'another_publication',
+          community_enabled: false,
+          copyright: '© 2023 Another Publication',
+          founding_subscription_benefits: [],
+          paid_subscription_benefits: [],
+          free_subscription_benefits: [],
+          stripe_user_id: 'stripe_456',
+          stripe_country: 'US',
+          payments_state: 'enabled',
+          language: 'en',
+          email_from_name: 'Another Publication',
+          homepage_type: 'newsletter',
+          theme: {
+            background_pop_color: '#ffffff',
+            web_bg_color: '#f8f9fa',
+            cover_bg_color: null
           }
         }
       ]
