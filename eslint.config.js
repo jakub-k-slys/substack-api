@@ -33,6 +33,7 @@ export default [
         URLSearchParams: 'readonly',
         Blob: 'readonly',
         global: 'readonly',
+        console: 'readonly',
         jest: 'readonly',
         describe: 'readonly',
         it: 'readonly',

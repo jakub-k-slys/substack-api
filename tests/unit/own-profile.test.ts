@@ -467,4 +467,69 @@ describe('OwnProfile Entity', () => {
     expect(mockClient.get).toHaveBeenCalledWith('/api/v1/user/3/profile')
     expect(mockClient.get).toHaveBeenCalledTimes(4)
   })
+
+  it('should use slug resolver for followees when available', async () => {
+    // Create a mock slug resolver
+    const mockSlugResolver = jest.fn()
+
+    // Setup mock slug resolver to return different slugs than the handle
+    mockSlugResolver.mockImplementation((userId: number, fallbackHandle?: string) => {
+      if (userId === 1) return Promise.resolve('resolved-slug-1')
+      if (userId === 2) return Promise.resolve('resolved-slug-2')
+      return Promise.resolve(fallbackHandle)
+    })
+
+    // Create OwnProfile with the slug resolver
+    const ownProfileWithResolver = new OwnProfile(
+      mockProfileData,
+      {
+        get: jest.fn(),
+        post: jest.fn(),
+        request: jest.fn()
+      } as unknown as jest.Mocked<SubstackHttpClient>,
+      'resolved-own-slug',
+      mockSlugResolver
+    )
+
+    const mockClient = ownProfileWithResolver['client'] as jest.Mocked<SubstackHttpClient>
+
+    // Mock the following endpoint and profile endpoints
+    const mockFollowingIds = [1, 2]
+    mockClient.get.mockImplementation((url: string) => {
+      if (url === '/api/v1/feed/following') {
+        return Promise.resolve(mockFollowingIds)
+      } else if (url === '/api/v1/user/1/profile') {
+        return Promise.resolve({
+          id: 1,
+          handle: 'user1',
+          name: 'User One',
+          photo_url: 'https://example.com/user1.jpg'
+        } as SubstackFullProfile)
+      } else if (url === '/api/v1/user/2/profile') {
+        return Promise.resolve({
+          id: 2,
+          handle: 'user2',
+          name: 'User Two',
+          photo_url: 'https://example.com/user2.jpg'
+        } as SubstackFullProfile)
+      }
+      return Promise.reject(new Error(`Unexpected URL: ${url}`))
+    })
+
+    const followees = []
+    for await (const profile of ownProfileWithResolver.followees()) {
+      followees.push(profile)
+    }
+
+    expect(followees).toHaveLength(2)
+
+    // Check that the slug resolver was called for each user
+    expect(mockSlugResolver).toHaveBeenCalledWith(1, 'user1')
+    expect(mockSlugResolver).toHaveBeenCalledWith(2, 'user2')
+    expect(mockSlugResolver).toHaveBeenCalledTimes(2)
+
+    // Check that the resolved slugs are used
+    expect(followees[0].slug).toBe('resolved-slug-1')
+    expect(followees[1].slug).toBe('resolved-slug-2')
+  })
 })

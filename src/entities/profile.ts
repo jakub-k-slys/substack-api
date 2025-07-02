@@ -21,12 +21,18 @@ export class Profile {
 
   constructor(
     protected readonly rawData: SubstackPublicProfile | SubstackFullProfile,
-    protected readonly client: SubstackHttpClient
+    protected readonly client: SubstackHttpClient,
+    resolvedSlug?: string,
+    protected readonly slugResolver?: (
+      userId: number,
+      fallbackHandle?: string
+    ) => Promise<string | undefined>
   ) {
     this.id = rawData.id
-    this.slug = rawData.handle
+    // Use resolved slug from subscriptions cache if available, otherwise fallback to handle
+    this.slug = resolvedSlug || rawData.handle
     this.name = rawData.name
-    this.url = `https://substack.com/@${rawData.handle}`
+    this.url = `https://substack.com/@${this.slug}`
     this.avatarUrl = rawData.photo_url
     this.bio = rawData.bio
   }
@@ -36,10 +42,9 @@ export class Profile {
    */
   async *posts(options: { limit?: number } = {}): AsyncIterable<Post> {
     try {
-      // Try to fetch posts for this profile
-      // The API endpoint might vary, so we'll try a few approaches
+      // Use the correct endpoint for profile posts
       const response = await this.client.get<{ posts?: SubstackPost[] }>(
-        `/api/v1/users/${this.id}/posts`
+        `/api/v1/profile/posts?profile_user_id=${this.id}`
       )
 
       if (response.posts) {
