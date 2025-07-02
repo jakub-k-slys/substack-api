@@ -143,7 +143,9 @@ export class SubstackClient {
     }
 
     try {
-      const profile = await this.httpClient.get<SubstackFullProfile>(`/api/v1/users/${slug}`)
+      const profile = await this.httpClient.get<SubstackFullProfile>(
+        `/api/v1/user/${slug}/public_profile`
+      )
 
       // For profiles fetched by slug, we can use the provided slug as the resolved slug
       // but still check subscriptions cache for consistency
