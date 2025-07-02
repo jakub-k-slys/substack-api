@@ -40,6 +40,60 @@ describe('SubstackClient Integration Tests', () => {
         expect(profile.bio).toContain('Former scientist turned software engineer')
         expect(profile.bio).toBeTruthy()
       })
+
+      test('should use correct API endpoint for profileForId', async () => {
+        // This test verifies that the fix for issue #61 is working
+        // The method should use /api/v1/user/{id}/profile, not /api/v1/users/{id}
+        const userId = 282291554
+
+        // Mock the HTTP request to verify the correct endpoint is called
+        const originalGet = client['httpClient'].get
+        const getSpy = jest.fn().mockImplementation(originalGet.bind(client['httpClient']))
+        client['httpClient'].get = getSpy
+
+        try {
+          await client.profileForId(userId)
+
+          // Verify the correct endpoint was called
+          expect(getSpy).toHaveBeenCalledWith(`/api/v1/user/${userId}/profile`)
+
+          // Verify the old (incorrect) endpoint was NOT called
+          expect(getSpy).not.toHaveBeenCalledWith(`/api/v1/users/${userId}`)
+        } finally {
+          // Restore original method
+          client['httpClient'].get = originalGet
+        }
+      })
+
+      test('should return Profile instance with all expected properties', async () => {
+        const userId = 282291554
+
+        const profile = await client.profileForId(userId)
+
+        // Verify it's a Profile instance
+        expect(profile).toBeInstanceOf(Profile)
+
+        // Verify all expected properties are present
+        expect(profile.id).toBe(userId)
+        expect(typeof profile.name).toBe('string')
+        expect(profile.name).toBeTruthy()
+        expect(typeof profile.bio).toBe('string')
+        expect(profile.bio).toBeTruthy()
+
+        // Verify methods are available
+        expect(typeof profile.posts).toBe('function')
+        expect(typeof profile.notes).toBe('function')
+      })
+
+      test('should handle large user IDs correctly', async () => {
+        // Test with a large user ID to ensure proper handling
+        const largeUserId = 999999999
+
+        // This should fail with our mock server, but we're testing the correct error handling
+        await expect(client.profileForId(largeUserId)).rejects.toThrow(
+          `Profile with ID ${largeUserId} not found`
+        )
+      })
     })
 
     describe('profileForSlug', () => {
