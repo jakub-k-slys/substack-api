@@ -1,16 +1,19 @@
 # Substack API Documentation
 
-Welcome to the Substack API client documentation. This TypeScript library provides a simple interface to interact with Substack publications, posts, and comments.
+Welcome to the Substack API client documentation. This modern TypeScript library provides a clean, entity-based interface to interact with Substack publications, posts, comments, and user profiles.
 
 ## Features
 
-- Fetch publication details
-- Get and search posts
-- Access comments
-- Pagination support
-- TypeScript support
-- Error handling
-- Configurable API version
+- 🏗️ **Modern Entity Model** - Object-oriented API with fluent navigation (`profile.posts()`, `post.comments()`)
+- 🔄 **Async Iterators** - Seamless pagination with `for await` syntax  
+- 🛡️ **Type Safety** - Full TypeScript support with entity classes (Profile, Post, Note, Comment)
+- 🔐 **Cookie Authentication** - Secure authentication using connect.sid cookies
+- 📝 **Content Creation** - Create posts, notes, and comments through OwnProfile
+- 💬 **Social Features** - Like, comment, follow, and subscribe functionality
+- 📄 **Smart Pagination** - Built-in pagination with configurable limits
+- 🚀 **Built-in Caching** - Automatic in-memory caching with TTL for improved performance
+- ⚡ **Error Handling** - Comprehensive error handling with custom error types
+- 🔧 **Configurable** - Support for different hostnames and custom configurations
 
 ## Quick Links
 

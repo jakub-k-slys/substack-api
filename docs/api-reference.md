@@ -1,993 +1,647 @@
 # API Reference
 
-This section provides comprehensive documentation for all classes, methods, and types available in the Substack API client, including detailed descriptions and practical code examples.
+This section provides comprehensive documentation for the modern SubstackClient entity-based API, including all classes, methods, and types with detailed descriptions and practical examples.
 
-## Substack Class
+## SubstackClient Class
 
-The main class for interacting with the Substack API. This client provides access to publications, posts, comments, notes, and user profiles.
+The main class for interacting with the Substack API using the modern entity model. This client provides access to profiles, posts, notes, comments, and social features through an object-oriented interface.
 
 ### Constructor
 
 ```typescript
-new Substack(config: SubstackConfig)
+new SubstackClient(config: SubstackConfig)
 ```
 
-Creates a new Substack API client instance. The client requires an API key for authentication.
+Creates a new SubstackClient instance with cookie-based authentication.
 
 **Parameters:**
 - `config`: Configuration object (required)
-  - `hostname` (optional): The publication's hostname (e.g., 'example.substack.com', default: 'substack.com')
-  - `apiVersion` (optional): API version to use (default: 'v1')
-  - `apiKey`: Your Substack API key (required)
-  - `perPage` (optional): Default items per page for pagination (default: 25)
-  - `cacheTTL` (optional): Cache TTL in seconds (default: 300)
+  - `apiKey`: Your connect.sid cookie value (required)
+  - `hostname` (optional): Publication hostname (default: 'substack.com')
 
 **Example:**
 ```typescript
-import { Substack } from 'substack-api';
+import { SubstackClient } from 'substack-api';
 
-const client = new Substack({
-  hostname: 'example.substack.com',
-  apiKey: 'your-api-key-here',
-  perPage: 50, // Custom page size
-  cacheTTL: 600 // Cache for 10 minutes
+const client = new SubstackClient({
+  apiKey: 'your-connect-sid-cookie-value',
+  hostname: 'example.substack.com'
 });
 ```
 
-## Performance Features
+### Core Methods
 
-### Built-in Caching
-
-The Substack client includes automatic in-memory caching for read-only operations (`GET` requests) to improve performance and reduce API calls.
-
-**Cache Behavior:**
-- **Automatic**: Enabled by default for all read-only methods (`getPosts`, `getNotes`, `getComments`, etc.)
-- **TTL-based**: Cached responses expire after the configured `cacheTTL` (default: 300 seconds)
-- **Key-based**: Uses request URL and method as cache keys
-- **Memory-only**: Cache is stored in memory and doesn't persist across application restarts
-
-**Cache Configuration:**
-```typescript
-const client = new Substack({
-  apiKey: 'your-api-key',
-  cacheTTL: 600 // Cache responses for 10 minutes
-});
-```
-
-**Cache Benefits:**
-- Reduced API calls for repeated requests
-- Faster response times for cached data
-- Automatic cache invalidation via TTL
-- No external dependencies required
-
-### Configurable Pagination
-
-The client uses configurable page sizes for optimal performance:
-
-**Default Behavior:**
-- Default `perPage`: 25 items per API request
-- Automatic pagination continues until all data is retrieved or limit is reached
-- Intelligent request sizing when limits are applied
-
-**Custom Configuration:**
-```typescript
-const client = new Substack({
-  apiKey: 'your-api-key',
-  perPage: 50 // Request 50 items per page instead of 25
-});
-```
-
-## Post Methods
-
-### getPosts
+#### testConnectivity()
 
 ```typescript
-getPosts(options?: PostsIteratorOptions): AsyncIterable<SubstackPost>
+testConnectivity(): Promise<boolean>
 ```
 
-Retrieves posts from the publication with automatic pagination handling. Returns an async iterable that yields individual posts, making pagination transparent to the developer.
-
-**Parameters:**
-- `options` (optional): Iterator options
-  - `limit`: Maximum total number of posts to retrieve across all pages
+Tests API connectivity and authentication status.
 
 **Returns:**
-- `AsyncIterable<SubstackPost>` - An async iterable that yields individual posts
+- `Promise<boolean>` - `true` if connected successfully, `false` otherwise
 
 **Example:**
 ```typescript
-// ✅ Async iteration (preferred for streaming large sets)
-for await (const post of client.getPosts()) {
-  console.log(`${post.title} (${post.type})`);
-  console.log(`Published: ${new Date(post.post_date).toLocaleDateString()}`);
+const isConnected = await client.testConnectivity();
+if (isConnected) {
+  console.log('✅ Successfully connected to Substack API');
+} else {
+  console.error('❌ Failed to connect - check your authentication');
+}
+```
+
+#### ownProfile()
+
+```typescript
+ownProfile(): Promise<OwnProfile>
+```
+
+Gets your authenticated profile with write capabilities (content creation, following, etc.).
+
+**Returns:**
+- `Promise<OwnProfile>` - Your profile with full read/write access
+
+**Example:**
+```typescript
+const myProfile = await client.ownProfile();
+console.log(`Welcome ${myProfile.name}! (@${myProfile.slug})`);
+console.log(`Followers: ${myProfile.followerCount}`);
+
+// Create content
+await myProfile.createPost({
+  title: 'My New Post',
+  body: 'Content here...',
+  isDraft: false
+});
+```
+
+#### profileForSlug()
+
+```typescript
+profileForSlug(slug: string): Promise<Profile>
+```
+
+Gets a profile by their username/slug (read-only access).
+
+**Parameters:**
+- `slug`: The user's slug/handle (without @ symbol)
+
+**Returns:**
+- `Promise<Profile>` - The user's profile (read-only)
+
+**Example:**
+```typescript
+const profile = await client.profileForSlug('example-user');
+console.log(`${profile.name}: ${profile.bio || 'No bio'}`);
+
+// Navigate to their posts
+for await (const post of profile.posts({ limit: 5 })) {
+  console.log(`- ${post.title}`);
+}
+```
+
+#### profileForId()
+
+```typescript
+profileForId(id: number): Promise<Profile>
+```
+
+Gets a profile by their numeric ID.
+
+**Parameters:**
+- `id`: The user's numeric ID
+
+**Returns:**
+- `Promise<Profile>` - The user's profile
+
+**Example:**
+```typescript
+const profile = await client.profileForId(12345);
+console.log(`Found: ${profile.name} (@${profile.slug})`);
+```
+
+#### postForId()
+
+```typescript
+postForId(id: string): Promise<Post>
+```
+
+Gets a specific post by its ID or slug.
+
+**Parameters:**
+- `id`: The post's ID or slug
+
+**Returns:**
+- `Promise<Post>` - The post entity
+
+**Example:**
+```typescript
+const post = await client.postForId('my-awesome-post');
+console.log(`Title: ${post.title}`);
+console.log(`Author: ${post.author.name}`);
+console.log(`Published: ${post.publishedAt?.toLocaleDateString()}`);
+
+// Navigate to comments
+for await (const comment of post.comments({ limit: 10 })) {
+  console.log(`💬 ${comment.author.name}: ${comment.body.substring(0, 100)}...`);
+}
+```
+
+#### noteForId()
+
+```typescript
+noteForId(id: string): Promise<Note>
+```
+
+Gets a specific note by its ID.
+
+**Parameters:**
+- `id`: The note's ID
+
+**Returns:**
+- `Promise<Note>` - The note entity
+
+**Example:**
+```typescript
+const note = await client.noteForId('note-123');
+console.log(`Note by ${note.author.name}: ${note.body}`);
+
+// Interact with the note
+await note.like();
+await note.addComment('Great point!');
+```
+
+#### commentForId()
+
+```typescript
+commentForId(id: string): Promise<Comment>
+```
+
+Gets a specific comment by its ID.
+
+**Parameters:**
+- `id`: The comment's ID
+
+**Returns:**
+- `Promise<Comment>` - The comment entity
+
+**Example:**
+```typescript
+const comment = await client.commentForId('comment-456');
+console.log(`Comment by ${comment.author.name}: ${comment.body}`);
+
+// Like the comment
+await comment.like();
+
+// Navigate to parent post
+if (comment.post) {
+  console.log(`Parent post: ${comment.post.title}`);
+}
+```
+
+## Entity Classes
+
+The SubstackClient returns entity objects that provide navigation and interaction capabilities.
+
+### Profile Entity
+
+Represents a user profile with read-only access to their content.
+
+#### Properties
+
+```typescript
+interface Profile {
+  id: number;
+  name: string;
+  slug: string;
+  bio?: string;
+  followerCount: number;
+  isFollowing: boolean;
+  // ... other properties
+}
+```
+
+#### Methods
+
+##### posts()
+
+```typescript
+posts(options?: { limit?: number }): AsyncIterable<Post>
+```
+
+Iterate through the profile's posts with automatic pagination.
+
+**Example:**
+```typescript
+// Get all posts
+for await (const post of profile.posts()) {
+  console.log(post.title);
 }
 
-// Limit the total number of posts
-for await (const post of client.getPosts({ limit: 50 })) {
-  console.log(`Post: ${post.title}`);
+// Limit to 10 posts
+for await (const post of profile.posts({ limit: 10 })) {
+  console.log(post.title);
 }
+```
 
-// Collect posts into an array if needed
+##### notes()
+
+```typescript
+notes(options?: { limit?: number }): AsyncIterable<Note>
+```
+
+Iterate through the profile's notes.
+
+**Example:**
+```typescript
+for await (const note of profile.notes({ limit: 20 })) {
+  console.log(`📝 ${note.body.substring(0, 80)}...`);
+}
+```
+
+##### follow()
+
+```typescript
+follow(): Promise<void>
+```
+
+Follow this profile (requires authentication).
+
+**Example:**
+```typescript
+await profile.follow();
+console.log(`Now following ${profile.name}`);
+```
+
+##### unfollow()
+
+```typescript
+unfollow(): Promise<void>
+```
+
+Unfollow this profile (requires authentication).
+
+### OwnProfile Entity
+
+Extends Profile with write capabilities for content creation and management.
+
+#### Additional Methods
+
+##### createPost()
+
+```typescript
+createPost(options: {
+  title: string;
+  body: string;
+  isDraft: boolean;
+}): Promise<Post>
+```
+
+Create a new post on your publication.
+
+**Example:**
+```typescript
+const post = await myProfile.createPost({
+  title: 'My New Article',
+  body: 'This is the content of my article...',
+  isDraft: false
+});
+console.log(`Published: ${post.title}`);
+```
+
+##### createNote()
+
+```typescript
+createNote(options: { body: string }): Promise<Note>
+```
+
+Create a new short-form note.
+
+**Example:**
+```typescript
+const note = await myProfile.createNote({
+  body: '🚀 Just shipped a new feature! Excited to share what we\'ve been working on.'
+});
+console.log(`Note created: ${note.id}`);
+```
+
+### Post Entity
+
+Represents a publication post with interaction capabilities.
+
+#### Properties
+
+```typescript
+interface Post {
+  id: string;
+  title: string;
+  body: string;
+  author: Profile;
+  publishedAt?: Date;
+  reactions?: Reaction[];
+  // ... other properties
+}
+```
+
+#### Methods
+
+##### comments()
+
+```typescript
+comments(options?: { limit?: number }): AsyncIterable<Comment>
+```
+
+Iterate through post comments with pagination.
+
+**Example:**
+```typescript
+for await (const comment of post.comments({ limit: 50 })) {
+  console.log(`${comment.author.name}: ${comment.body}`);
+}
+```
+
+##### like()
+
+```typescript
+like(): Promise<void>
+```
+
+Like this post (requires authentication).
+
+**Example:**
+```typescript
+await post.like();
+console.log('Post liked!');
+```
+
+##### addComment()
+
+```typescript
+addComment(body: string): Promise<Comment>
+```
+
+Add a comment to this post (requires authentication).
+
+**Example:**
+```typescript
+const comment = await post.addComment('Great insights! Thanks for sharing.');
+console.log(`Comment added: ${comment.id}`);
+```
+
+### Note Entity
+
+Represents a short-form note/post.
+
+#### Properties
+
+```typescript
+interface Note {
+  id: string;
+  body: string;
+  author: Profile;
+  createdAt: Date;
+  reactions?: Reaction[];
+  // ... other properties
+}
+```
+
+#### Methods
+
+##### like()
+
+```typescript
+like(): Promise<void>
+```
+
+Like this note.
+
+##### addComment()
+
+```typescript
+addComment(body: string): Promise<Comment>
+```
+
+Add a comment to this note.
+
+### Comment Entity
+
+Represents a comment on a post or note.
+
+#### Properties
+
+```typescript
+interface Comment {
+  id: string;
+  body: string;
+  author: Profile;
+  post?: Post;
+  createdAt: Date;
+  reactions?: Reaction[];
+  // ... other properties
+}
+```
+
+#### Methods
+
+##### like()
+
+```typescript
+like(): Promise<void>
+```
+
+Like this comment.
+
+## Async Iteration Patterns
+
+The entity model uses async iterators for seamless pagination handling.
+
+### Basic Iteration
+
+```typescript
+// Simple iteration - processes all items
+for await (const post of profile.posts()) {
+  console.log(post.title);
+}
+```
+
+### Limited Iteration
+
+```typescript
+// Limit total items processed
+for await (const post of profile.posts({ limit: 10 })) {
+  console.log(post.title);
+}
+```
+
+### Manual Control
+
+```typescript
+// Break early based on conditions
+for await (const post of profile.posts()) {
+  console.log(post.title);
+  
+  if (post.title.includes('IMPORTANT')) {
+    console.log('Found important post, stopping search');
+    break;
+  }
+}
+```
+
+### Collecting Results
+
+```typescript
+// Collect into array for further processing
 const recentPosts = [];
-for await (const post of client.getPosts({ limit: 10 })) {
+for await (const post of profile.posts({ limit: 20 })) {
   recentPosts.push(post);
 }
+
 console.log(`Collected ${recentPosts.length} recent posts`);
+recentPosts.forEach(post => {
+  console.log(`- ${post.title} (${post.publishedAt?.toLocaleDateString()})`);
+});
 ```
 
-### getPost
+### Nested Iteration
 
 ```typescript
-getPost(slug: string): Promise<SubstackPost>
-```
-
-Retrieves detailed information about a specific post using its URL slug.
-
-**Parameters:**
-- `slug`: The post's URL slug (the part after the publication URL)
-
-**Returns:**
-- Promise resolving to a `SubstackPost` object with full post details
-
-**Example:**
-```typescript
-// Get a specific post by its slug
-const post = await client.getPost('my-awesome-post');
-console.log(`Title: ${post.title}`);
-console.log(`Subtitle: ${post.subtitle}`);
-console.log(`Published: ${new Date(post.post_date).toLocaleDateString()}`);
-console.log(`Paywalled: ${post.paywalled ? 'Yes' : 'No'}`);
-
-if (post.cover_image) {
-  console.log(`Cover image: ${post.cover_image}`);
+// Navigate relationships with nested iteration
+for await (const post of profile.posts({ limit: 5 })) {
+  console.log(`\n📄 ${post.title}`);
+  console.log(`   💖 ${post.reactions?.length || 0} reactions`);
+  
+  // Get comments for each post
+  const comments = [];
+  for await (const comment of post.comments({ limit: 3 })) {
+    comments.push(comment);
+  }
+  console.log(`   💬 ${comments.length} recent comments`);
 }
 ```
 
-### searchPosts
+## Error Handling
+
+Handle errors gracefully in entity operations:
 
 ```typescript
-searchPosts(params: SearchParams): Promise<SubstackSearchResult>
-```
-
-Searches for posts within the publication using various filters and criteria.
-
-**Parameters:**
-- `params`: Search parameters
-  - `query`: Search query string (searches title, subtitle, and content)
-  - `type` (optional): Filter by post type ('newsletter' | 'podcast' | 'thread')
-  - `published_before` (optional): ISO date string to find posts published before this date
-  - `published_after` (optional): ISO date string to find posts published after this date
-  - `offset` (optional): Number of items to skip
-  - `limit` (optional): Maximum number of items to return
-
-**Returns:**
-- Promise resolving to a `SubstackSearchResult` object containing total count and results
-
-**Example:**
-```typescript
-// Search for posts about TypeScript
-const results = await client.searchPosts({
-  query: 'TypeScript',
-  limit: 10
-});
-
-console.log(`Found ${results.total} posts matching "TypeScript"`);
-results.results.forEach(post => {
-  console.log(`- ${post.title} (${post.post_date})`);
-});
-
-// Search for newsletters published in the last month
-const oneMonthAgo = new Date();
-oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-
-const recentNewsletters = await client.searchPosts({
-  query: '',
-  type: 'newsletter',
-  published_after: oneMonthAgo.toISOString(),
-  limit: 20
-});
-```
-
-## Comment Methods
-
-### getComments
-
-```typescript
-getComments(postId: number, options?: CommentsIteratorOptions): AsyncIterable<SubstackComment>
-```
-
-Retrieves comments for a specific post with automatic pagination handling. Returns an async iterable that yields individual comments, making pagination transparent to the developer.
-
-**Parameters:**
-- `postId`: The numeric ID of the post
-- `options` (optional): Iterator options
-  - `limit`: Maximum total number of comments to retrieve across all pages
-
-**Returns:**
-- `AsyncIterable<SubstackComment>` - An async iterable that yields individual comments
-
-**Example:**
-```typescript
-// ✅ Async iteration (preferred for streaming large sets)
-for await (const comment of client.getComments(12345)) {
-  console.log(`${comment.author.name}: ${comment.body.substring(0, 100)}...`);
-  console.log(`Posted: ${new Date(comment.created_at).toLocaleDateString()}`);
-  if (comment.author.is_admin) {
-    console.log('⭐ Admin comment');
+try {
+  const profile = await client.ownProfile();
+  
+  // Try to create content
+  const post = await profile.createPost({
+    title: 'My Post',
+    body: 'Content...',
+    isDraft: false
+  });
+  
+  console.log(`Post created: ${post.id}`);
+} catch (error) {
+  if (error.message.includes('401')) {
+    console.error('Authentication failed - check your connect.sid cookie');
+  } else if (error.message.includes('403')) {
+    console.error('Permission denied - check your account permissions');
+  } else {
+    console.error('Unexpected error:', error.message);
   }
 }
-
-// Limit the total number of comments
-for await (const comment of client.getComments(12345, { limit: 20 })) {
-  console.log(`Comment: ${comment.body.substring(0, 50)}...`);
-}
-
-// Collect comments into an array if needed
-const recentComments = [];
-for await (const comment of client.getComments(12345, { limit: 10 })) {
-  recentComments.push(comment);
-}
-console.log(`Collected ${recentComments.length} recent comments`);
 ```
 
-### getComment
+## Type Definitions
 
-```typescript
-getComment(commentId: number): Promise<SubstackComment>
-```
-
-Retrieves a specific comment by its unique ID.
-
-**Parameters:**
-- `commentId`: The numeric ID of the comment
-
-**Returns:**
-- Promise resolving to a `SubstackComment` object
-
-**Example:**
-```typescript
-// Get a specific comment
-const comment = await client.getComment(67890);
-console.log(`Comment by ${comment.author.name}:`);
-console.log(comment.body);
-console.log(`Posted on: ${new Date(comment.created_at).toLocaleDateString()}`);
-```
-
-## Notes Methods
-
-Notes are short-form posts that appear on users' feeds, similar to social media posts.
-
-### getNotes
-
-```typescript
-getNotes(options?: NotesIteratorOptions): AsyncIterable<SubstackNote>
-```
-
-Retrieves notes from the authenticated user's feed with automatic pagination handling. Returns an async iterable that yields individual notes, making pagination transparent to the developer.
-
-**Parameters:**
-- `options` (optional): Iterator options
-  - `limit`: Maximum total number of notes to retrieve across all pages
-
-**Returns:**
-- `AsyncIterable<SubstackNote>` - An async iterable that yields individual notes
-
-**Example:**
-```typescript
-// ✅ Async iteration (preferred for streaming large sets)
-for await (const note of client.getNotes()) {
-  if (note.comment) {
-    console.log(`${note.context.users[0].name}: ${note.comment.body}`);
-    console.log(`Posted: ${new Date(note.comment.date).toLocaleDateString()}`);
-  }
-}
-
-// Limit the total number of notes
-for await (const note of client.getNotes({ limit: 50 })) {
-  console.log(`Note: ${note.comment?.body || 'No content'}`);
-}
-
-// Collect notes into an array if needed
-const recentNotes = [];
-for await (const note of client.getNotes({ limit: 10 })) {
-  recentNotes.push(note);
-}
-console.log(`Collected ${recentNotes.length} recent notes`);
-```
-
-### publishNote
-
-```typescript
-publishNote(text: string): Promise<PublishNoteResponse>
-```
-
-Publishes a simple text note to your Substack feed.
-
-**Parameters:**
-- `text`: The text content of the note
-
-**Returns:**
-- Promise resolving to a `PublishNoteResponse` with the published note details
-
-**Example:**
-```typescript
-// Publish a simple note
-const response = await client.publishNote('Just discovered this amazing TypeScript feature! 🚀');
-console.log(`Note published with ID: ${response.id}`);
-console.log(`Published at: ${new Date(response.date).toLocaleString()}`);
-```
-
-### note
-
-```typescript
-note(text?: string): NoteBuilder
-```
-
-Creates a `NoteBuilder` instance for building formatted notes with rich text features.
-
-**Parameters:**
-- `text` (optional): Initial text for the first paragraph
-
-**Returns:**
-- A `NoteBuilder` instance for fluent note composition
-
-**Example:**
-```typescript
-// Build a formatted note
-const response = await client
-  .note('This is the first paragraph.')
-  .addParagraph('This is a ')
-  .addBold('bold')
-  .addText(' word and this is ')
-  .addItalic('italic')
-  .addText('.')
-  .publish();
-
-console.log(`Formatted note published: ${response.id}`);
-```
-
-## User Profile Methods
-
-### getUserProfile
-
-```typescript
-getUserProfile(userId: number): Promise<SubstackUserProfile>
-```
-
-Retrieves detailed profile information for a user including their activity feed.
-
-**Parameters:**
-- `userId`: The numeric ID of the user
-
-**Returns:**
-- Promise resolving to a `SubstackUserProfile` object with detailed user information
-
-**Example:**
-```typescript
-const profile = await client.getUserProfile(12345);
-console.log(`User has ${profile.items.length} feed items`);
-
-// Display user's recent activity
-profile.items.forEach(item => {
-  const user = item.context.users[0];
-  console.log(`${user.name} (${user.handle})`);
-  if (user.bio) {
-    console.log(`Bio: ${user.bio}`);
-  }
-});
-```
-
-### getPublicProfile
-
-```typescript
-getPublicProfile(slug: string): Promise<SubstackPublicProfile>
-```
-
-Retrieves the public profile information for a user by their handle/slug.
-
-**Parameters:**
-- `slug`: The user's handle/slug (without the @ symbol)
-
-**Returns:**
-- Promise resolving to a `SubstackPublicProfile` object
-
-**Example:**
-```typescript
-const publicProfile = await client.getPublicProfile('john-doe');
-console.log(`Name: ${publicProfile.name}`);
-console.log(`Handle: @${publicProfile.handle}`);
-console.log(`Subscribers: ${publicProfile.subscriberCountString}`);
-console.log(`Bio: ${publicProfile.bio}`);
-
-// List user's publications
-publicProfile.publicationUsers.forEach(pubUser => {
-  console.log(`- ${pubUser.publication.name} (${pubUser.role})`);
-});
-```
-
-### getFullProfileBySlug
-
-```typescript
-getFullProfileBySlug(slug: string): Promise<SubstackFullProfile>
-```
-
-Retrieves complete profile information (public + user profile) for a user by their handle.
-
-**Parameters:**
-- `slug`: The user's handle/slug
-
-**Returns:**
-- Promise resolving to a `SubstackFullProfile` object combining public and user profile data
-
-**Example:**
-```typescript
-const fullProfile = await client.getFullProfileBySlug('jane-smith');
-console.log(`Full profile for ${fullProfile.name}`);
-console.log(`Public info: ${fullProfile.subscriberCount} subscribers`);
-if (fullProfile.userProfile) {
-  console.log(`Activity items: ${fullProfile.userProfile.items.length}`);
-}
-```
-
-### getFullProfileById
-
-```typescript
-getFullProfileById(userId: number): Promise<SubstackFullProfile>
-```
-
-Retrieves complete profile information for a user by their numeric ID.
-
-**Parameters:**
-- `userId`: The numeric ID of the user
-
-**Returns:**
-- Promise resolving to a `SubstackFullProfile` object
-
-**Example:**
-```typescript
-const fullProfile = await client.getFullProfileById(12345);
-console.log(`Profile: ${fullProfile.name} (@${fullProfile.handle})`);
-```
-
-## Following Methods
-
-### getFollowingIds
-
-```typescript
-getFollowingIds(): Promise<number[]>
-```
-
-Retrieves the list of user IDs that the authenticated user follows.
-
-**Returns:**
-- Promise resolving to an array of numeric user IDs
-
-**Example:**
-```typescript
-const followingIds = await client.getFollowingIds();
-console.log(`You follow ${followingIds.length} users`);
-console.log('User IDs:', followingIds);
-```
-
-### getFollowingProfiles
-
-```typescript
-getFollowingProfiles(): Promise<SubstackFullProfile[]>
-```
-
-Retrieves complete profile information for all users that the authenticated user follows.
-
-**Returns:**
-- Promise resolving to an array of `SubstackFullProfile` objects
-
-**Example:**
-```typescript
-const followingProfiles = await client.getFollowingProfiles();
-console.log(`You follow ${followingProfiles.length} users:`);
-
-followingProfiles.forEach(profile => {
-  console.log(`- ${profile.name} (@${profile.handle})`);
-  console.log(`  Subscribers: ${profile.subscriberCountString}`);
-  if (profile.primaryPublication) {
-    console.log(`  Publication: ${profile.primaryPublication.name}`);
-  }
-});
-```
-
-## NoteBuilder Class
-
-The `NoteBuilder` class provides a fluent API for creating formatted notes with rich text features like bold and italic text.
-
-### Constructor
-
-```typescript
-new NoteBuilder(client: Substack, text?: string)
-```
-
-Creates a new note builder instance. Usually accessed through the `client.note()` method.
-
-**Parameters:**
-- `client`: The Substack client instance
-- `text` (optional): Initial text for the first paragraph
-
-### Methods
-
-#### note
-
-```typescript
-note(text: string): NoteBuilder
-```
-
-Starts a new paragraph in the note.
-
-**Parameters:**
-- `text`: Text content for the new paragraph
-
-**Returns:**
-- The NoteBuilder instance for method chaining
-
-#### bold
-
-```typescript
-bold(text: string): NoteBuilder
-```
-
-Adds bold text to the current paragraph.
-
-**Parameters:**
-- `text`: Text to be formatted as bold
-
-**Returns:**
-- The NoteBuilder instance for method chaining
-
-#### italic
-
-```typescript
-italic(text: string): NoteBuilder
-```
-
-Adds italic text to the current paragraph.
-
-**Parameters:**
-- `text`: Text to be formatted as italic
-
-**Returns:**
-- The NoteBuilder instance for method chaining
-
-#### simple
-
-```typescript
-simple(text: string): NoteBuilder
-```
-
-Adds plain text to the current paragraph.
-
-**Parameters:**
-- `text`: Plain text to add
-
-**Returns:**
-- The NoteBuilder instance for method chaining
-
-#### publish
-
-```typescript
-publish(): Promise<PublishNoteResponse>
-```
-
-Publishes the constructed note to your Substack feed.
-
-**Returns:**
-- Promise resolving to a `PublishNoteResponse` with the published note details
-
-**Example Usage:**
-```typescript
-// Simple note with formatting
-const response = await client
-  .note('Welcome to my ')
-  .bold('awesome')
-  .simple(' Substack!')
-  .note('This is a ')
-  .italic('second paragraph')
-  .simple(' with different formatting.')
-  .publish();
-
-console.log(`Note published: ${response.id}`);
-
-// Multi-paragraph note with rich formatting
-const complexNote = await client
-  .note('🚀 Exciting news!')
-  .note('I just released a new ')
-  .bold('TypeScript library')
-  .simple(' for interacting with APIs.')
-  .note('Key features:')
-  .note('• ')
-  .bold('Type safety')
-  .simple(' throughout')
-  .note('• ')
-  .italic('Easy to use')
-  .simple(' fluent API')
-  .note('Check it out and let me know what you think! 💪')
-  .publish();
-```
-
-## Types
-
-### Configuration Types
-
-#### SubstackConfig
+### SubstackConfig
 
 ```typescript
 interface SubstackConfig {
-  hostname?: string;
-  apiVersion?: string;
-  apiKey: string;
-  perPage?: number;
-  cacheTTL?: number;
+  apiKey: string;        // connect.sid cookie value
+  hostname?: string;     // publication hostname (optional)
 }
 ```
 
-Configuration options for the Substack client.
-
-**Properties:**
-- `hostname`: The publication's hostname (optional, defaults to 'substack.com')
-- `apiVersion`: API version to use (optional, defaults to 'v1')
-- `apiKey`: Your Substack API key (required for authentication)
-- `perPage`: Default items per page for pagination (optional, defaults to 25)
-- `cacheTTL`: Cache TTL in seconds (optional, defaults to 300)
-
-### Post Types
-
-#### SubstackPost
+### Common Types
 
 ```typescript
-interface SubstackPost {
-  id: number;
-  title: string;
-  subtitle?: string;
-  slug: string;
-  post_date: string;
-  description?: string;
-  audience?: string;
-  canonical_url: string;
-  cover_image?: string;
-  podcast_url?: string;
-  type: 'newsletter' | 'podcast' | 'thread';
-  published: boolean;
-  paywalled: boolean;
-}
-```
-
-Represents a post on Substack with all its metadata.
-
-**Properties:**
-- `id`: Unique numeric identifier for the post
-- `title`: The post's title
-- `subtitle`: Optional subtitle
-- `slug`: URL slug used in the post's URL
-- `post_date`: ISO date string when the post was published
-- `description`: Optional post description/excerpt
-- `audience`: Target audience for the post
-- `canonical_url`: The full URL to the post
-- `cover_image`: Optional cover image URL
-- `podcast_url`: Optional podcast audio URL (for podcast posts)
-- `type`: The type of post (newsletter, podcast, or thread)
-- `published`: Whether the post is published
-- `paywalled`: Whether the post is behind a paywall
-
-#### SubstackSearchResult
-
-```typescript
-interface SubstackSearchResult {
-  total: number;
-  results: SubstackPost[];
-}
-```
-
-Represents search results for posts.
-
-**Properties:**
-- `total`: Total number of posts matching the search criteria
-- `results`: Array of `SubstackPost` objects for the current page
-
-### Comment Types
-
-#### SubstackComment
-
-```typescript
-interface SubstackComment {
-  id: number;
-  body: string;
-  created_at: string;
-  parent_post_id: number;
-  author: {
-    id: number;
-    name: string;
-    is_admin?: boolean;
-  };
-}
-```
-
-Represents a comment on a Substack post.
-
-**Properties:**
-- `id`: Unique numeric identifier for the comment
-- `body`: The comment's text content
-- `created_at`: ISO date string when the comment was created
-- `parent_post_id`: ID of the post this comment belongs to
-- `author`: Information about the comment author
-
-### Notes Types
-
-#### SubstackNote
-
-```typescript
-interface SubstackNote {
-  entity_key: string;
+interface Reaction {
+  id: string;
   type: string;
-  context: {
-    type: string;
-    timestamp: string;
-    users: Array<{
-      id: number;
-      name: string;
-      handle: string;
-      photo_url: string;
-      bio?: string;
-      // ... additional user properties
-    }>;
-    // ... additional context properties
-  };
-  comment?: {
-    id: number;
-    body: string;
-    body_json?: Record<string, unknown>;
-    user_id: number;
-    type: string;
-    date: string;
-    // ... additional comment properties
-  };
-  // ... additional note properties
+  author: Profile;
+}
+
+interface IteratorOptions {
+  limit?: number;        // Maximum total items to retrieve
 }
 ```
 
-Represents a note (short-form post) in the Substack feed. Notes are complex objects that can contain various types of content including text, images, and links.
+## Best Practices
 
-#### NotesIteratorOptions
+### Authentication
+
+- Always use environment variables for your connect.sid cookie
+- Test connectivity before performing operations
+- Handle authentication errors gracefully
 
 ```typescript
-interface NotesIteratorOptions {
-  limit?: number; // Total number of notes to retrieve across all pages
+const client = new SubstackClient({
+  apiKey: process.env.SUBSTACK_API_KEY!
+});
+
+const isConnected = await client.testConnectivity();
+if (!isConnected) {
+  throw new Error('Failed to authenticate with Substack API');
 }
 ```
 
-Options for controlling the notes iteration behavior.
+### Pagination
 
-**Properties:**
-- `limit`: Maximum total number of notes to retrieve across all pages. If not specified, all available notes will be retrieved.
-
-#### PostsIteratorOptions
+- Use reasonable limits to avoid overwhelming the API
+- Consider memory usage when collecting large datasets
+- Break early when you find what you need
 
 ```typescript
-interface PostsIteratorOptions {
-  limit?: number; // Total number of posts to retrieve across all pages
+// Good: Limited and efficient
+for await (const post of profile.posts({ limit: 50 })) {
+  if (post.title.includes('search-term')) {
+    console.log('Found it!');
+    break;
+  }
 }
 ```
 
-Options for controlling the posts iteration behavior.
+### Error Handling
 
-**Properties:**
-- `limit`: Maximum total number of posts to retrieve across all pages. If not specified, all available posts will be retrieved.
+- Always wrap API calls in try-catch blocks
+- Handle specific error cases appropriately
+- Provide meaningful error messages to users
 
-#### CommentsIteratorOptions
-
-```typescript
-interface CommentsIteratorOptions {
-  limit?: number; // Total number of comments to retrieve across all pages
-}
-```
-
-Options for controlling the comments iteration behavior.
-
-**Properties:**
-- `limit`: Maximum total number of comments to retrieve across all pages. If not specified, all available comments will be retrieved.
-
-Options for controlling the notes iteration behavior.
-
-**Properties:**
-- `limit`: Maximum total number of notes to retrieve across all pages. If not specified, all available notes will be retrieved.
-
-### User Profile Types
-
-#### SubstackUserProfile
-
-```typescript
-interface SubstackUserProfile {
-  items: Array<{
-    entity_key: string;
-    type: string;
-    context: {
-      type: string;
-      timestamp: string;
-      users: Array<{
-        id: number;
-        name: string;
-        handle: string;
-        photo_url: string;
-        bio?: string;
-        // ... additional user properties
-      }>;
-      // ... additional context properties
-    };
-    // ... additional item properties
-  }>;
-  originalCursorTimestamp: string;
-  nextCursor: string;
-}
-```
-
-Represents a user's profile including their activity feed items.
-
-#### SubstackPublicProfile
-
-```typescript
-interface SubstackPublicProfile {
-  id: number;
-  name: string;
-  handle: string;
-  photo_url: string;
-  bio?: string;
-  subscriberCount: string;
-  subscriberCountNumber: number;
-  publicationUsers: Array<{
-    id: number;
-    role: string;
-    publication: {
-      id: number;
-      name: string;
-      subdomain: string;
-      logo_url: string;
-      // ... additional publication properties
-    };
-  }>;
-  // ... additional profile properties
-}
-```
-
-Represents a user's public profile information including their publications and subscriber count.
-
-#### SubstackFullProfile
-
-```typescript
-interface SubstackFullProfile extends SubstackPublicProfile {
-  userProfile?: SubstackUserProfile;
-}
-```
-
-Combines public profile information with user profile data for a complete view of a user.
-
-### Pagination Types
-
-#### PaginationParams
-
-```typescript
-interface PaginationParams {
-  offset?: number;
-  limit?: number;
-  cursor?: string;
-}
-```
-
-Parameters for paginated requests.
-
-**Properties:**
-- `offset`: Number of items to skip (for offset-based pagination)
-- `limit`: Maximum number of items to return
-- `cursor`: Cursor string for cursor-based pagination
-
-#### SearchParams
-
-```typescript
-interface SearchParams extends PaginationParams {
-  query: string;
-  published_before?: string;
-  published_after?: string;
-  type?: 'newsletter' | 'podcast' | 'thread';
-}
-```
-
-Parameters for searching posts with additional filtering options.
-
-**Properties:**
-- `query`: Search query string
-- `published_before`: ISO date string to find posts published before this date
-- `published_after`: ISO date string to find posts published after this date
-- `type`: Filter by post type
-
-### Note Publishing Types
-
-#### PublishNoteRequest
-
-```typescript
-interface PublishNoteRequest {
-  bodyJson: NoteBodyJson;
-  replyMinimumRole: 'everyone';
-}
-```
-
-Request structure for publishing a note.
-
-#### PublishNoteResponse
-
-```typescript
-interface PublishNoteResponse {
-  id: number;
-  body: string;
-  body_json: NoteBodyJson;
-  date: string;
-  name: string;
-  photo_url: string;
-  reactions: Record<string, number>;
-  // ... additional response properties
-}
-```
-
-Response structure when a note is successfully published.
-
-#### NoteBodyJson
-
-```typescript
-interface NoteBodyJson {
-  type: 'doc';
-  attrs: {
-    schemaVersion: 'v1';
-  };
-  content: Array<{
-    type: 'paragraph';
-    content: Array<{
-      type: 'text';
-      text: string;
-      marks?: Array<{
-        type: 'bold' | 'italic';
-      }>;
-    }>;
-  }>;
-}
-```
-
-Structured format for note content supporting rich text formatting.
-
-### Error Types
-
-#### SubstackError
-
-```typescript
-class SubstackError extends Error {
-  constructor(
-    message: string,
-    public readonly status?: number,
-    public readonly response?: Response
-  );
-}
-```
-
-Custom error class for API-related errors.
-
-**Properties:**
-- `message`: Error message describing what went wrong
-- `status`: HTTP status code (if available)
-- `response`: Original Response object (if available)
-
-**Example Usage:**
 ```typescript
 try {
-  const posts = [];
-  for await (const post of client.getPosts()) {
-    posts.push(post);
-  }
+  await post.like();
 } catch (error) {
-  if (error instanceof SubstackError) {
-    console.error(`API Error: ${error.message}`);
-    console.error(`Status: ${error.status}`);
+  if (error.message.includes('429')) {
+    console.error('Rate limited - please wait before trying again');
+  } else {
+    console.error('Failed to like post:', error.message);
   }
 }
+```
+
+### Performance
+
+- Use async iteration for large datasets
+- Consider caching frequently accessed data
+- Batch operations when possible
+
+```typescript
+// Efficient: Process items as they arrive
+for await (const post of profile.posts()) {
+  await processPost(post); // Process immediately
+}
+
+// Less efficient: Load all then process
+const allPosts = [];
+for await (const post of profile.posts()) {
+  allPosts.push(post);
+}
+allPosts.forEach(processPost); // Delayed processing
 ```

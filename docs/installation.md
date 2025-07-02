@@ -2,8 +2,9 @@
 
 ## Requirements
 
-- Node.js 14 or higher
+- Node.js 16 or higher  
 - npm or yarn package manager
+- A Substack account with publication access
 
 ## NPM Installation
 
@@ -41,17 +42,17 @@ For optimal TypeScript integration, ensure your `tsconfig.json` includes:
 To verify the installation, you can create a simple test file:
 
 ```typescript
-import { Substack } from 'substack-api';
+import { SubstackClient } from 'substack-api';
 
-const client = new Substack();
+const client = new SubstackClient({
+  apiKey: 'your-connect-sid-cookie-value',
+  hostname: 'example.substack.com'
+});
 
 async function test() {
   try {
-    const posts = [];
-    for await (const post of client.getPosts({ limit: 1 })) {
-      posts.push(post);
-    }
-    console.log('Successfully connected - found posts:', posts.length);
+    const isConnected = await client.testConnectivity();
+    console.log('Connection status:', isConnected ? 'Connected' : 'Failed');
   } catch (error) {
     console.error('Error:', error.message);
   }
