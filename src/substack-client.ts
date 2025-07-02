@@ -110,7 +110,12 @@ export class SubstackClient {
       // Step 3: Resolve slug from subscriptions cache
       const resolvedSlug = await this.getSlugForUserId(userId, profile.handle)
 
-      return new OwnProfile(profile, this.httpClient, resolvedSlug)
+      return new OwnProfile(
+        profile,
+        this.httpClient,
+        resolvedSlug,
+        this.getSlugForUserId.bind(this)
+      )
     } catch (error) {
       throw new Error(`Failed to get own profile: ${(error as Error).message}`)
     }
@@ -126,7 +131,7 @@ export class SubstackClient {
       // Resolve slug from subscriptions cache
       const resolvedSlug = await this.getSlugForUserId(id, profile.handle)
 
-      return new Profile(profile, this.httpClient, resolvedSlug)
+      return new Profile(profile, this.httpClient, resolvedSlug, this.getSlugForUserId.bind(this))
     } catch (error) {
       throw new Error(`Profile with ID ${id} not found: ${(error as Error).message}`)
     }
@@ -147,7 +152,7 @@ export class SubstackClient {
       // but still check subscriptions cache for consistency
       const resolvedSlug = await this.getSlugForUserId(profile.id, slug)
 
-      return new Profile(profile, this.httpClient, resolvedSlug)
+      return new Profile(profile, this.httpClient, resolvedSlug, this.getSlugForUserId.bind(this))
     } catch (error) {
       throw new Error(`Profile with slug '${slug}' not found: ${(error as Error).message}`)
     }

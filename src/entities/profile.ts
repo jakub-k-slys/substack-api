@@ -22,7 +22,11 @@ export class Profile {
   constructor(
     protected readonly rawData: SubstackPublicProfile | SubstackFullProfile,
     protected readonly client: SubstackHttpClient,
-    resolvedSlug?: string
+    resolvedSlug?: string,
+    protected readonly slugResolver?: (
+      userId: number,
+      fallbackHandle?: string
+    ) => Promise<string | undefined>
   ) {
     this.id = rawData.id
     // Use resolved slug from subscriptions cache if available, otherwise fallback to handle
