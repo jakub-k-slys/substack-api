@@ -6,6 +6,7 @@ import type { SubstackConfig } from './types'
 export class SubstackHttpClient {
   private readonly baseUrl: string
   private readonly cookie: string
+  private readonly perPage: number
 
   constructor(config: SubstackConfig) {
     if (!config.apiKey) {
@@ -14,6 +15,14 @@ export class SubstackHttpClient {
     const protocol = config.protocol || 'https'
     this.baseUrl = `${protocol}://${config.hostname || 'substack.com'}`
     this.cookie = `connect.sid=${config.apiKey}`
+    this.perPage = config.perPage || 25
+  }
+
+  /**
+   * Get the configured items per page for pagination
+   */
+  getPerPage(): number {
+    return this.perPage
   }
 
   async request<T>(path: string, options: RequestInit = {}): Promise<T> {

@@ -49,7 +49,8 @@ describe('OwnProfile Entity', () => {
     const mockClient = {
       get: jest.fn(),
       post: jest.fn(),
-      request: jest.fn()
+      request: jest.fn(),
+      getPerPage: jest.fn().mockReturnValue(25)
     } as unknown as jest.Mocked<SubstackHttpClient>
 
     ownProfile = new OwnProfile(mockProfileData, mockClient)
@@ -82,7 +83,8 @@ describe('OwnProfile Entity', () => {
     const mockClient = {
       post: jest.fn().mockResolvedValue(mockPost),
       get: jest.fn(),
-      request: jest.fn()
+      request: jest.fn(),
+      getPerPage: jest.fn().mockReturnValue(25)
     } as unknown as jest.Mocked<SubstackHttpClient>
 
     const ownProfile = new OwnProfile(mockProfileData, mockClient)
@@ -107,7 +109,8 @@ describe('OwnProfile Entity', () => {
     const mockClient = {
       post: jest.fn().mockRejectedValue(new Error('API Error')),
       get: jest.fn(),
-      request: jest.fn()
+      request: jest.fn(),
+      getPerPage: jest.fn().mockReturnValue(25)
     } as unknown as jest.Mocked<SubstackHttpClient>
 
     const ownProfile = new OwnProfile(mockProfileData, mockClient)
@@ -188,7 +191,8 @@ describe('OwnProfile Entity', () => {
     const mockClient = {
       post: jest.fn().mockResolvedValue(mockNoteResponse),
       get: jest.fn(),
-      request: jest.fn()
+      request: jest.fn(),
+      getPerPage: jest.fn().mockReturnValue(25)
     } as unknown as jest.Mocked<SubstackHttpClient>
 
     const ownProfile = new OwnProfile(mockProfileData, mockClient)
@@ -209,7 +213,8 @@ describe('OwnProfile Entity', () => {
     const mockClient = {
       post: jest.fn().mockRejectedValue(new Error('API not available')),
       get: jest.fn(),
-      request: jest.fn()
+      request: jest.fn(),
+      getPerPage: jest.fn().mockReturnValue(25)
     } as unknown as jest.Mocked<SubstackHttpClient>
 
     const ownProfile = new OwnProfile(mockProfileData, mockClient)
@@ -226,7 +231,8 @@ describe('OwnProfile Entity', () => {
     const mockClient = {
       post: jest.fn().mockRejectedValue(new Error('API not available')),
       get: jest.fn(),
-      request: jest.fn()
+      request: jest.fn(),
+      getPerPage: jest.fn().mockReturnValue(25)
     } as unknown as jest.Mocked<SubstackHttpClient>
 
     const ownProfile = new OwnProfile(mockProfileData, mockClient)
@@ -485,7 +491,8 @@ describe('OwnProfile Entity', () => {
       {
         get: jest.fn(),
         post: jest.fn(),
-        request: jest.fn()
+        request: jest.fn(),
+        getPerPage: jest.fn().mockReturnValue(25)
       } as unknown as jest.Mocked<SubstackHttpClient>,
       'resolved-own-slug',
       mockSlugResolver
