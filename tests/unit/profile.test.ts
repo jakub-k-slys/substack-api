@@ -85,7 +85,7 @@ describe('Profile Entity', () => {
       expect(posts[0]).toBeInstanceOf(Post)
       expect(posts[0].title).toBe('Post 1')
       expect(posts[1].title).toBe('Post 2')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/users/123/posts')
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/profile/posts?profile_user_id=123')
     })
 
     it('should handle limit parameter', async () => {

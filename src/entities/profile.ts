@@ -42,10 +42,9 @@ export class Profile {
    */
   async *posts(options: { limit?: number } = {}): AsyncIterable<Post> {
     try {
-      // Try to fetch posts for this profile
-      // The API endpoint might vary, so we'll try a few approaches
+      // Use the correct endpoint for profile posts
       const response = await this.client.get<{ posts?: SubstackPost[] }>(
-        `/api/v1/users/${this.id}/posts`
+        `/api/v1/profile/posts?profile_user_id=${this.id}`
       )
 
       if (response.posts) {

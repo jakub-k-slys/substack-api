@@ -54,6 +54,9 @@ export class SubstackClient {
       for (const subscription of subscriptionsResponse.subscriptions) {
         if (subscription.author_handle && subscription.publication?.author_id) {
           mapping.set(subscription.publication.author_id, subscription.author_handle)
+          console.log(
+            `Mapped user_id ${subscription.publication.author_id} to slug: ${subscription.author_handle}`
+          )
         }
       }
 
@@ -82,14 +85,6 @@ export class SubstackClient {
   ): Promise<string | undefined> {
     const slugMapping = await this.getSlugMapping()
     return slugMapping.get(userId) || fallbackHandle
-  }
-
-  /**
-   * Clear the subscriptions cache to force refresh on next access
-   */
-  refreshSlugCache(): void {
-    this.subscriptionsCache = null
-    this.subscriptionsCacheTimestamp = null
   }
 
   /**

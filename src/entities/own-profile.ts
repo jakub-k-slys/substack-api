@@ -58,12 +58,15 @@ export class OwnProfile extends Profile {
   /**
    * Get users that the authenticated user follows
    */
-  async *followees(_options: { limit?: number } = {}): AsyncIterable<Profile> {
+  async *followees(options: { limit?: number } = {}): AsyncIterable<Profile> {
     // First, get the list of user IDs that the user follows
     const followingResponse = await this.client.get<number[]>('/api/v1/feed/following')
 
     // Then, for each user ID, fetch their detailed profile
+    let count = 0
     for (const userId of followingResponse) {
+      if (options.limit && count >= options.limit) break
+
       try {
         const profileResponse = await this.client.get<SubstackFullProfile>(
           `/api/v1/user/${userId}/profile`
@@ -77,6 +80,7 @@ export class OwnProfile extends Profile {
         }
 
         yield new Profile(profileResponse, this.client, resolvedSlug, this.slugResolver)
+        count++
       } catch {
         // Skip profiles that can't be fetched (e.g., deleted accounts, private profiles)
         // This ensures the iterator continues working even if some profiles are inaccessible
