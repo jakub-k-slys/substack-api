@@ -23,8 +23,8 @@ describe('SubstackClient Integration Tests', () => {
       test('should test API connectivity', async () => {
         const result = await client.testConnectivity()
         expect(typeof result).toBe('boolean')
-        // Currently returns false since /api/v1/feed/following endpoint returns 404 in mock server
-        expect(result).toBe(false)
+        // Returns true since /api/v1/feed/following endpoint returns valid data in mock server
+        expect(result).toBe(true)
       })
     })
 
