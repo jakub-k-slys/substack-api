@@ -6,7 +6,8 @@ import type {
   SubstackPost,
   SubstackNote,
   SubstackComment,
-  SubstackSubscriptionsResponse
+  SubstackSubscriptionsResponse,
+  SubstackSubscriptionPublication
 } from './types'
 
 /**
@@ -51,12 +52,15 @@ export class SubstackClient {
       // Build user_id -> slug mapping
       const mapping = new Map<number, string>()
 
-      for (const subscription of subscriptionsResponse.subscriptions) {
-        if (subscription.author_handle && subscription.publication?.author_id) {
-          mapping.set(subscription.publication.author_id, subscription.author_handle)
-          console.log(
-            `Mapped user_id ${subscription.publication.author_id} to slug: ${subscription.author_handle}`
-          )
+      for (const publication of subscriptionsResponse.publications as SubstackSubscriptionPublication[]) {
+        if (publication.author_id) {
+          // Use subdomain as the slug, or custom_domain if the publication is not on substack
+          const slug = publication.author_handle || undefined
+          
+          if (slug) {
+            mapping.set(publication.author_id, slug)
+            console.log(`Mapped user_id ${publication.author_id} to slug: ${slug}`)
+          }
         }
       }
 

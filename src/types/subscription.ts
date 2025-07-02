@@ -3,50 +3,78 @@
  */
 
 export interface SubstackSubscription {
-  user_id: number
   id: number
-  visibility: string
+  user_id: number
+  publication_id: number
+  expiry: string | null
+  email_disabled: boolean
   membership_state: string
-  type?: string | null
+  type: string | null
+  gift_user_id: number | null
+  created_at: string
+  gifted_at: string | null
+  paused: string | null
+  is_group_parent: boolean
+  visibility: string
   is_founding: boolean
-  email_settings?: Record<string, string>
-  section_podcasts_enabled?: number[]
-  author_handle: string // This is the key field for slug resolution
-  publication: {
-    id: number
-    name: string
-    subdomain: string
-    custom_domain?: string | null
-    custom_domain_optional: boolean
-    hero_text?: string
-    logo_url: string
-    author_id: number
-    primary_user_id: number
-    theme_var_background_pop: string
-    created_at: string
-    email_from_name?: string | null
-    copyright?: string
-    founding_plan_name?: string
-    community_enabled: boolean
-    invite_only: boolean
-    payments_state: string
-    language?: string | null
-    explicit: boolean
-    homepage_type: string
-    is_personal_mode: boolean
-    author: {
-      id: number
-      name: string
-      handle: string
-      previous_name?: string
-      photo_url: string
-      bio?: string
-      profile_set_up_at: string
-      reader_installed_at: string
-    }
+  is_favorite: boolean
+  podcast_rss_token: string
+  email_settings: Record<string, any> | null
+  section_podcasts_enabled: string[] | null
+}
+
+export interface SubstackPublicationUser {
+  id: number
+  publication_id: number
+  user_id: number
+  public: boolean
+  created_at: string
+  updated_at: string
+  public_rank: number
+  name: string | null
+  bio: string | null
+  photo_url: string | null
+  role: string
+  is_primary: boolean
+  show_badge: boolean | null
+  is_in_notes_feed: boolean
+  twitter_screen_name: string | null
+  email: string | null
+  primary_section_id: number | null
+}
+
+export interface SubstackSubscriptionPublication {
+  id: number
+  name: string
+  subdomain: string
+  custom_domain?: string | null
+  is_on_substack: boolean
+  author_id: number
+  author_handle: string
+  created_at: string
+  logo_url?: string
+  cover_photo_url?: string
+  twitter_screen_name?: string | null
+  community_enabled: boolean
+  copyright?: string
+  founding_subscription_benefits?: string[]
+  paid_subscription_benefits?: string[]
+  free_subscription_benefits?: string[]
+  stripe_user_id?: string
+  stripe_country?: string
+  payments_state?: string
+  language?: string
+  email_from_name?: string
+  homepage_type?: string
+  theme?: {
+    background_pop_color?: string
+    web_bg_color?: string
+    cover_bg_color?: string | null
   }
 }
 
 export interface SubstackSubscriptionsResponse {
   subscriptions: SubstackSubscription[]
+  publicationUsers: SubstackPublicationUser[]
+  publications: SubstackSubscriptionPublication[]
 }
