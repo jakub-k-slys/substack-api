@@ -68,6 +68,57 @@ export default [
     }
   },
   {
+    files: ['tests/integration/**/*.ts'],
+    languageOptions: {
+      parser: tsparser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        project: ['./tsconfig.test.json']
+      },
+      globals: {
+        fetch: 'readonly',
+        Response: 'readonly',
+        RequestInit: 'readonly',
+        URLSearchParams: 'readonly',
+        Blob: 'readonly',
+        global: 'readonly',
+        jest: 'readonly',
+        describe: 'readonly',
+        it: 'readonly',
+        test: 'readonly',
+        expect: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        console: 'readonly',
+        process: 'readonly'
+      }
+    },
+    plugins: {
+      '@typescript-eslint': tseslint,
+      prettier: prettier
+    },
+    rules: {
+      'semi': ['error', 'never'],
+      'quotes': ['error', 'single'],
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': ['error', { 
+        'argsIgnorePattern': '^_',
+        'varsIgnorePattern': '^_'
+      }],
+      'prettier/prettier': ['error', {
+        'semi': false,
+        'singleQuote': true,
+        'trailingComma': 'none',
+        'printWidth': 100
+      }]
+    }
+  },
+  {
     files: ['tests/e2e/**/*.ts'],
     languageOptions: {
       parser: tsparser,

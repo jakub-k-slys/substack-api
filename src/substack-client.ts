@@ -58,7 +58,6 @@ export class SubstackClient {
           const slug = publication.author_handle || undefined
           if (slug) {
             mapping.set(publication.author_id, slug)
-            console.log(`Mapped user_id ${publication.author_id} to slug: ${slug}`)
           }
         }
       }

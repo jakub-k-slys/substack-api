@@ -11,7 +11,8 @@ export class SubstackHttpClient {
     if (!config.apiKey) {
       throw new Error('apiKey is required in SubstackConfig')
     }
-    this.baseUrl = `https://${config.hostname || 'substack.com'}`
+    const protocol = config.protocol || 'https'
+    this.baseUrl = `${protocol}://${config.hostname || 'substack.com'}`
     this.cookie = `connect.sid=${config.apiKey}`
   }
 
