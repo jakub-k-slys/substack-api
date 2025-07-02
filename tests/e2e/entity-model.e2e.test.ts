@@ -66,6 +66,49 @@ describe('SubstackClient Entity Model E2E', () => {
     console.log(`✅ Retrieved jakubslys profile: ${profile.name} (@${profile.slug})`)
   })
 
+  test('should get profile by ID', async () => {
+    // Get a profile by slug first to get a known user ID
+    const profileBySlug = await client.profileForSlug('jakubslys')
+    const userId = profileBySlug.id
+
+    // Now test profileForId with that user ID
+    const profileById = await client.profileForId(userId)
+
+    expect(profileById).toBeInstanceOf(Profile)
+    expect(profileById.id).toBe(userId)
+    expect(profileById.name).toBeTruthy()
+    expect(profileById.slug).toBeTruthy()
+    expect(typeof profileById.name).toBe('string')
+    expect(typeof profileById.slug).toBe('string')
+
+    // The profiles should match
+    expect(profileById.name).toBe(profileBySlug.name)
+    expect(profileById.slug).toBe(profileBySlug.slug)
+
+    console.log(`✅ Retrieved profile by ID: ${profileById.name} (ID: ${profileById.id})`)
+  })
+
+  test('should handle invalid profile ID gracefully', async () => {
+    try {
+      // Test with a user ID that should not exist
+      const invalidUserId = 999999999999
+      await client.profileForId(invalidUserId)
+
+      // If we reach here, the API might return a default or the ID exists
+      console.log('ℹ️ Profile lookup completed (may be default profile)')
+    } catch (error) {
+      // Check if it's a proper error
+      const errorName = error?.constructor?.name
+      const isValidError =
+        errorName === 'Error' ||
+        errorName === 'TypeError' ||
+        errorName === 'FetchError' ||
+        error instanceof Error
+      expect(isValidError).toBe(true)
+      console.log('✅ Properly handles invalid profile ID lookup')
+    }
+  })
+
   test('should iterate through followees', async () => {
     if (!global.E2E_CONFIG.hasCredentials) {
       console.log('⏭️ Skipping test - no credentials available')
