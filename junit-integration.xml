@@ -1,39 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="16" failures="0" errors="0" time="3.374">
-  <testsuite name="Sample Data Validation Integration Tests" errors="0" failures="0" skipped="0" timestamp="2025-07-02T10:36:01" time="2.701" tests="8">
-    <testcase classname="Sample Data Validation Integration Tests › sample file structure validation" name="should validate all sample files are valid JSON" time="0.026">
-    </testcase>
-    <testcase classname="Sample Data Validation Integration Tests › sample file structure validation" name="should validate subscription sample has required fields" time="0.001">
-    </testcase>
-    <testcase classname="Sample Data Validation Integration Tests › sample file structure validation" name="should validate subscriptions sample has required structure" time="0.014">
-    </testcase>
-    <testcase classname="Sample Data Validation Integration Tests › sample file structure validation" name="should validate profile samples have required fields" time="0.004">
-    </testcase>
-    <testcase classname="Sample Data Validation Integration Tests › data consistency validation" name="should validate user IDs are consistent across samples" time="0.002">
-    </testcase>
-    <testcase classname="Sample Data Validation Integration Tests › data consistency validation" name="should validate publication references are consistent" time="0.013">
-    </testcase>
-    <testcase classname="Sample Data Validation Integration Tests › sample data realism" name="should have realistic publication data" time="0.011">
-    </testcase>
-    <testcase classname="Sample Data Validation Integration Tests › sample data realism" name="should have realistic subscription states" time="0.012">
+<testsuites name="jest tests" tests="11" failures="0" errors="0" time="4.712">
+  <testsuite name="Sample Data Validation" errors="0" failures="0" skipped="0" timestamp="2025-07-02T11:03:53" time="2.199" tests="1">
+    <testcase classname="Sample Data Validation › basic sample file validation" name="should validate all sample files are valid JSON" time="0.023">
     </testcase>
   </testsuite>
-  <testsuite name="Sample Data Integration Tests" errors="0" failures="0" skipped="0" timestamp="2025-07-02T10:36:01" time="2.805" tests="8">
-    <testcase classname="Sample Data Integration Tests › subscription data structure" name="should parse subscription sample correctly" time="0.004">
+  <testsuite name="SubstackClient Integration Tests" errors="0" failures="0" skipped="0" timestamp="2025-07-02T11:03:53" time="4.163" tests="10">
+    <testcase classname="SubstackClient Integration Tests › testConnectivity" name="should test API connectivity against mock server" time="0.267">
     </testcase>
-    <testcase classname="Sample Data Integration Tests › subscription data structure" name="should parse subscriptions list sample correctly" time="0.012">
+    <testcase classname="SubstackClient Integration Tests › ownProfile" name="should retrieve authenticated user profile" time="0.252">
     </testcase>
-    <testcase classname="Sample Data Integration Tests › user profile data structure" name="should parse user profile sample correctly" time="0.001">
+    <testcase classname="SubstackClient Integration Tests › profileForId" name="should retrieve profile by user ID using mock server" time="0.253">
     </testcase>
-    <testcase classname="Sample Data Integration Tests › user profile data structure" name="should parse public profile sample correctly" time="0.003">
+    <testcase classname="SubstackClient Integration Tests › profileForSlug" name="should retrieve profile by slug using mock server" time="0.251">
     </testcase>
-    <testcase classname="Sample Data Integration Tests › Profile entity integration" name="should create Profile entity from public profile sample" time="0.002">
+    <testcase classname="SubstackClient Integration Tests › profileForSlug" name="should handle empty slug parameter" time="0.01">
     </testcase>
-    <testcase classname="Sample Data Integration Tests › complex data structures" name="should handle publication with comprehensive metadata" time="0.011">
+    <testcase classname="SubstackClient Integration Tests › postForId" name="should attempt to retrieve post by ID" time="0.253">
     </testcase>
-    <testcase classname="Sample Data Integration Tests › complex data structures" name="should maintain referential integrity between entities" time="0.009">
+    <testcase classname="SubstackClient Integration Tests › noteForId" name="should attempt to retrieve note by ID" time="0.252">
     </testcase>
-    <testcase classname="Sample Data Integration Tests › HTTP server integration" name="should have integration server available" time="0">
+    <testcase classname="SubstackClient Integration Tests › commentForId" name="should attempt to retrieve comment by ID" time="0.252">
+    </testcase>
+    <testcase classname="SubstackClient Integration Tests › commentForId" name="should validate comment ID format" time="0.001">
+    </testcase>
+    <testcase classname="SubstackClient Integration Tests › HTTP server behavior" name="should have integration server available" time="0.001">
     </testcase>
   </testsuite>
 </testsuites>
