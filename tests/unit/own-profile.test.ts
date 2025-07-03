@@ -544,7 +544,7 @@ describe('OwnProfile Entity', () => {
   describe('notes()', () => {
     it('should iterate through own profile notes', async () => {
       const mockResponse = {
-        notes: [
+        items: [
           {
             entity_key: '1',
             type: 'note',
@@ -691,7 +691,7 @@ describe('OwnProfile Entity', () => {
 
     it('should handle limit parameter for notes', async () => {
       const mockResponse = {
-        notes: [
+        items: [
           {
             entity_key: '1',
             type: 'note',

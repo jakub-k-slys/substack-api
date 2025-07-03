@@ -84,7 +84,7 @@ describe('Post Entity', () => {
       expect(comments[0]).toBeInstanceOf(Comment)
       expect(comments[0].body).toBe('Comment 1')
       expect(comments[1].body).toBe('Comment 2')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/posts/456/comments')
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/post/456/comments')
     })
 
     it('should handle limit parameter', async () => {
