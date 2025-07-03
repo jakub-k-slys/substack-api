@@ -118,8 +118,8 @@ export class Profile {
         offset += perPageConfig
       }
     } catch {
-        // If both endpoints fail, return empty iterator
-        yield* []
+      // If both endpoints fail, return empty iterator
+      yield* []
     }
   }
 }
