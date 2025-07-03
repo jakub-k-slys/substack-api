@@ -45,7 +45,7 @@ export class Post {
   async *comments(options: { limit?: number } = {}): AsyncIterable<Comment> {
     try {
       const response = await this.client.get<{ comments?: SubstackComment[] }>(
-        `/api/v1/posts/${this.id}/comments`
+        `/api/v1/post/${this.id}/comments`
       )
 
       if (response.comments) {
