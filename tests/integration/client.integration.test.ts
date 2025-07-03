@@ -104,6 +104,7 @@ describe('SubstackClient Integration Tests', () => {
 
         // Test that the profile can be used for further operations
         expect(typeof profile.posts).toBe('function')
+        expect(typeof profile.notes).toBe('function')
 
         console.log(`✅ Profile workflow validated for ${profile.name} (@${profile.slug})`)
       })

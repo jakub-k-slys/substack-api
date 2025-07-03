@@ -1,6 +1,12 @@
-import type { SubstackPublicProfile, SubstackFullProfile, SubstackPost } from '../types'
+import type {
+  SubstackPublicProfile,
+  SubstackFullProfile,
+  SubstackPost,
+  SubstackNote
+} from '../types'
 import type { SubstackHttpClient } from '../http-client'
 import { Post } from './post'
+import { Note } from './note'
 
 /**
  * Base Profile class representing a Substack user profile (read-only)
@@ -68,6 +74,51 @@ export class Profile {
       }
     } catch {
       // If the endpoint doesn't exist or fails, return empty iterator
+      yield* []
+    }
+  }
+
+  /**
+   * Get notes from this profile
+   */
+  async *notes(options: { limit?: number } = {}): AsyncIterable<Note> {
+    try {
+      // Try the reader feed endpoint first
+      // Get the perPage configuration from the client
+      const perPageConfig = this.client.getPerPage()
+      let offset = 0
+      let totalYielded = 0
+
+      while (true) {
+        // Use the reader feed endpoint for profile notes with types=note filter
+        const response = await this.client.get<{ items?: SubstackNote[] }>(
+          `/api/v1/reader/feed/profile/${this.id}?types=note&limit=${perPageConfig}&offset=${offset}`
+        )
+
+        if (!response.items || response.items.length === 0) {
+          break // No more notes to fetch
+        }
+
+        for (const item of response.items) {
+          // Filter for note items (type: "comment" with comment.type: "feed")
+          if (item.type === 'comment' && item.comment?.type === 'feed') {
+            if (options.limit && totalYielded >= options.limit) {
+              return // Stop if we've reached the requested limit
+            }
+            yield new Note(item, this.client)
+            totalYielded++
+          }
+        }
+
+        // If we got fewer items than requested, we've reached the end
+        if (response.items.length < perPageConfig) {
+          break
+        }
+
+        offset += perPageConfig
+      }
+    } catch {
+      // If both endpoints fail, return empty iterator
       yield* []
     }
   }

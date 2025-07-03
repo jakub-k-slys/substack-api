@@ -95,11 +95,11 @@ export class OwnProfile extends Profile {
   async *notes(options: { limit?: number } = {}): AsyncIterable<Note> {
     try {
       // Fetch notes for the authenticated user
-      const response = await this.client.get<{ notes?: SubstackNote[] }>('/api/v1/notes')
+      const response = await this.client.get<{ items?: SubstackNote[] }>('/api/v1/notes')
 
-      if (response.notes) {
+      if (response.items) {
         let count = 0
-        for (const noteData of response.notes) {
+        for (const noteData of response.items) {
           if (options.limit && count >= options.limit) break
           yield new Note(noteData, this.client)
           count++
