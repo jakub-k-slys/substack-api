@@ -1,0 +1,218 @@
+{
+  "item": {
+    "entity_key": "c-131648795",
+    "type": "comment",
+    "context": {
+      "fallbackReason": "",
+      "fallbackUrl": null,
+      "users": [],
+      "timestamp": "2025-07-03T08:53:04.146Z",
+      "type": "note",
+      "source": "db-note"
+    },
+    "publication": null,
+    "post": null,
+    "comment": {
+      "id": 131648795,
+      "body": "🧨 DO YOU KNOW WHAT REAL AUTOMATION LOOKS LIKE?\n\nn8n-operator doesn’t babysit your workflows — it runs your entire automation fleet like a boss.\n\nKubernetes-native. GitOps-approved. Click-free.\n\n🚫 No more manual configs.\n\n🚫 No more hacked-together Helm charts.\n\n✅ Just declarative, scalable, zero-touch deployment of n8n instances.\n\nWrite YAML. Push to Git. Walk away.\n\nYou don’t manage n8n anymore — you orchestrate it. 👇",
+      "body_json": {
+        "content": [
+          {
+            "content": [
+              {
+                "type": "text",
+                "text": "🧨 DO YOU KNOW WHAT REAL AUTOMATION LOOKS LIKE?",
+                "marks": [
+                  {
+                    "type": "bold"
+                  }
+                ]
+              }
+            ],
+            "type": "paragraph"
+          },
+          {
+            "content": [
+              {
+                "type": "text",
+                "text": "n8n-operator",
+                "marks": [
+                  {
+                    "type": "bold"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " doesn’t babysit your workflows — "
+              },
+              {
+                "type": "text",
+                "text": "it runs your entire automation fleet",
+                "marks": [
+                  {
+                    "type": "bold"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " like a boss."
+              }
+            ],
+            "type": "paragraph"
+          },
+          {
+            "content": [
+              {
+                "text": "Kubernetes-native. GitOps-approved. Click-free.",
+                "type": "text"
+              }
+            ],
+            "type": "paragraph"
+          },
+          {
+            "content": [
+              {
+                "type": "text",
+                "text": "🚫 No more manual configs."
+              }
+            ],
+            "type": "paragraph"
+          },
+          {
+            "content": [
+              {
+                "type": "text",
+                "text": "🚫 No more hacked-together Helm charts."
+              }
+            ],
+            "type": "paragraph"
+          },
+          {
+            "content": [
+              {
+                "text": "✅ Just declarative, scalable, zero-touch deployment of n8n instances.",
+                "type": "text"
+              }
+            ],
+            "type": "paragraph"
+          },
+          {
+            "content": [
+              {
+                "text": "Write ",
+                "type": "text"
+              },
+              {
+                "text": "YAML",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "italic"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": ". Push to Git. Walk away."
+              }
+            ],
+            "type": "paragraph"
+          },
+          {
+            "content": [
+              {
+                "type": "text",
+                "text": "You don’t manage n8n anymore — "
+              },
+              {
+                "text": "you orchestrate it. 👇",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "bold"
+                  }
+                ]
+              }
+            ],
+            "type": "paragraph"
+          }
+        ],
+        "type": "doc",
+        "attrs": {
+          "schemaVersion": "v1"
+        }
+      },
+      "publication_id": null,
+      "post_id": null,
+      "user_id": 254824415,
+      "type": "feed",
+      "date": "2025-07-03T08:53:04.146Z",
+      "edited_at": null,
+      "ancestor_path": "",
+      "reply_minimum_role": "everyone",
+      "media_clip_id": null,
+      "name": "Jakub Slys 🎖️",
+      "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/4d17c584-3500-4a83-9db9-f826c356ee62_2000x2000.png",
+      "bio": "Ever wonder how Uber matches rides 🚗 in seconds or how OpenAI 🤖 chats like a human? 💻 Engineer @ Pega | ex-Sabre | ex-Nokia",
+      "handle": "jakubslys",
+      "reaction_count": 0,
+      "reactions": {
+        "❤": 0
+      },
+      "restacks": 1,
+      "restacked": false,
+      "children_count": 1,
+      "attachments": [
+        {
+          "id": "7e4ae363-3052-46ce-b3a9-01f8957376e1",
+          "type": "image",
+          "imageUrl": "https://substack-post-media.s3.amazonaws.com/public/images/0a97c730-786e-447d-9988-ac65bb748303_1024x1024.jpeg",
+          "imageWidth": 1024,
+          "imageHeight": 1024,
+          "explicit": false
+        }
+      ],
+      "user_bestseller_tier": null,
+      "user_primary_publication": {
+        "id": 2817779,
+        "subdomain": "slys",
+        "custom_domain": "iam.slys.dev",
+        "custom_domain_optional": false,
+        "name": "slys.dev",
+        "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/d3b67508-e73c-434b-89ae-fde2c72e8fa4_256x256.png",
+        "author_id": 254824415,
+        "user_id": 254824415,
+        "handles_enabled": false,
+        "explicit": false,
+        "is_personal_mode": false,
+        "payments_state": "enabled",
+        "pledges_enabled": false
+      }
+    },
+    "parentComments": [],
+    "isMuted": false,
+    "canReply": true,
+    "trackingParameters": {
+      "item_primary_entity_key": "c-131648795",
+      "item_entity_key": "c-131648795",
+      "item_type": "comment",
+      "item_comment_id": 131648795,
+      "item_content_user_id": 254824415,
+      "item_context_type": "note",
+      "item_context_type_bucket": "",
+      "item_context_timestamp": "2025-07-03T08:53:04.146Z",
+      "item_context_user_id": 254824415,
+      "item_context_user_ids": [],
+      "item_can_reply": true,
+      "item_last_impression_at": null,
+      "item_source": "db-note",
+      "impression_id": "a60aea18-43a9-4839-ac31-96b1e6e82d66",
+      "followed_user_count": 0,
+      "subscribed_publication_count": 0,
+      "is_following": false,
+      "is_explicitly_subscribed": false
+    }
+  }
+}
