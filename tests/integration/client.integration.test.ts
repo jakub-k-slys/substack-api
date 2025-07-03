@@ -171,7 +171,7 @@ describe('SubstackClient Integration Tests', () => {
 
       test('should get comment by ID with sample data', async () => {
         // Test with a valid comment ID - we have sample data for this
-        const commentId = '123456789'
+        const commentId = '131648795'
 
         const comment = await client.commentForId(commentId)
         expect(comment).toBeInstanceOf(Comment)
