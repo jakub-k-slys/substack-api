@@ -185,7 +185,7 @@ export class SubstackClient {
       throw new Error('Invalid comment ID - must be numeric')
     }
 
-    const comment = await this.httpClient.get<SubstackComment>(`/api/v1/comments/${id}`)
+    const comment = await this.httpClient.get<SubstackComment>(`/api/v1/reader/comment/${id}`)
     return new Comment(comment, this.httpClient)
   }
 }

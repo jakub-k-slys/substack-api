@@ -276,7 +276,7 @@ describe('SubstackClient', () => {
 
       const comment = await client.commentForId('999')
       expect(comment).toBeInstanceOf(Comment)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/comments/999')
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/comment/999')
     })
   })
 })
