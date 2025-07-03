@@ -101,13 +101,11 @@ export class Profile {
 
         for (const item of response.items) {
           // Filter for note items (type: "comment" with comment.type: "feed")
-          if (item.type === 'comment' && item.comment?.type === 'feed') {
-            if (options.limit && totalYielded >= options.limit) {
-              return // Stop if we've reached the requested limit
-            }
-            yield new Note(item, this.client)
-            totalYielded++
+          if (options.limit && totalYielded >= options.limit) {
+            return // Stop if we've reached the requested limit
           }
+          yield new Note(item, this.client)
+          totalYielded++
         }
 
         // If we got fewer items than requested, we've reached the end
@@ -118,22 +116,7 @@ export class Profile {
         offset += perPageConfig
       }
     } catch {
-      // If the reader feed endpoint fails, try the own notes endpoint as fallback
-      // This handles the case where the profile is the user's own profile
-      try {
-        const ownNotesResponse = await this.client.get<{ notes?: SubstackNote[] }>('/api/v1/notes')
-        if (ownNotesResponse.notes) {
-          let count = 0
-          for (const noteData of ownNotesResponse.notes) {
-            if (options.limit && count >= options.limit) break
-            yield new Note(noteData, this.client)
-            count++
-          }
-        }
-      } catch {
-        // If both endpoints fail, return empty iterator
         yield* []
-      }
     }
   }
 }
