@@ -25,7 +25,87 @@ const createMockServer = (): Promise<{ server: Server; port: number; url: string
         return
       }
 
-      // Map URLs to sample files
+      // Handle POST requests to /api/v1/comment/feed (note publishing)
+      if (req.method === 'POST' && req.url === '/api/v1/comment/feed') {
+        let body = ''
+        req.on('data', (chunk) => {
+          body += chunk.toString()
+        })
+        req.on('end', () => {
+          try {
+            // Validate that request body contains expected structure
+            const requestData = JSON.parse(body)
+            
+            // Validate request structure
+            if (!requestData.bodyJson || !requestData.replyMinimumRole) {
+              res.writeHead(400)
+              res.end(JSON.stringify({ error: 'Missing required fields: bodyJson or replyMinimumRole' }))
+              return
+            }
+
+            if (requestData.bodyJson.type !== 'doc' || 
+                requestData.bodyJson.attrs?.schemaVersion !== 'v1' ||
+                !Array.isArray(requestData.bodyJson.content)) {
+              res.writeHead(400)
+              res.end(JSON.stringify({ error: 'Invalid bodyJson structure' }))
+              return
+            }
+
+            if (requestData.replyMinimumRole !== 'everyone') {
+              res.writeHead(400)
+              res.end(JSON.stringify({ error: 'Invalid replyMinimumRole' }))
+              return
+            }
+
+            // Validate content structure
+            for (const contentItem of requestData.bodyJson.content) {
+              if (contentItem.type !== 'paragraph' || !Array.isArray(contentItem.content)) {
+                res.writeHead(400)
+                res.end(JSON.stringify({ error: 'Invalid content structure' }))
+                return
+              }
+
+              for (const textItem of contentItem.content) {
+                if (textItem.type !== 'text' || typeof textItem.text !== 'string') {
+                  res.writeHead(400)
+                  res.end(JSON.stringify({ error: 'Invalid text item structure' }))
+                  return
+                }
+
+                // Validate marks if present
+                if (textItem.marks) {
+                  if (!Array.isArray(textItem.marks)) {
+                    res.writeHead(400)
+                    res.end(JSON.stringify({ error: 'Invalid marks structure' }))
+                    return
+                  }
+
+                  for (const mark of textItem.marks) {
+                    if (!['bold', 'italic', 'code'].includes(mark.type)) {
+                      res.writeHead(400)
+                      res.end(JSON.stringify({ error: `Invalid mark type: ${mark.type}` }))
+                      return
+                    }
+                  }
+                }
+              }
+            }
+
+            // Return the sample response
+            const sampleResponsePath = join(process.cwd(), 'samples', 'api', 'v1', 'comment', 'response')
+            const sampleData = readFileSync(sampleResponsePath, 'utf8')
+            res.writeHead(200)
+            res.end(sampleData)
+          } catch (error) {
+            console.error('Error processing note publish request:', error)
+            res.writeHead(400)
+            res.end(JSON.stringify({ error: 'Invalid JSON' }))
+          }
+        })
+        return
+      }
+
+      // Map URLs to sample files for GET requests
       const samplePath = mapUrlToSampleFile(req.url || '')
 
       if (samplePath) {
