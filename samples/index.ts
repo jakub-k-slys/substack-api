@@ -157,6 +157,54 @@ async function runExample(): Promise<void> {
       console.log(`   ⚠️  Could not fetch followees: ${(error as Error).message}`)
     }
 
+    // 7. Fetching foreign profile
+    console.log('\n👤 Fetching foreign profile...')
+    const foreignProfile = await client.profileForId(343074721)
+
+    console.log(`📋 Profile Information:`)
+    console.log(`   Name: ${foreignProfile.name}`)
+    console.log(`   Handle: @${foreignProfile.slug}`)
+    console.log(`   URL: ${foreignProfile.url}`)
+    if (foreignProfile.bio) {
+      console.log(`   Bio: ${foreignProfile.bio}`)
+    }
+
+    console.log('\n📝 Fetching your 3 most recent notes...')
+    try {
+      for await (const note of foreignProfile.notes({ limit: 3 })) {
+        const preview = note.body.length > 100 ? 
+          note.body.substring(0, 97) + '...' : 
+          note.body
+        
+        console.log(`"${preview}"`)
+        console.log(`      Date: ${note.publishedAt ? note.publishedAt.toLocaleDateString() : 'Unknown'}`)
+        console.log(`      Author: ${note.author.name} (@${note.author.handle})`)
+        console.log('')
+      }
+      
+    } catch (error) {
+      console.log(`   ⚠️  Could not fetch notes: ${(error as Error).message}`)
+    }
+
+    console.log('\n📝 Fetching your 3 most recent posts...')
+    try {
+      for await (const post of foreignProfile.posts({ limit: 3 })) {
+        console.log(`   "${post.title}"`)
+        if (post.body) {
+          const bodyPreview = post.body.length > 100 ? 
+            post.body.substring(0, 97) + '...' : 
+            post.body
+          console.log(`      Description: ${bodyPreview}`)
+        }
+        console.log(`      Published: ${post.publishedAt ? post.publishedAt.toLocaleDateString() : 'Unknown'}`)
+        console.log(`      Author: ${post.author.name} (@${post.author.handle})`)
+        console.log('')
+      }
+  
+    } catch (error) {
+      console.log(`   ⚠️  Could not fetch posts: ${(error as Error).message}`)
+    }
+
     console.log('\n✨ Example completed successfully!')
     console.log('\n💡 This example demonstrates basic Substack API usage.')
     console.log('   For more advanced features, check out the full documentation.')
