@@ -265,18 +265,23 @@ describe('SubstackClient', () => {
 
   describe('commentForId', () => {
     it('should get comment by ID', async () => {
-      const mockComment = {
-        id: 999,
-        body: 'Test comment',
-        created_at: '2023-01-01T00:00:00Z',
-        parent_post_id: 456,
-        author: { id: 123, name: 'Test User' }
+      const mockCommentResponse = {
+        item: {
+          comment: {
+            id: 999,
+            body: 'Test comment',
+            user_id: 123,
+            name: 'Test User',
+            date: '2023-01-01T00:00:00Z',
+            post_id: 456
+          }
+        }
       }
-      mockHttpClient.get.mockResolvedValue(mockComment)
+      mockHttpClient.get.mockResolvedValue(mockCommentResponse)
 
       const comment = await client.commentForId('999')
       expect(comment).toBeInstanceOf(Comment)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/comments/999')
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/comment/999')
     })
   })
 })

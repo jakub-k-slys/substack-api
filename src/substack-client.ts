@@ -6,6 +6,7 @@ import type {
   SubstackPost,
   SubstackNote,
   SubstackComment,
+  SubstackCommentResponse,
   SubstackSubscriptionsResponse,
   SubstackSubscriptionPublication
 } from './types'
@@ -185,7 +186,23 @@ export class SubstackClient {
       throw new Error('Invalid comment ID - must be numeric')
     }
 
-    const comment = await this.httpClient.get<SubstackComment>(`/api/v1/comments/${id}`)
-    return new Comment(comment, this.httpClient)
+    const response = await this.httpClient.get<SubstackCommentResponse>(
+      `/api/v1/reader/comment/${id}`
+    )
+
+    // Transform the API response to match SubstackComment interface
+    const commentData: SubstackComment = {
+      id: response.item.comment.id,
+      body: response.item.comment.body,
+      created_at: response.item.comment.date,
+      parent_post_id: response.item.comment.post_id || 0,
+      author: {
+        id: response.item.comment.user_id,
+        name: response.item.comment.name,
+        is_admin: false // Default value as this info is not available in the API response
+      }
+    }
+
+    return new Comment(commentData, this.httpClient)
   }
 }

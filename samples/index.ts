@@ -101,11 +101,10 @@ async function runExample(): Promise<void> {
 
     // 4. List recent posts
     console.log('\n📰 Fetching your 3 most recent posts...')
-    let postCount = 0
+  
     try {
       for await (const post of profile.posts({ limit: 3 })) {
-        postCount++
-        console.log(`   ${postCount}. "${post.title}"`)
+        console.log(`   "${post.title}"`)
         if (post.body) {
           const bodyPreview = post.body.length > 100 ? 
             post.body.substring(0, 97) + '...' : 
@@ -116,44 +115,34 @@ async function runExample(): Promise<void> {
         console.log(`      Author: ${post.author.name} (@${post.author.handle})`)
         console.log('')
       }
-      
-      if (postCount === 0) {
-        console.log('   No posts found')
-      }
+  
     } catch (error) {
       console.log(`   ⚠️  Could not fetch posts: ${(error as Error).message}`)
     }
 
     // 5. List recent notes
     console.log('\n📝 Fetching your 3 most recent notes...')
-    let noteCount = 0
     try {
       for await (const note of profile.notes({ limit: 3 })) {
-        noteCount++
         const preview = note.body.length > 100 ? 
           note.body.substring(0, 97) + '...' : 
           note.body
         
-        console.log(`   ${noteCount}. "${preview}"`)
+        console.log(`     "${preview}"`)
         console.log(`      Date: ${note.publishedAt ? note.publishedAt.toLocaleDateString() : 'Unknown'}`)
         console.log(`      Author: ${note.author.name} (@${note.author.handle})`)
         console.log('')
       }
-      
-      if (noteCount === 0) {
-        console.log('   No notes found')
-      }
+    
     } catch (error) {
       console.log(`   ⚠️  Could not fetch notes: ${(error as Error).message}`)
     }
 
     // 6. List followees
     console.log('\n🤝 Fetching users you follow...')
-    let followeeCount = 0
     try {
-      for await (const followee of profile.followees({ limit: 5 })) {
-        followeeCount++
-        console.log(`   ${followeeCount}. ${followee.name} (@${followee.slug})`)
+      for await (const followee of profile.followees({ limit: 3 })) {
+        console.log(`   ${followee.name} (@${followee.slug})`)
         if (followee.bio) {
           const bioPrev = followee.bio.length > 80 ? 
             followee.bio.substring(0, 77) + '...' : 
@@ -164,9 +153,6 @@ async function runExample(): Promise<void> {
         console.log('')
       }
       
-      if (followeeCount === 0) {
-        console.log('   You are not following anyone yet')
-      }
     } catch (error) {
       console.log(`   ⚠️  Could not fetch followees: ${(error as Error).message}`)
     }

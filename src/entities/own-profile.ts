@@ -88,4 +88,26 @@ export class OwnProfile extends Profile {
       }
     }
   }
+
+  /**
+   * Get notes from the authenticated user's profile
+   */
+  async *notes(options: { limit?: number } = {}): AsyncIterable<Note> {
+    try {
+      // Fetch notes for the authenticated user
+      const response = await this.client.get<{ notes?: SubstackNote[] }>('/api/v1/notes')
+
+      if (response.notes) {
+        let count = 0
+        for (const noteData of response.notes) {
+          if (options.limit && count >= options.limit) break
+          yield new Note(noteData, this.client)
+          count++
+        }
+      }
+    } catch {
+      // If the endpoint doesn't exist or fails, return empty iterator
+      yield* []
+    }
+  }
 }

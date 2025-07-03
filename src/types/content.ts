@@ -40,6 +40,24 @@ export interface SubstackComment {
   }
 }
 
+/**
+ * Response structure from /api/v1/reader/comment/{id} endpoint
+ */
+export interface SubstackCommentResponse {
+  item: {
+    comment: {
+      id: number
+      body: string
+      user_id: number
+      name: string
+      date: string
+      post_id?: number | null
+      // Additional fields that may be present but not needed for our Comment entity
+      [key: string]: unknown
+    }
+  }
+}
+
 export interface SubstackSearchResult {
   total: number
   results: SubstackPost[]
