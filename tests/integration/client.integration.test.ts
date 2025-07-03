@@ -58,7 +58,6 @@ describe('SubstackClient Integration Tests', () => {
 
         // Verify methods are available
         expect(typeof profile.posts).toBe('function')
-        expect(typeof profile.notes).toBe('function')
       })
 
       test('should handle large user IDs correctly', async () => {

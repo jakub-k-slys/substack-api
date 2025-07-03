@@ -1,12 +1,6 @@
-import type {
-  SubstackPublicProfile,
-  SubstackFullProfile,
-  SubstackPost,
-  SubstackNote
-} from '../types'
+import type { SubstackPublicProfile, SubstackFullProfile, SubstackPost } from '../types'
 import type { SubstackHttpClient } from '../http-client'
 import { Post } from './post'
-import { Note } from './note'
 
 /**
  * Base Profile class representing a Substack user profile (read-only)
@@ -71,30 +65,6 @@ export class Profile {
         }
 
         offset += perPageConfig
-      }
-    } catch {
-      // If the endpoint doesn't exist or fails, return empty iterator
-      yield* []
-    }
-  }
-
-  /**
-   * Get notes from this profile
-   */
-  async *notes(options: { limit?: number } = {}): AsyncIterable<Note> {
-    try {
-      // Try to fetch notes for this profile
-      const response = await this.client.get<{ notes?: SubstackNote[] }>(
-        `/api/v1/notes`
-      )
-
-      if (response.notes) {
-        let count = 0
-        for (const noteData of response.notes) {
-          if (options.limit && count >= options.limit) break
-          yield new Note(noteData, this.client)
-          count++
-        }
       }
     } catch {
       // If the endpoint doesn't exist or fails, return empty iterator
