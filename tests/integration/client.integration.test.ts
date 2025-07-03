@@ -174,12 +174,11 @@ describe('SubstackClient Integration Tests', () => {
 
         const comment = await client.commentForId(commentId)
         expect(comment).toBeInstanceOf(Comment)
-        expect(comment.id).toBe(123456789)
-        expect(comment.body).toBe(
-          'This is a sample comment response from the /api/v1/reader/comment/{id} endpoint. It contains the comment text and author information.'
-        )
-        expect(comment.author.name).toBe('Sample User')
-        expect(comment.author.id).toBe(112233)
+        expect(comment.id).toBe(131648795)
+        expect(comment.body).toContain('🧨 DO YOU KNOW WHAT REAL AUTOMATION LOOKS LIKE?')
+        expect(comment.body).toContain('n8n-operator')
+        expect(comment.author.name).toBe('Jakub Slys 🎖️')
+        expect(comment.author.id).toBe(254824415)
         expect(comment.createdAt).toBeInstanceOf(Date)
       })
     })
