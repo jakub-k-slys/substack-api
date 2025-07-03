@@ -1,5 +1,5 @@
 import { SubstackClient } from '../../src/substack-client'
-import { Profile, OwnProfile } from '../../src/entities'
+import { Profile, OwnProfile, Comment } from '../../src/entities'
 import { get } from 'http'
 
 describe('SubstackClient Integration Tests', () => {
@@ -167,6 +167,21 @@ describe('SubstackClient Integration Tests', () => {
 
       test('should handle non-existent comment ID', async () => {
         await expect(client.commentForId('999999999')).rejects.toThrow()
+      })
+
+      test('should get comment by ID with sample data', async () => {
+        // Test with a valid comment ID - we have sample data for this
+        const commentId = '123456789'
+
+        const comment = await client.commentForId(commentId)
+        expect(comment).toBeInstanceOf(Comment)
+        expect(comment.id).toBe(123456789)
+        expect(comment.body).toBe(
+          'This is a sample comment response from the /api/v1/reader/comment/{id} endpoint. It contains the comment text and author information.'
+        )
+        expect(comment.author.name).toBe('Sample User')
+        expect(comment.author.id).toBe(112233)
+        expect(comment.createdAt).toBeInstanceOf(Date)
       })
     })
 
