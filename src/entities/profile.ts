@@ -91,15 +91,15 @@ export class Profile {
 
       while (true) {
         // Use the reader feed endpoint for profile notes with types=note filter
-        const response = await this.client.get<{ items?: SubstackNote[] }>(
+        const response = await this.client.get<{ notes?: SubstackNote[] }>(
           `/api/v1/reader/feed/profile/${this.id}?types=note&limit=${perPageConfig}&offset=${offset}`
         )
 
-        if (!response.items || response.items.length === 0) {
+        if (!response.notes || response.notes.length === 0) {
           break // No more notes to fetch
         }
 
-        for (const item of response.items) {
+        for (const item of response.notes) {
           // Filter for note items (type: "comment" with comment.type: "feed")
           if (options.limit && totalYielded >= options.limit) {
             return // Stop if we've reached the requested limit
@@ -109,7 +109,7 @@ export class Profile {
         }
 
         // If we got fewer items than requested, we've reached the end
-        if (response.items.length < perPageConfig) {
+        if (response.notes.length < perPageConfig) {
           break
         }
 
