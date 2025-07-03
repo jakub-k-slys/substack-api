@@ -924,10 +924,10 @@ describe('Profile Entity', () => {
       // Mock the reader feed endpoint to fail (simulating own profile scenario)
       // Mock the own notes endpoint to succeed
       const mockOwnNotesResponse = {
-        notes: [
+        items: [
           {
             entity_key: '1',
-            type: 'note',
+            type: 'comment',
             context: {
               type: 'feed',
               timestamp: '2023-01-01T00:00:00Z',

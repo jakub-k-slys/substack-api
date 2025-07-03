@@ -91,32 +91,52 @@ export class Profile {
 
       while (true) {
         // Use the reader feed endpoint for profile notes with types=note filter
-        const response = await this.client.get<{ notes?: SubstackNote[] }>(
+        const response = await this.client.get<{ items?: SubstackNote[] }>(
           `/api/v1/reader/feed/profile/${this.id}?types=note&limit=${perPageConfig}&offset=${offset}`
         )
 
-        if (!response.notes || response.notes.length === 0) {
+        if (!response.items || response.items.length === 0) {
           break // No more notes to fetch
         }
 
-        for (const item of response.notes) {
+        for (const item of response.items) {
           // Filter for note items (type: "comment" with comment.type: "feed")
-          if (options.limit && totalYielded >= options.limit) {
-            return // Stop if we've reached the requested limit
+          if (item.type === 'comment' && item.comment?.type === 'feed') {
+            if (options.limit && totalYielded >= options.limit) {
+              return // Stop if we've reached the requested limit
+            }
+            yield new Note(item, this.client)
+            totalYielded++
           }
-          yield new Note(item, this.client)
-          totalYielded++
         }
 
         // If we got fewer items than requested, we've reached the end
-        if (response.notes.length < perPageConfig) {
+        if (response.items.length < perPageConfig) {
           break
         }
 
         offset += perPageConfig
       }
     } catch {
+      // If the reader feed endpoint fails, try the own notes endpoint as fallback
+      // This handles the case where the profile is the user's own profile
+      try {
+        const ownNotesResponse = await this.client.get<{ items?: SubstackNote[] }>('/api/v1/notes')
+        if (ownNotesResponse.items) {
+          let count = 0
+          for (const noteData of ownNotesResponse.items) {
+            // Apply the same filtering logic as the reader feed endpoint
+            if (noteData.type === 'comment' && noteData.comment?.type === 'feed') {
+              if (options.limit && count >= options.limit) break
+              yield new Note(noteData, this.client)
+              count++
+            }
+          }
+        }
+      } catch {
+        // If both endpoints fail, return empty iterator
         yield* []
+      }
     }
   }
 }
