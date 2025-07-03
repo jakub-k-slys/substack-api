@@ -83,6 +83,7 @@ export class Profile {
    */
   async *notes(options: { limit?: number } = {}): AsyncIterable<Note> {
     try {
+      // Try the reader feed endpoint first
       // Get the perPage configuration from the client
       const perPageConfig = this.client.getPerPage()
       let offset = 0
@@ -117,8 +118,22 @@ export class Profile {
         offset += perPageConfig
       }
     } catch {
-      // If the endpoint doesn't exist or fails, return empty iterator
-      yield* []
+      // If the reader feed endpoint fails, try the own notes endpoint as fallback
+      // This handles the case where the profile is the user's own profile
+      try {
+        const ownNotesResponse = await this.client.get<{ notes?: SubstackNote[] }>('/api/v1/notes')
+        if (ownNotesResponse.notes) {
+          let count = 0
+          for (const noteData of ownNotesResponse.notes) {
+            if (options.limit && count >= options.limit) break
+            yield new Note(noteData, this.client)
+            count++
+          }
+        }
+      } catch {
+        // If both endpoints fail, return empty iterator
+        yield* []
+      }
     }
   }
 }
