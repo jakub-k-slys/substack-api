@@ -1,6 +1,7 @@
 import { Profile } from './profile'
 import { Post } from './post'
 import { Note } from './note'
+import { NoteBuilder } from '../note-builder'
 import type { SubstackPost, SubstackNote, SubstackFullProfile } from '../types'
 
 /**
@@ -31,6 +32,15 @@ export class OwnProfile extends Profile {
     } catch (error) {
       throw new Error(`Failed to create post: ${(error as Error).message}`)
     }
+  }
+
+  /**
+   * Create a new note using the builder pattern
+   */
+  newNote(): NoteBuilder
+  newNote(text: string): NoteBuilder
+  newNote(text?: string): NoteBuilder {
+    return new NoteBuilder(this.client, text)
   }
 
   /**

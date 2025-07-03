@@ -1,6 +1,7 @@
 import { OwnProfile } from '../../src/entities/own-profile'
 import { Note } from '../../src/entities/note'
 import { Profile } from '../../src/entities/profile'
+import { NoteBuilder } from '../../src/note-builder'
 import type { SubstackFullProfile } from '../../src/types'
 import type { SubstackHttpClient } from '../../src/http-client'
 
@@ -65,6 +66,7 @@ describe('OwnProfile Entity', () => {
   it('should have additional write methods', () => {
     expect(typeof ownProfile.createPost).toBe('function')
     expect(typeof ownProfile.createNote).toBe('function')
+    expect(typeof ownProfile.newNote).toBe('function')
     expect(typeof ownProfile.followees).toBe('function')
     expect(typeof ownProfile.notes).toBe('function')
   })
@@ -244,6 +246,16 @@ describe('OwnProfile Entity', () => {
         formatting: [{ start: 0, end: 4, type: 'bold' }]
       })
     ).rejects.toThrow('Failed to create note: API not available')
+  })
+
+  it('should create a note builder without initial text', () => {
+    const builder = ownProfile.newNote()
+    expect(builder).toBeInstanceOf(NoteBuilder)
+  })
+
+  it('should create a note builder with initial text', () => {
+    const builder = ownProfile.newNote('Initial text')
+    expect(builder).toBeInstanceOf(NoteBuilder)
   })
 
   it('should iterate through followees using correct endpoint chain', async () => {

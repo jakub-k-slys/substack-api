@@ -19,7 +19,7 @@ export interface NoteBodyJson {
       type: 'text'
       text: string
       marks?: Array<{
-        type: 'bold' | 'italic'
+        type: 'bold' | 'italic' | 'code'
       }>
     }>
   }>
