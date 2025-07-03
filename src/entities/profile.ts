@@ -118,25 +118,8 @@ export class Profile {
         offset += perPageConfig
       }
     } catch {
-      // If the reader feed endpoint fails, try the own notes endpoint as fallback
-      // This handles the case where the profile is the user's own profile
-      try {
-        const ownNotesResponse = await this.client.get<{ items?: SubstackNote[] }>('/api/v1/notes')
-        if (ownNotesResponse.items) {
-          let count = 0
-          for (const noteData of ownNotesResponse.items) {
-            // Apply the same filtering logic as the reader feed endpoint
-            if (noteData.type === 'comment' && noteData.comment?.type === 'feed') {
-              if (options.limit && count >= options.limit) break
-              yield new Note(noteData, this.client)
-              count++
-            }
-          }
-        }
-      } catch {
         // If both endpoints fail, return empty iterator
         yield* []
-      }
     }
   }
 }
