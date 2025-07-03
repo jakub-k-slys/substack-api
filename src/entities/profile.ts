@@ -85,7 +85,7 @@ export class Profile {
     try {
       // Try to fetch notes for this profile
       const response = await this.client.get<{ notes?: SubstackNote[] }>(
-        `/api/v1/users/${this.id}/notes`
+        `/api/v1/notes`
       )
 
       if (response.notes) {
