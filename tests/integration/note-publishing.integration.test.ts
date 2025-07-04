@@ -22,13 +22,17 @@ describe('note publishing tests', () => {
 
   test('should build and publish note with correct request structure and response', async () => {
     const profile = await client.ownProfile()
-    await profile.newNote()
-      .paragraph().bold('test')
-      .paragraph().italic('test1')
-      .paragraph().code('another test').text(' ')
+    await profile
+      .newNote()
+      .paragraph()
+      .bold('test')
+      .paragraph()
+      .italic('test1')
+      .paragraph()
+      .code('another test')
+      .text(' ')
       .paragraph('just a test')
       .publish()
-
 
     expect(global.INTEGRATION_SERVER.capturedRequests).toHaveLength(1)
     const capturedRequest = global.INTEGRATION_SERVER.capturedRequests[0]
