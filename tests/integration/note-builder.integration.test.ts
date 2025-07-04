@@ -2,20 +2,12 @@ import { SubstackClient } from '../../src/substack-client'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 
-interface CapturedRequest {
-  url: string
-  method: string
-  body: unknown
-  headers: unknown
-}
-
-describe('NoteBuilder Integration Tests', () => {
+describe('note publishing tests', () => {
   let client: SubstackClient
-  let _capturedRequests: CapturedRequest[] = []
 
   beforeEach(() => {
-    // Reset captured requests
-    _capturedRequests = []
+    // Clear captured requests before each test
+    global.INTEGRATION_SERVER.capturedRequests.length = 0
 
     // Create client configured to use our local test server
     const url = new URL(global.INTEGRATION_SERVER.url)
@@ -28,224 +20,93 @@ describe('NoteBuilder Integration Tests', () => {
     })
   })
 
-  describe('Note Builder HTTP Request Validation', () => {
-    test('should send correct request structure for simple note', async () => {
-      try {
-        const profile = await client.ownProfile()
-        const result = await profile.newNote('test').publish()
+  test('should build and publish note with correct request structure and response', async () => {
+    // 1. Use Substack API to build and publish note
+    try {
+      const profile = await client.ownProfile()
+      await profile.newNote('test').publish()
+    } catch {
+      // Expected - we're testing request structure, not auth success
+      // The request will still be captured by our mock server
+    }
 
-        // The request should have been captured by our mock server
-        expect(result).toBeDefined()
-      } catch (error) {
-        // Expected - we're testing request structure, not auth success
-        expect(error).toBeInstanceOf(Error)
-      }
+    // 2. Intercept and verify the built request against provided example
+    expect(global.INTEGRATION_SERVER.capturedRequests).toHaveLength(1)
+    const capturedRequest = global.INTEGRATION_SERVER.capturedRequests[0]
 
-      // Verify the request was made to correct endpoint
-      const response = await fetch(`${global.INTEGRATION_SERVER.url}/api/v1/comment/feed`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer test-key'
+    // Verify the request was made to the correct endpoint
+    expect(capturedRequest.method).toBe('POST')
+    expect(capturedRequest.url).toBe('/api/v1/comment/feed')
+
+    // Load the expected request structure from samples
+    const expectedRequestPath = join(process.cwd(), 'samples', 'api', 'v1', 'comment', 'feed')
+    const expectedRequestData = JSON.parse(readFileSync(expectedRequestPath, 'utf8'))
+
+    // 3. Verify the content of intercepted request against provided example
+    const requestBody = capturedRequest.body as Record<string, unknown>
+    expect(requestBody).toHaveProperty('bodyJson')
+    expect(requestBody.bodyJson).toHaveProperty('type', 'doc')
+    expect(requestBody.bodyJson).toHaveProperty('attrs.schemaVersion', 'v1')
+    expect(requestBody.bodyJson).toHaveProperty('content')
+    expect(Array.isArray((requestBody.bodyJson as Record<string, unknown>).content)).toBe(true)
+
+    // Verify the request structure matches the expected format from samples
+    expect(requestBody).toHaveProperty('tabId', expectedRequestData.tabId)
+    expect(requestBody).toHaveProperty('surface', expectedRequestData.surface)
+    expect(requestBody).toHaveProperty(
+      'replyMinimumRole',
+      expectedRequestData.replyMinimumRole
+    )
+
+    // 4. Verify response structure (already handled by mock server returning sample response)
+    // Test that our mock server responds correctly with the provided example response
+    const response = await fetch(`${global.INTEGRATION_SERVER.url}/api/v1/comment/feed`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer test-key'
+      },
+      body: JSON.stringify({
+        bodyJson: {
+          type: 'doc',
+          attrs: { schemaVersion: 'v1' },
+          content: [
+            {
+              type: 'paragraph',
+              content: [
+                {
+                  type: 'text',
+                  text: 'test'
+                }
+              ]
+            }
+          ]
         },
-        body: JSON.stringify({
-          bodyJson: {
-            type: 'doc',
-            attrs: { schemaVersion: 'v1' },
-            content: [
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: 'test'
-                  }
-                ]
-              }
-            ]
-          },
-          tabId: 'for-you',
-          surface: 'feed',
-          replyMinimumRole: 'everyone'
-        })
+        tabId: 'for-you',
+        surface: 'feed',
+        replyMinimumRole: 'everyone'
       })
-
-      expect(response.status).toBe(200)
-      const responseData = await response.json()
-
-      // Verify response matches expected structure from samples
-      expect(responseData).toHaveProperty('user_id')
-      expect(responseData).toHaveProperty('body_json')
-      expect(responseData).toHaveProperty('type', 'feed')
-      expect(responseData).toHaveProperty('status', 'published')
     })
 
-    test('should send correct request for multiple paragraphs', async () => {
-      const response = await fetch(`${global.INTEGRATION_SERVER.url}/api/v1/comment/feed`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer test-key'
-        },
-        body: JSON.stringify({
-          bodyJson: {
-            type: 'doc',
-            attrs: { schemaVersion: 'v1' },
-            content: [
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: 'first paragraph'
-                  }
-                ]
-              },
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: 'second paragraph'
-                  }
-                ]
-              }
-            ]
-          },
-          tabId: 'for-you',
-          surface: 'feed',
-          replyMinimumRole: 'everyone'
-        })
-      })
+    expect(response.status).toBe(200)
+    const responseData = await response.json()
 
-      expect(response.status).toBe(200)
-      const responseData = await response.json()
-      expect(responseData).toHaveProperty('body_json.content')
-    })
+    // Load the expected response structure from samples
+    const expectedResponsePath = join(process.cwd(), 'samples', 'api', 'v1', 'comment', 'response')
+    const expectedResponseData = JSON.parse(readFileSync(expectedResponsePath, 'utf8'))
 
-    test('should send correct request for rich formatting', async () => {
-      const response = await fetch(`${global.INTEGRATION_SERVER.url}/api/v1/comment/feed`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer test-key'
-        },
-        body: JSON.stringify({
-          bodyJson: {
-            type: 'doc',
-            attrs: { schemaVersion: 'v1' },
-            content: [
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    marks: [{ type: 'bold' }],
-                    text: 'bold text'
-                  },
-                  {
-                    type: 'text',
-                    marks: [{ type: 'italic' }],
-                    text: 'italic text'
-                  },
-                  {
-                    type: 'text',
-                    marks: [{ type: 'code' }],
-                    text: 'code text'
-                  }
-                ]
-              }
-            ]
-          },
-          tabId: 'for-you',
-          surface: 'feed',
-          replyMinimumRole: 'everyone'
-        })
-      })
-
-      expect(response.status).toBe(200)
-      const responseData = await response.json()
-
-      // Verify response structure matches sample
-      expect(responseData).toHaveProperty('body_json.type', 'doc')
-      expect(responseData).toHaveProperty('body_json.attrs.schemaVersion', 'v1')
-      expect(Array.isArray(responseData.body_json.content)).toBe(true)
-    })
-
-    test('should validate request against provided example structure', async () => {
-      // Load the expected request structure from samples
-      const expectedRequestPath = join(process.cwd(), 'samples', 'api', 'v1', 'comment', 'feed')
-      const expectedRequestData = JSON.parse(readFileSync(expectedRequestPath, 'utf8'))
-
-      // Verify our request structure matches the expected format
-      expect(expectedRequestData).toHaveProperty('bodyJson')
-      expect(expectedRequestData.bodyJson).toHaveProperty('type', 'doc')
-      expect(expectedRequestData.bodyJson).toHaveProperty('attrs.schemaVersion', 'v1')
-      expect(expectedRequestData.bodyJson).toHaveProperty('content')
-      expect(expectedRequestData).toHaveProperty('tabId', 'for-you')
-      expect(expectedRequestData).toHaveProperty('surface', 'feed')
-      expect(expectedRequestData).toHaveProperty('replyMinimumRole', 'everyone')
-
-      // Test that our mock server can handle this structure
-      const response = await fetch(`${global.INTEGRATION_SERVER.url}/api/v1/comment/feed`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(expectedRequestData)
-      })
-
-      expect(response.status).toBe(200)
-    })
-
-    test('should return response matching provided example', async () => {
-      // Load the expected response structure from samples
-      const expectedResponsePath = join(
-        process.cwd(),
-        'samples',
-        'api',
-        'v1',
-        'comment',
-        'response'
-      )
-      const expectedResponseData = JSON.parse(readFileSync(expectedResponsePath, 'utf8'))
-
-      const response = await fetch(`${global.INTEGRATION_SERVER.url}/api/v1/comment/feed`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          bodyJson: {
-            type: 'doc',
-            attrs: { schemaVersion: 'v1' },
-            content: []
-          },
-          tabId: 'for-you',
-          surface: 'feed',
-          replyMinimumRole: 'everyone'
-        })
-      })
-
-      expect(response.status).toBe(200)
-      const actualResponseData = await response.json()
-
-      // Verify response structure matches the sample
-      expect(actualResponseData).toHaveProperty('user_id', expectedResponseData.user_id)
-      expect(actualResponseData).toHaveProperty(
-        'body_json.type',
-        expectedResponseData.body_json.type
-      )
-      expect(actualResponseData).toHaveProperty(
-        'body_json.attrs.schemaVersion',
-        expectedResponseData.body_json.attrs.schemaVersion
-      )
-      expect(actualResponseData).toHaveProperty('type', expectedResponseData.type)
-      expect(actualResponseData).toHaveProperty('status', expectedResponseData.status)
-      expect(actualResponseData).toHaveProperty(
-        'reply_minimum_role',
-        expectedResponseData.reply_minimum_role
-      )
-    })
+    // 5. Verify API is functional by checking response structure
+    expect(responseData).toHaveProperty('user_id', expectedResponseData.user_id)
+    expect(responseData).toHaveProperty('body_json.type', expectedResponseData.body_json.type)
+    expect(responseData).toHaveProperty(
+      'body_json.attrs.schemaVersion',
+      expectedResponseData.body_json.attrs.schemaVersion
+    )
+    expect(responseData).toHaveProperty('type', expectedResponseData.type)
+    expect(responseData).toHaveProperty('status', expectedResponseData.status)
+    expect(responseData).toHaveProperty(
+      'reply_minimum_role',
+      expectedResponseData.reply_minimum_role
+    )
   })
 })

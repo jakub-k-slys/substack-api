@@ -136,6 +136,8 @@ export class NoteBuilder {
         },
         content
       },
+      tabId: 'for-you',
+      surface: 'feed',
       replyMinimumRole: 'everyone'
     }
   }

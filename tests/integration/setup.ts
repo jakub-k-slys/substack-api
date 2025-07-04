@@ -7,12 +7,35 @@ declare global {
     server: Server
     port: number
     url: string
+    capturedRequests: Array<{
+      method: string
+      url: string
+      headers: Record<string, string>
+      body: unknown
+    }>
   }
 }
 
 // Mock HTTP server that serves sample API responses
-const createMockServer = (): Promise<{ server: Server; port: number; url: string }> => {
+const createMockServer = (): Promise<{
+  server: Server
+  port: number
+  url: string
+  capturedRequests: Array<{
+    method: string
+    url: string
+    headers: Record<string, string>
+    body: unknown
+  }>
+}> => {
   return new Promise((resolve, reject) => {
+    const capturedRequests: Array<{
+      method: string
+      url: string
+      headers: Record<string, string>
+      body: unknown
+    }> = []
+
     const server = createServer((req, res) => {
       res.setHeader('Content-Type', 'application/json')
       res.setHeader('Access-Control-Allow-Origin', '*')
@@ -33,8 +56,16 @@ const createMockServer = (): Promise<{ server: Server; port: number; url: string
         })
         req.on('end', () => {
           try {
-            // Just validate that we receive valid JSON - don't interfere with API implementation
+            // Parse and capture the request for verification
             const requestData = JSON.parse(body)
+
+            // Capture the request for test verification
+            capturedRequests.push({
+              method: req.method!,
+              url: req.url!,
+              headers: req.headers as Record<string, string>,
+              body: requestData
+            })
 
             // Basic validation that we received some data
             if (!requestData) {
@@ -43,7 +74,7 @@ const createMockServer = (): Promise<{ server: Server; port: number; url: string
               return
             }
 
-            // Return the sample response without validating internal structure
+            // Return the sample response
             const sampleResponsePath = join(
               process.cwd(),
               'samples',
@@ -92,7 +123,7 @@ const createMockServer = (): Promise<{ server: Server; port: number; url: string
 
       const port = address.port
       const url = `http://localhost:${port}`
-      resolve({ server, port, url })
+      resolve({ server, port, url, capturedRequests })
     })
 
     server.on('error', reject)
@@ -111,8 +142,10 @@ function mapUrlToSampleFile(url: string): string | null {
     'api/v1/subscription': 'subscription',
     'api/v1/subscriptions': 'subscriptions',
     'api/v1/user/282291554/profile': 'user/282291554/profile',
+    'api/v1/user/254824415/profile': 'user/282291554/profile', // Map the subscription user_id to existing profile
     'api/v1/user/jakubslys/public_profile': 'user/jakubslys/public_profile',
     'api/v1/users/282291554': 'user/282291554/profile',
+    'api/v1/users/254824415': 'user/282291554/profile', // Map the subscription user_id to existing profile
     'api/v1/reader/feed/profile/282291554': 'reader/feed/profile/282291554',
     'api/v1/profile/posts': 'profile/posts?profile_user_id=27968736&limit=50',
     'api/v1/feed/following': 'feed/following',

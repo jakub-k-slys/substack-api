@@ -27,6 +27,8 @@ export interface NoteBodyJson {
 
 export interface PublishNoteRequest {
   bodyJson: NoteBodyJson
+  tabId: string
+  surface: string
   replyMinimumRole: 'everyone'
 }
 

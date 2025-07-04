@@ -82,6 +82,8 @@ describe('NoteBuilder', () => {
             }
           ]
         },
+        tabId: 'for-you',
+        surface: 'feed',
         replyMinimumRole: 'everyone'
       })
       expect(result).toBe(mockPublishResponse)
@@ -118,6 +120,8 @@ describe('NoteBuilder', () => {
             }
           ]
         },
+        tabId: 'for-you',
+        surface: 'feed',
         replyMinimumRole: 'everyone'
       })
       expect(result).toBe(mockPublishResponse)
@@ -169,6 +173,8 @@ describe('NoteBuilder', () => {
             }
           ]
         },
+        tabId: 'for-you',
+        surface: 'feed',
         replyMinimumRole: 'everyone'
       })
       expect(result).toBe(mockPublishResponse)
@@ -232,6 +238,8 @@ describe('NoteBuilder', () => {
             }
           ]
         },
+        tabId: 'for-you',
+        surface: 'feed',
         replyMinimumRole: 'everyone'
       })
       expect(result).toBe(mockPublishResponse)
@@ -273,6 +281,8 @@ describe('NoteBuilder', () => {
             }
           ]
         },
+        tabId: 'for-you',
+        surface: 'feed',
         replyMinimumRole: 'everyone'
       })
       expect(result).toBe(mockPublishResponse)
@@ -321,6 +331,8 @@ describe('NoteBuilder', () => {
             }
           ]
         },
+        tabId: 'for-you',
+        surface: 'feed',
         replyMinimumRole: 'everyone'
       })
       expect(result).toBe(mockPublishResponse)
@@ -367,6 +379,8 @@ describe('NoteBuilder', () => {
             }
           ]
         },
+        tabId: 'for-you',
+        surface: 'feed',
         replyMinimumRole: 'everyone'
       })
       expect(result).toBe(mockPublishResponse)
@@ -392,6 +406,8 @@ describe('NoteBuilder', () => {
             }
           ]
         },
+        tabId: 'for-you',
+        surface: 'feed',
         replyMinimumRole: 'everyone'
       })
       expect(result).toBe(mockPublishResponse)
@@ -409,6 +425,8 @@ describe('NoteBuilder', () => {
           attrs: { schemaVersion: 'v1' },
           content: []
         },
+        tabId: 'for-you',
+        surface: 'feed',
         replyMinimumRole: 'everyone'
       })
       expect(result).toBe(mockPublishResponse)
