@@ -206,7 +206,7 @@ async function runExample(): Promise<void> {
     }
 
     console.log('\n✨ Example completed successfully!')
-    console.log('\n💡 This example demonstrates basic Substack API usage.')
+    console.log('💡 This example demonstrates basic Substack API usage.')
     console.log('   For more advanced features, check out the full documentation.')
 
   } catch (error) {

@@ -3,77 +3,127 @@ import { SubstackHttpClient } from './http-client'
 
 interface TextSegment {
   text: string
-  type: 'bold' | 'italic' | 'simple'
+  type: 'bold' | 'italic' | 'code' | 'simple'
 }
 
 interface Paragraph {
   segments: TextSegment[]
 }
 
-export class NoteBuilder {
-  private paragraphs: Paragraph[] = []
-  private currentParagraph: Paragraph = { segments: [] }
+/**
+ * Builder for constructing rich text within a paragraph
+ */
+export class ParagraphBuilder {
+  private segments: TextSegment[] = []
 
-  constructor(
-    private readonly client: SubstackHttpClient,
-    text?: string
-  ) {
-    if (text) {
-      this.currentParagraph.segments.push({ text, type: 'simple' })
-    }
-  }
+  constructor(private readonly noteBuilder: NoteBuilder) {}
 
   /**
-   * Start a new paragraph
+   * Add plain text to the current paragraph
    */
-  note(text: string): NoteBuilder {
-    if (this.currentParagraph.segments.length > 0) {
-      this.paragraphs.push(this.currentParagraph)
-    }
-    this.currentParagraph = { segments: [{ text, type: 'simple' }] }
+  text(text: string): ParagraphBuilder {
+    this.segments.push({ text, type: 'simple' })
     return this
   }
 
   /**
    * Add bold text to the current paragraph
    */
-  bold(text: string): NoteBuilder {
-    this.currentParagraph.segments.push({ text, type: 'bold' })
+  bold(text: string): ParagraphBuilder {
+    this.segments.push({ text, type: 'bold' })
     return this
   }
 
   /**
    * Add italic text to the current paragraph
    */
-  italic(text: string): NoteBuilder {
-    this.currentParagraph.segments.push({ text, type: 'italic' })
+  italic(text: string): ParagraphBuilder {
+    this.segments.push({ text, type: 'italic' })
     return this
   }
 
   /**
-   * Add plain text to the current paragraph
+   * Add code text to the current paragraph
    */
-  simple(text: string): NoteBuilder {
-    this.currentParagraph.segments.push({ text, type: 'simple' })
+  code(text: string): ParagraphBuilder {
+    this.segments.push({ text, type: 'code' })
     return this
+  }
+
+  /**
+   * Complete this paragraph and start a new one
+   */
+  paragraph(): ParagraphBuilder
+  paragraph(text: string): NoteBuilder
+  paragraph(text?: string): ParagraphBuilder | NoteBuilder {
+    // Commit the current paragraph
+    this.noteBuilder.addParagraph({ segments: this.segments })
+
+    if (text) {
+      // Simple paragraph case
+      return this.noteBuilder.paragraph(text)
+    } else {
+      // Rich paragraph case
+      return this.noteBuilder.paragraph()
+    }
+  }
+
+  /**
+   * Publish the note
+   */
+  async publish(): Promise<PublishNoteResponse> {
+    // Commit the current paragraph before publishing
+    this.noteBuilder.addParagraph({ segments: this.segments })
+    return this.noteBuilder.publish()
+  }
+}
+
+export class NoteBuilder {
+  private paragraphs: Paragraph[] = []
+
+  constructor(
+    private readonly client: SubstackHttpClient,
+    text?: string
+  ) {
+    if (text) {
+      this.paragraphs.push({ segments: [{ text, type: 'simple' }] })
+    }
+  }
+
+  /**
+   * Add a paragraph to the note
+   */
+  addParagraph(paragraph: Paragraph): void {
+    this.paragraphs.push(paragraph)
+  }
+
+  /**
+   * Add a paragraph to the note
+   */
+  paragraph(): ParagraphBuilder
+  paragraph(text: string): NoteBuilder
+  paragraph(text?: string): ParagraphBuilder | NoteBuilder {
+    if (text) {
+      // Simple paragraph case
+      this.paragraphs.push({ segments: [{ text, type: 'simple' }] })
+      return this
+    } else {
+      // Rich paragraph case
+      return new ParagraphBuilder(this)
+    }
   }
 
   /**
    * Convert the builder's content to Substack's note format
    */
   private toNoteRequest(): PublishNoteRequest {
-    const allParagraphs = [...this.paragraphs]
-    if (this.currentParagraph.segments.length > 0) {
-      allParagraphs.push(this.currentParagraph)
-    }
-
-    const content = allParagraphs.map((paragraph) => ({
+    const content = this.paragraphs.map((paragraph) => ({
       type: 'paragraph' as const,
       content: paragraph.segments.map((segment) => ({
         type: 'text' as const,
         text: segment.text,
         ...(segment.type !== 'simple' && {
-          marks: [{ type: segment.type }]
+          marks: [{ type: segment.type as 'bold' | 'italic' | 'code' }]
         })
       }))
     }))
@@ -86,6 +136,8 @@ export class NoteBuilder {
         },
         content
       },
+      tabId: 'for-you',
+      surface: 'feed',
       replyMinimumRole: 'everyone'
     }
   }
@@ -94,6 +146,6 @@ export class NoteBuilder {
    * Publish the note
    */
   async publish(): Promise<PublishNoteResponse> {
-    return this.client.post<PublishNoteResponse>('/api/v1/notes', this.toNoteRequest())
+    return this.client.post<PublishNoteResponse>('/api/v1/comment/feed', this.toNoteRequest())
   }
 }

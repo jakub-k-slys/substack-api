@@ -19,7 +19,7 @@ export interface NoteBodyJson {
       type: 'text'
       text: string
       marks?: Array<{
-        type: 'bold' | 'italic'
+        type: 'bold' | 'italic' | 'code'
       }>
     }>
   }>
@@ -27,6 +27,8 @@ export interface NoteBodyJson {
 
 export interface PublishNoteRequest {
   bodyJson: NoteBodyJson
+  tabId: string
+  surface: string
   replyMinimumRole: 'everyone'
 }
 
