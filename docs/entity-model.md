@@ -149,42 +149,25 @@ console.log(`Followers: ${myProfile.followerCount}`);
 
 #### Content Creation
 
-##### createPost()
+##### newNote()
 
-Create new posts on your publication:
-
-```typescript
-// Create a draft post
-const draftPost = await myProfile.createPost({
-  title: 'My Draft Article',
-  body: 'This is the content of my article...',
-  isDraft: true
-});
-console.log(`Draft created: ${draftPost.title}`);
-
-// Publish a post immediately
-const publishedPost = await myProfile.createPost({
-  title: 'Live Article',
-  body: 'This post goes live immediately!',
-  isDraft: false
-});
-console.log(`Published: ${publishedPost.title}`);
-```
-
-##### createNote()
-
-Create short-form notes:
+Create short-form notes using the builder pattern (recommended approach):
 
 ```typescript
-const note = await myProfile.createNote({
-  body: '🚀 Just shipped a new feature! Excited to share what we\'ve been working on.'
-});
+// Simple note
+const note = await myProfile.newNote('🚀 Just shipped a new feature! Excited to share what we\'ve been working on.').publish();
 console.log(`Note published: ${note.id}`);
 
+// Complex note with formatting
+const formattedNote = await myProfile
+  .newNote()
+  .addParagraph('Great discussion with the community today!')
+  .addParagraph().text('Key takeaways: ').bold('engagement is everything')
+  .addParagraph().text('Check out our latest updates at: ').link('https://example.com', 'our blog')
+  .publish();
+
 // Note with mentions or hashtags
-const socialNote = await myProfile.createNote({
-  body: 'Great discussion with the community today! #substack #writing'
-});
+const socialNote = await myProfile.newNote('Building the future of newsletters #substack #writing').publish();
 ```
 
 #### Following Management

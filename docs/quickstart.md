@@ -117,31 +117,24 @@ console.log(`Comment added: ${newComment.id}`);
 
 ### Content Creation (OwnProfile)
 
-Create posts, notes, and manage content through your authenticated profile:
+Create notes and manage content through your authenticated profile:
 
 ```typescript
 const myProfile = await client.ownProfile();
 
-// Create a draft post
-const draftPost = await myProfile.createPost({
-  title: 'My New Blog Post',
-  body: 'This is the content of my post...',
-  isDraft: true
-});
-console.log(`Draft created: ${draftPost.title}`);
-
-// Publish a post immediately
-const publishedPost = await myProfile.createPost({
-  title: 'Published Post',
-  body: 'This post goes live immediately!',
-  isDraft: false
-});
-
-// Create a note (short-form content)
-const note = await myProfile.createNote({
-  body: '🚀 Just shipped a new feature! Excited to share what we\'ve been working on.'
-});
+// Create a simple note using builder pattern
+const note = await myProfile.newNote('🚀 Just shipped a new feature! Excited to share what we\'ve been working on.').publish();
 console.log(`Note published: ${note.id}`);
+
+// Create a complex note with formatting
+const formattedNote = await myProfile
+  .newNote()
+  .addParagraph('Building something amazing...')
+  .addParagraph().bold('Key insight: ').text('User feedback drives everything')
+  .addParagraph().text('Read more: ').link('https://example.com', 'our latest update')
+  .publish();
+
+console.log(`Formatted note created: ${formattedNote.id}`);
 ```
 
 ## Working with Notes
