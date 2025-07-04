@@ -69,10 +69,6 @@ describe('OwnProfile Entity', () => {
     expect(typeof ownProfile.notes).toBe('function')
   })
 
-
-
-
-
   it('should create a note builder without initial text', () => {
     const builder = ownProfile.newNote()
     expect(builder).toBeInstanceOf(NoteBuilder)

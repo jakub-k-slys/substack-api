@@ -69,12 +69,9 @@ const myProfile = await client.ownProfile();
 console.log(`Welcome ${myProfile.name}! (@${myProfile.slug})`);
 console.log(`Followers: ${myProfile.followerCount}`);
 
-// Create content
-await myProfile.createPost({
-  title: 'My New Post',
-  body: 'Content here...',
-  isDraft: false
-});
+// Create content using builder pattern
+const note = await myProfile.newNote('Just published something amazing! 🚀').publish();
+console.log(`Note created: ${note.id}`);
 ```
 
 #### profileForSlug()
@@ -289,41 +286,26 @@ Extends Profile with write capabilities for content creation and management.
 
 #### Additional Methods
 
-##### createPost()
+##### newNote()
 
 ```typescript
-createPost(options: {
-  title: string;
-  body: string;
-  isDraft: boolean;
-}): Promise<Post>
+newNote(text?: string): NoteBuilder
 ```
 
-Create a new post on your publication.
+Create a new note using the builder pattern (recommended approach).
 
 **Example:**
 ```typescript
-const post = await myProfile.createPost({
-  title: 'My New Article',
-  body: 'This is the content of my article...',
-  isDraft: false
-});
-console.log(`Published: ${post.title}`);
-```
+// Simple note
+const note = await myProfile.newNote('Just shipped a new feature! 🚀').publish();
 
-##### createNote()
+// Complex note with formatting
+const complexNote = await myProfile
+  .newNote()
+  .addParagraph('Building something amazing...')
+  .addParagraph().bold('Important update: ').text('Check out our latest release!')
+  .publish();
 
-```typescript
-createNote(options: { body: string }): Promise<Note>
-```
-
-Create a new short-form note.
-
-**Example:**
-```typescript
-const note = await myProfile.createNote({
-  body: '🚀 Just shipped a new feature! Excited to share what we\'ve been working on.'
-});
 console.log(`Note created: ${note.id}`);
 ```
 
@@ -529,14 +511,10 @@ Handle errors gracefully in entity operations:
 try {
   const profile = await client.ownProfile();
   
-  // Try to create content
-  const post = await profile.createPost({
-    title: 'My Post',
-    body: 'Content...',
-    isDraft: false
-  });
+  // Try to create content using builder pattern
+  const note = await profile.newNote('My first note! 🎉').publish();
   
-  console.log(`Post created: ${post.id}`);
+  console.log(`Note created: ${note.id}`);
 } catch (error) {
   if (error.message.includes('401')) {
     console.error('Authentication failed - check your connect.sid cookie');
