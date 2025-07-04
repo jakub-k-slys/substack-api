@@ -1,7 +1,7 @@
 import { SubstackClient } from '../../src/substack-client'
 import { SubstackHttpClient } from '../../src/http-client'
 import { OwnProfile, Profile } from '../../src/entities'
-import type { SubstackFullProfile, SubstackSubscriptionsResponse } from '../../src/types'
+import type { SubstackFullProfile, SubstackSubscriptionsResponse } from '../../src/internal'
 
 // Mock the HTTP client
 jest.mock('../../src/http-client')

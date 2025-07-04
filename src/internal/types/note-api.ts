@@ -1,12 +1,6 @@
 /**
- * Core note interfaces for Substack notes
+ * Internal API request/response types for notes
  */
-
-import { SubstackPublication } from './content'
-
-export interface NotesIteratorOptions {
-  limit?: number
-}
 
 export interface NoteBodyJson {
   type: 'doc'
@@ -74,3 +68,6 @@ export interface PublishNoteResponse {
   }>
   user_primary_publication?: SubstackPublication
 }
+
+// Import from api-responses for convenience
+import type { SubstackPublication } from './api-responses'

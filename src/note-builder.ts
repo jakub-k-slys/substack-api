@@ -1,4 +1,4 @@
-import { PublishNoteRequest, PublishNoteResponse } from './types'
+import { PublishNoteRequest, PublishNoteResponse } from './internal'
 import { SubstackHttpClient } from './http-client'
 
 interface TextSegment {

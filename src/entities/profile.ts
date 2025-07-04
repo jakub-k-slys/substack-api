@@ -3,7 +3,7 @@ import type {
   SubstackFullProfile,
   SubstackPost,
   SubstackNote
-} from '../types'
+} from '../internal'
 import type { SubstackHttpClient } from '../http-client'
 import { Post } from './post'
 import { Note } from './note'

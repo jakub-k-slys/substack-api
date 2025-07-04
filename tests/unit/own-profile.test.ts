@@ -2,7 +2,7 @@ import { OwnProfile } from '../../src/entities/own-profile'
 import { Note } from '../../src/entities/note'
 import { Profile } from '../../src/entities/profile'
 import { NoteBuilder } from '../../src/note-builder'
-import type { SubstackFullProfile } from '../../src/types'
+import type { SubstackFullProfile } from '../../src/internal'
 import type { SubstackHttpClient } from '../../src/http-client'
 
 describe('OwnProfile Entity', () => {

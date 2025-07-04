@@ -1,7 +1,84 @@
 /**
- * Subscription types for the /api/v1/subscriptions endpoint
+ * Internal API response types - not exported from the public API
+ * These represent raw response shapes from Substack's API endpoints
  */
 
+/**
+ * Raw API response shape for publications
+ */
+export interface SubstackPublication {
+  name: string
+  hostname: string
+  subdomain: string
+  logo?: {
+    url: string
+  }
+  description?: string
+}
+
+/**
+ * Raw API response shape for posts
+ */
+export interface SubstackPost {
+  id: number
+  title: string
+  subtitle?: string
+  slug: string
+  post_date: string
+  description?: string
+  audience?: string
+  canonical_url: string
+  cover_image?: string
+  podcast_url?: string
+  type: 'newsletter' | 'podcast' | 'thread'
+  published?: boolean
+  paywalled?: boolean
+}
+
+/**
+ * Raw API response shape for comments
+ */
+export interface SubstackComment {
+  id: number
+  body: string
+  created_at: string
+  parent_post_id: number
+  author: {
+    id: number
+    name: string
+    is_admin?: boolean
+  }
+}
+
+/**
+ * Response structure from /api/v1/reader/comment/{id} endpoint
+ */
+export interface SubstackCommentResponse {
+  item: {
+    comment: {
+      id: number
+      body: string
+      user_id: number
+      name: string
+      date: string
+      post_id?: number | null
+      // Additional fields that may be present but not needed for our Comment entity
+      [key: string]: unknown
+    }
+  }
+}
+
+/**
+ * Raw API response shape for search results
+ */
+export interface SubstackSearchResult {
+  total: number
+  results: SubstackPost[]
+}
+
+/**
+ * Subscription types for internal API responses
+ */
 export interface SubstackSubscription {
   id: number
   user_id: number

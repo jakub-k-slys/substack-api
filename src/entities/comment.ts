@@ -1,4 +1,4 @@
-import type { SubstackComment } from '../types'
+import type { SubstackComment } from '../internal'
 import type { SubstackHttpClient } from '../http-client'
 
 /**

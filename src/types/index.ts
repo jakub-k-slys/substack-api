@@ -1,12 +1,7 @@
 /**
- * Export all type definitions for the Substack API client
+ * Export domain types and user-facing interfaces
+ * These are the clean, stable types that users should depend on
  */
 
-export * from './config'
-export * from './content'
-export * from './note-basic'
-export * from './note-details'
-export * from './user-profile'
-export * from './public-profile'
-export * from './full-profile'
-export * from './subscription'
+export * from './domain-config'
+export * from './domain-options'

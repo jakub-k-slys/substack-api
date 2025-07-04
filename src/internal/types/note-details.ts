@@ -1,8 +1,8 @@
 /**
- * Detailed note context and tracking interfaces
+ * Internal note context and tracking interfaces
  */
 
-import { SubstackPublication, SubstackPost } from './content'
+import type { SubstackPublication, SubstackPost } from './api-responses'
 
 export interface SubstackNoteContext {
   type: string

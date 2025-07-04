@@ -1,6 +1,6 @@
 import { NoteBuilder, ParagraphBuilder } from '../../src/note-builder'
 import type { SubstackHttpClient } from '../../src/http-client'
-import type { PublishNoteResponse } from '../../src/types'
+import type { PublishNoteResponse } from '../../src/internal'
 
 describe('NoteBuilder', () => {
   let mockHttpClient: jest.Mocked<SubstackHttpClient>

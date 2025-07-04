@@ -1,7 +1,7 @@
 import { Profile } from './profile'
 import { Note } from './note'
 import { NoteBuilder } from '../note-builder'
-import type { SubstackNote, SubstackFullProfile } from '../types'
+import type { SubstackNote, SubstackFullProfile } from '../internal'
 
 /**
  * OwnProfile extends Profile with write capabilities for the authenticated user

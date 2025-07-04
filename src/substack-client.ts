@@ -1,7 +1,7 @@
 import { SubstackHttpClient } from './http-client'
 import { Profile, OwnProfile, Post, Note, Comment } from './entities'
+import type { SubstackConfig } from './types'
 import type {
-  SubstackConfig,
   SubstackFullProfile,
   SubstackPost,
   SubstackNote,
@@ -9,7 +9,7 @@ import type {
   SubstackCommentResponse,
   SubstackSubscriptionsResponse,
   SubstackSubscriptionPublication
-} from './types'
+} from './internal'
 
 /**
  * Modern SubstackClient with entity-based API
