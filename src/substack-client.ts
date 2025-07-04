@@ -1,26 +1,59 @@
 import { SubstackHttpClient } from './http-client'
 import { Profile, OwnProfile, Post, Note, Comment } from './entities'
+import { ProfileService, PostService, NoteService, CommentService, MemoryCache } from './services'
+import type { ServiceConfig, SlugResolver } from './services'
 import type {
   SubstackConfig,
-  SubstackFullProfile,
-  SubstackPost,
-  SubstackNote,
-  SubstackComment,
-  SubstackCommentResponse,
   SubstackSubscriptionsResponse,
   SubstackSubscriptionPublication
 } from './types'
 
 /**
- * Modern SubstackClient with entity-based API
+ * Modern SubstackClient with entity-based API using service layer
  */
 export class SubstackClient {
   private readonly httpClient: SubstackHttpClient
   private subscriptionsCache: Map<number, string> | null = null // user_id -> slug mapping
   private subscriptionsCacheTimestamp: number | null = null
+  
+  // Service instances
+  private readonly profileService: ProfileService
+  private readonly postService: PostService
+  private readonly noteService: NoteService
+  private readonly commentService: CommentService
 
   constructor(config: SubstackConfig) {
     this.httpClient = new SubstackHttpClient(config)
+    
+    // Initialize services with dependency injection
+    const serviceConfig: ServiceConfig = {
+      httpClient: this.httpClient,
+      cache: new MemoryCache(),
+      logger: undefined // Can be injected by advanced users
+    }
+    
+    this.profileService = new ProfileService(serviceConfig)
+    this.postService = new PostService(serviceConfig)
+    this.noteService = new NoteService(serviceConfig)
+    this.commentService = new CommentService(serviceConfig)
+  }
+
+  /**
+   * Re-initialize services with the current HTTP client instance
+   * This method is called internally after httpClient is replaced in tests
+   * @private
+   */
+  private reinitializeServices(): void {
+    const serviceConfig: ServiceConfig = {
+      httpClient: this.httpClient,
+      cache: new MemoryCache(),
+      logger: undefined
+    }
+    
+    ;(this as unknown as { profileService: ProfileService }).profileService = new ProfileService(serviceConfig)
+    ;(this as unknown as { postService: PostService }).postService = new PostService(serviceConfig)
+    ;(this as unknown as { noteService: NoteService }).noteService = new NoteService(serviceConfig)
+    ;(this as unknown as { commentService: CommentService }).commentService = new CommentService(serviceConfig)
   }
 
   /**
@@ -95,114 +128,65 @@ export class SubstackClient {
    * @throws {Error} When authentication fails or user profile cannot be retrieved
    */
   async ownProfile(): Promise<OwnProfile> {
-    try {
-      // Step 1: Get user_id from subscription endpoint
-      const subscription = await this.httpClient.get<{ user_id: number }>('/api/v1/subscription')
-      const userId = subscription.user_id
-
-      // Step 2: Get full profile using the user_id
-      const profile = await this.httpClient.get<SubstackFullProfile>(
-        `/api/v1/user/${userId}/profile`
-      )
-
-      // Step 3: Resolve slug from subscriptions cache
-      const resolvedSlug = await this.getSlugForUserId(userId, profile.handle)
-
-      return new OwnProfile(
-        profile,
-        this.httpClient,
-        resolvedSlug,
-        this.getSlugForUserId.bind(this)
-      )
-    } catch (error) {
-      throw new Error(`Failed to get own profile: ${(error as Error).message}`)
+    // Ensure services use the current httpClient (needed for testing)
+    if ((this.httpClient as unknown as { get?: unknown }).get) {
+      this.reinitializeServices()
     }
+    return this.profileService.getOwnProfile(this.getSlugForUserId.bind(this))
   }
 
   /**
    * Get a profile by user ID
    */
   async profileForId(id: number): Promise<Profile> {
-    try {
-      const profile = await this.httpClient.get<SubstackFullProfile>(`/api/v1/user/${id}/profile`)
-
-      // Resolve slug from subscriptions cache
-      const resolvedSlug = await this.getSlugForUserId(id, profile.handle)
-
-      return new Profile(profile, this.httpClient, resolvedSlug, this.getSlugForUserId.bind(this))
-    } catch (error) {
-      throw new Error(`Profile with ID ${id} not found: ${(error as Error).message}`)
+    // Ensure services use the current httpClient (needed for testing)
+    if ((this.httpClient as unknown as { get?: unknown }).get) {
+      this.reinitializeServices()
     }
+    return this.profileService.getProfileById(id, this.getSlugForUserId.bind(this))
   }
 
   /**
    * Get a profile by handle/slug
    */
   async profileForSlug(slug: string): Promise<Profile> {
-    if (!slug || slug.trim() === '') {
-      throw new Error('Profile slug cannot be empty')
+    // Ensure services use the current httpClient (needed for testing)
+    if ((this.httpClient as unknown as { get?: unknown }).get) {
+      this.reinitializeServices()
     }
-
-    try {
-      const profile = await this.httpClient.get<SubstackFullProfile>(
-        `/api/v1/user/${slug}/public_profile`
-      )
-
-      // For profiles fetched by slug, we can use the provided slug as the resolved slug
-      // but still check subscriptions cache for consistency
-      const resolvedSlug = await this.getSlugForUserId(profile.id, slug)
-
-      return new Profile(profile, this.httpClient, resolvedSlug, this.getSlugForUserId.bind(this))
-    } catch (error) {
-      throw new Error(`Profile with slug '${slug}' not found: ${(error as Error).message}`)
-    }
+    return this.profileService.getProfileBySlug(slug, this.getSlugForUserId.bind(this))
   }
 
   /**
    * Get a specific post by ID
    */
   async postForId(id: string): Promise<Post> {
-    const post = await this.httpClient.get<SubstackPost>(`/api/v1/posts/${id}`)
-    return new Post(post, this.httpClient)
+    // Ensure services use the current httpClient (needed for testing)
+    if ((this.httpClient as unknown as { get?: unknown }).get) {
+      this.reinitializeServices()
+    }
+    return this.postService.getPostById(id)
   }
 
   /**
    * Get a specific note by ID
    */
   async noteForId(id: string): Promise<Note> {
-    try {
-      const note = await this.httpClient.get<SubstackNote>(`/api/v1/notes/${id}`)
-      return new Note(note, this.httpClient)
-    } catch {
-      throw new Error(`Note with ID ${id} not found`)
+    // Ensure services use the current httpClient (needed for testing)
+    if ((this.httpClient as unknown as { get?: unknown }).get) {
+      this.reinitializeServices()
     }
+    return this.noteService.getNoteById(id)
   }
 
   /**
    * Get a specific comment by ID
    */
   async commentForId(id: string): Promise<Comment> {
-    if (!/^\d+$/.test(id)) {
-      throw new Error('Invalid comment ID - must be numeric')
+    // Ensure services use the current httpClient (needed for testing)
+    if ((this.httpClient as unknown as { get?: unknown }).get) {
+      this.reinitializeServices()
     }
-
-    const response = await this.httpClient.get<SubstackCommentResponse>(
-      `/api/v1/reader/comment/${id}`
-    )
-
-    // Transform the API response to match SubstackComment interface
-    const commentData: SubstackComment = {
-      id: response.item.comment.id,
-      body: response.item.comment.body,
-      created_at: response.item.comment.date,
-      parent_post_id: response.item.comment.post_id || 0,
-      author: {
-        id: response.item.comment.user_id,
-        name: response.item.comment.name,
-        is_admin: false // Default value as this info is not available in the API response
-      }
-    }
-
-    return new Comment(commentData, this.httpClient)
+    return this.commentService.getCommentById(id)
   }
 }
