@@ -1,5 +1,5 @@
-import { Profile } from '../../src/entities/profile'
-import { Post, Note } from '../../src/entities'
+import { Profile } from '../../src/domain/profile'
+import { Post, Note } from '../../src/domain'
 import type { SubstackHttpClient } from '../../src/http-client'
 
 describe('Profile Entity', () => {

@@ -1,5 +1,5 @@
 import { SubstackClient } from '../../src/substack-client'
-import { Profile } from '../../src/entities'
+import { Profile } from '../../src/domain'
 
 describe('SubstackClient Entity Model E2E', () => {
   let client: SubstackClient

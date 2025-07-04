@@ -1,5 +1,5 @@
 import { SubstackHttpClient } from './http-client'
-import { Profile, OwnProfile, Post, Note, Comment } from './entities'
+import { Profile, OwnProfile, Post, Note, Comment } from './domain'
 import type { SubstackConfig } from './types'
 import type {
   SubstackFullProfile,

@@ -1,5 +1,5 @@
-import { Post } from '../../src/entities/post'
-import { Comment } from '../../src/entities/comment'
+import { Post } from '../../src/domain/post'
+import { Comment } from '../../src/domain/comment'
 import type { SubstackHttpClient } from '../../src/http-client'
 
 describe('Post Entity', () => {

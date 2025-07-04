@@ -1,6 +1,6 @@
 import { SubstackClient } from '../../src/substack-client'
 import { SubstackHttpClient } from '../../src/http-client'
-import { OwnProfile, Profile } from '../../src/entities'
+import { OwnProfile, Profile } from '../../src/domain'
 import type { SubstackFullProfile, SubstackSubscriptionsResponse } from '../../src/internal'
 
 // Mock the HTTP client
