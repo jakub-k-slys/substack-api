@@ -1,13 +1,11 @@
 export { SubstackClient } from './substack-client'
-export { Profile, OwnProfile, Post, Note, Comment } from './entities'
+export { Profile, OwnProfile, Post, Note, Comment } from './domain'
 
 export type {
-  SubstackPublication,
-  SubstackPost,
-  SubstackComment,
   SubstackConfig,
-  SubstackSearchResult,
   PaginationParams,
   SearchParams,
+  PostsIteratorOptions,
+  CommentsIteratorOptions,
   NotesIteratorOptions
 } from './types'

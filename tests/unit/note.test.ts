@@ -1,7 +1,7 @@
-import { Note } from '../../src/entities/note'
-import { Comment } from '../../src/entities/comment'
+import { Note } from '../../src/domain/note'
+import { Comment } from '../../src/domain/comment'
 import type { SubstackHttpClient } from '../../src/http-client'
-import type { SubstackNoteComment } from '../../src/types/note-details'
+import type { SubstackNoteComment } from '../../src/internal'
 
 describe('Note Entity', () => {
   let mockHttpClient: jest.Mocked<SubstackHttpClient>

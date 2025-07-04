@@ -1,8 +1,8 @@
-import { OwnProfile } from '../../src/entities/own-profile'
-import { Note } from '../../src/entities/note'
-import { Profile } from '../../src/entities/profile'
+import { OwnProfile } from '../../src/domain/own-profile'
+import { Note } from '../../src/domain/note'
+import { Profile } from '../../src/domain/profile'
 import { NoteBuilder } from '../../src/note-builder'
-import type { SubstackFullProfile } from '../../src/types'
+import type { SubstackFullProfile } from '../../src/internal'
 import type { SubstackHttpClient } from '../../src/http-client'
 
 describe('OwnProfile Entity', () => {
