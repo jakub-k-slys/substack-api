@@ -21,7 +21,13 @@ export class MemoryCache implements Cache {
     return item.value as T
   }
 
-  async set<T>(key: string, value: T, ttl = 300000): Promise<void> { // 5 minutes default TTL
+  async set<T>(key: string, value: T, ttl = 300000): Promise<void> {
+    // 5 minutes default TTL
+    if (ttl <= 0) {
+      // Don't store items with zero or negative TTL
+      return
+    }
+
     this.store.set(key, {
       value,
       expires: Date.now() + ttl

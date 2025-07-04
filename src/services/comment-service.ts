@@ -37,7 +37,7 @@ export class CommentService {
 
     try {
       this.config.logger?.debug('Fetching comment by ID', { id })
-      
+
       const response = await this.config.httpClient.get<RawSubstackCommentResponse>(
         `/api/v1/reader/comment/${id}`
       )
@@ -57,11 +57,17 @@ export class CommentService {
 
       const substackComment = this.convertRawToSubstackComment(rawCommentData)
 
-      this.config.logger?.debug('Comment fetched successfully', { id, authorName: substackComment.author.name })
-      
+      this.config.logger?.debug('Comment fetched successfully', {
+        id,
+        authorName: substackComment.author.name
+      })
+
       return new Comment(substackComment, this.config.httpClient)
     } catch (error) {
-      this.config.logger?.error('Failed to fetch comment by ID', { id, error: (error as Error).message })
+      this.config.logger?.error('Failed to fetch comment by ID', {
+        id,
+        error: (error as Error).message
+      })
       throw new Error(`Comment with ID ${id} not found: ${(error as Error).message}`)
     }
   }
@@ -69,27 +75,33 @@ export class CommentService {
   /**
    * Get comments for a specific post
    */
-  async getCommentsForPost(postId: number, options: { limit?: number; offset?: number } = {}): Promise<SubstackComment[]> {
+  async getCommentsForPost(
+    postId: number,
+    options: { limit?: number; offset?: number } = {}
+  ): Promise<SubstackComment[]> {
     try {
       this.config.logger?.debug('Fetching comments for post', { postId, options })
-      
+
       const response = await this.config.httpClient.get<{ comments?: RawSubstackComment[] }>(
         `/api/v1/post/${postId}/comments`
       )
 
       const comments = response.comments || []
-      
+
       // Apply limit if specified
       const limitedComments = options.limit ? comments.slice(0, options.limit) : comments
-      
-      this.config.logger?.debug('Comments fetched successfully', { postId, count: limitedComments.length })
-      
-      return limitedComments.map(comment => this.convertRawToSubstackComment(comment))
+
+      this.config.logger?.debug('Comments fetched successfully', {
+        postId,
+        count: limitedComments.length
+      })
+
+      return limitedComments.map((comment) => this.convertRawToSubstackComment(comment))
     } catch (error) {
-      this.config.logger?.error('Failed to fetch comments for post', { 
-        postId, 
-        options, 
-        error: (error as Error).message 
+      this.config.logger?.error('Failed to fetch comments for post', {
+        postId,
+        options,
+        error: (error as Error).message
       })
       throw new Error(`Failed to fetch comments for post ${postId}: ${(error as Error).message}`)
     }

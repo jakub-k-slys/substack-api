@@ -1,7 +1,7 @@
 import { SubstackHttpClient } from './http-client'
 import { Profile, OwnProfile, Post, Note, Comment } from './entities'
 import { ProfileService, PostService, NoteService, CommentService, MemoryCache } from './services'
-import type { ServiceConfig, SlugResolver } from './services'
+import type { ServiceConfig } from './services'
 import type {
   SubstackConfig,
   SubstackSubscriptionsResponse,
@@ -15,7 +15,7 @@ export class SubstackClient {
   private readonly httpClient: SubstackHttpClient
   private subscriptionsCache: Map<number, string> | null = null // user_id -> slug mapping
   private subscriptionsCacheTimestamp: number | null = null
-  
+
   // Service instances
   private readonly profileService: ProfileService
   private readonly postService: PostService
@@ -24,14 +24,14 @@ export class SubstackClient {
 
   constructor(config: SubstackConfig) {
     this.httpClient = new SubstackHttpClient(config)
-    
+
     // Initialize services with dependency injection
     const serviceConfig: ServiceConfig = {
       httpClient: this.httpClient,
       cache: new MemoryCache(),
       logger: undefined // Can be injected by advanced users
     }
-    
+
     this.profileService = new ProfileService(serviceConfig)
     this.postService = new PostService(serviceConfig)
     this.noteService = new NoteService(serviceConfig)
@@ -49,11 +49,15 @@ export class SubstackClient {
       cache: new MemoryCache(),
       logger: undefined
     }
-    
-    ;(this as unknown as { profileService: ProfileService }).profileService = new ProfileService(serviceConfig)
+
+    ;(this as unknown as { profileService: ProfileService }).profileService = new ProfileService(
+      serviceConfig
+    )
     ;(this as unknown as { postService: PostService }).postService = new PostService(serviceConfig)
     ;(this as unknown as { noteService: NoteService }).noteService = new NoteService(serviceConfig)
-    ;(this as unknown as { commentService: CommentService }).commentService = new CommentService(serviceConfig)
+    ;(this as unknown as { commentService: CommentService }).commentService = new CommentService(
+      serviceConfig
+    )
   }
 
   /**

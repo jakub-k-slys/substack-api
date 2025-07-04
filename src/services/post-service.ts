@@ -37,15 +37,18 @@ export class PostService {
   async getPostById(id: string): Promise<Post> {
     try {
       this.config.logger?.debug('Fetching post by ID', { id })
-      
+
       const rawPost = await this.config.httpClient.get<RawSubstackPost>(`/api/v1/posts/${id}`)
       const substackPost = this.convertRawToSubstackPost(rawPost)
-      
+
       this.config.logger?.debug('Post fetched successfully', { id, title: substackPost.title })
-      
+
       return new Post(substackPost, this.config.httpClient)
     } catch (error) {
-      this.config.logger?.error('Failed to fetch post by ID', { id, error: (error as Error).message })
+      this.config.logger?.error('Failed to fetch post by ID', {
+        id,
+        error: (error as Error).message
+      })
       throw new Error(`Post with ID ${id} not found: ${(error as Error).message}`)
     }
   }
@@ -53,10 +56,13 @@ export class PostService {
   /**
    * Get posts for a specific profile/publication
    */
-  async getPostsForProfile(profileUserId: number, options: { limit?: number; offset?: number } = {}): Promise<SubstackPost[]> {
+  async getPostsForProfile(
+    profileUserId: number,
+    options: { limit?: number; offset?: number } = {}
+  ): Promise<SubstackPost[]> {
     try {
       this.config.logger?.debug('Fetching posts for profile', { profileUserId, options })
-      
+
       const perPage = this.config.httpClient.getPerPage()
       const actualLimit = Math.min(options.limit || perPage, perPage)
       const offset = options.offset || 0
@@ -66,16 +72,21 @@ export class PostService {
       )
 
       const posts = response.posts || []
-      this.config.logger?.debug('Posts fetched successfully', { profileUserId, count: posts.length })
-      
-      return posts.map(post => this.convertRawToSubstackPost(post))
-    } catch (error) {
-      this.config.logger?.error('Failed to fetch posts for profile', { 
-        profileUserId, 
-        options, 
-        error: (error as Error).message 
+      this.config.logger?.debug('Posts fetched successfully', {
+        profileUserId,
+        count: posts.length
       })
-      throw new Error(`Failed to fetch posts for profile ${profileUserId}: ${(error as Error).message}`)
+
+      return posts.map((post) => this.convertRawToSubstackPost(post))
+    } catch (error) {
+      this.config.logger?.error('Failed to fetch posts for profile', {
+        profileUserId,
+        options,
+        error: (error as Error).message
+      })
+      throw new Error(
+        `Failed to fetch posts for profile ${profileUserId}: ${(error as Error).message}`
+      )
     }
   }
 }

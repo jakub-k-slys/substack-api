@@ -23,7 +23,7 @@ export interface Cache {
 }
 
 /**
- * Basic logger interface for services  
+ * Basic logger interface for services
  */
 export interface Logger {
   debug(message: string, meta?: object): void
