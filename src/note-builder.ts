@@ -104,11 +104,9 @@ export class NoteBuilder {
   paragraph(text: string): NoteBuilder
   paragraph(text?: string): ParagraphBuilder | NoteBuilder {
     if (text) {
-      // Simple paragraph case
       this.paragraphs.push({ segments: [{ text, type: 'simple' }] })
       return this
     } else {
-      // Rich paragraph case
       return new ParagraphBuilder(this)
     }
   }

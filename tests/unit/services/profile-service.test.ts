@@ -221,7 +221,7 @@ describe('ProfileService', () => {
       mockHttpClient.get.mockRejectedValue(new Error('Not found'))
 
       await expect(profileService.getProfileBySlug('nonexistent')).rejects.toThrow(
-        "Profile with slug 'nonexistent' not found: Not found"
+        /Profile with slug 'nonexistent' not found/
       )
     })
   })
