@@ -50,11 +50,9 @@ export class Note {
           body: comment.body,
           created_at: comment.date,
           parent_post_id: comment.post_id || 0,
-          author: {
-            id: comment.user_id,
-            name: comment.name,
-            is_admin: false // Not available in note comment format
-          }
+          author_id: comment.user_id,
+          author_name: comment.name,
+          author_is_admin: false // Not available in note comment format
         }
         yield new Comment(commentData, this.client)
       }

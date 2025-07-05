@@ -196,11 +196,9 @@ export class SubstackClient {
       body: response.item.comment.body,
       created_at: response.item.comment.date,
       parent_post_id: response.item.comment.post_id || 0,
-      author: {
-        id: response.item.comment.user_id,
-        name: response.item.comment.name,
-        is_admin: false // Default value as this info is not available in the API response
-      }
+      author_id: response.item.comment.user_id,
+      author_name: response.item.comment.name,
+      author_is_admin: false // Default value as this info is not available in the API response
     }
 
     return new Comment(commentData, this.httpClient)

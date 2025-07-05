@@ -10,7 +10,7 @@ export type {
   SubstackCommentResponse,
   SubstackSearchResult,
   SubstackSubscription,
-  SubstackPublicationUser,
+  SubstackPublicationUser as SubstackAPIPublicationUser,
   SubstackSubscriptionPublication,
   SubstackSubscriptionsResponse
 } from './api-responses'
@@ -25,3 +25,18 @@ export type {
 } from './note-details'
 
 export type { SubstackPublicProfile, SubstackFullProfile, SubstackUserProfile } from './profile-api'
+
+export type {
+  SubstackUser,
+  SubstackPublicationBase,
+  SubstackProfilePublication,
+  SubstackAuthor,
+  SubstackLinkMetadata,
+  SubstackAttachment,
+  SubstackTheme,
+  SubstackUserLink,
+  SubstackPublicationUser,
+  SubstackProfileSubscription,
+  SubstackTrackingParameters,
+  SubstackProfileItemContext
+} from './common'

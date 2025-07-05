@@ -22,9 +22,9 @@ export class Comment {
     this.id = rawData.id
     this.body = rawData.body
     this.author = {
-      id: rawData.author.id,
-      name: rawData.author.name,
-      isAdmin: rawData.author.is_admin
+      id: rawData.author_id,
+      name: rawData.author_name,
+      isAdmin: rawData.author_is_admin
     }
     this.createdAt = new Date(rawData.created_at)
     this.likesCount = undefined // TODO: Extract from rawData when available
