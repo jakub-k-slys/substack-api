@@ -60,11 +60,9 @@ describe('SubstackClient - Slug Resolution', () => {
           language: 'en',
           email_from_name: 'Test Publication',
           homepage_type: 'newsletter',
-          theme: {
-            background_pop_color: '#ffffff',
-            web_bg_color: '#f8f9fa',
-            cover_bg_color: null
-          }
+          theme_background_pop_color: '#ffffff',
+          theme_web_bg_color: '#f8f9fa',
+          theme_cover_bg_color: null
         },
         {
           id: 2,
@@ -89,11 +87,9 @@ describe('SubstackClient - Slug Resolution', () => {
           language: 'en',
           email_from_name: 'Another Publication',
           homepage_type: 'newsletter',
-          theme: {
-            background_pop_color: '#ffffff',
-            web_bg_color: '#f8f9fa',
-            cover_bg_color: null
-          }
+          theme_background_pop_color: '#ffffff',
+          theme_web_bg_color: '#f8f9fa',
+          theme_cover_bg_color: null
         }
       ]
     }

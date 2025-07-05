@@ -2,6 +2,9 @@
  * Internal API request/response types for notes
  */
 
+import type { SubstackPublication } from './api-responses'
+import type { SubstackAttachment } from './common'
+
 export interface NoteBodyJson {
   type: 'doc'
   attrs: {
@@ -50,24 +53,6 @@ export interface PublishNoteResponse {
   restacks: number
   restacked: boolean
   children_count: number
-  attachments: Array<{
-    id: string
-    type: string
-    imageUrl?: string
-    imageWidth?: number
-    imageHeight?: number
-    explicit: boolean
-    linkMetadata?: {
-      url: string
-      host: string
-      title: string
-      description?: string
-      image?: string
-      original_image?: string
-    }
-  }>
+  attachments: SubstackAttachment[]
   user_primary_publication?: SubstackPublication
 }
-
-// Import from api-responses for convenience
-import type { SubstackPublication } from './api-responses'

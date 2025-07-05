@@ -4,15 +4,13 @@
  */
 
 /**
- * Raw API response shape for publications
+ * Raw API response shape for publications - flattened
  */
 export interface SubstackPublication {
   name: string
   hostname: string
   subdomain: string
-  logo?: {
-    url: string
-  }
+  logo_url?: string
   description?: string
 }
 
@@ -36,22 +34,20 @@ export interface SubstackPost {
 }
 
 /**
- * Raw API response shape for comments
+ * Raw API response shape for comments - flattened
  */
 export interface SubstackComment {
   id: number
   body: string
   created_at: string
   parent_post_id: number
-  author: {
-    id: number
-    name: string
-    is_admin?: boolean
-  }
+  author_id: number
+  author_name: string
+  author_is_admin?: boolean
 }
 
 /**
- * Response structure from /api/v1/reader/comment/{id} endpoint
+ * Response structure from /api/v1/reader/comment/{id} endpoint - keeping wrapper structure
  */
 export interface SubstackCommentResponse {
   item: {
@@ -143,11 +139,9 @@ export interface SubstackSubscriptionPublication {
   language?: string
   email_from_name?: string
   homepage_type?: string
-  theme?: {
-    background_pop_color?: string
-    web_bg_color?: string
-    cover_bg_color?: string | null
-  }
+  theme_background_pop_color?: string
+  theme_web_bg_color?: string
+  theme_cover_bg_color?: string | null
 }
 
 export interface SubstackSubscriptionsResponse {
