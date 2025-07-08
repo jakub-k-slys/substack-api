@@ -11,7 +11,6 @@ global.fetch = jest.fn()
 describe('SubstackClient', () => {
   let client: SubstackClient
   let mockHttpClient: jest.Mocked<SubstackHttpClient>
-  const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -22,6 +21,7 @@ describe('SubstackClient', () => {
     mockHttpClient.get = jest.fn()
     mockHttpClient.post = jest.fn()
     mockHttpClient.request = jest.fn()
+    mockHttpClient.globalRequest = jest.fn()
     mockHttpClient.getCookie = jest.fn().mockReturnValue('connect.sid=test-api-key')
 
     client = new SubstackClient({
@@ -182,33 +182,19 @@ describe('SubstackClient', () => {
         type: 'newsletter' as const
       }
 
-      // Mock the global fetch response for postForId
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockPost,
-        status: 200,
-        statusText: 'OK'
-      } as Response)
+      // Mock the globalRequest method for postForId
+      mockHttpClient.globalRequest.mockResolvedValueOnce(mockPost)
 
       const post = await client.postForId('456')
       expect(post).toBeInstanceOf(Post)
 
-      // Verify that fetch was called with the global substack.com endpoint
-      expect(mockFetch).toHaveBeenCalledWith('https://substack.com/api/v1/posts/by-id/456', {
-        headers: {
-          Cookie: 'connect.sid=test-api-key',
-          'Content-Type': 'application/json'
-        }
-      })
+      // Verify that globalRequest was called with the correct path
+      expect(mockHttpClient.globalRequest).toHaveBeenCalledWith('/api/v1/posts/by-id/456')
     })
 
     it('should handle API error for postForId', async () => {
-      // Mock fetch to return a 404 error
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-        statusText: 'Not found'
-      } as Response)
+      // Mock globalRequest to throw an HTTP error
+      mockHttpClient.globalRequest.mockRejectedValueOnce(new Error('HTTP 404: Not found'))
 
       await expect(client.postForId('nonexistent')).rejects.toThrow(
         'Post with ID nonexistent not found: HTTP 404: Not found'

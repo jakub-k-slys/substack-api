@@ -164,19 +164,7 @@ export class SubstackClient {
   async postForId(id: string): Promise<Post> {
     try {
       // Post lookup by ID must use the global substack.com endpoint, not publication-specific hostnames
-      const url = `https://substack.com/api/v1/posts/by-id/${id}`
-      const response = await fetch(url, {
-        headers: {
-          Cookie: this.httpClient.getCookie(),
-          'Content-Type': 'application/json'
-        }
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-
-      const post = (await response.json()) as SubstackPost
+      const post = await this.httpClient.globalRequest<SubstackPost>(`/api/v1/posts/by-id/${id}`)
       return new Post(post, this.httpClient)
     } catch (error) {
       throw new Error(`Post with ID ${id} not found: ${(error as Error).message}`)

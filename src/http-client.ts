@@ -60,4 +60,25 @@ export class SubstackHttpClient {
       body: data ? JSON.stringify(data) : undefined
     })
   }
+
+  /**
+   * Make a request to the global substack.com endpoint (not publication-specific)
+   */
+  async globalRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
+    const url = `https://substack.com${path}`
+    const response = await fetch(url, {
+      headers: {
+        Cookie: this.cookie,
+        'Content-Type': 'application/json',
+        ...options.headers
+      },
+      ...options
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
+
+    return response.json()
+  }
 }
