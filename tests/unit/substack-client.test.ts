@@ -5,9 +5,13 @@ import { SubstackHttpClient } from '../../src/http-client'
 // Mock the http client
 jest.mock('../../src/http-client')
 
+// Mock the global fetch function
+global.fetch = jest.fn()
+
 describe('SubstackClient', () => {
   let client: SubstackClient
   let mockHttpClient: jest.Mocked<SubstackHttpClient>
+  const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -18,6 +22,7 @@ describe('SubstackClient', () => {
     mockHttpClient.get = jest.fn()
     mockHttpClient.post = jest.fn()
     mockHttpClient.request = jest.fn()
+    mockHttpClient.getCookie = jest.fn().mockReturnValue('connect.sid=test-api-key')
 
     client = new SubstackClient({
       apiKey: 'test-api-key',
@@ -176,18 +181,37 @@ describe('SubstackClient', () => {
         canonical_url: 'https://example.com/post',
         type: 'newsletter' as const
       }
-      mockHttpClient.get.mockResolvedValue(mockPost)
+
+      // Mock the global fetch response for postForId
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockPost,
+        status: 200,
+        statusText: 'OK'
+      } as Response)
 
       const post = await client.postForId('456')
       expect(post).toBeInstanceOf(Post)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/posts/by-id/456')
+
+      // Verify that fetch was called with the global substack.com endpoint
+      expect(mockFetch).toHaveBeenCalledWith('https://substack.com/api/v1/posts/by-id/456', {
+        headers: {
+          Cookie: 'connect.sid=test-api-key',
+          'Content-Type': 'application/json'
+        }
+      })
     })
 
     it('should handle API error for postForId', async () => {
-      mockHttpClient.get.mockRejectedValue(new Error('Not found'))
+      // Mock fetch to return a 404 error
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        statusText: 'Not found'
+      } as Response)
 
       await expect(client.postForId('nonexistent')).rejects.toThrow(
-        'Post with ID nonexistent not found: Not found'
+        'Post with ID nonexistent not found: HTTP 404: Not found'
       )
     })
   })
