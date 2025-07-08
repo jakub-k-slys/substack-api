@@ -32,8 +32,7 @@ export class SubstackHttpClient {
     return this.cookie
   }
 
-  async request<T>(path: string, options: RequestInit = {}): Promise<T> {
-    const url = `${this.baseUrl}${path}`
+  private async makeRequest<T>(url: string, options: RequestInit = {}): Promise<T> {
     const response = await fetch(url, {
       headers: {
         Cookie: this.cookie,
@@ -48,6 +47,11 @@ export class SubstackHttpClient {
     }
 
     return response.json()
+  }
+
+  async request<T>(path: string, options: RequestInit = {}): Promise<T> {
+    const url = `${this.baseUrl}${path}`
+    return this.makeRequest<T>(url, options)
   }
 
   async get<T>(path: string): Promise<T> {
@@ -66,19 +70,6 @@ export class SubstackHttpClient {
    */
   async globalRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
     const url = `https://substack.com${path}`
-    const response = await fetch(url, {
-      headers: {
-        Cookie: this.cookie,
-        'Content-Type': 'application/json',
-        ...options.headers
-      },
-      ...options
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-    }
-
-    return response.json()
+    return this.makeRequest<T>(url, options)
   }
 }
