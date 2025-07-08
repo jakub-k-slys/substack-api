@@ -162,8 +162,12 @@ export class SubstackClient {
    * Get a specific post by ID
    */
   async postForId(id: string): Promise<Post> {
-    const post = await this.httpClient.get<SubstackPost>(`/api/v1/posts/${id}`)
-    return new Post(post, this.httpClient)
+    try {
+      const post = await this.httpClient.get<SubstackPost>(`/api/v1/posts/by-id/${id}`)
+      return new Post(post, this.httpClient)
+    } catch (error) {
+      throw new Error(`Post with ID ${id} not found: ${(error as Error).message}`)
+    }
   }
 
   /**
