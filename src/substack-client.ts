@@ -171,8 +171,77 @@ export class SubstackClient {
    */
   async noteForId(id: string): Promise<Note> {
     try {
-      const note = await this.httpClient.get<SubstackNote>(`/api/v1/notes/${id}`)
-      return new Note(note, this.httpClient)
+      // Notes are fetched using the same endpoint as comments
+      const response = await this.httpClient.get<SubstackCommentResponse>(
+        `/api/v1/reader/comment/${id}`
+      )
+
+      // Transform the comment response to the SubstackNote structure expected by Note entity
+      const noteData: SubstackNote = {
+        entity_key: id,
+        type: 'note',
+        context: {
+          type: 'feed',
+          timestamp: response.item.comment.date,
+          users: [
+            {
+              id: response.item.comment.user_id,
+              name: response.item.comment.name,
+              handle: '', // Not available in comment response
+              photo_url: '', // Not available in comment response
+              bio: '',
+              profile_set_up_at: response.item.comment.date,
+              reader_installed_at: response.item.comment.date
+            }
+          ],
+          isFresh: false,
+          page_rank: 1
+        },
+        comment: {
+          name: response.item.comment.name,
+          handle: '',
+          photo_url: '',
+          id: response.item.comment.id,
+          body: response.item.comment.body,
+          user_id: response.item.comment.user_id,
+          type: 'feed',
+          date: response.item.comment.date,
+          ancestor_path: '',
+          reply_minimum_role: 'everyone',
+          reaction_count: 0, // Not available in comment response
+          reactions: {},
+          restacks: 0,
+          restacked: false,
+          children_count: 0,
+          attachments: []
+        },
+        parentComments: [],
+        canReply: true,
+        isMuted: false,
+        trackingParameters: {
+          item_primary_entity_key: id,
+          item_entity_key: id,
+          item_type: 'note',
+          item_content_user_id: response.item.comment.user_id,
+          item_context_type: 'feed',
+          item_context_type_bucket: 'note',
+          item_context_timestamp: response.item.comment.date,
+          item_context_user_id: response.item.comment.user_id,
+          item_context_user_ids: [response.item.comment.user_id],
+          item_can_reply: true,
+          item_is_fresh: false,
+          item_last_impression_at: null,
+          item_page: null,
+          item_page_rank: 1,
+          impression_id: 'generated',
+          followed_user_count: 0,
+          subscribed_publication_count: 0,
+          is_following: false,
+          is_explicitly_subscribed: false
+        }
+      }
+
+      return new Note(noteData, this.httpClient)
     } catch {
       throw new Error(`Note with ID ${id} not found`)
     }
