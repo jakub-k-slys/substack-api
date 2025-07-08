@@ -203,7 +203,7 @@ describe('SubstackClient', () => {
       const note = await client.noteForId('789')
       expect(note).toBeInstanceOf(Note)
       expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/comment/789')
-      
+
       // Verify Note properties are correctly populated
       expect(note.id).toBe('789')
       expect(note.body).toBe('Test note')
