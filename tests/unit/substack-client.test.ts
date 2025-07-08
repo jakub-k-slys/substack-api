@@ -186,74 +186,29 @@ describe('SubstackClient', () => {
 
   describe('noteForId', () => {
     it('should get note by ID', async () => {
-      const mockNote = {
-        entity_key: '789',
-        type: 'note',
-        context: {
-          type: 'feed',
-          timestamp: '2023-01-01T00:00:00Z',
-          users: [
-            {
-              id: 123,
-              name: 'Test User',
-              handle: 'testuser',
-              photo_url: 'https://example.com/photo.jpg',
-              bio: 'Test bio',
-              profile_set_up_at: '2023-01-01T00:00:00Z',
-              reader_installed_at: '2023-01-01T00:00:00Z'
-            }
-          ],
-          isFresh: false,
-          page_rank: 1
-        },
-        comment: {
-          name: 'Test User',
-          handle: 'testuser',
-          photo_url: 'https://example.com/photo.jpg',
-          id: 789,
-          body: 'Test note',
-          user_id: 123,
-          type: 'feed',
-          date: '2023-01-01T00:00:00Z',
-          ancestor_path: '',
-          reply_minimum_role: 'everyone',
-          reaction_count: 0,
-          reactions: {},
-          restacks: 0,
-          restacked: false,
-          children_count: 0,
-          attachments: []
-        },
-        parentComments: [],
-        canReply: true,
-        isMuted: false,
-        trackingParameters: {
-          item_primary_entity_key: '789',
-          item_entity_key: '789',
-          item_type: 'note',
-          item_content_user_id: 123,
-          item_context_type: 'feed',
-          item_context_type_bucket: 'note',
-          item_context_timestamp: '2023-01-01T00:00:00Z',
-          item_context_user_id: 123,
-          item_context_user_ids: [123],
-          item_can_reply: true,
-          item_is_fresh: false,
-          item_last_impression_at: null,
-          item_page: null,
-          item_page_rank: 1,
-          impression_id: 'test-impression',
-          followed_user_count: 0,
-          subscribed_publication_count: 0,
-          is_following: false,
-          is_explicitly_subscribed: false
+      const mockNoteResponse = {
+        item: {
+          comment: {
+            id: 789,
+            body: 'Test note',
+            user_id: 123,
+            name: 'Test User',
+            date: '2023-01-01T00:00:00Z',
+            post_id: null
+          }
         }
       }
-      mockHttpClient.get.mockResolvedValue(mockNote)
+      mockHttpClient.get.mockResolvedValue(mockNoteResponse)
 
       const note = await client.noteForId('789')
       expect(note).toBeInstanceOf(Note)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/notes/789')
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/comment/789')
+      
+      // Verify Note properties are correctly populated
+      expect(note.id).toBe('789')
+      expect(note.body).toBe('Test note')
+      expect(note.author.id).toBe(123)
+      expect(note.author.name).toBe('Test User')
     })
 
     it('should handle API error for noteForId', async () => {
