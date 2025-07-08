@@ -180,7 +180,15 @@ describe('SubstackClient', () => {
 
       const post = await client.postForId('456')
       expect(post).toBeInstanceOf(Post)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/posts/456')
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/posts/by-id/456')
+    })
+
+    it('should handle API error for postForId', async () => {
+      mockHttpClient.get.mockRejectedValue(new Error('Not found'))
+
+      await expect(client.postForId('nonexistent')).rejects.toThrow(
+        'Post with ID nonexistent not found: Not found'
+      )
     })
   })
 
