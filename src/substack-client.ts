@@ -1,6 +1,6 @@
 import { SubstackHttpClient } from './http-client'
 import { Profile, OwnProfile, Post, Note, Comment } from './domain'
-import { PostService } from './services'
+import { PostService, NoteService, ProfileService } from './services'
 import type { SubstackConfig } from './types'
 import type {
   SubstackFullProfile,
@@ -18,6 +18,8 @@ export class SubstackClient {
   private readonly httpClient: SubstackHttpClient
   private readonly globalHttpClient: SubstackHttpClient
   private readonly postService: PostService
+  private readonly noteService: NoteService
+  private readonly profileService: ProfileService
   private subscriptionsCache: Map<number, string> | null = null // user_id -> slug mapping
   private subscriptionsCacheTimestamp: number | null = null
 
@@ -33,6 +35,8 @@ export class SubstackClient {
 
     // Initialize services
     this.postService = new PostService(this.httpClient, this.globalHttpClient)
+    this.noteService = new NoteService(this.httpClient, this.globalHttpClient)
+    this.profileService = new ProfileService(this.httpClient, this.globalHttpClient)
   }
 
   /**
@@ -108,16 +112,13 @@ export class SubstackClient {
    */
   async ownProfile(): Promise<OwnProfile> {
     try {
-      // Step 1: Get user_id from subscription endpoint
+      const profile = await this.profileService.getOwnProfile()
+
+      // Get user_id for slug resolution
       const subscription = await this.httpClient.get<{ user_id: number }>('/api/v1/subscription')
       const userId = subscription.user_id
 
-      // Step 2: Get full profile using the user_id
-      const profile = await this.httpClient.get<SubstackFullProfile>(
-        `/api/v1/user/${userId}/profile`
-      )
-
-      // Step 3: Resolve slug from subscriptions cache
+      // Resolve slug from subscriptions cache
       const resolvedSlug = await this.getSlugForUserId(userId, profile.handle)
 
       return new OwnProfile(
@@ -136,7 +137,7 @@ export class SubstackClient {
    */
   async profileForId(id: number): Promise<Profile> {
     try {
-      const profile = await this.httpClient.get<SubstackFullProfile>(`/api/v1/user/${id}/profile`)
+      const profile = await this.profileService.getProfileById(id)
 
       // Resolve slug from subscriptions cache
       const resolvedSlug = await this.getSlugForUserId(id, profile.handle)
@@ -156,9 +157,7 @@ export class SubstackClient {
     }
 
     try {
-      const profile = await this.httpClient.get<SubstackFullProfile>(
-        `/api/v1/user/${slug}/public_profile`
-      )
+      const profile = await this.profileService.getProfileBySlug(slug)
 
       // For profiles fetched by slug, we can use the provided slug as the resolved slug
       // but still check subscriptions cache for consistency
@@ -195,76 +194,7 @@ export class SubstackClient {
     }
 
     try {
-      // Notes are fetched using the same endpoint as comments
-      const response = await this.httpClient.get<SubstackCommentResponse>(
-        `/api/v1/reader/comment/${id}`
-      )
-
-      // Transform the comment response to the SubstackNote structure expected by Note entity
-      const noteData: SubstackNote = {
-        entity_key: String(id),
-        type: 'note',
-        context: {
-          type: 'feed',
-          timestamp: response.item.comment.date,
-          users: [
-            {
-              id: response.item.comment.user_id,
-              name: response.item.comment.name,
-              handle: '', // Not available in comment response
-              photo_url: '', // Not available in comment response
-              bio: '',
-              profile_set_up_at: response.item.comment.date,
-              reader_installed_at: response.item.comment.date
-            }
-          ],
-          isFresh: false,
-          page_rank: 1
-        },
-        comment: {
-          name: response.item.comment.name,
-          handle: '',
-          photo_url: '',
-          id: response.item.comment.id,
-          body: response.item.comment.body,
-          user_id: response.item.comment.user_id,
-          type: 'feed',
-          date: response.item.comment.date,
-          ancestor_path: '',
-          reply_minimum_role: 'everyone',
-          reaction_count: 0, // Not available in comment response
-          reactions: {},
-          restacks: 0,
-          restacked: false,
-          children_count: 0,
-          attachments: []
-        },
-        parentComments: [],
-        canReply: true,
-        isMuted: false,
-        trackingParameters: {
-          item_primary_entity_key: String(id),
-          item_entity_key: String(id),
-          item_type: 'note',
-          item_content_user_id: response.item.comment.user_id,
-          item_context_type: 'feed',
-          item_context_type_bucket: 'note',
-          item_context_timestamp: response.item.comment.date,
-          item_context_user_id: response.item.comment.user_id,
-          item_context_user_ids: [response.item.comment.user_id],
-          item_can_reply: true,
-          item_is_fresh: false,
-          item_last_impression_at: null,
-          item_page: null,
-          item_page_rank: 1,
-          impression_id: 'generated',
-          followed_user_count: 0,
-          subscribed_publication_count: 0,
-          is_following: false,
-          is_explicitly_subscribed: false
-        }
-      }
-
+      const noteData = await this.noteService.getNoteById(id)
       return new Note(noteData, this.httpClient)
     } catch {
       throw new Error(`Note with ID ${id} not found`)

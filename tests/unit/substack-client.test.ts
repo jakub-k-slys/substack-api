@@ -1,7 +1,7 @@
 import { SubstackClient } from '../../src/substack-client'
 import { Profile, Post, Note, Comment, OwnProfile } from '../../src/domain'
 import { SubstackHttpClient } from '../../src/http-client'
-import { PostService } from '../../src/services'
+import { PostService, NoteService, ProfileService } from '../../src/services'
 
 // Mock the http client and services
 jest.mock('../../src/http-client')
@@ -15,6 +15,8 @@ describe('SubstackClient', () => {
   let mockHttpClient: jest.Mocked<SubstackHttpClient>
   let mockGlobalHttpClient: jest.Mocked<SubstackHttpClient>
   let mockPostService: jest.Mocked<PostService>
+  let mockNoteService: jest.Mocked<NoteService>
+  let mockProfileService: jest.Mocked<ProfileService>
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -40,6 +42,20 @@ describe('SubstackClient', () => {
     ) as jest.Mocked<PostService>
     mockPostService.getPostById = jest.fn()
 
+    mockNoteService = new NoteService(
+      mockHttpClient,
+      mockGlobalHttpClient
+    ) as jest.Mocked<NoteService>
+    mockNoteService.getNoteById = jest.fn()
+
+    mockProfileService = new ProfileService(
+      mockHttpClient,
+      mockGlobalHttpClient
+    ) as jest.Mocked<ProfileService>
+    mockProfileService.getOwnProfile = jest.fn()
+    mockProfileService.getProfileById = jest.fn()
+    mockProfileService.getProfileBySlug = jest.fn()
+
     client = new SubstackClient({
       apiKey: 'test-api-key',
       hostname: 'test.substack.com'
@@ -49,6 +65,8 @@ describe('SubstackClient', () => {
     ;(client as unknown as { globalHttpClient: SubstackHttpClient }).globalHttpClient =
       mockGlobalHttpClient
     ;(client as unknown as { postService: PostService }).postService = mockPostService
+    ;(client as unknown as { noteService: NoteService }).noteService = mockNoteService
+    ;(client as unknown as { profileService: ProfileService }).profileService = mockProfileService
   })
 
   describe('testConnectivity', () => {
@@ -103,20 +121,19 @@ describe('SubstackClient', () => {
         can_dm: false,
         dm_upgrade_options: []
       }
-      mockHttpClient.get
-        .mockResolvedValueOnce(mockSubscription) // First call to /api/v1/subscription
-        .mockResolvedValueOnce(mockProfile) // Second call to /api/v1/user/{id}/profile
+      mockProfileService.getOwnProfile.mockResolvedValueOnce(mockProfile)
+      mockHttpClient.get.mockResolvedValueOnce(mockSubscription) // For slug resolution
 
       const ownProfile = await client.ownProfile()
       expect(ownProfile).toBeInstanceOf(OwnProfile)
       expect(ownProfile.id).toBe(123)
       expect(ownProfile.name).toBe('Test User')
+      expect(mockProfileService.getOwnProfile).toHaveBeenCalled()
       expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/subscription')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/123/profile')
     })
 
     it('should throw error when authentication fails', async () => {
-      mockHttpClient.get.mockRejectedValue(new Error('Unauthorized'))
+      mockProfileService.getOwnProfile.mockRejectedValue(new Error('Unauthorized'))
 
       await expect(client.ownProfile()).rejects.toThrow('Failed to get own profile: Unauthorized')
     })
@@ -130,15 +147,15 @@ describe('SubstackClient', () => {
         name: 'Test User',
         photo_url: 'https://example.com/photo.jpg'
       }
-      mockHttpClient.get.mockResolvedValue(mockProfile)
+      mockProfileService.getProfileById.mockResolvedValue(mockProfile)
 
       const profile = await client.profileForId(123)
       expect(profile).toBeInstanceOf(Profile)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/123/profile')
+      expect(mockProfileService.getProfileById).toHaveBeenCalledWith(123)
     })
 
     it('should handle API error for profileForId', async () => {
-      mockHttpClient.get.mockRejectedValue(new Error('Not found'))
+      mockProfileService.getProfileById.mockRejectedValue(new Error('Not found'))
 
       await expect(client.profileForId(999)).rejects.toThrow(
         'Profile with ID 999 not found: Not found'
@@ -152,11 +169,11 @@ describe('SubstackClient', () => {
         name: 'Test User',
         photo_url: 'https://example.com/photo.jpg'
       }
-      mockHttpClient.get.mockResolvedValue(mockProfile)
+      mockProfileService.getProfileById.mockResolvedValue(mockProfile)
 
       const profile = await client.profileForId(9876543210)
       expect(profile).toBeInstanceOf(Profile)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/9876543210/profile')
+      expect(mockProfileService.getProfileById).toHaveBeenCalledWith(9876543210)
     })
   })
 
@@ -168,11 +185,11 @@ describe('SubstackClient', () => {
         name: 'Test User',
         photo_url: 'https://example.com/photo.jpg'
       }
-      mockHttpClient.get.mockResolvedValue(mockProfile)
+      mockProfileService.getProfileBySlug.mockResolvedValue(mockProfile)
 
       const profile = await client.profileForSlug('testuser')
       expect(profile).toBeInstanceOf(Profile)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/testuser/public_profile')
+      expect(mockProfileService.getProfileBySlug).toHaveBeenCalledWith('testuser')
     })
 
     it('should handle empty slug', async () => {
@@ -181,7 +198,7 @@ describe('SubstackClient', () => {
     })
 
     it('should handle API error for profileForSlug', async () => {
-      mockHttpClient.get.mockRejectedValue(new Error('Not found'))
+      mockProfileService.getProfileBySlug.mockRejectedValue(new Error('Not found'))
 
       await expect(client.profileForSlug('nonexistent')).rejects.toThrow(
         // eslint-disable-next-line quotes
@@ -223,23 +240,76 @@ describe('SubstackClient', () => {
 
   describe('noteForId', () => {
     it('should get note by ID', async () => {
-      const mockNoteResponse = {
-        item: {
-          comment: {
-            id: 789,
-            body: 'Test note',
-            user_id: 123,
-            name: 'Test User',
-            date: '2023-01-01T00:00:00Z',
-            post_id: null
-          }
+      const mockNoteData = {
+        entity_key: '789',
+        type: 'note',
+        context: {
+          type: 'feed',
+          timestamp: '2023-01-01T00:00:00Z',
+          users: [
+            {
+              id: 123,
+              name: 'Test User',
+              handle: '',
+              photo_url: '',
+              bio: '',
+              profile_set_up_at: '2023-01-01T00:00:00Z',
+              reader_installed_at: '2023-01-01T00:00:00Z'
+            }
+          ],
+          isFresh: false,
+          page: null,
+          page_rank: 1
+        },
+        comment: {
+          id: 789,
+          body: 'Test note',
+          type: 'feed',
+          date: '2023-01-01T00:00:00Z',
+          user_id: 123,
+          post_id: null,
+          name: 'Test User',
+          handle: '',
+          photo_url: '',
+          ancestor_path: '',
+          reply_minimum_role: 'everyone',
+          reaction_count: 0,
+          reactions: {},
+          restacks: 0,
+          restacked: false,
+          children_count: 0,
+          attachments: []
+        },
+        parentComments: [],
+        canReply: true,
+        isMuted: false,
+        trackingParameters: {
+          item_primary_entity_key: '789',
+          item_entity_key: '789',
+          item_type: 'note',
+          item_content_user_id: 123,
+          item_context_type: 'feed',
+          item_context_type_bucket: 'note',
+          item_context_timestamp: '2023-01-01T00:00:00Z',
+          item_context_user_id: 123,
+          item_context_user_ids: [123],
+          item_can_reply: true,
+          item_is_fresh: false,
+          item_last_impression_at: null,
+          item_page: null,
+          item_page_rank: 1,
+          impression_id: 'generated',
+          followed_user_count: 0,
+          subscribed_publication_count: 0,
+          is_following: false,
+          is_explicitly_subscribed: false
         }
       }
-      mockHttpClient.get.mockResolvedValue(mockNoteResponse)
+      mockNoteService.getNoteById.mockResolvedValue(mockNoteData)
 
       const note = await client.noteForId(789)
       expect(note).toBeInstanceOf(Note)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/comment/789')
+      expect(mockNoteService.getNoteById).toHaveBeenCalledWith(789)
 
       // Verify Note properties are correctly populated
       expect(note.id).toBe('789')
@@ -249,7 +319,7 @@ describe('SubstackClient', () => {
     })
 
     it('should handle API error for noteForId', async () => {
-      mockHttpClient.get.mockRejectedValue(new Error('Not found'))
+      mockNoteService.getNoteById.mockRejectedValue(new Error('Not found'))
 
       await expect(client.noteForId(999)).rejects.toThrow('Note with ID 999 not found')
     })
