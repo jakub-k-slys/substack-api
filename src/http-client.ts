@@ -8,12 +8,11 @@ export class SubstackHttpClient {
   private readonly cookie: string
   private readonly perPage: number
 
-  constructor(config: SubstackConfig) {
+  constructor(baseUrl: string, config: SubstackConfig) {
     if (!config.apiKey) {
       throw new Error('apiKey is required in SubstackConfig')
     }
-    const protocol = config.protocol || 'https'
-    this.baseUrl = `${protocol}://${config.hostname || 'substack.com'}`
+    this.baseUrl = baseUrl
     this.cookie = `connect.sid=${config.apiKey}`
     this.perPage = config.perPage || 25
   }
@@ -25,8 +24,7 @@ export class SubstackHttpClient {
     return this.perPage
   }
 
-  async request<T>(path: string, options: RequestInit = {}): Promise<T> {
-    const url = `${this.baseUrl}${path}`
+  private async makeRequest<T>(url: string, options: RequestInit = {}): Promise<T> {
     const response = await fetch(url, {
       headers: {
         Cookie: this.cookie,
@@ -41,6 +39,11 @@ export class SubstackHttpClient {
     }
 
     return response.json()
+  }
+
+  async request<T>(path: string, options: RequestInit = {}): Promise<T> {
+    const url = `${this.baseUrl}${path}`
+    return this.makeRequest<T>(url, options)
   }
 
   async get<T>(path: string): Promise<T> {
