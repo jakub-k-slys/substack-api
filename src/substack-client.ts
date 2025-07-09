@@ -74,8 +74,8 @@ export class SubstackClient {
         this.httpClient,
         this.profileService,
         this.postService,
-        this.commentService,
         this.noteService,
+        this.commentService,
         this.followeeService,
         resolvedSlug,
         this.slugService.getSlugForUserId.bind(this.slugService)
@@ -100,6 +100,7 @@ export class SubstackClient {
         this.httpClient,
         this.profileService,
         this.postService,
+        this.noteService,
         this.commentService,
         resolvedSlug,
         this.slugService.getSlugForUserId.bind(this.slugService)
@@ -129,6 +130,7 @@ export class SubstackClient {
         this.httpClient,
         this.profileService,
         this.postService,
+        this.noteService,
         this.commentService,
         resolvedSlug,
         this.slugService.getSlugForUserId.bind(this.slugService)

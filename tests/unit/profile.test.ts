@@ -1,12 +1,13 @@
 import { Profile } from '../../src/domain/profile'
 import { Post, Note } from '../../src/domain'
-import { ProfileService, PostService, CommentService } from '../../src/internal/services'
+import { ProfileService, PostService, NoteService, CommentService } from '../../src/internal/services'
 import type { SubstackHttpClient } from '../../src/http-client'
 
 describe('Profile Entity', () => {
   let mockHttpClient: jest.Mocked<SubstackHttpClient>
   let mockProfileService: jest.Mocked<ProfileService>
   let mockPostService: jest.Mocked<PostService>
+  let mockNoteService: jest.Mocked<NoteService>
   let mockCommentService: jest.Mocked<CommentService>
   let profile: Profile
 
@@ -21,14 +22,19 @@ describe('Profile Entity', () => {
     mockProfileService = {
       getOwnProfile: jest.fn(),
       getProfileById: jest.fn(),
-      getProfileBySlug: jest.fn(),
-      getPostsForProfile: jest.fn(),
-      getNotesForProfile: jest.fn()
+      getProfileBySlug: jest.fn()
     } as unknown as jest.Mocked<ProfileService>
 
     mockPostService = {
-      getPostById: jest.fn()
+      getPostById: jest.fn(),
+      getPostsForProfile: jest.fn()
     } as unknown as jest.Mocked<PostService>
+
+    mockNoteService = {
+      getNoteById: jest.fn(),
+      getNotesForLoggedUser: jest.fn(),
+      getNotesForProfile: jest.fn()
+    } as unknown as jest.Mocked<NoteService>
 
     mockCommentService = {
       getCommentsForPost: jest.fn(),
@@ -76,6 +82,7 @@ describe('Profile Entity', () => {
       mockHttpClient,
       mockProfileService,
       mockPostService,
+      mockNoteService,
       mockCommentService
     )
   })
@@ -100,7 +107,7 @@ describe('Profile Entity', () => {
           type: 'newsletter' as const
         }
       ]
-      mockProfileService.getPostsForProfile.mockResolvedValue(mockPosts)
+      mockPostService.getPostsForProfile.mockResolvedValue(mockPosts)
 
       const posts = []
       for await (const post of profile.posts({ limit: 2 })) {

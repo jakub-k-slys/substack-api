@@ -1,6 +1,6 @@
 import { SubstackClient } from '../../src/substack-client'
 import { Profile, Post, Comment } from '../../src/domain'
-import { PostService, ProfileService, CommentService } from '../../src/internal/services'
+import { PostService, ProfileService, NoteService, CommentService } from '../../src/internal/services'
 import type { SubstackHttpClient } from '../../src/http-client'
 
 describe('SubstackClient Entity Model', () => {
@@ -71,15 +71,19 @@ describe('SubstackClient Entity Model', () => {
       const mockProfileService = {
         getOwnProfile: jest.fn(),
         getProfileById: jest.fn(),
-        getProfileBySlug: jest.fn(),
-        getPostsForProfile: jest.fn(),
-        getNotesForProfile: jest.fn(),
-        getFollowingUsers: jest.fn()
+        getProfileBySlug: jest.fn()
       } as unknown as ProfileService
 
       const mockPostService = {
-        getPostById: jest.fn()
+        getPostById: jest.fn(),
+        getPostsForProfile: jest.fn()
       } as unknown as PostService
+
+      const mockNoteService = {
+        getNoteById: jest.fn(),
+        getNotesForLoggedUser: jest.fn(),
+        getNotesForProfile: jest.fn()
+      } as unknown as NoteService
 
       const mockCommentService = {
         getCommentsForPost: jest.fn(),
@@ -91,6 +95,7 @@ describe('SubstackClient Entity Model', () => {
         httpClient,
         mockProfileService,
         mockPostService,
+        mockNoteService,
         mockCommentService
       )
 

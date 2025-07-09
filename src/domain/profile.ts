@@ -3,7 +3,7 @@ import type {
   SubstackFullProfile
 } from '../internal'
 import type { SubstackHttpClient } from '../http-client'
-import type { ProfileService, CommentService } from '../internal/services'
+import type { ProfileService, CommentService, PostService, NoteService } from '../internal/services'
 import { Post } from './post'
 import { Note } from './note'
 
@@ -22,7 +22,8 @@ export class Profile {
     protected readonly rawData: SubstackPublicProfile | SubstackFullProfile,
     protected readonly client: SubstackHttpClient,
     protected readonly profileService: ProfileService,
-    protected readonly postService: any, // Will be properly typed when needed
+    protected readonly postService: PostService,
+    protected readonly noteService: NoteService,
     protected readonly commentService: CommentService,
     resolvedSlug?: string,
     protected readonly slugResolver?: (
@@ -50,8 +51,8 @@ export class Profile {
       let totalYielded = 0
 
       while (true) {
-        // Use ProfileService to get posts
-        const postsData = await this.profileService.getPostsForProfile(this.id, {
+        // Use PostService to get posts
+        const postsData = await this.postService.getPostsForProfile(this.id, {
           limit: perPageConfig,
           offset
         })
@@ -92,8 +93,8 @@ export class Profile {
       let totalYielded = 0
 
       while (true) {
-        // Use ProfileService to get notes for this profile
-        const notesData = await this.profileService.getNotesForProfile(this.id, {
+        // Use NoteService to get notes for this profile
+        const notesData = await this.noteService.getNotesForProfile(this.id, {
           limit: perPageConfig,
           offset
         })

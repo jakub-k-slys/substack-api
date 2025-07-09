@@ -18,13 +18,13 @@ export class OwnProfile extends Profile {
     client: any,
     profileService: ProfileService,
     postService: any,
+    noteService: NoteService,
     commentService: CommentService,
-    private readonly noteService: NoteService,
     private readonly followeeService: FolloweeService,
     resolvedSlug?: string,
     slugResolver?: (userId: number, fallbackHandle?: string) => Promise<string | undefined>
   ) {
-    super(rawData, client, profileService, postService, commentService, resolvedSlug, slugResolver)
+    super(rawData, client, profileService, postService, noteService, commentService, resolvedSlug, slugResolver)
   }
 
   /**
@@ -41,7 +41,7 @@ export class OwnProfile extends Profile {
    */
   async *followees(options: { limit?: number } = {}): AsyncIterable<Profile> {
     // Use FolloweeService to get the list of user IDs that the user follows
-    const followingUserIds = await this.followeeService.getFollowingUsers()
+    const followingUserIds = await this.followeeService.getFollowees()
 
     // Then, for each user ID, fetch their detailed profile
     let count = 0
@@ -63,6 +63,7 @@ export class OwnProfile extends Profile {
           this.client,
           this.profileService,
           this.postService,
+          this.noteService,
           this.commentService,
           resolvedSlug,
           this.slugResolver
@@ -82,7 +83,7 @@ export class OwnProfile extends Profile {
   async *notes(options: { limit?: number } = {}): AsyncIterable<Note> {
     try {
       // Use NoteService to fetch notes for the authenticated user
-      const notesData = await this.noteService.getNotesForUser()
+      const notesData = await this.noteService.getNotesForLoggedUser()
 
       let count = 0
       for (const noteData of notesData) {

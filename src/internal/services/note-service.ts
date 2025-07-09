@@ -95,8 +95,25 @@ export class NoteService {
    * @returns Promise<SubstackNote[]> - Raw note data from API
    * @throws {Error} When notes cannot be retrieved
    */
-  async getNotesForUser(): Promise<SubstackNote[]> {
+  async getNotesForLoggedUser(): Promise<SubstackNote[]> {
     const response = await this.httpClient.get<{ items?: SubstackNote[] }>('/api/v1/notes')
+    return response.items || []
+  }
+
+  /**
+   * Get notes for a profile
+   * @param profileId - The profile user ID
+   * @param options - Pagination options
+   * @returns Promise<SubstackNote[]> - Raw note data from API
+   * @throws {Error} When notes cannot be retrieved
+   */
+  async getNotesForProfile(
+    profileId: number,
+    options: { limit: number; offset: number }
+  ): Promise<SubstackNote[]> {
+    const response = await this.httpClient.get<{ items?: SubstackNote[] }>(
+      `/api/v1/reader/feed/profile/${profileId}?types=note&limit=${options.limit}&offset=${options.offset}`
+    )
     return response.items || []
   }
 }

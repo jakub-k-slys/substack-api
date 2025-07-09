@@ -20,12 +20,12 @@ describe('FolloweeService', () => {
     followeeService = new FolloweeService(mockHttpClient)
   })
 
-  describe('getFollowingUsers', () => {
+  describe('getFollowees', () => {
     it('should fetch following users successfully', async () => {
       const mockUserIds = [123, 456, 789]
       mockHttpClient.get.mockResolvedValue(mockUserIds)
 
-      const result = await followeeService.getFollowingUsers()
+      const result = await followeeService.getFollowees()
 
       expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/feed/following')
       expect(result).toEqual(mockUserIds)
@@ -35,7 +35,7 @@ describe('FolloweeService', () => {
       const mockUserIds: number[] = []
       mockHttpClient.get.mockResolvedValue(mockUserIds)
 
-      const result = await followeeService.getFollowingUsers()
+      const result = await followeeService.getFollowees()
 
       expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/feed/following')
       expect(result).toEqual([])
@@ -45,7 +45,7 @@ describe('FolloweeService', () => {
       const error = new Error('Network error')
       mockHttpClient.get.mockRejectedValue(error)
 
-      await expect(followeeService.getFollowingUsers()).rejects.toThrow('Network error')
+      await expect(followeeService.getFollowees()).rejects.toThrow('Network error')
       expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/feed/following')
     })
 
@@ -53,7 +53,7 @@ describe('FolloweeService', () => {
       const error = new Error('Unauthorized')
       mockHttpClient.get.mockRejectedValue(error)
 
-      await expect(followeeService.getFollowingUsers()).rejects.toThrow('Unauthorized')
+      await expect(followeeService.getFollowees()).rejects.toThrow('Unauthorized')
       expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/feed/following')
     })
   })

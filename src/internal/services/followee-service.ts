@@ -12,7 +12,7 @@ export class FolloweeService {
    * @returns Promise<number[]> - Array of user IDs that the user follows
    * @throws {Error} When following list cannot be retrieved
    */
-  async getFollowingUsers(): Promise<number[]> {
+  async getFollowees(): Promise<number[]> {
     return await this.httpClient.get<number[]>('/api/v1/feed/following')
   }
 }

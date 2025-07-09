@@ -41,38 +41,4 @@ export class ProfileService {
   async getProfileBySlug(slug: string): Promise<SubstackFullProfile> {
     return await this.httpClient.get<SubstackFullProfile>(`/api/v1/user/${slug}/public_profile`)
   }
-
-  /**
-   * Get posts for a profile
-   * @param profileId - The profile user ID
-   * @param options - Pagination options
-   * @returns Promise<SubstackPost[]> - Raw post data from API
-   * @throws {Error} When posts cannot be retrieved
-   */
-  async getPostsForProfile(
-    profileId: number,
-    options: { limit: number; offset: number }
-  ): Promise<SubstackPost[]> {
-    const response = await this.httpClient.get<{ posts?: SubstackPost[] }>(
-      `/api/v1/profile/posts?profile_user_id=${profileId}&limit=${options.limit}&offset=${options.offset}`
-    )
-    return response.posts || []
-  }
-
-  /**
-   * Get notes for a profile
-   * @param profileId - The profile user ID
-   * @param options - Pagination options
-   * @returns Promise<SubstackNote[]> - Raw note data from API
-   * @throws {Error} When notes cannot be retrieved
-   */
-  async getNotesForProfile(
-    profileId: number,
-    options: { limit: number; offset: number }
-  ): Promise<SubstackNote[]> {
-    const response = await this.httpClient.get<{ items?: SubstackNote[] }>(
-      `/api/v1/reader/feed/profile/${profileId}?types=note&limit=${options.limit}&offset=${options.offset}`
-    )
-    return response.items || []
-  }
 }
