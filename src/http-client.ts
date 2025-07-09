@@ -24,13 +24,6 @@ export class SubstackHttpClient {
     return this.perPage
   }
 
-  /**
-   * Get the cookie for authentication
-   */
-  getCookie(): string {
-    return this.cookie
-  }
-
   private async makeRequest<T>(url: string, options: RequestInit = {}): Promise<T> {
     const response = await fetch(url, {
       headers: {

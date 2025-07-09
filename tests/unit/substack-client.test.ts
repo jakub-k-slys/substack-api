@@ -22,7 +22,6 @@ describe('SubstackClient', () => {
     mockHttpClient.get = jest.fn()
     mockHttpClient.post = jest.fn()
     mockHttpClient.request = jest.fn()
-    mockHttpClient.getCookie = jest.fn().mockReturnValue('connect.sid=test-api-key')
 
     mockGlobalHttpClient = new SubstackHttpClient('https://substack.com', {
       apiKey: 'test',
@@ -31,7 +30,6 @@ describe('SubstackClient', () => {
     mockGlobalHttpClient.get = jest.fn()
     mockGlobalHttpClient.post = jest.fn()
     mockGlobalHttpClient.request = jest.fn()
-    mockGlobalHttpClient.getCookie = jest.fn().mockReturnValue('connect.sid=test-api-key')
 
     client = new SubstackClient({
       apiKey: 'test-api-key',
