@@ -1,6 +1,11 @@
 import { Profile } from '../../src/domain/profile'
 import { Post, Note } from '../../src/domain'
-import { ProfileService, PostService, NoteService, CommentService } from '../../src/internal/services'
+import {
+  ProfileService,
+  PostService,
+  NoteService,
+  CommentService
+} from '../../src/internal/services'
 import type { SubstackHttpClient } from '../../src/http-client'
 
 describe('Profile Entity', () => {

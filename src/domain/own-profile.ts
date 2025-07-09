@@ -24,7 +24,16 @@ export class OwnProfile extends Profile {
     resolvedSlug?: string,
     slugResolver?: (userId: number, fallbackHandle?: string) => Promise<string | undefined>
   ) {
-    super(rawData, client, profileService, postService, noteService, commentService, resolvedSlug, slugResolver)
+    super(
+      rawData,
+      client,
+      profileService,
+      postService,
+      noteService,
+      commentService,
+      resolvedSlug,
+      slugResolver
+    )
   }
 
   /**

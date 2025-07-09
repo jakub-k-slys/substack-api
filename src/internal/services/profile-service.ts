@@ -1,4 +1,4 @@
-import type { SubstackFullProfile, SubstackPost, SubstackNote } from '../types'
+import type { SubstackFullProfile } from '../types'
 import type { SubstackHttpClient } from '../../http-client'
 
 /**

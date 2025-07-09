@@ -1,7 +1,14 @@
 import { SubstackClient } from '../../src/substack-client'
 import { Profile, Post, Note, Comment, OwnProfile } from '../../src/domain'
 import { SubstackHttpClient } from '../../src/http-client'
-import { PostService, NoteService, ProfileService, SlugService } from '../../src/internal/services'
+import {
+  PostService,
+  NoteService,
+  ProfileService,
+  SlugService,
+  CommentService,
+  FolloweeService
+} from '../../src/internal/services'
 import type { SubstackFullProfile } from '../../src/internal'
 
 // Mock the http client and services
@@ -19,6 +26,8 @@ describe('SubstackClient', () => {
   let mockNoteService: jest.Mocked<NoteService>
   let mockProfileService: jest.Mocked<ProfileService>
   let mockSlugService: jest.Mocked<SlugService>
+  let mockCommentService: jest.Mocked<CommentService>
+  let mockFolloweeService: jest.Mocked<FolloweeService>
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -58,6 +67,13 @@ describe('SubstackClient', () => {
     mockSlugService.clearCache = jest.fn()
     mockSlugService.isCached = jest.fn()
 
+    mockCommentService = new CommentService(mockHttpClient) as jest.Mocked<CommentService>
+    mockCommentService.getCommentById = jest.fn()
+    mockCommentService.getCommentsForPost = jest.fn()
+
+    mockFolloweeService = new FolloweeService(mockHttpClient) as jest.Mocked<FolloweeService>
+    mockFolloweeService.getFollowees = jest.fn()
+
     client = new SubstackClient({
       apiKey: 'test-api-key',
       hostname: 'test.substack.com'
@@ -70,6 +86,9 @@ describe('SubstackClient', () => {
     ;(client as unknown as { noteService: NoteService }).noteService = mockNoteService
     ;(client as unknown as { profileService: ProfileService }).profileService = mockProfileService
     ;(client as unknown as { slugService: SlugService }).slugService = mockSlugService
+    ;(client as unknown as { commentService: CommentService }).commentService = mockCommentService
+    ;(client as unknown as { followeeService: FolloweeService }).followeeService =
+      mockFolloweeService
   })
 
   describe('testConnectivity', () => {
@@ -416,23 +435,19 @@ describe('SubstackClient', () => {
 
   describe('commentForId', () => {
     it('should get comment by ID', async () => {
-      const mockCommentResponse = {
-        item: {
-          comment: {
-            id: 999,
-            body: 'Test comment',
-            user_id: 123,
-            name: 'Test User',
-            date: '2023-01-01T00:00:00Z',
-            post_id: 456
-          }
-        }
+      const mockCommentData = {
+        id: 999,
+        body: 'Test comment',
+        created_at: '2023-01-01T00:00:00Z',
+        parent_post_id: 456,
+        author_id: 123,
+        author_name: 'Test User'
       }
-      mockHttpClient.get.mockResolvedValue(mockCommentResponse)
+      mockCommentService.getCommentById.mockResolvedValue(mockCommentData)
 
       const comment = await client.commentForId(999)
       expect(comment).toBeInstanceOf(Comment)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/comment/999')
+      expect(mockCommentService.getCommentById).toHaveBeenCalledWith(999)
     })
 
     it('should throw TypeError for non-number comment ID', async () => {
