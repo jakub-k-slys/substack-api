@@ -1,9 +1,11 @@
 import { SubstackClient } from '../../src/substack-client'
 import { Profile, Post, Note, Comment, OwnProfile } from '../../src/domain'
 import { SubstackHttpClient } from '../../src/http-client'
+import { PostService } from '../../src/services'
 
-// Mock the http client
+// Mock the http client and services
 jest.mock('../../src/http-client')
+jest.mock('../../src/services')
 
 // Mock the global fetch function
 global.fetch = jest.fn()
@@ -12,6 +14,7 @@ describe('SubstackClient', () => {
   let client: SubstackClient
   let mockHttpClient: jest.Mocked<SubstackHttpClient>
   let mockGlobalHttpClient: jest.Mocked<SubstackHttpClient>
+  let mockPostService: jest.Mocked<PostService>
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -31,14 +34,21 @@ describe('SubstackClient', () => {
     mockGlobalHttpClient.post = jest.fn()
     mockGlobalHttpClient.request = jest.fn()
 
+    mockPostService = new PostService(
+      mockHttpClient,
+      mockGlobalHttpClient
+    ) as jest.Mocked<PostService>
+    mockPostService.getPostById = jest.fn()
+
     client = new SubstackClient({
       apiKey: 'test-api-key',
       hostname: 'test.substack.com'
     })
-    // Replace the internal http clients with our mocks
+    // Replace the internal http clients and services with our mocks
     ;(client as unknown as { httpClient: SubstackHttpClient }).httpClient = mockHttpClient
     ;(client as unknown as { globalHttpClient: SubstackHttpClient }).globalHttpClient =
       mockGlobalHttpClient
+    ;(client as unknown as { postService: PostService }).postService = mockPostService
   })
 
   describe('testConnectivity', () => {
@@ -191,19 +201,19 @@ describe('SubstackClient', () => {
         type: 'newsletter' as const
       }
 
-      // Mock the global HTTP client's get method for postForId
-      mockGlobalHttpClient.get.mockResolvedValueOnce(mockPost)
+      // Mock the PostService's getPostById method
+      mockPostService.getPostById.mockResolvedValueOnce(mockPost)
 
       const post = await client.postForId(456)
       expect(post).toBeInstanceOf(Post)
 
-      // Verify that global HTTP client was called with the correct path
-      expect(mockGlobalHttpClient.get).toHaveBeenCalledWith('/api/v1/posts/by-id/456')
+      // Verify that PostService was called with the correct ID
+      expect(mockPostService.getPostById).toHaveBeenCalledWith(456)
     })
 
     it('should handle API error for postForId', async () => {
-      // Mock global HTTP client to throw an HTTP error
-      mockGlobalHttpClient.get.mockRejectedValueOnce(new Error('HTTP 404: Not found'))
+      // Mock PostService to throw an HTTP error
+      mockPostService.getPostById.mockRejectedValueOnce(new Error('HTTP 404: Not found'))
 
       await expect(client.postForId(999999999)).rejects.toThrow(
         'Post with ID 999999999 not found: HTTP 404: Not found'

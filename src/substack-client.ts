@@ -1,9 +1,9 @@
 import { SubstackHttpClient } from './http-client'
 import { Profile, OwnProfile, Post, Note, Comment } from './domain'
+import { PostService } from './services'
 import type { SubstackConfig } from './types'
 import type {
   SubstackFullProfile,
-  SubstackPost,
   SubstackNote,
   SubstackComment,
   SubstackCommentResponse,
@@ -17,6 +17,7 @@ import type {
 export class SubstackClient {
   private readonly httpClient: SubstackHttpClient
   private readonly globalHttpClient: SubstackHttpClient
+  private readonly postService: PostService
   private subscriptionsCache: Map<number, string> | null = null // user_id -> slug mapping
   private subscriptionsCacheTimestamp: number | null = null
 
@@ -29,6 +30,9 @@ export class SubstackClient {
     // Create HTTP client for global Substack endpoints
     const substackBaseUrl = config.substackBaseUrl || 'https://substack.com'
     this.globalHttpClient = new SubstackHttpClient(substackBaseUrl, config)
+
+    // Initialize services
+    this.postService = new PostService(this.httpClient, this.globalHttpClient)
   }
 
   /**
@@ -175,8 +179,7 @@ export class SubstackClient {
     }
 
     try {
-      // Post lookup by ID must use the global substack.com endpoint, not publication-specific hostnames
-      const post = await this.globalHttpClient.get<SubstackPost>(`/api/v1/posts/by-id/${id}`)
+      const post = await this.postService.getPostById(id)
       return new Post(post, this.httpClient)
     } catch (error) {
       throw new Error(`Post with ID ${id} not found: ${(error as Error).message}`)
