@@ -1,5 +1,6 @@
-import type { SubstackPost, SubstackComment } from '../internal'
+import type { SubstackPost } from '../internal'
 import type { SubstackHttpClient } from '../http-client'
+import type { PostService, CommentService } from '../internal/services'
 import { Comment } from './comment'
 
 /**
@@ -20,7 +21,9 @@ export class Post {
 
   constructor(
     private readonly rawData: SubstackPost,
-    private readonly client: SubstackHttpClient
+    private readonly client: SubstackHttpClient,
+    private readonly postService: PostService,
+    private readonly commentService: CommentService
   ) {
     this.id = rawData.id
     this.title = rawData.title
@@ -44,17 +47,13 @@ export class Post {
    */
   async *comments(options: { limit?: number } = {}): AsyncIterable<Comment> {
     try {
-      const response = await this.client.get<{ comments?: SubstackComment[] }>(
-        `/api/v1/post/${this.id}/comments`
-      )
+      const commentsData = await this.commentService.getCommentsForPost(this.id)
 
-      if (response.comments) {
-        let count = 0
-        for (const commentData of response.comments) {
-          if (options.limit && count >= options.limit) break
-          yield new Comment(commentData, this.client)
-          count++
-        }
+      let count = 0
+      for (const commentData of commentsData) {
+        if (options.limit && count >= options.limit) break
+        yield new Comment(commentData, this.client)
+        count++
       }
     } catch (error) {
       throw new Error(`Failed to get comments for post ${this.id}: ${(error as Error).message}`)

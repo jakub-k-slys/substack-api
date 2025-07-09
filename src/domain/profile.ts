@@ -1,10 +1,6 @@
-import type {
-  SubstackPublicProfile,
-  SubstackFullProfile,
-  SubstackPost,
-  SubstackNote
-} from '../internal'
+import type { SubstackPublicProfile, SubstackFullProfile } from '../internal'
 import type { SubstackHttpClient } from '../http-client'
+import type { ProfileService, CommentService, PostService, NoteService } from '../internal/services'
 import { Post } from './post'
 import { Note } from './note'
 
@@ -22,6 +18,10 @@ export class Profile {
   constructor(
     protected readonly rawData: SubstackPublicProfile | SubstackFullProfile,
     protected readonly client: SubstackHttpClient,
+    protected readonly profileService: ProfileService,
+    protected readonly postService: PostService,
+    protected readonly noteService: NoteService,
+    protected readonly commentService: CommentService,
     resolvedSlug?: string,
     protected readonly slugResolver?: (
       userId: number,
@@ -48,25 +48,26 @@ export class Profile {
       let totalYielded = 0
 
       while (true) {
-        // Use the correct endpoint for profile posts with limit and offset parameters
-        const response = await this.client.get<{ posts?: SubstackPost[] }>(
-          `/api/v1/profile/posts?profile_user_id=${this.id}&limit=${perPageConfig}&offset=${offset}`
-        )
+        // Use PostService to get posts
+        const postsData = await this.postService.getPostsForProfile(this.id, {
+          limit: perPageConfig,
+          offset
+        })
 
-        if (!response.posts || response.posts.length === 0) {
+        if (!postsData || postsData.length === 0) {
           break // No more posts to fetch
         }
 
-        for (const postData of response.posts) {
+        for (const postData of postsData) {
           if (options.limit && totalYielded >= options.limit) {
             return // Stop if we've reached the requested limit
           }
-          yield new Post(postData, this.client)
+          yield new Post(postData, this.client, this.postService, this.commentService)
           totalYielded++
         }
 
         // If we got fewer posts than requested, we've reached the end
-        if (response.posts.length < perPageConfig) {
+        if (postsData.length < perPageConfig) {
           break
         }
 
@@ -83,23 +84,23 @@ export class Profile {
    */
   async *notes(options: { limit?: number } = {}): AsyncIterable<Note> {
     try {
-      // Try the reader feed endpoint first
       // Get the perPage configuration from the client
       const perPageConfig = this.client.getPerPage()
       let offset = 0
       let totalYielded = 0
 
       while (true) {
-        // Use the reader feed endpoint for profile notes with types=note filter
-        const response = await this.client.get<{ items?: SubstackNote[] }>(
-          `/api/v1/reader/feed/profile/${this.id}?types=note&limit=${perPageConfig}&offset=${offset}`
-        )
+        // Use NoteService to get notes for this profile
+        const notesData = await this.noteService.getNotesForProfile(this.id, {
+          limit: perPageConfig,
+          offset
+        })
 
-        if (!response.items || response.items.length === 0) {
+        if (!notesData || notesData.length === 0) {
           break // No more notes to fetch
         }
 
-        for (const item of response.items) {
+        for (const item of notesData) {
           // Filter for note items (type: "comment" with comment.type: "feed")
           if (item.type === 'comment' && item.comment?.type === 'feed') {
             if (options.limit && totalYielded >= options.limit) {
@@ -111,7 +112,7 @@ export class Profile {
         }
 
         // If we got fewer items than requested, we've reached the end
-        if (response.items.length < perPageConfig) {
+        if (notesData.length < perPageConfig) {
           break
         }
 
