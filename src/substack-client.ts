@@ -169,7 +169,11 @@ export class SubstackClient {
   /**
    * Get a specific post by ID
    */
-  async postForId(id: string): Promise<Post> {
+  async postForId(id: number): Promise<Post> {
+    if (typeof id !== 'number') {
+      throw new TypeError('Post ID must be a number')
+    }
+
     try {
       // Post lookup by ID must use the global substack.com endpoint, not publication-specific hostnames
       const post = await this.globalHttpClient.get<SubstackPost>(`/api/v1/posts/by-id/${id}`)
@@ -182,7 +186,11 @@ export class SubstackClient {
   /**
    * Get a specific note by ID
    */
-  async noteForId(id: string): Promise<Note> {
+  async noteForId(id: number): Promise<Note> {
+    if (typeof id !== 'number') {
+      throw new TypeError('Note ID must be a number')
+    }
+
     try {
       // Notes are fetched using the same endpoint as comments
       const response = await this.httpClient.get<SubstackCommentResponse>(
@@ -191,7 +199,7 @@ export class SubstackClient {
 
       // Transform the comment response to the SubstackNote structure expected by Note entity
       const noteData: SubstackNote = {
-        entity_key: id,
+        entity_key: String(id),
         type: 'note',
         context: {
           type: 'feed',
@@ -232,8 +240,8 @@ export class SubstackClient {
         canReply: true,
         isMuted: false,
         trackingParameters: {
-          item_primary_entity_key: id,
-          item_entity_key: id,
+          item_primary_entity_key: String(id),
+          item_entity_key: String(id),
           item_type: 'note',
           item_content_user_id: response.item.comment.user_id,
           item_context_type: 'feed',
@@ -263,9 +271,9 @@ export class SubstackClient {
   /**
    * Get a specific comment by ID
    */
-  async commentForId(id: string): Promise<Comment> {
-    if (!/^\d+$/.test(id)) {
-      throw new Error('Invalid comment ID - must be numeric')
+  async commentForId(id: number): Promise<Comment> {
+    if (typeof id !== 'number') {
+      throw new TypeError('Comment ID must be a number')
     }
 
     const response = await this.httpClient.get<SubstackCommentResponse>(

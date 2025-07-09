@@ -198,7 +198,7 @@ describe('SubstackClient Entity Model E2E', () => {
   test('should handle error cases gracefully - invalid post id', async () => {
     try {
       // Test invalid post ID
-      const _post = await client.postForId('this-post-should-not-exist-12345')
+      const _post = await client.postForId(999999999999)
       // If we reach here, the post unexpectedly exists or there's a default
       console.log('ℹ️ Post request completed (may be default or existing post)')
     } catch (error) {
@@ -216,7 +216,7 @@ describe('SubstackClient Entity Model E2E', () => {
   test('should handle error cases gracefully - invalid note id', async () => {
     try {
       // Test invalid note ID
-      const _note = await client.noteForId('this-note-should-not-exist-12345')
+      const _note = await client.noteForId(999999999999)
       // If we reach here, the note unexpectedly exists or there's a default
       console.log('ℹ️ Note request completed (may be default or existing note)')
     } catch (error) {

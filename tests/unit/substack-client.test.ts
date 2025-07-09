@@ -194,7 +194,7 @@ describe('SubstackClient', () => {
       // Mock the global HTTP client's get method for postForId
       mockGlobalHttpClient.get.mockResolvedValueOnce(mockPost)
 
-      const post = await client.postForId('456')
+      const post = await client.postForId(456)
       expect(post).toBeInstanceOf(Post)
 
       // Verify that global HTTP client was called with the correct path
@@ -205,8 +205,8 @@ describe('SubstackClient', () => {
       // Mock global HTTP client to throw an HTTP error
       mockGlobalHttpClient.get.mockRejectedValueOnce(new Error('HTTP 404: Not found'))
 
-      await expect(client.postForId('nonexistent')).rejects.toThrow(
-        'Post with ID nonexistent not found: HTTP 404: Not found'
+      await expect(client.postForId(999999999)).rejects.toThrow(
+        'Post with ID 999999999 not found: HTTP 404: Not found'
       )
     })
   })
@@ -227,7 +227,7 @@ describe('SubstackClient', () => {
       }
       mockHttpClient.get.mockResolvedValue(mockNoteResponse)
 
-      const note = await client.noteForId('789')
+      const note = await client.noteForId(789)
       expect(note).toBeInstanceOf(Note)
       expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/comment/789')
 
@@ -241,7 +241,7 @@ describe('SubstackClient', () => {
     it('should handle API error for noteForId', async () => {
       mockHttpClient.get.mockRejectedValue(new Error('Not found'))
 
-      await expect(client.noteForId('999')).rejects.toThrow('Note with ID 999 not found')
+      await expect(client.noteForId(999)).rejects.toThrow('Note with ID 999 not found')
     })
   })
 
@@ -261,9 +261,35 @@ describe('SubstackClient', () => {
       }
       mockHttpClient.get.mockResolvedValue(mockCommentResponse)
 
-      const comment = await client.commentForId('999')
+      const comment = await client.commentForId(999)
       expect(comment).toBeInstanceOf(Comment)
       expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/comment/999')
+    })
+
+    it('should throw TypeError for non-number comment ID', async () => {
+      await expect(client.commentForId('not-a-number' as any)).rejects.toThrow(
+        new TypeError('Comment ID must be a number')
+      )
+    })
+  })
+
+  describe('Type validation', () => {
+    it('should validate postForId parameter type', async () => {
+      await expect(client.postForId('not-a-number' as any)).rejects.toThrow(
+        new TypeError('Post ID must be a number')
+      )
+    })
+
+    it('should validate noteForId parameter type', async () => {
+      await expect(client.noteForId('not-a-number' as any)).rejects.toThrow(
+        new TypeError('Note ID must be a number')
+      )
+    })
+
+    it('should validate commentForId parameter type', async () => {
+      await expect(client.commentForId('not-a-number' as any)).rejects.toThrow(
+        new TypeError('Comment ID must be a number')
+      )
     })
   })
 })

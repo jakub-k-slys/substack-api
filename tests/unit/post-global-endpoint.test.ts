@@ -37,7 +37,7 @@ describe('SubstackClient - Global Post Endpoint', () => {
         statusText: 'OK'
       } as Response)
 
-      const post = await client.postForId('123')
+      const post = await client.postForId(123)
 
       expect(post).toBeInstanceOf(Post)
       expect(mockFetch).toHaveBeenCalledTimes(1)
@@ -72,7 +72,7 @@ describe('SubstackClient - Global Post Endpoint', () => {
         statusText: 'OK'
       } as Response)
 
-      await anotherClient.postForId('456')
+      await anotherClient.postForId(456)
 
       expect(mockFetch).toHaveBeenCalledTimes(1)
 
@@ -100,7 +100,7 @@ describe('SubstackClient - Global Post Endpoint', () => {
         statusText: 'OK'
       } as Response)
 
-      await client.postForId('789')
+      await client.postForId(789)
 
       expect(mockFetch).toHaveBeenCalledTimes(1)
 
@@ -122,14 +122,14 @@ describe('SubstackClient - Global Post Endpoint', () => {
         statusText: 'Not Found'
       } as Response)
 
-      await expect(client.postForId('nonexistent')).rejects.toThrow(
-        'Post with ID nonexistent not found: HTTP 404: Not Found'
+      await expect(client.postForId(999999999)).rejects.toThrow(
+        'Post with ID 999999999 not found: HTTP 404: Not Found'
       )
 
       // Verify it still attempted to call the global endpoint
       const fetchCall = mockFetch.mock.calls[0]
       const requestUrl = fetchCall[0] as string
-      expect(requestUrl).toBe('https://substack.com/api/v1/posts/by-id/nonexistent')
+      expect(requestUrl).toBe('https://substack.com/api/v1/posts/by-id/999999999')
     })
   })
 })
