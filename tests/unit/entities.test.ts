@@ -17,9 +17,9 @@ describe('SubstackClient Entity Model', () => {
       expect(client).toBeInstanceOf(SubstackClient)
     })
 
-    it('should handle invalid comment ID', async () => {
-      await expect(client.commentForId('invalid')).rejects.toThrow(
-        'Invalid comment ID - must be numeric'
+    it('should handle invalid comment ID type', async () => {
+      await expect(client.commentForId('invalid' as any)).rejects.toThrow(
+        'Comment ID must be a number'
       )
     })
 

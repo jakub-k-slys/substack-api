@@ -153,25 +153,25 @@ describe('SubstackClient Integration Tests', () => {
     })
 
     describe('commentForId', () => {
-      test('should validate comment ID format - non-numeric', async () => {
-        await expect(client.commentForId('invalid-id')).rejects.toThrow(
-          'Invalid comment ID - must be numeric'
+      test('should validate comment ID type - non-numeric string', async () => {
+        await expect(client.commentForId('invalid-id' as any)).rejects.toThrow(
+          'Comment ID must be a number'
         )
       })
 
-      test('should validate comment ID format - alphanumeric', async () => {
-        await expect(client.commentForId('abc123')).rejects.toThrow(
-          'Invalid comment ID - must be numeric'
+      test('should validate comment ID type - alphanumeric string', async () => {
+        await expect(client.commentForId('abc123' as any)).rejects.toThrow(
+          'Comment ID must be a number'
         )
       })
 
       test('should handle non-existent comment ID', async () => {
-        await expect(client.commentForId('999999999')).rejects.toThrow()
+        await expect(client.commentForId(999999999)).rejects.toThrow()
       })
 
       test('should get comment by ID with sample data', async () => {
         // Test with a valid comment ID - we have sample data for this
-        const commentId = '131648795'
+        const commentId = 131648795
 
         const comment = await client.commentForId(commentId)
         expect(comment).toBeInstanceOf(Comment)
@@ -186,14 +186,14 @@ describe('SubstackClient Integration Tests', () => {
 
     describe('postForId', () => {
       test('should handle non-existent post ID', async () => {
-        await expect(client.postForId('nonexistentpost123')).rejects.toThrow()
+        await expect(client.postForId(999999999)).rejects.toThrow()
       })
     })
 
     describe('noteForId', () => {
       test('should handle non-existent note ID', async () => {
-        await expect(client.noteForId('nonexistentnote123')).rejects.toThrow(
-          'Note with ID nonexistentnote123 not found'
+        await expect(client.noteForId(999999999)).rejects.toThrow(
+          'Note with ID 999999999 not found'
         )
       })
     })
