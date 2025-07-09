@@ -12,7 +12,7 @@ describe('SubstackClient - Slug Resolution', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockHttpClient = new SubstackHttpClient({
+    mockHttpClient = new SubstackHttpClient('https://test.com', {
       apiKey: 'test',
       hostname: 'test.com'
     }) as jest.Mocked<SubstackHttpClient>

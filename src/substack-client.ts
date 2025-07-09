@@ -16,11 +16,19 @@ import type {
  */
 export class SubstackClient {
   private readonly httpClient: SubstackHttpClient
+  private readonly globalHttpClient: SubstackHttpClient
   private subscriptionsCache: Map<number, string> | null = null // user_id -> slug mapping
   private subscriptionsCacheTimestamp: number | null = null
 
   constructor(config: SubstackConfig) {
-    this.httpClient = new SubstackHttpClient(config)
+    // Create HTTP client for publication-specific endpoints
+    const protocol = config.protocol || 'https'
+    const publicationBaseUrl = `${protocol}://${config.hostname || 'substack.com'}`
+    this.httpClient = new SubstackHttpClient(publicationBaseUrl, config)
+
+    // Create HTTP client for global Substack endpoints
+    const substackBaseUrl = config.substackBaseUrl || 'https://substack.com'
+    this.globalHttpClient = new SubstackHttpClient(substackBaseUrl, config)
   }
 
   /**
@@ -164,7 +172,7 @@ export class SubstackClient {
   async postForId(id: string): Promise<Post> {
     try {
       // Post lookup by ID must use the global substack.com endpoint, not publication-specific hostnames
-      const post = await this.httpClient.globalRequest<SubstackPost>(`/api/v1/posts/by-id/${id}`)
+      const post = await this.globalHttpClient.get<SubstackPost>(`/api/v1/posts/by-id/${id}`)
       return new Post(post, this.httpClient)
     } catch (error) {
       throw new Error(`Post with ID ${id} not found: ${(error as Error).message}`)

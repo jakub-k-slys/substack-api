@@ -9,6 +9,7 @@ export interface SubstackConfig {
   perPage?: number // Default items per page for pagination (default: 25)
   cacheTTL?: number // Cache TTL in seconds (default: 300)
   protocol?: 'http' | 'https' // Protocol to use (default: 'https')
+  substackBaseUrl?: string // Base URL for global Substack endpoints (default: 'https://substack.com')
 }
 
 export interface PaginationParams {

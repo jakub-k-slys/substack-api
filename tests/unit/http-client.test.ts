@@ -9,7 +9,7 @@ describe('SubstackHttpClient', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    client = new SubstackHttpClient({
+    client = new SubstackHttpClient('https://test.substack.com', {
       apiKey: 'test-api-key',
       hostname: 'test.substack.com'
     })
@@ -17,17 +17,17 @@ describe('SubstackHttpClient', () => {
 
   describe('constructor', () => {
     it('should throw error when apiKey is missing', () => {
-      expect(() => new SubstackHttpClient({ apiKey: '', hostname: 'test.com' })).toThrow(
-        'apiKey is required in SubstackConfig'
-      )
+      expect(
+        () => new SubstackHttpClient('https://test.com', { apiKey: '', hostname: 'test.com' })
+      ).toThrow('apiKey is required in SubstackConfig')
     })
 
-    it('should use default hostname when not provided', () => {
-      const clientWithoutHostname = new SubstackHttpClient({
+    it('should use provided base URL', () => {
+      const clientWithCustomBaseUrl = new SubstackHttpClient('https://custom.example.com', {
         apiKey: 'test-key',
         hostname: 'default.substack.com'
       })
-      expect(clientWithoutHostname).toBeDefined()
+      expect(clientWithCustomBaseUrl).toBeDefined()
     })
 
     it('should set up correct base URL and cookie', () => {

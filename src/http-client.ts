@@ -8,12 +8,11 @@ export class SubstackHttpClient {
   private readonly cookie: string
   private readonly perPage: number
 
-  constructor(config: SubstackConfig) {
+  constructor(baseUrl: string, config: SubstackConfig) {
     if (!config.apiKey) {
       throw new Error('apiKey is required in SubstackConfig')
     }
-    const protocol = config.protocol || 'https'
-    this.baseUrl = `${protocol}://${config.hostname || 'substack.com'}`
+    this.baseUrl = baseUrl
     this.cookie = `connect.sid=${config.apiKey}`
     this.perPage = config.perPage || 25
   }
@@ -63,13 +62,5 @@ export class SubstackHttpClient {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined
     })
-  }
-
-  /**
-   * Make a request to the global substack.com endpoint (not publication-specific)
-   */
-  async globalRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
-    const url = `https://substack.com${path}`
-    return this.makeRequest<T>(url, options)
   }
 }
