@@ -1,6 +1,6 @@
 import { PostService } from '../../src/internal/services/post-service'
 import { SubstackHttpClient } from '../../src/http-client'
-import type { SubstackPost, SubstackComment } from '../../src/internal'
+import type { SubstackPost } from '../../src/internal'
 
 // Mock the http client
 jest.mock('../../src/http-client')
@@ -71,45 +71,6 @@ describe('PostService', () => {
 
       // Verify that only the global HTTP client is used
       expect(mockGlobalHttpClient.get).toHaveBeenCalledWith('/api/v1/posts/by-id/456')
-    })
-  })
-
-  describe('getCommentsForPost', () => {
-    it('should return comments for a post', async () => {
-      const mockComments: SubstackComment[] = [
-        {
-          id: 1,
-          body: 'Great post!',
-          author_id: 123,
-          author_name: 'John Doe',
-          parent_post_id: 456,
-          created_at: '2023-01-01T00:00:00Z'
-        }
-      ]
-
-      mockHttpClient.get.mockResolvedValueOnce({ comments: mockComments })
-
-      const result = await postService.getCommentsForPost(456)
-
-      expect(result).toEqual(mockComments)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/post/456/comments')
-    })
-
-    it('should return empty array when no comments', async () => {
-      mockHttpClient.get.mockResolvedValueOnce({})
-
-      const result = await postService.getCommentsForPost(456)
-
-      expect(result).toEqual([])
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/post/456/comments')
-    })
-
-    it('should throw error when HTTP client fails', async () => {
-      const errorMessage = 'HTTP 404: Not found'
-      mockHttpClient.get.mockRejectedValueOnce(new Error(errorMessage))
-
-      await expect(postService.getCommentsForPost(999)).rejects.toThrow(errorMessage)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/post/999/comments')
     })
   })
 })

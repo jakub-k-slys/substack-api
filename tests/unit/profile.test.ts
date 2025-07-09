@@ -1,12 +1,13 @@
 import { Profile } from '../../src/domain/profile'
 import { Post, Note } from '../../src/domain'
-import { ProfileService, PostService } from '../../src/internal/services'
+import { ProfileService, PostService, CommentService } from '../../src/internal/services'
 import type { SubstackHttpClient } from '../../src/http-client'
 
 describe('Profile Entity', () => {
   let mockHttpClient: jest.Mocked<SubstackHttpClient>
   let mockProfileService: jest.Mocked<ProfileService>
   let mockPostService: jest.Mocked<PostService>
+  let mockCommentService: jest.Mocked<CommentService>
   let profile: Profile
 
   beforeEach(() => {
@@ -22,14 +23,17 @@ describe('Profile Entity', () => {
       getProfileById: jest.fn(),
       getProfileBySlug: jest.fn(),
       getPostsForProfile: jest.fn(),
-      getNotesForProfile: jest.fn(),
-      getFollowingUsers: jest.fn()
+      getNotesForProfile: jest.fn()
     } as unknown as jest.Mocked<ProfileService>
 
     mockPostService = {
-      getPostById: jest.fn(),
-      getCommentsForPost: jest.fn()
+      getPostById: jest.fn()
     } as unknown as jest.Mocked<PostService>
+
+    mockCommentService = {
+      getCommentsForPost: jest.fn(),
+      getCommentById: jest.fn()
+    } as unknown as jest.Mocked<CommentService>
 
     const mockProfileData = {
       id: 123,
@@ -67,7 +71,13 @@ describe('Profile Entity', () => {
       dm_upgrade_options: []
     }
 
-    profile = new Profile(mockProfileData, mockHttpClient, mockProfileService, mockPostService)
+    profile = new Profile(
+      mockProfileData,
+      mockHttpClient,
+      mockProfileService,
+      mockPostService,
+      mockCommentService
+    )
   })
 
   describe('posts()', () => {

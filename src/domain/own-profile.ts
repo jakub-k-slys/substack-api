@@ -1,8 +1,13 @@
 import { Profile } from './profile'
 import { Note } from './note'
 import { NoteBuilder } from '../note-builder'
-import type { SubstackNote, SubstackFullProfile } from '../internal'
-import type { ProfileService, NoteService } from '../internal/services'
+import type { SubstackFullProfile } from '../internal'
+import type {
+  ProfileService,
+  NoteService,
+  FolloweeService,
+  CommentService
+} from '../internal/services'
 
 /**
  * OwnProfile extends Profile with write capabilities for the authenticated user
@@ -13,11 +18,13 @@ export class OwnProfile extends Profile {
     client: any,
     profileService: ProfileService,
     postService: any,
+    commentService: CommentService,
     private readonly noteService: NoteService,
+    private readonly followeeService: FolloweeService,
     resolvedSlug?: string,
     slugResolver?: (userId: number, fallbackHandle?: string) => Promise<string | undefined>
   ) {
-    super(rawData, client, profileService, postService, resolvedSlug, slugResolver)
+    super(rawData, client, profileService, postService, commentService, resolvedSlug, slugResolver)
   }
 
   /**
@@ -33,8 +40,8 @@ export class OwnProfile extends Profile {
    * Get users that the authenticated user follows
    */
   async *followees(options: { limit?: number } = {}): AsyncIterable<Profile> {
-    // Use ProfileService to get the list of user IDs that the user follows
-    const followingUserIds = await this.profileService.getFollowingUsers()
+    // Use FolloweeService to get the list of user IDs that the user follows
+    const followingUserIds = await this.followeeService.getFollowingUsers()
 
     // Then, for each user ID, fetch their detailed profile
     let count = 0
@@ -56,6 +63,7 @@ export class OwnProfile extends Profile {
           this.client,
           this.profileService,
           this.postService,
+          this.commentService,
           resolvedSlug,
           this.slugResolver
         )

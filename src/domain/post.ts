@@ -1,6 +1,6 @@
-import type { SubstackPost, SubstackComment } from '../internal'
+import type { SubstackPost } from '../internal'
 import type { SubstackHttpClient } from '../http-client'
-import type { PostService } from '../internal/services'
+import type { PostService, CommentService } from '../internal/services'
 import { Comment } from './comment'
 
 /**
@@ -22,7 +22,8 @@ export class Post {
   constructor(
     private readonly rawData: SubstackPost,
     private readonly client: SubstackHttpClient,
-    private readonly postService: PostService
+    private readonly postService: PostService,
+    private readonly commentService: CommentService
   ) {
     this.id = rawData.id
     this.title = rawData.title
@@ -46,7 +47,7 @@ export class Post {
    */
   async *comments(options: { limit?: number } = {}): AsyncIterable<Comment> {
     try {
-      const commentsData = await this.postService.getCommentsForPost(this.id)
+      const commentsData = await this.commentService.getCommentsForPost(this.id)
 
       let count = 0
       for (const commentData of commentsData) {

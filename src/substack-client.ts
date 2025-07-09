@@ -1,8 +1,14 @@
 import { SubstackHttpClient } from './http-client'
 import { Profile, OwnProfile, Post, Note, Comment } from './domain'
-import { PostService, NoteService, ProfileService, SlugService } from './internal/services'
+import {
+  PostService,
+  NoteService,
+  ProfileService,
+  SlugService,
+  CommentService,
+  FolloweeService
+} from './internal/services'
 import type { SubstackConfig } from './types'
-import type { SubstackComment, SubstackCommentResponse } from './internal'
 
 /**
  * Modern SubstackClient with entity-based API
@@ -14,6 +20,8 @@ export class SubstackClient {
   private readonly noteService: NoteService
   private readonly profileService: ProfileService
   private readonly slugService: SlugService
+  private readonly commentService: CommentService
+  private readonly followeeService: FolloweeService
 
   constructor(config: SubstackConfig) {
     // Create HTTP client for publication-specific endpoints
@@ -30,6 +38,8 @@ export class SubstackClient {
     this.noteService = new NoteService(this.httpClient)
     this.profileService = new ProfileService(this.httpClient)
     this.slugService = new SlugService(this.httpClient)
+    this.commentService = new CommentService(this.httpClient)
+    this.followeeService = new FolloweeService(this.httpClient)
   }
 
   /**
@@ -64,7 +74,9 @@ export class SubstackClient {
         this.httpClient,
         this.profileService,
         this.postService,
+        this.commentService,
         this.noteService,
+        this.followeeService,
         resolvedSlug,
         this.slugService.getSlugForUserId.bind(this.slugService)
       )
@@ -88,6 +100,7 @@ export class SubstackClient {
         this.httpClient,
         this.profileService,
         this.postService,
+        this.commentService,
         resolvedSlug,
         this.slugService.getSlugForUserId.bind(this.slugService)
       )
@@ -116,6 +129,7 @@ export class SubstackClient {
         this.httpClient,
         this.profileService,
         this.postService,
+        this.commentService,
         resolvedSlug,
         this.slugService.getSlugForUserId.bind(this.slugService)
       )
@@ -134,7 +148,7 @@ export class SubstackClient {
 
     try {
       const post = await this.postService.getPostById(id)
-      return new Post(post, this.httpClient, this.postService)
+      return new Post(post, this.httpClient, this.postService, this.commentService)
     } catch (error) {
       throw new Error(`Post with ID ${id} not found: ${(error as Error).message}`)
     }
@@ -164,21 +178,11 @@ export class SubstackClient {
       throw new TypeError('Comment ID must be a number')
     }
 
-    const response = await this.httpClient.get<SubstackCommentResponse>(
-      `/api/v1/reader/comment/${id}`
-    )
-
-    // Transform the API response to match SubstackComment interface
-    const commentData: SubstackComment = {
-      id: response.item.comment.id,
-      body: response.item.comment.body,
-      created_at: response.item.comment.date,
-      parent_post_id: response.item.comment.post_id || 0,
-      author_id: response.item.comment.user_id,
-      author_name: response.item.comment.name,
-      author_is_admin: false // Default value as this info is not available in the API response
+    try {
+      const commentData = await this.commentService.getCommentById(id)
+      return new Comment(commentData, this.httpClient)
+    } catch (error) {
+      throw new Error(`Comment with ID ${id} not found: ${(error as Error).message}`)
     }
-
-    return new Comment(commentData, this.httpClient)
   }
 }

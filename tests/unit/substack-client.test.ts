@@ -38,9 +38,11 @@ describe('SubstackClient', () => {
     mockGlobalHttpClient.post = jest.fn()
     mockGlobalHttpClient.request = jest.fn()
 
-    mockPostService = new PostService(mockGlobalHttpClient, mockHttpClient) as jest.Mocked<PostService>
+    mockPostService = new PostService(
+      mockGlobalHttpClient,
+      mockHttpClient
+    ) as jest.Mocked<PostService>
     mockPostService.getPostById = jest.fn()
-    mockPostService.getCommentsForPost = jest.fn()
 
     mockNoteService = new NoteService(mockHttpClient) as jest.Mocked<NoteService>
     mockNoteService.getNoteById = jest.fn()

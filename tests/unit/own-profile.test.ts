@@ -2,16 +2,23 @@ import { OwnProfile } from '../../src/domain/own-profile'
 import { Note } from '../../src/domain/note'
 import { Profile } from '../../src/domain/profile'
 import { NoteBuilder } from '../../src/note-builder'
-import { ProfileService, PostService, NoteService } from '../../src/internal/services'
+import {
+  ProfileService,
+  PostService,
+  NoteService,
+  CommentService,
+  FolloweeService
+} from '../../src/internal/services'
 import type { SubstackFullProfile } from '../../src/internal'
 import type { SubstackHttpClient } from '../../src/http-client'
 
 describe('OwnProfile Entity', () => {
   let mockProfileData: SubstackFullProfile
-  let mockClient: jest.Mocked<SubstackHttpClient>
   let mockProfileService: jest.Mocked<ProfileService>
   let mockPostService: jest.Mocked<PostService>
+  let mockCommentService: jest.Mocked<CommentService>
   let mockNoteService: jest.Mocked<NoteService>
+  let mockFolloweeService: jest.Mocked<FolloweeService>
   let ownProfile: OwnProfile
 
   beforeEach(() => {
@@ -64,26 +71,35 @@ describe('OwnProfile Entity', () => {
       getProfileById: jest.fn(),
       getProfileBySlug: jest.fn(),
       getPostsForProfile: jest.fn(),
-      getNotesForProfile: jest.fn(),
-      getFollowingUsers: jest.fn()
+      getNotesForProfile: jest.fn()
     } as unknown as jest.Mocked<ProfileService>
 
     mockPostService = {
-      getPostById: jest.fn(),
-      getCommentsForPost: jest.fn()
+      getPostById: jest.fn()
     } as unknown as jest.Mocked<PostService>
+
+    mockCommentService = {
+      getCommentsForPost: jest.fn(),
+      getCommentById: jest.fn()
+    } as unknown as jest.Mocked<CommentService>
 
     mockNoteService = {
       getNoteById: jest.fn(),
       getNotesForUser: jest.fn()
     } as unknown as jest.Mocked<NoteService>
 
+    mockFolloweeService = {
+      getFollowingUsers: jest.fn()
+    } as unknown as jest.Mocked<FolloweeService>
+
     ownProfile = new OwnProfile(
       mockProfileData,
       mockClient,
       mockProfileService,
       mockPostService,
-      mockNoteService
+      mockCommentService,
+      mockNoteService,
+      mockFolloweeService
     )
   })
 
@@ -358,6 +374,11 @@ describe('OwnProfile Entity', () => {
         request: jest.fn(),
         getPerPage: jest.fn().mockReturnValue(25)
       } as unknown as jest.Mocked<SubstackHttpClient>,
+      mockProfileService,
+      mockPostService,
+      mockCommentService,
+      mockNoteService,
+      mockFolloweeService,
       'resolved-own-slug',
       mockSlugResolver
     )

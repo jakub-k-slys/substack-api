@@ -1,6 +1,6 @@
 import { SubstackClient } from '../../src/substack-client'
 import { Profile, Post, Comment } from '../../src/domain'
-import { PostService, ProfileService } from '../../src/internal/services'
+import { PostService, ProfileService, CommentService } from '../../src/internal/services'
 import type { SubstackHttpClient } from '../../src/http-client'
 
 describe('SubstackClient Entity Model', () => {
@@ -66,7 +66,7 @@ describe('SubstackClient Entity Model', () => {
         dm_upgrade_options: []
       }
       const httpClient = (client as unknown as { httpClient: SubstackHttpClient }).httpClient
-      
+
       // Create mock services
       const mockProfileService = {
         getOwnProfile: jest.fn(),
@@ -76,13 +76,23 @@ describe('SubstackClient Entity Model', () => {
         getNotesForProfile: jest.fn(),
         getFollowingUsers: jest.fn()
       } as unknown as ProfileService
-      
+
       const mockPostService = {
-        getPostById: jest.fn(),
-        getCommentsForPost: jest.fn()
+        getPostById: jest.fn()
       } as unknown as PostService
-      
-      const profile = new Profile(mockData, httpClient, mockProfileService, mockPostService)
+
+      const mockCommentService = {
+        getCommentsForPost: jest.fn(),
+        getCommentById: jest.fn()
+      } as unknown as CommentService
+
+      const profile = new Profile(
+        mockData,
+        httpClient,
+        mockProfileService,
+        mockPostService,
+        mockCommentService
+      )
 
       expect(profile).toBeInstanceOf(Profile)
       expect(profile.id).toBe(123)
@@ -100,14 +110,18 @@ describe('SubstackClient Entity Model', () => {
         type: 'newsletter' as const
       }
       const httpClient = (client as unknown as { httpClient: SubstackHttpClient }).httpClient
-      
+
       // Create mock services
       const mockPostService = {
-        getPostById: jest.fn(),
-        getCommentsForPost: jest.fn()
+        getPostById: jest.fn()
       } as unknown as PostService
-      
-      const post = new Post(mockData, httpClient, mockPostService)
+
+      const mockCommentService = {
+        getCommentsForPost: jest.fn(),
+        getCommentById: jest.fn()
+      } as unknown as CommentService
+
+      const post = new Post(mockData, httpClient, mockPostService, mockCommentService)
 
       expect(post).toBeInstanceOf(Post)
       expect(post.id).toBe(456)
