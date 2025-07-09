@@ -1,4 +1,4 @@
-import { ProfileService } from '../../src/services/profile-service'
+import { ProfileService } from '../../src/internal/services/profile-service'
 import { SubstackHttpClient } from '../../src/http-client'
 import type { SubstackFullProfile } from '../../src/internal'
 

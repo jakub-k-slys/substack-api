@@ -1,5 +1,5 @@
-import type { SubstackFullProfile } from '../internal'
-import type { SubstackHttpClient } from '../http-client'
+import type { SubstackFullProfile } from '../types'
+import type { SubstackHttpClient } from '../../http-client'
 
 /**
  * Service responsible for profile-related HTTP operations

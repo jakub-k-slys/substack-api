@@ -1,4 +1,4 @@
-import { NoteService } from '../../src/services/note-service'
+import { NoteService } from '../../src/internal/services/note-service'
 import { SubstackHttpClient } from '../../src/http-client'
 import type { SubstackNote, SubstackCommentResponse } from '../../src/internal'
 

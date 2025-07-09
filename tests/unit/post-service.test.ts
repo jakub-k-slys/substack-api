@@ -1,4 +1,4 @@
-import { PostService } from '../../src/services/post-service'
+import { PostService } from '../../src/internal/services/post-service'
 import { SubstackHttpClient } from '../../src/http-client'
 import type { SubstackPost } from '../../src/internal'
 

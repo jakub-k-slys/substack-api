@@ -1,5 +1,5 @@
-import type { SubstackPost } from '../internal'
-import type { SubstackHttpClient } from '../http-client'
+import type { SubstackPost } from '../types'
+import type { SubstackHttpClient } from '../../http-client'
 
 /**
  * Service responsible for post-related HTTP operations

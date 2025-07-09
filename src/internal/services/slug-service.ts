@@ -1,5 +1,5 @@
-import type { SubstackSubscriptionsResponse, SubstackSubscriptionPublication } from '../internal'
-import type { SubstackHttpClient } from '../http-client'
+import type { SubstackSubscriptionsResponse, SubstackSubscriptionPublication } from '../types'
+import type { SubstackHttpClient } from '../../http-client'
 
 /**
  * Service responsible for slug resolution and user handle management

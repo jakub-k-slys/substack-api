@@ -1,4 +1,4 @@
-import { SlugService } from '../../src/services/slug-service'
+import { SlugService } from '../../src/internal/services/slug-service'
 import { SubstackHttpClient } from '../../src/http-client'
 import type { SubstackSubscriptionsResponse } from '../../src/internal'
 

@@ -1,6 +1,6 @@
 import { SubstackHttpClient } from './http-client'
 import { Profile, OwnProfile, Post, Note, Comment } from './domain'
-import { PostService, NoteService, ProfileService, SlugService } from './services'
+import { PostService, NoteService, ProfileService, SlugService } from './internal/services'
 import type { SubstackConfig } from './types'
 import type { SubstackComment, SubstackCommentResponse } from './internal'
 

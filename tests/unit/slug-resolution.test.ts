@@ -1,12 +1,12 @@
 import { SubstackClient } from '../../src/substack-client'
 import { SubstackHttpClient } from '../../src/http-client'
 import { OwnProfile, Profile } from '../../src/domain'
-import { SlugService, ProfileService } from '../../src/services'
+import { SlugService, ProfileService } from '../../src/internal/services'
 import type { SubstackFullProfile } from '../../src/internal'
 
 // Mock the HTTP client and services
 jest.mock('../../src/http-client')
-jest.mock('../../src/services')
+jest.mock('../../src/internal/services')
 
 describe('SubstackClient - Slug Resolution', () => {
   let client: SubstackClient
