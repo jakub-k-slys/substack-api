@@ -240,16 +240,13 @@ describe('OwnProfile Entity', () => {
   })
 
   it('should handle profile fetch errors gracefully', async () => {
-    // Mock the first call to return user IDs
+    // Mock the FolloweeService to return user IDs
     const mockFollowingIds = [1, 2, 3]
+    mockFolloweeService.getFollowees.mockResolvedValue(mockFollowingIds)
 
-    const mockClient = ownProfile['client'] as jest.Mocked<SubstackHttpClient>
-
-    // Setup mock where one profile fetch fails
-    mockClient.get.mockImplementation((url: string) => {
-      if (url === '/api/v1/feed/following') {
-        return Promise.resolve(mockFollowingIds)
-      } else if (url === '/api/v1/user/1/profile') {
+    // Mock ProfileService where one profile fetch fails
+    mockProfileService.getProfileById.mockImplementation((userId: number) => {
+      if (userId === 1) {
         return Promise.resolve({
           id: 1,
           handle: 'user1',
@@ -285,10 +282,10 @@ describe('OwnProfile Entity', () => {
           can_dm: false,
           dm_upgrade_options: []
         } as SubstackFullProfile)
-      } else if (url === '/api/v1/user/2/profile') {
+      } else if (userId === 2) {
         // This one fails (e.g., deleted account)
         return Promise.reject(new Error('Profile not found'))
-      } else if (url === '/api/v1/user/3/profile') {
+      } else if (userId === 3) {
         return Promise.resolve({
           id: 3,
           handle: 'user3',
@@ -325,7 +322,7 @@ describe('OwnProfile Entity', () => {
           dm_upgrade_options: []
         } as SubstackFullProfile)
       }
-      return Promise.reject(new Error(`Unexpected URL: ${url}`))
+      return Promise.reject(new Error(`Unexpected userId: ${userId}`))
     })
 
     const followees = []
@@ -338,12 +335,12 @@ describe('OwnProfile Entity', () => {
     expect(followees[0].name).toBe('User One')
     expect(followees[1].name).toBe('User Three')
 
-    // Verify all API calls were attempted
-    expect(mockClient.get).toHaveBeenCalledWith('/api/v1/feed/following')
-    expect(mockClient.get).toHaveBeenCalledWith('/api/v1/user/1/profile')
-    expect(mockClient.get).toHaveBeenCalledWith('/api/v1/user/2/profile')
-    expect(mockClient.get).toHaveBeenCalledWith('/api/v1/user/3/profile')
-    expect(mockClient.get).toHaveBeenCalledTimes(4)
+    // Verify service calls were made
+    expect(mockFolloweeService.getFollowees).toHaveBeenCalledTimes(1)
+    expect(mockProfileService.getProfileById).toHaveBeenCalledWith(1)
+    expect(mockProfileService.getProfileById).toHaveBeenCalledWith(2)
+    expect(mockProfileService.getProfileById).toHaveBeenCalledWith(3)
+    expect(mockProfileService.getProfileById).toHaveBeenCalledTimes(3)
   })
 
   it('should use slug resolver for followees when available', async () => {
@@ -357,6 +354,17 @@ describe('OwnProfile Entity', () => {
       return Promise.resolve(fallbackHandle)
     })
 
+    // Create fresh service mocks for this test
+    const localFolloweeService = {
+      getFollowees: jest.fn()
+    } as unknown as jest.Mocked<FolloweeService>
+
+    const localProfileService = {
+      getOwnProfile: jest.fn(),
+      getProfileById: jest.fn(),
+      getProfileBySlug: jest.fn()
+    } as unknown as jest.Mocked<ProfileService>
+
     // Create OwnProfile with the slug resolver
     const ownProfileWithResolver = new OwnProfile(
       mockProfileData,
@@ -366,30 +374,28 @@ describe('OwnProfile Entity', () => {
         request: jest.fn(),
         getPerPage: jest.fn().mockReturnValue(25)
       } as unknown as jest.Mocked<SubstackHttpClient>,
-      mockProfileService,
+      localProfileService,
       mockPostService,
       mockNoteService,
       mockCommentService,
-      mockFolloweeService,
+      localFolloweeService,
       'resolved-own-slug',
       mockSlugResolver
     )
 
-    const mockClient = ownProfileWithResolver['client'] as jest.Mocked<SubstackHttpClient>
-
-    // Mock the following endpoint and profile endpoints
+    // Mock the services
     const mockFollowingIds = [1, 2]
-    mockClient.get.mockImplementation((url: string) => {
-      if (url === '/api/v1/feed/following') {
-        return Promise.resolve(mockFollowingIds)
-      } else if (url === '/api/v1/user/1/profile') {
+    localFolloweeService.getFollowees.mockResolvedValue(mockFollowingIds)
+
+    localProfileService.getProfileById.mockImplementation((userId: number) => {
+      if (userId === 1) {
         return Promise.resolve({
           id: 1,
           handle: 'user1',
           name: 'User One',
           photo_url: 'https://example.com/user1.jpg'
         } as SubstackFullProfile)
-      } else if (url === '/api/v1/user/2/profile') {
+      } else if (userId === 2) {
         return Promise.resolve({
           id: 2,
           handle: 'user2',
@@ -397,7 +403,7 @@ describe('OwnProfile Entity', () => {
           photo_url: 'https://example.com/user2.jpg'
         } as SubstackFullProfile)
       }
-      return Promise.reject(new Error(`Unexpected URL: ${url}`))
+      return Promise.reject(new Error(`Unexpected userId: ${userId}`))
     })
 
     const followees = []
@@ -694,8 +700,8 @@ describe('OwnProfile Entity', () => {
         ]
       }
 
-      const mockClient = ownProfile['client'] as jest.Mocked<SubstackHttpClient>
-      mockClient.get.mockResolvedValue(mockResponse)
+      // Mock the NoteService instead of the HTTP client
+      mockNoteService.getNotesForLoggedUser.mockResolvedValue(mockResponse.items)
 
       const notes = []
       for await (const note of ownProfile.notes({ limit: 1 })) {
