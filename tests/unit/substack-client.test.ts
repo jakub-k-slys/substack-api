@@ -38,30 +38,18 @@ describe('SubstackClient', () => {
     mockGlobalHttpClient.post = jest.fn()
     mockGlobalHttpClient.request = jest.fn()
 
-    mockPostService = new PostService(
-      mockHttpClient,
-      mockGlobalHttpClient
-    ) as jest.Mocked<PostService>
+    mockPostService = new PostService(mockGlobalHttpClient) as jest.Mocked<PostService>
     mockPostService.getPostById = jest.fn()
 
-    mockNoteService = new NoteService(
-      mockHttpClient,
-      mockGlobalHttpClient
-    ) as jest.Mocked<NoteService>
+    mockNoteService = new NoteService(mockHttpClient) as jest.Mocked<NoteService>
     mockNoteService.getNoteById = jest.fn()
 
-    mockProfileService = new ProfileService(
-      mockHttpClient,
-      mockGlobalHttpClient
-    ) as jest.Mocked<ProfileService>
+    mockProfileService = new ProfileService(mockHttpClient) as jest.Mocked<ProfileService>
     mockProfileService.getOwnProfile = jest.fn()
     mockProfileService.getProfileById = jest.fn()
     mockProfileService.getProfileBySlug = jest.fn()
 
-    mockSlugService = new SlugService(
-      mockHttpClient,
-      mockGlobalHttpClient
-    ) as jest.Mocked<SlugService>
+    mockSlugService = new SlugService(mockHttpClient) as jest.Mocked<SlugService>
     mockSlugService.getSlugForUserId = jest.fn()
     mockSlugService.getSlugMapping = jest.fn()
     mockSlugService.clearCache = jest.fn()

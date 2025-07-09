@@ -26,10 +26,10 @@ export class SubstackClient {
     this.globalHttpClient = new SubstackHttpClient(substackBaseUrl, config)
 
     // Initialize services
-    this.postService = new PostService(this.httpClient, this.globalHttpClient)
-    this.noteService = new NoteService(this.httpClient, this.globalHttpClient)
-    this.profileService = new ProfileService(this.httpClient, this.globalHttpClient)
-    this.slugService = new SlugService(this.httpClient, this.globalHttpClient)
+    this.postService = new PostService(this.globalHttpClient)
+    this.noteService = new NoteService(this.httpClient)
+    this.profileService = new ProfileService(this.httpClient)
+    this.slugService = new SlugService(this.httpClient)
   }
 
   /**

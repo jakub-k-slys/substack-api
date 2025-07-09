@@ -9,10 +9,7 @@ export class SlugService {
   private subscriptionsCache: Map<number, string> | null = null // user_id -> slug mapping
   private subscriptionsCacheTimestamp: number | null = null
 
-  constructor(
-    private readonly httpClient: SubstackHttpClient,
-    private readonly globalHttpClient: SubstackHttpClient
-  ) {}
+  constructor(private readonly httpClient: SubstackHttpClient) {}
 
   /**
    * Get or build the user_id to slug mapping from subscriptions

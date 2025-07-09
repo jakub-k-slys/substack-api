@@ -8,7 +8,6 @@ jest.mock('../../src/http-client')
 describe('NoteService', () => {
   let noteService: NoteService
   let mockHttpClient: jest.Mocked<SubstackHttpClient>
-  let mockGlobalHttpClient: jest.Mocked<SubstackHttpClient>
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -19,13 +18,7 @@ describe('NoteService', () => {
     }) as jest.Mocked<SubstackHttpClient>
     mockHttpClient.get = jest.fn()
 
-    mockGlobalHttpClient = new SubstackHttpClient('https://substack.com', {
-      apiKey: 'test',
-      hostname: 'test.com'
-    }) as jest.Mocked<SubstackHttpClient>
-    mockGlobalHttpClient.get = jest.fn()
-
-    noteService = new NoteService(mockHttpClient, mockGlobalHttpClient)
+    noteService = new NoteService(mockHttpClient)
   })
 
   describe('getNoteById', () => {
@@ -114,7 +107,6 @@ describe('NoteService', () => {
       } as SubstackNote)
 
       expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/comment/123')
-      expect(mockGlobalHttpClient.get).not.toHaveBeenCalled()
     })
 
     it('should handle null post_id in comment response', async () => {

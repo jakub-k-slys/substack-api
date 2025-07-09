@@ -6,10 +6,7 @@ import type { SubstackHttpClient } from '../http-client'
  * Returns internal types that can be transformed into domain models
  */
 export class NoteService {
-  constructor(
-    private readonly httpClient: SubstackHttpClient,
-    private readonly globalHttpClient: SubstackHttpClient
-  ) {}
+  constructor(private readonly httpClient: SubstackHttpClient) {}
 
   /**
    * Get a note by ID from the API

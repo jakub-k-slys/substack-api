@@ -24,14 +24,11 @@ describe('SubstackClient - Slug Resolution', () => {
     mockHttpClient.post = jest.fn()
     mockHttpClient.request = jest.fn()
 
-    mockSlugService = new SlugService(mockHttpClient, mockHttpClient) as jest.Mocked<SlugService>
+    mockSlugService = new SlugService(mockHttpClient) as jest.Mocked<SlugService>
     mockSlugService.getSlugForUserId = jest.fn()
     mockSlugService.getSlugMapping = jest.fn()
 
-    mockProfileService = new ProfileService(
-      mockHttpClient,
-      mockHttpClient
-    ) as jest.Mocked<ProfileService>
+    mockProfileService = new ProfileService(mockHttpClient) as jest.Mocked<ProfileService>
     mockProfileService.getOwnProfile = jest.fn()
     mockProfileService.getProfileById = jest.fn()
 

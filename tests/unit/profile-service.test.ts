@@ -8,7 +8,6 @@ jest.mock('../../src/http-client')
 describe('ProfileService', () => {
   let profileService: ProfileService
   let mockHttpClient: jest.Mocked<SubstackHttpClient>
-  let mockGlobalHttpClient: jest.Mocked<SubstackHttpClient>
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -19,13 +18,7 @@ describe('ProfileService', () => {
     }) as jest.Mocked<SubstackHttpClient>
     mockHttpClient.get = jest.fn()
 
-    mockGlobalHttpClient = new SubstackHttpClient('https://substack.com', {
-      apiKey: 'test',
-      hostname: 'test.com'
-    }) as jest.Mocked<SubstackHttpClient>
-    mockGlobalHttpClient.get = jest.fn()
-
-    profileService = new ProfileService(mockHttpClient, mockGlobalHttpClient)
+    profileService = new ProfileService(mockHttpClient)
   })
 
   describe('getOwnProfile', () => {
@@ -75,7 +68,6 @@ describe('ProfileService', () => {
       expect(result).toEqual(mockProfile)
       expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/subscription')
       expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/123/profile')
-      expect(mockGlobalHttpClient.get).not.toHaveBeenCalled()
     })
 
     it('should throw error when subscription request fails', async () => {
@@ -143,7 +135,6 @@ describe('ProfileService', () => {
 
       expect(result).toEqual(mockProfile)
       expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/456/profile')
-      expect(mockGlobalHttpClient.get).not.toHaveBeenCalled()
     })
 
     it('should throw error when HTTP request fails', async () => {
@@ -200,7 +191,6 @@ describe('ProfileService', () => {
 
       expect(result).toEqual(mockProfile)
       expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/sluguser/public_profile')
-      expect(mockGlobalHttpClient.get).not.toHaveBeenCalled()
     })
 
     it('should throw error when HTTP request fails', async () => {

@@ -8,7 +8,6 @@ jest.mock('../../src/http-client')
 describe('SlugService', () => {
   let slugService: SlugService
   let mockHttpClient: jest.Mocked<SubstackHttpClient>
-  let mockGlobalHttpClient: jest.Mocked<SubstackHttpClient>
 
   const mockSubscriptionsResponse: SubstackSubscriptionsResponse = {
     subscriptions: [],
@@ -107,13 +106,7 @@ describe('SlugService', () => {
     }) as jest.Mocked<SubstackHttpClient>
     mockHttpClient.get = jest.fn()
 
-    mockGlobalHttpClient = new SubstackHttpClient('https://substack.com', {
-      apiKey: 'test',
-      hostname: 'test.com'
-    }) as jest.Mocked<SubstackHttpClient>
-    mockGlobalHttpClient.get = jest.fn()
-
-    slugService = new SlugService(mockHttpClient, mockGlobalHttpClient)
+    slugService = new SlugService(mockHttpClient)
   })
 
   describe('getSlugMapping', () => {

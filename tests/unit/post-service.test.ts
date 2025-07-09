@@ -7,17 +7,10 @@ jest.mock('../../src/http-client')
 
 describe('PostService', () => {
   let postService: PostService
-  let mockHttpClient: jest.Mocked<SubstackHttpClient>
   let mockGlobalHttpClient: jest.Mocked<SubstackHttpClient>
 
   beforeEach(() => {
     jest.clearAllMocks()
-
-    mockHttpClient = new SubstackHttpClient('https://test.com', {
-      apiKey: 'test',
-      hostname: 'test.com'
-    }) as jest.Mocked<SubstackHttpClient>
-    mockHttpClient.get = jest.fn()
 
     mockGlobalHttpClient = new SubstackHttpClient('https://substack.com', {
       apiKey: 'test',
@@ -25,7 +18,7 @@ describe('PostService', () => {
     }) as jest.Mocked<SubstackHttpClient>
     mockGlobalHttpClient.get = jest.fn()
 
-    postService = new PostService(mockHttpClient, mockGlobalHttpClient)
+    postService = new PostService(mockGlobalHttpClient)
   })
 
   describe('getPostById', () => {
@@ -45,7 +38,6 @@ describe('PostService', () => {
 
       expect(result).toEqual(mockPost)
       expect(mockGlobalHttpClient.get).toHaveBeenCalledWith('/api/v1/posts/by-id/123')
-      expect(mockHttpClient.get).not.toHaveBeenCalled()
     })
 
     it('should throw error when global HTTP client fails', async () => {
@@ -72,7 +64,6 @@ describe('PostService', () => {
 
       // Verify that only the global HTTP client is used
       expect(mockGlobalHttpClient.get).toHaveBeenCalledWith('/api/v1/posts/by-id/456')
-      expect(mockHttpClient.get).not.toHaveBeenCalled()
     })
   })
 })
