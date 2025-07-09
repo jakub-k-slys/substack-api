@@ -68,42 +68,16 @@ describe('Post Entity', () => {
           body: 'Comment 1',
           created_at: '2023-01-01T00:00:00Z',
           parent_post_id: 456,
-          author: { id: 123, name: 'User 1' },
-          user_id: 123,
-          post_id: 456,
-          date: '2023-01-01T00:00:00Z',
-          name: 'User 1',
-          handle: 'user1',
-          photo_url: '',
-          ancestor_path: '',
-          reply_minimum_role: 'everyone',
-          reaction_count: 0,
-          reactions: {},
-          restacks: 0,
-          restacked: false,
-          children_count: 0,
-          attachments: []
+          author_id: 123,
+          author_name: 'User 1'
         },
         {
           id: 2,
           body: 'Comment 2',
           created_at: '2023-01-02T00:00:00Z',
           parent_post_id: 456,
-          author: { id: 124, name: 'User 2' },
-          user_id: 124,
-          post_id: 456,
-          date: '2023-01-02T00:00:00Z',
-          name: 'User 2',
-          handle: 'user2',
-          photo_url: '',
-          ancestor_path: '',
-          reply_minimum_role: 'everyone',
-          reaction_count: 0,
-          reactions: {},
-          restacks: 0,
-          restacked: false,
-          children_count: 0,
-          attachments: []
+          author_id: 124,
+          author_name: 'User 2'
         }
       ]
       mockPostService.getCommentsForPost.mockResolvedValue(mockComments)
@@ -127,42 +101,16 @@ describe('Post Entity', () => {
           body: 'Comment 1',
           created_at: '2023-01-01T00:00:00Z',
           parent_post_id: 456,
-          author: { id: 123, name: 'User 1' },
-          user_id: 123,
-          post_id: 456,
-          date: '2023-01-01T00:00:00Z',
-          name: 'User 1',
-          handle: 'user1',
-          photo_url: '',
-          ancestor_path: '',
-          reply_minimum_role: 'everyone',
-          reaction_count: 0,
-          reactions: {},
-          restacks: 0,
-          restacked: false,
-          children_count: 0,
-          attachments: []
+          author_id: 123,
+          author_name: 'User 1'
         },
         {
           id: 2,
           body: 'Comment 2',
           created_at: '2023-01-02T00:00:00Z',
           parent_post_id: 456,
-          author: { id: 124, name: 'User 2' },
-          user_id: 124,
-          post_id: 456,
-          date: '2023-01-02T00:00:00Z',
-          name: 'User 2',
-          handle: 'user2',
-          photo_url: '',
-          ancestor_path: '',
-          reply_minimum_role: 'everyone',
-          reaction_count: 0,
-          reactions: {},
-          restacks: 0,
-          restacked: false,
-          children_count: 0,
-          attachments: []
+          author_id: 124,
+          author_name: 'User 2'
         }
       ]
       mockPostService.getCommentsForPost.mockResolvedValue(mockComments)

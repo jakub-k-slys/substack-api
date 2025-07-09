@@ -80,20 +80,10 @@ describe('PostService', () => {
         {
           id: 1,
           body: 'Great post!',
-          user_id: 123,
-          post_id: 456,
-          date: '2023-01-01T00:00:00Z',
-          name: 'John Doe',
-          handle: 'johndoe',
-          photo_url: 'https://example.com/avatar.jpg',
-          ancestor_path: '',
-          reply_minimum_role: 'everyone',
-          reaction_count: 5,
-          reactions: {},
-          restacks: 2,
-          restacked: false,
-          children_count: 0,
-          attachments: []
+          author_id: 123,
+          author_name: 'John Doe',
+          parent_post_id: 456,
+          created_at: '2023-01-01T00:00:00Z'
         }
       ]
 
