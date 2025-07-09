@@ -1,9 +1,12 @@
 import { Profile } from '../../src/domain/profile'
 import { Post, Note } from '../../src/domain'
+import { ProfileService, PostService } from '../../src/internal/services'
 import type { SubstackHttpClient } from '../../src/http-client'
 
 describe('Profile Entity', () => {
   let mockHttpClient: jest.Mocked<SubstackHttpClient>
+  let mockProfileService: jest.Mocked<ProfileService>
+  let mockPostService: jest.Mocked<PostService>
   let profile: Profile
 
   beforeEach(() => {
@@ -13,6 +16,20 @@ describe('Profile Entity', () => {
       request: jest.fn(),
       getPerPage: jest.fn().mockReturnValue(25)
     } as unknown as jest.Mocked<SubstackHttpClient>
+
+    mockProfileService = {
+      getOwnProfile: jest.fn(),
+      getProfileById: jest.fn(),
+      getProfileBySlug: jest.fn(),
+      getPostsForProfile: jest.fn(),
+      getNotesForProfile: jest.fn(),
+      getFollowingUsers: jest.fn()
+    } as unknown as jest.Mocked<ProfileService>
+
+    mockPostService = {
+      getPostById: jest.fn(),
+      getCommentsForPost: jest.fn()
+    } as unknown as jest.Mocked<PostService>
 
     const mockProfileData = {
       id: 123,
@@ -50,32 +67,30 @@ describe('Profile Entity', () => {
       dm_upgrade_options: []
     }
 
-    profile = new Profile(mockProfileData, mockHttpClient)
+    profile = new Profile(mockProfileData, mockHttpClient, mockProfileService, mockPostService)
   })
 
   describe('posts()', () => {
     it('should iterate through profile posts', async () => {
-      const mockResponse = {
-        posts: [
-          {
-            id: 1,
-            title: 'Post 1',
-            slug: 'post-1',
-            post_date: '2023-01-01T00:00:00Z',
-            canonical_url: 'https://example.com/post1',
-            type: 'newsletter' as const
-          },
-          {
-            id: 2,
-            title: 'Post 2',
-            slug: 'post-2',
-            post_date: '2023-01-02T00:00:00Z',
-            canonical_url: 'https://example.com/post2',
-            type: 'newsletter' as const
-          }
-        ]
-      }
-      mockHttpClient.get.mockResolvedValue(mockResponse)
+      const mockPosts = [
+        {
+          id: 1,
+          title: 'Post 1',
+          slug: 'post-1',
+          post_date: '2023-01-01T00:00:00Z',
+          canonical_url: 'https://example.com/post1',
+          type: 'newsletter' as const
+        },
+        {
+          id: 2,
+          title: 'Post 2',
+          slug: 'post-2',
+          post_date: '2023-01-02T00:00:00Z',
+          canonical_url: 'https://example.com/post2',
+          type: 'newsletter' as const
+        }
+      ]
+      mockProfileService.getPostsForProfile.mockResolvedValue(mockPosts)
 
       const posts = []
       for await (const post of profile.posts({ limit: 2 })) {

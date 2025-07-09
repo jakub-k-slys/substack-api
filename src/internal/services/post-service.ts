@@ -1,4 +1,4 @@
-import type { SubstackPost } from '../types'
+import type { SubstackPost, SubstackComment } from '../types'
 import type { SubstackHttpClient } from '../../http-client'
 
 /**
@@ -6,7 +6,10 @@ import type { SubstackHttpClient } from '../../http-client'
  * Returns internal types that can be transformed into domain models
  */
 export class PostService {
-  constructor(private readonly globalHttpClient: SubstackHttpClient) {}
+  constructor(
+    private readonly globalHttpClient: SubstackHttpClient,
+    private readonly httpClient: SubstackHttpClient
+  ) {}
 
   /**
    * Get a post by ID from the API
@@ -17,5 +20,18 @@ export class PostService {
   async getPostById(id: number): Promise<SubstackPost> {
     // Post lookup by ID must use the global substack.com endpoint, not publication-specific hostnames
     return await this.globalHttpClient.get<SubstackPost>(`/api/v1/posts/by-id/${id}`)
+  }
+
+  /**
+   * Get comments for a post
+   * @param postId - The post ID
+   * @returns Promise<SubstackComment[]> - Raw comment data from API
+   * @throws {Error} When comments cannot be retrieved
+   */
+  async getCommentsForPost(postId: number): Promise<SubstackComment[]> {
+    const response = await this.httpClient.get<{ comments?: SubstackComment[] }>(
+      `/api/v1/post/${postId}/comments`
+    )
+    return response.comments || []
   }
 }

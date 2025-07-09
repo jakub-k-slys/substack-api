@@ -2,11 +2,16 @@ import { OwnProfile } from '../../src/domain/own-profile'
 import { Note } from '../../src/domain/note'
 import { Profile } from '../../src/domain/profile'
 import { NoteBuilder } from '../../src/note-builder'
+import { ProfileService, PostService, NoteService } from '../../src/internal/services'
 import type { SubstackFullProfile } from '../../src/internal'
 import type { SubstackHttpClient } from '../../src/http-client'
 
 describe('OwnProfile Entity', () => {
   let mockProfileData: SubstackFullProfile
+  let mockClient: jest.Mocked<SubstackHttpClient>
+  let mockProfileService: jest.Mocked<ProfileService>
+  let mockPostService: jest.Mocked<PostService>
+  let mockNoteService: jest.Mocked<NoteService>
   let ownProfile: OwnProfile
 
   beforeEach(() => {
@@ -54,7 +59,32 @@ describe('OwnProfile Entity', () => {
       getPerPage: jest.fn().mockReturnValue(25)
     } as unknown as jest.Mocked<SubstackHttpClient>
 
-    ownProfile = new OwnProfile(mockProfileData, mockClient)
+    mockProfileService = {
+      getOwnProfile: jest.fn(),
+      getProfileById: jest.fn(),
+      getProfileBySlug: jest.fn(),
+      getPostsForProfile: jest.fn(),
+      getNotesForProfile: jest.fn(),
+      getFollowingUsers: jest.fn()
+    } as unknown as jest.Mocked<ProfileService>
+
+    mockPostService = {
+      getPostById: jest.fn(),
+      getCommentsForPost: jest.fn()
+    } as unknown as jest.Mocked<PostService>
+
+    mockNoteService = {
+      getNoteById: jest.fn(),
+      getNotesForUser: jest.fn()
+    } as unknown as jest.Mocked<NoteService>
+
+    ownProfile = new OwnProfile(
+      mockProfileData,
+      mockClient,
+      mockProfileService,
+      mockPostService,
+      mockNoteService
+    )
   })
 
   it('should inherit from Profile', () => {

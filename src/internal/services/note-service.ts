@@ -89,4 +89,14 @@ export class NoteService {
 
     return noteData
   }
+
+  /**
+   * Get notes for the authenticated user
+   * @returns Promise<SubstackNote[]> - Raw note data from API
+   * @throws {Error} When notes cannot be retrieved
+   */
+  async getNotesForUser(): Promise<SubstackNote[]> {
+    const response = await this.httpClient.get<{ items?: SubstackNote[] }>('/api/v1/notes')
+    return response.items || []
+  }
 }

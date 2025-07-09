@@ -1,5 +1,6 @@
 import { SubstackClient } from '../../src/substack-client'
 import { Profile, Post, Comment } from '../../src/domain'
+import { PostService, ProfileService } from '../../src/internal/services'
 import type { SubstackHttpClient } from '../../src/http-client'
 
 describe('SubstackClient Entity Model', () => {
@@ -65,7 +66,23 @@ describe('SubstackClient Entity Model', () => {
         dm_upgrade_options: []
       }
       const httpClient = (client as unknown as { httpClient: SubstackHttpClient }).httpClient
-      const profile = new Profile(mockData, httpClient)
+      
+      // Create mock services
+      const mockProfileService = {
+        getOwnProfile: jest.fn(),
+        getProfileById: jest.fn(),
+        getProfileBySlug: jest.fn(),
+        getPostsForProfile: jest.fn(),
+        getNotesForProfile: jest.fn(),
+        getFollowingUsers: jest.fn()
+      } as unknown as ProfileService
+      
+      const mockPostService = {
+        getPostById: jest.fn(),
+        getCommentsForPost: jest.fn()
+      } as unknown as PostService
+      
+      const profile = new Profile(mockData, httpClient, mockProfileService, mockPostService)
 
       expect(profile).toBeInstanceOf(Profile)
       expect(profile.id).toBe(123)
@@ -83,7 +100,14 @@ describe('SubstackClient Entity Model', () => {
         type: 'newsletter' as const
       }
       const httpClient = (client as unknown as { httpClient: SubstackHttpClient }).httpClient
-      const post = new Post(mockData, httpClient)
+      
+      // Create mock services
+      const mockPostService = {
+        getPostById: jest.fn(),
+        getCommentsForPost: jest.fn()
+      } as unknown as PostService
+      
+      const post = new Post(mockData, httpClient, mockPostService)
 
       expect(post).toBeInstanceOf(Post)
       expect(post.id).toBe(456)

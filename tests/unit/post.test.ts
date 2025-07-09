@@ -1,9 +1,11 @@
 import { Post } from '../../src/domain/post'
 import { Comment } from '../../src/domain/comment'
+import { PostService } from '../../src/internal/services/post-service'
 import type { SubstackHttpClient } from '../../src/http-client'
 
 describe('Post Entity', () => {
   let mockHttpClient: jest.Mocked<SubstackHttpClient>
+  let mockPostService: jest.Mocked<PostService>
   let post: Post
 
   beforeEach(() => {
@@ -12,6 +14,11 @@ describe('Post Entity', () => {
       post: jest.fn(),
       request: jest.fn()
     } as unknown as jest.Mocked<SubstackHttpClient>
+
+    mockPostService = {
+      getPostById: jest.fn(),
+      getCommentsForPost: jest.fn()
+    } as unknown as jest.Mocked<PostService>
 
     const mockPostData = {
       id: 456,
@@ -50,30 +57,56 @@ describe('Post Entity', () => {
       theme: { background_pop: 'blue' }
     }
 
-    post = new Post(mockPostData, mockHttpClient)
+    post = new Post(mockPostData, mockHttpClient, mockPostService)
   })
 
   describe('comments()', () => {
     it('should iterate through post comments', async () => {
-      const mockResponse = {
-        comments: [
-          {
-            id: 1,
-            body: 'Comment 1',
-            created_at: '2023-01-01T00:00:00Z',
-            parent_post_id: 456,
-            author: { id: 123, name: 'User 1' }
-          },
-          {
-            id: 2,
-            body: 'Comment 2',
-            created_at: '2023-01-02T00:00:00Z',
-            parent_post_id: 456,
-            author: { id: 124, name: 'User 2' }
-          }
-        ]
-      }
-      mockHttpClient.get.mockResolvedValue(mockResponse)
+      const mockComments = [
+        {
+          id: 1,
+          body: 'Comment 1',
+          created_at: '2023-01-01T00:00:00Z',
+          parent_post_id: 456,
+          author: { id: 123, name: 'User 1' },
+          user_id: 123,
+          post_id: 456,
+          date: '2023-01-01T00:00:00Z',
+          name: 'User 1',
+          handle: 'user1',
+          photo_url: '',
+          ancestor_path: '',
+          reply_minimum_role: 'everyone',
+          reaction_count: 0,
+          reactions: {},
+          restacks: 0,
+          restacked: false,
+          children_count: 0,
+          attachments: []
+        },
+        {
+          id: 2,
+          body: 'Comment 2',
+          created_at: '2023-01-02T00:00:00Z',
+          parent_post_id: 456,
+          author: { id: 124, name: 'User 2' },
+          user_id: 124,
+          post_id: 456,
+          date: '2023-01-02T00:00:00Z',
+          name: 'User 2',
+          handle: 'user2',
+          photo_url: '',
+          ancestor_path: '',
+          reply_minimum_role: 'everyone',
+          reaction_count: 0,
+          reactions: {},
+          restacks: 0,
+          restacked: false,
+          children_count: 0,
+          attachments: []
+        }
+      ]
+      mockPostService.getCommentsForPost.mockResolvedValue(mockComments)
 
       const comments = []
       for await (const comment of post.comments({ limit: 2 })) {
@@ -84,29 +117,55 @@ describe('Post Entity', () => {
       expect(comments[0]).toBeInstanceOf(Comment)
       expect(comments[0].body).toBe('Comment 1')
       expect(comments[1].body).toBe('Comment 2')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/post/456/comments')
+      expect(mockPostService.getCommentsForPost).toHaveBeenCalledWith(456)
     })
 
     it('should handle limit parameter', async () => {
-      const mockResponse = {
-        comments: [
-          {
-            id: 1,
-            body: 'Comment 1',
-            created_at: '2023-01-01T00:00:00Z',
-            parent_post_id: 456,
-            author: { id: 123, name: 'User 1' }
-          },
-          {
-            id: 2,
-            body: 'Comment 2',
-            created_at: '2023-01-02T00:00:00Z',
-            parent_post_id: 456,
-            author: { id: 124, name: 'User 2' }
-          }
-        ]
-      }
-      mockHttpClient.get.mockResolvedValue(mockResponse)
+      const mockComments = [
+        {
+          id: 1,
+          body: 'Comment 1',
+          created_at: '2023-01-01T00:00:00Z',
+          parent_post_id: 456,
+          author: { id: 123, name: 'User 1' },
+          user_id: 123,
+          post_id: 456,
+          date: '2023-01-01T00:00:00Z',
+          name: 'User 1',
+          handle: 'user1',
+          photo_url: '',
+          ancestor_path: '',
+          reply_minimum_role: 'everyone',
+          reaction_count: 0,
+          reactions: {},
+          restacks: 0,
+          restacked: false,
+          children_count: 0,
+          attachments: []
+        },
+        {
+          id: 2,
+          body: 'Comment 2',
+          created_at: '2023-01-02T00:00:00Z',
+          parent_post_id: 456,
+          author: { id: 124, name: 'User 2' },
+          user_id: 124,
+          post_id: 456,
+          date: '2023-01-02T00:00:00Z',
+          name: 'User 2',
+          handle: 'user2',
+          photo_url: '',
+          ancestor_path: '',
+          reply_minimum_role: 'everyone',
+          reaction_count: 0,
+          reactions: {},
+          restacks: 0,
+          restacked: false,
+          children_count: 0,
+          attachments: []
+        }
+      ]
+      mockPostService.getCommentsForPost.mockResolvedValue(mockComments)
 
       const comments = []
       for await (const comment of post.comments({ limit: 1 })) {
@@ -118,8 +177,7 @@ describe('Post Entity', () => {
     })
 
     it('should handle empty comments response', async () => {
-      const mockResponse = { comments: [] }
-      mockHttpClient.get.mockResolvedValue(mockResponse)
+      mockPostService.getCommentsForPost.mockResolvedValue([])
 
       const comments = []
       for await (const comment of post.comments()) {
@@ -130,8 +188,7 @@ describe('Post Entity', () => {
     })
 
     it('should handle missing comments property', async () => {
-      const mockResponse = {}
-      mockHttpClient.get.mockResolvedValue(mockResponse)
+      mockPostService.getCommentsForPost.mockResolvedValue([])
 
       const comments = []
       for await (const comment of post.comments()) {
@@ -142,7 +199,7 @@ describe('Post Entity', () => {
     })
 
     it('should throw error when API fails', async () => {
-      mockHttpClient.get.mockRejectedValue(new Error('API error'))
+      mockPostService.getCommentsForPost.mockRejectedValue(new Error('API error'))
 
       const comments = []
       await expect(async () => {

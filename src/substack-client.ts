@@ -26,7 +26,7 @@ export class SubstackClient {
     this.globalHttpClient = new SubstackHttpClient(substackBaseUrl, config)
 
     // Initialize services
-    this.postService = new PostService(this.globalHttpClient)
+    this.postService = new PostService(this.globalHttpClient, this.httpClient)
     this.noteService = new NoteService(this.httpClient)
     this.profileService = new ProfileService(this.httpClient)
     this.slugService = new SlugService(this.httpClient)
@@ -62,6 +62,9 @@ export class SubstackClient {
       return new OwnProfile(
         profile,
         this.httpClient,
+        this.profileService,
+        this.postService,
+        this.noteService,
         resolvedSlug,
         this.slugService.getSlugForUserId.bind(this.slugService)
       )
@@ -83,6 +86,8 @@ export class SubstackClient {
       return new Profile(
         profile,
         this.httpClient,
+        this.profileService,
+        this.postService,
         resolvedSlug,
         this.slugService.getSlugForUserId.bind(this.slugService)
       )
@@ -109,6 +114,8 @@ export class SubstackClient {
       return new Profile(
         profile,
         this.httpClient,
+        this.profileService,
+        this.postService,
         resolvedSlug,
         this.slugService.getSlugForUserId.bind(this.slugService)
       )
@@ -127,7 +134,7 @@ export class SubstackClient {
 
     try {
       const post = await this.postService.getPostById(id)
-      return new Post(post, this.httpClient)
+      return new Post(post, this.httpClient, this.postService)
     } catch (error) {
       throw new Error(`Post with ID ${id} not found: ${(error as Error).message}`)
     }
