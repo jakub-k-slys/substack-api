@@ -419,139 +419,136 @@ describe('OwnProfile Entity', () => {
 
   describe('notes()', () => {
     it('should iterate through own profile notes', async () => {
-      const mockResponse = {
-        items: [
-          {
-            entity_key: '1',
-            type: 'note',
-            context: {
-              type: 'feed',
-              timestamp: '2023-01-01T00:00:00Z',
-              users: [
-                {
-                  id: 123,
-                  name: 'Test User',
-                  handle: 'testuser',
-                  photo_url: 'https://example.com/photo.jpg',
-                  bio: 'Test bio',
-                  profile_set_up_at: '2023-01-01T00:00:00Z',
-                  reader_installed_at: '2023-01-01T00:00:00Z'
-                }
-              ],
-              isFresh: false,
-              page_rank: 1
-            },
-            comment: {
-              name: 'Test User',
-              handle: 'testuser',
-              photo_url: 'https://example.com/photo.jpg',
-              id: 1,
-              body: 'Note 1',
-              user_id: 123,
-              type: 'feed',
-              date: '2023-01-01T00:00:00Z',
-              ancestor_path: '',
-              reply_minimum_role: 'everyone',
-              reaction_count: 0,
-              reactions: {},
-              restacks: 0,
-              restacked: false,
-              children_count: 0,
-              attachments: []
-            },
-            parentComments: [],
-            canReply: true,
-            isMuted: false,
-            trackingParameters: {
-              item_primary_entity_key: '1',
-              item_entity_key: '1',
-              item_type: 'note',
-              item_content_user_id: 123,
-              item_context_type: 'feed',
-              item_context_type_bucket: 'note',
-              item_context_timestamp: '2023-01-01T00:00:00Z',
-              item_context_user_id: 123,
-              item_context_user_ids: [123],
-              item_can_reply: true,
-              item_is_fresh: false,
-              item_last_impression_at: null,
-              item_page: null,
-              item_page_rank: 1,
-              impression_id: 'test-impression',
-              followed_user_count: 0,
-              subscribed_publication_count: 0,
-              is_following: false,
-              is_explicitly_subscribed: false
-            }
+      const mockNotes = [
+        {
+          entity_key: '1',
+          type: 'note',
+          context: {
+            type: 'feed',
+            timestamp: '2023-01-01T00:00:00Z',
+            users: [
+              {
+                id: 123,
+                name: 'Test User',
+                handle: 'testuser',
+                photo_url: 'https://example.com/photo.jpg',
+                bio: 'Test bio',
+                profile_set_up_at: '2023-01-01T00:00:00Z',
+                reader_installed_at: '2023-01-01T00:00:00Z'
+              }
+            ],
+            isFresh: false,
+            page_rank: 1
           },
-          {
-            entity_key: '2',
-            type: 'note',
-            context: {
-              type: 'feed',
-              timestamp: '2023-01-02T00:00:00Z',
-              users: [
-                {
-                  id: 123,
-                  name: 'Test User',
-                  handle: 'testuser',
-                  photo_url: 'https://example.com/photo.jpg',
-                  bio: 'Test bio',
-                  profile_set_up_at: '2023-01-01T00:00:00Z',
-                  reader_installed_at: '2023-01-01T00:00:00Z'
-                }
-              ],
-              isFresh: false,
-              page_rank: 1
-            },
-            comment: {
-              name: 'Test User',
-              handle: 'testuser',
-              photo_url: 'https://example.com/photo.jpg',
-              id: 2,
-              body: 'Note 2',
-              user_id: 123,
-              type: 'feed',
-              date: '2023-01-02T00:00:00Z',
-              ancestor_path: '',
-              reply_minimum_role: 'everyone',
-              reaction_count: 0,
-              reactions: {},
-              restacks: 0,
-              restacked: false,
-              children_count: 0,
-              attachments: []
-            },
-            parentComments: [],
-            canReply: true,
-            isMuted: false,
-            trackingParameters: {
-              item_primary_entity_key: '2',
-              item_entity_key: '2',
-              item_type: 'note',
-              item_content_user_id: 123,
-              item_context_type: 'feed',
-              item_context_type_bucket: 'note',
-              item_context_timestamp: '2023-01-02T00:00:00Z',
-              item_context_user_id: 123,
-              item_context_user_ids: [123],
-              item_can_reply: true,
-              item_is_fresh: false,
-              item_last_impression_at: null,
-              item_page: null,
-              item_page_rank: 1,
-              impression_id: 'test-impression',
-              followed_user_count: 0,
-              subscribed_publication_count: 0,
-              is_following: false,
-              is_explicitly_subscribed: false
-            }
+          comment: {
+            name: 'Test User',
+            handle: 'testuser',
+            photo_url: 'https://example.com/photo.jpg',
+            id: 1,
+            body: 'Note 1',
+            user_id: 123,
+            type: 'feed',
+            date: '2023-01-01T00:00:00Z',
+            ancestor_path: '',
+            reply_minimum_role: 'everyone',
+            reaction_count: 0,
+            reactions: {},
+            restacks: 0,
+            restacked: false,
+            children_count: 0,
+            attachments: []
+          },
+          parentComments: [],
+          canReply: true,
+          isMuted: false,
+          trackingParameters: {
+            item_primary_entity_key: '1',
+            item_entity_key: '1',
+            item_type: 'note',
+            item_content_user_id: 123,
+            item_context_type: 'feed',
+            item_context_type_bucket: 'note',
+            item_context_timestamp: '2023-01-01T00:00:00Z',
+            item_context_user_id: 123,
+            item_context_user_ids: [123],
+            item_can_reply: true,
+            item_is_fresh: false,
+            item_last_impression_at: null,
+            item_page: null,
+            item_page_rank: 1,
+            impression_id: 'test-impression',
+            followed_user_count: 0,
+            subscribed_publication_count: 0,
+            is_following: false,
+            is_explicitly_subscribed: false
           }
-        ]
-      }
+        },
+        {
+          entity_key: '2',
+          type: 'note',
+          context: {
+            type: 'feed',
+            timestamp: '2023-01-02T00:00:00Z',
+            users: [
+              {
+                id: 123,
+                name: 'Test User',
+                handle: 'testuser',
+                photo_url: 'https://example.com/photo.jpg',
+                bio: 'Test bio',
+                profile_set_up_at: '2023-01-01T00:00:00Z',
+                reader_installed_at: '2023-01-01T00:00:00Z'
+              }
+            ],
+            isFresh: false,
+            page_rank: 1
+          },
+          comment: {
+            name: 'Test User',
+            handle: 'testuser',
+            photo_url: 'https://example.com/photo.jpg',
+            id: 2,
+            body: 'Note 2',
+            user_id: 123,
+            type: 'feed',
+            date: '2023-01-02T00:00:00Z',
+            ancestor_path: '',
+            reply_minimum_role: 'everyone',
+            reaction_count: 0,
+            reactions: {},
+            restacks: 0,
+            restacked: false,
+            children_count: 0,
+            attachments: []
+          },
+          parentComments: [],
+          canReply: true,
+          isMuted: false,
+          trackingParameters: {
+            item_primary_entity_key: '2',
+            item_entity_key: '2',
+            item_type: 'note',
+            item_content_user_id: 123,
+            item_context_type: 'feed',
+            item_context_type_bucket: 'note',
+            item_context_timestamp: '2023-01-02T00:00:00Z',
+            item_context_user_id: 123,
+            item_context_user_ids: [123],
+            item_can_reply: true,
+            item_is_fresh: false,
+            item_last_impression_at: null,
+            item_page: null,
+            item_page_rank: 1,
+            impression_id: 'test-impression',
+            followed_user_count: 0,
+            subscribed_publication_count: 0,
+            is_following: false,
+            is_explicitly_subscribed: false
+          }
+        }
+      ]
 
-      const mockClient = ownProfile['client'] as jest.Mocked<SubstackHttpClient>
-      mockClient.get.mockResolvedValue(mockResponse)
+      mockNoteService.getNotesForLoggedUser.mockResolvedValue(mockNotes)
 
       const notes = []
       for await (const note of ownProfile.notes({ limit: 2 })) {
@@ -562,7 +559,7 @@ describe('OwnProfile Entity', () => {
       expect(notes[0]).toBeInstanceOf(Note)
       expect(notes[0].body).toBe('Note 1')
       expect(notes[1].body).toBe('Note 2')
-      expect(mockClient.get).toHaveBeenCalledWith('/api/v1/notes')
+      expect(mockNoteService.getNotesForLoggedUser).toHaveBeenCalledTimes(1)
     })
 
     it('should handle limit parameter for notes', async () => {
