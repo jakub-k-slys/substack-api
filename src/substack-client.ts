@@ -1,15 +1,8 @@
 import { SubstackHttpClient } from './http-client'
 import { Profile, OwnProfile, Post, Note, Comment } from './domain'
-import { PostService, NoteService, ProfileService } from './services'
+import { PostService, NoteService, ProfileService, SlugService } from './services'
 import type { SubstackConfig } from './types'
-import type {
-  SubstackFullProfile,
-  SubstackNote,
-  SubstackComment,
-  SubstackCommentResponse,
-  SubstackSubscriptionsResponse,
-  SubstackSubscriptionPublication
-} from './internal'
+import type { SubstackComment, SubstackCommentResponse } from './internal'
 
 /**
  * Modern SubstackClient with entity-based API
@@ -20,8 +13,7 @@ export class SubstackClient {
   private readonly postService: PostService
   private readonly noteService: NoteService
   private readonly profileService: ProfileService
-  private subscriptionsCache: Map<number, string> | null = null // user_id -> slug mapping
-  private subscriptionsCacheTimestamp: number | null = null
+  private readonly slugService: SlugService
 
   constructor(config: SubstackConfig) {
     // Create HTTP client for publication-specific endpoints
@@ -37,6 +29,7 @@ export class SubstackClient {
     this.postService = new PostService(this.httpClient, this.globalHttpClient)
     this.noteService = new NoteService(this.httpClient, this.globalHttpClient)
     this.profileService = new ProfileService(this.httpClient, this.globalHttpClient)
+    this.slugService = new SlugService(this.httpClient, this.globalHttpClient)
   }
 
   /**
@@ -52,61 +45,6 @@ export class SubstackClient {
   }
 
   /**
-   * Get or build the user_id to slug mapping from subscriptions
-   * @private
-   */
-  private async getSlugMapping(): Promise<Map<number, string>> {
-    // Return cached mapping if available and fresh (within session)
-    if (this.subscriptionsCache && this.subscriptionsCacheTimestamp) {
-      return this.subscriptionsCache
-    }
-
-    try {
-      // Fetch subscriptions data
-      const subscriptionsResponse =
-        await this.httpClient.get<SubstackSubscriptionsResponse>('/api/v1/subscriptions')
-
-      // Build user_id -> slug mapping
-      const mapping = new Map<number, string>()
-
-      for (const publication of subscriptionsResponse.publications as SubstackSubscriptionPublication[]) {
-        if (publication.author_id) {
-          // Use subdomain as the slug, or custom_domain if the publication is not on substack
-          const slug = publication.author_handle || undefined
-          if (slug) {
-            mapping.set(publication.author_id, slug)
-          }
-        }
-      }
-
-      // Cache the mapping
-      this.subscriptionsCache = mapping
-      this.subscriptionsCacheTimestamp = Date.now()
-
-      return mapping
-    } catch {
-      // If subscriptions endpoint fails, return empty mapping
-      // This ensures graceful fallback
-      const emptyMapping = new Map<number, string>()
-      this.subscriptionsCache = emptyMapping
-      this.subscriptionsCacheTimestamp = Date.now()
-      return emptyMapping
-    }
-  }
-
-  /**
-   * Get slug for a user ID, with fallback to handle from profile data
-   * @private
-   */
-  private async getSlugForUserId(
-    userId: number,
-    fallbackHandle?: string
-  ): Promise<string | undefined> {
-    const slugMapping = await this.getSlugMapping()
-    return slugMapping.get(userId) || fallbackHandle
-  }
-
-  /**
    * Get the authenticated user's own profile with write capabilities
    * @throws {Error} When authentication fails or user profile cannot be retrieved
    */
@@ -118,14 +56,14 @@ export class SubstackClient {
       const subscription = await this.httpClient.get<{ user_id: number }>('/api/v1/subscription')
       const userId = subscription.user_id
 
-      // Resolve slug from subscriptions cache
-      const resolvedSlug = await this.getSlugForUserId(userId, profile.handle)
+      // Resolve slug from slug service
+      const resolvedSlug = await this.slugService.getSlugForUserId(userId, profile.handle)
 
       return new OwnProfile(
         profile,
         this.httpClient,
         resolvedSlug,
-        this.getSlugForUserId.bind(this)
+        this.slugService.getSlugForUserId.bind(this.slugService)
       )
     } catch (error) {
       throw new Error(`Failed to get own profile: ${(error as Error).message}`)
@@ -139,10 +77,15 @@ export class SubstackClient {
     try {
       const profile = await this.profileService.getProfileById(id)
 
-      // Resolve slug from subscriptions cache
-      const resolvedSlug = await this.getSlugForUserId(id, profile.handle)
+      // Resolve slug from slug service
+      const resolvedSlug = await this.slugService.getSlugForUserId(id, profile.handle)
 
-      return new Profile(profile, this.httpClient, resolvedSlug, this.getSlugForUserId.bind(this))
+      return new Profile(
+        profile,
+        this.httpClient,
+        resolvedSlug,
+        this.slugService.getSlugForUserId.bind(this.slugService)
+      )
     } catch (error) {
       throw new Error(`Profile with ID ${id} not found: ${(error as Error).message}`)
     }
@@ -160,10 +103,15 @@ export class SubstackClient {
       const profile = await this.profileService.getProfileBySlug(slug)
 
       // For profiles fetched by slug, we can use the provided slug as the resolved slug
-      // but still check subscriptions cache for consistency
-      const resolvedSlug = await this.getSlugForUserId(profile.id, slug)
+      // but still check slug service for consistency
+      const resolvedSlug = await this.slugService.getSlugForUserId(profile.id, slug)
 
-      return new Profile(profile, this.httpClient, resolvedSlug, this.getSlugForUserId.bind(this))
+      return new Profile(
+        profile,
+        this.httpClient,
+        resolvedSlug,
+        this.slugService.getSlugForUserId.bind(this.slugService)
+      )
     } catch (error) {
       throw new Error(`Profile with slug '${slug}' not found: ${(error as Error).message}`)
     }

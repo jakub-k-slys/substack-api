@@ -1,14 +1,18 @@
 import { SubstackClient } from '../../src/substack-client'
 import { SubstackHttpClient } from '../../src/http-client'
 import { OwnProfile, Profile } from '../../src/domain'
-import type { SubstackFullProfile, SubstackSubscriptionsResponse } from '../../src/internal'
+import { SlugService, ProfileService } from '../../src/services'
+import type { SubstackFullProfile } from '../../src/internal'
 
-// Mock the HTTP client
+// Mock the HTTP client and services
 jest.mock('../../src/http-client')
+jest.mock('../../src/services')
 
 describe('SubstackClient - Slug Resolution', () => {
   let client: SubstackClient
   let mockHttpClient: jest.Mocked<SubstackHttpClient>
+  let mockSlugService: jest.Mocked<SlugService>
+  let mockProfileService: jest.Mocked<ProfileService>
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -20,12 +24,25 @@ describe('SubstackClient - Slug Resolution', () => {
     mockHttpClient.post = jest.fn()
     mockHttpClient.request = jest.fn()
 
+    mockSlugService = new SlugService(mockHttpClient, mockHttpClient) as jest.Mocked<SlugService>
+    mockSlugService.getSlugForUserId = jest.fn()
+    mockSlugService.getSlugMapping = jest.fn()
+
+    mockProfileService = new ProfileService(
+      mockHttpClient,
+      mockHttpClient
+    ) as jest.Mocked<ProfileService>
+    mockProfileService.getOwnProfile = jest.fn()
+    mockProfileService.getProfileById = jest.fn()
+
     client = new SubstackClient({
       apiKey: 'test-api-key',
       hostname: 'test.substack.com'
     })
-    // Replace the internal http client with our mock
+    // Replace the internal services with our mocks
     ;(client as unknown as { httpClient: SubstackHttpClient }).httpClient = mockHttpClient
+    ;(client as unknown as { slugService: SlugService }).slugService = mockSlugService
+    ;(client as unknown as { profileService: ProfileService }).profileService = mockProfileService
   })
 
   afterEach(() => {
@@ -33,67 +50,6 @@ describe('SubstackClient - Slug Resolution', () => {
   })
 
   describe('slug resolution via subscriptions cache', () => {
-    const mockSubscriptionsResponse: SubstackSubscriptionsResponse = {
-      subscriptions: [],
-      publicationUsers: [],
-      publications: [
-        {
-          id: 1,
-          name: 'Test Publication',
-          subdomain: 'test',
-          custom_domain: null,
-          is_on_substack: true,
-          author_id: 123,
-          author_handle: 'resolved-slug-1',
-          created_at: '2023-01-01T00:00:00Z',
-          logo_url: 'https://example.com/logo.png',
-          cover_photo_url: 'https://example.com/cover.jpg',
-          twitter_screen_name: 'test_publication',
-          community_enabled: false,
-          copyright: '© 2023 Test Publication',
-          founding_subscription_benefits: [],
-          paid_subscription_benefits: [],
-          free_subscription_benefits: [],
-          stripe_user_id: 'stripe_123',
-          stripe_country: 'US',
-          payments_state: 'enabled',
-          language: 'en',
-          email_from_name: 'Test Publication',
-          homepage_type: 'newsletter',
-          theme_background_pop_color: '#ffffff',
-          theme_web_bg_color: '#f8f9fa',
-          theme_cover_bg_color: null
-        },
-        {
-          id: 2,
-          name: 'Another Publication',
-          subdomain: 'another',
-          custom_domain: null,
-          is_on_substack: true,
-          author_id: 456,
-          author_handle: 'resolved-slug-2',
-          created_at: '2023-01-01T00:00:00Z',
-          logo_url: 'https://example.com/logo2.png',
-          cover_photo_url: 'https://example.com/cover2.jpg',
-          twitter_screen_name: 'another_publication',
-          community_enabled: false,
-          copyright: '© 2023 Another Publication',
-          founding_subscription_benefits: [],
-          paid_subscription_benefits: [],
-          free_subscription_benefits: [],
-          stripe_user_id: 'stripe_456',
-          stripe_country: 'US',
-          payments_state: 'enabled',
-          language: 'en',
-          email_from_name: 'Another Publication',
-          homepage_type: 'newsletter',
-          theme_background_pop_color: '#ffffff',
-          theme_web_bg_color: '#f8f9fa',
-          theme_cover_bg_color: null
-        }
-      ]
-    }
-
     it('should resolve own profile slug from subscriptions cache', async () => {
       const mockSubscription = { user_id: 123 }
       const mockProfile: SubstackFullProfile = {
@@ -131,19 +87,18 @@ describe('SubstackClient - Slug Resolution', () => {
         dm_upgrade_options: []
       }
 
-      mockHttpClient.get
-        .mockResolvedValueOnce(mockSubscription) // /api/v1/subscription
-        .mockResolvedValueOnce(mockProfile) // /api/v1/user/123/profile
-        .mockResolvedValueOnce(mockSubscriptionsResponse) // /api/v1/subscriptions
+      mockProfileService.getOwnProfile.mockResolvedValueOnce(mockProfile)
+      mockHttpClient.get.mockResolvedValueOnce(mockSubscription) // /api/v1/subscription
+      mockSlugService.getSlugForUserId.mockResolvedValueOnce('resolved-slug-1')
 
       const ownProfile = await client.ownProfile()
 
       expect(ownProfile).toBeInstanceOf(OwnProfile)
-      expect(ownProfile.slug).toBe('resolved-slug-1') // Should use resolved slug from cache
+      expect(ownProfile.slug).toBe('resolved-slug-1') // Should use resolved slug from service
       expect(ownProfile.url).toBe('https://substack.com/@resolved-slug-1')
+      expect(mockProfileService.getOwnProfile).toHaveBeenCalled()
       expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/subscription')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/123/profile')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/subscriptions')
+      expect(mockSlugService.getSlugForUserId).toHaveBeenCalledWith(123, 'fallback-handle')
     })
 
     it('should resolve foreign profile slug from subscriptions cache', async () => {
@@ -182,17 +137,16 @@ describe('SubstackClient - Slug Resolution', () => {
         dm_upgrade_options: []
       }
 
-      mockHttpClient.get
-        .mockResolvedValueOnce(mockProfile) // /api/v1/user/456/profile
-        .mockResolvedValueOnce(mockSubscriptionsResponse) // /api/v1/subscriptions
+      mockProfileService.getProfileById.mockResolvedValueOnce(mockProfile)
+      mockSlugService.getSlugForUserId.mockResolvedValueOnce('resolved-slug-2')
 
       const profile = await client.profileForId(456)
 
       expect(profile).toBeInstanceOf(Profile)
-      expect(profile.slug).toBe('resolved-slug-2') // Should use resolved slug from cache
+      expect(profile.slug).toBe('resolved-slug-2') // Should use resolved slug from service
       expect(profile.url).toBe('https://substack.com/@resolved-slug-2')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/456/profile')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/subscriptions')
+      expect(mockProfileService.getProfileById).toHaveBeenCalledWith(456)
+      expect(mockSlugService.getSlugForUserId).toHaveBeenCalledWith(456, 'fallback-handle-2')
     })
 
     it('should use cached subscriptions on second call', async () => {
@@ -239,11 +193,13 @@ describe('SubstackClient - Slug Resolution', () => {
         slug: 'fallback-2'
       }
 
-      mockHttpClient.get
-        .mockResolvedValueOnce(mockProfile1) // /api/v1/user/123/profile
-        .mockResolvedValueOnce(mockSubscriptionsResponse) // /api/v1/subscriptions (first call)
-        .mockResolvedValueOnce(mockProfile2) // /api/v1/user/456/profile
-      // Note: No second call to /api/v1/subscriptions expected
+      mockProfileService.getProfileById
+        .mockResolvedValueOnce(mockProfile1) // First call
+        .mockResolvedValueOnce(mockProfile2) // Second call
+
+      mockSlugService.getSlugForUserId
+        .mockResolvedValueOnce('resolved-slug-1') // First call
+        .mockResolvedValueOnce('resolved-slug-2') // Second call (should use cache)
 
       const profile1 = await client.profileForId(123)
       const profile2 = await client.profileForId(456)
@@ -251,9 +207,10 @@ describe('SubstackClient - Slug Resolution', () => {
       expect(profile1.slug).toBe('resolved-slug-1')
       expect(profile2.slug).toBe('resolved-slug-2')
 
-      // Should only call subscriptions endpoint once
-      expect(mockHttpClient.get).toHaveBeenCalledTimes(3)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/subscriptions')
+      // Should call SlugService twice (same underlying cache)
+      expect(mockSlugService.getSlugForUserId).toHaveBeenCalledTimes(2)
+      expect(mockSlugService.getSlugForUserId).toHaveBeenCalledWith(123, 'fallback-1')
+      expect(mockSlugService.getSlugForUserId).toHaveBeenCalledWith(456, 'fallback-2')
     })
 
     it('should fallback to handle when slug not found in subscriptions', async () => {
@@ -292,14 +249,14 @@ describe('SubstackClient - Slug Resolution', () => {
         dm_upgrade_options: []
       }
 
-      mockHttpClient.get
-        .mockResolvedValueOnce(mockProfile) // /api/v1/user/999/profile
-        .mockResolvedValueOnce(mockSubscriptionsResponse) // /api/v1/subscriptions
+      mockProfileService.getProfileById.mockResolvedValueOnce(mockProfile)
+      mockSlugService.getSlugForUserId.mockResolvedValueOnce('unknown-handle') // Fallback to handle
 
       const profile = await client.profileForId(999)
 
       expect(profile.slug).toBe('unknown-handle') // Should fallback to handle
       expect(profile.url).toBe('https://substack.com/@unknown-handle')
+      expect(mockSlugService.getSlugForUserId).toHaveBeenCalledWith(999, 'unknown-handle')
     })
 
     it('should handle subscriptions endpoint failure gracefully', async () => {
@@ -338,14 +295,14 @@ describe('SubstackClient - Slug Resolution', () => {
         dm_upgrade_options: []
       }
 
-      mockHttpClient.get
-        .mockResolvedValueOnce(mockProfile) // /api/v1/user/123/profile
-        .mockRejectedValueOnce(new Error('Subscriptions unavailable')) // /api/v1/subscriptions fails
+      mockProfileService.getProfileById.mockResolvedValueOnce(mockProfile)
+      mockSlugService.getSlugForUserId.mockResolvedValueOnce('fallback-handle') // Graceful fallback
 
       const profile = await client.profileForId(123)
 
       expect(profile.slug).toBe('fallback-handle') // Should fallback to handle
       expect(profile.url).toBe('https://substack.com/@fallback-handle')
+      expect(mockSlugService.getSlugForUserId).toHaveBeenCalledWith(123, 'fallback-handle')
     })
   })
 })

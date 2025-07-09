@@ -68,9 +68,7 @@ describe('ProfileService', () => {
         dm_upgrade_options: []
       }
 
-      mockHttpClient.get
-        .mockResolvedValueOnce(mockSubscription)
-        .mockResolvedValueOnce(mockProfile)
+      mockHttpClient.get.mockResolvedValueOnce(mockSubscription).mockResolvedValueOnce(mockProfile)
 
       const result = await profileService.getOwnProfile()
 
@@ -91,10 +89,8 @@ describe('ProfileService', () => {
     it('should throw error when profile request fails', async () => {
       const mockSubscription = { user_id: 123 }
       const error = new Error('Profile API Error')
-      
-      mockHttpClient.get
-        .mockResolvedValueOnce(mockSubscription)
-        .mockRejectedValueOnce(error)
+
+      mockHttpClient.get.mockResolvedValueOnce(mockSubscription).mockRejectedValueOnce(error)
 
       await expect(profileService.getOwnProfile()).rejects.toThrow('Profile API Error')
       expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/subscription')

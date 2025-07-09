@@ -42,8 +42,6 @@ export class ProfileService {
    * @throws {Error} When profile is not found or API request fails
    */
   async getProfileBySlug(slug: string): Promise<SubstackFullProfile> {
-    return await this.httpClient.get<SubstackFullProfile>(
-      `/api/v1/user/${slug}/public_profile`
-    )
+    return await this.httpClient.get<SubstackFullProfile>(`/api/v1/user/${slug}/public_profile`)
   }
 }
