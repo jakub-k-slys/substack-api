@@ -1,4 +1,4 @@
-import { SubstackHttpClient } from './http-client'
+import { SubstackHttpClient } from './internal/http-client'
 import { Profile, OwnProfile, Post, Note, Comment } from './domain'
 import {
   PostService,

@@ -1,5 +1,5 @@
 import type { SubstackComment, SubstackCommentResponse } from '../types'
-import type { SubstackHttpClient } from '../../http-client'
+import type { SubstackHttpClient } from '../http-client'
 
 /**
  * Service responsible for comment-related HTTP operations

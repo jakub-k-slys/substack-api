@@ -1,5 +1,5 @@
 import type { SubstackSubscriptionsResponse, SubstackSubscriptionPublication } from '../types'
-import type { SubstackHttpClient } from '../../http-client'
+import type { SubstackHttpClient } from '../http-client'
 import type { SlugResolver } from './slug-resolver'
 
 /**

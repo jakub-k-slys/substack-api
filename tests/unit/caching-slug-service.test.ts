@@ -26,28 +26,24 @@ describe('CachingSlugService', () => {
   })
 
   describe('getSlugMapping', () => {
-    it('should delegate to base service and cache the result', async () => {
+    it('should delegate to base service', async () => {
       mockBase.getSlugMapping.mockResolvedValueOnce(mockMapping)
 
       const result = await cachingSlugService.getSlugMapping()
 
       expect(result).toBe(mockMapping)
       expect(mockBase.getSlugMapping).toHaveBeenCalledTimes(1)
-      expect(cachingSlugService.isCached()).toBe(true)
-
-      // Check that individual entries are cached
-      expect(cache.get(123)).toBe('test-author')
-      expect(cache.get(456)).toBe('another-author')
     })
 
-    it('should return cached mapping on second call', async () => {
-      mockBase.getSlugMapping.mockResolvedValueOnce(mockMapping)
+    it('should call base service every time (no mapping cache)', async () => {
+      mockBase.getSlugMapping.mockResolvedValueOnce(mockMapping).mockResolvedValueOnce(mockMapping)
 
       const result1 = await cachingSlugService.getSlugMapping()
       const result2 = await cachingSlugService.getSlugMapping()
 
-      expect(result1).toBe(result2) // Same object reference (cached)
-      expect(mockBase.getSlugMapping).toHaveBeenCalledTimes(1) // Only called once
+      expect(result1).toBe(mockMapping)
+      expect(result2).toBe(mockMapping)
+      expect(mockBase.getSlugMapping).toHaveBeenCalledTimes(2) // Called twice
     })
 
     it('should handle empty mapping', async () => {
@@ -58,7 +54,6 @@ describe('CachingSlugService', () => {
 
       expect(result).toBe(emptyMapping)
       expect(result.size).toBe(0)
-      expect(cachingSlugService.isCached()).toBe(true)
     })
 
     it('should propagate errors from base service', async () => {
@@ -67,7 +62,6 @@ describe('CachingSlugService', () => {
 
       await expect(cachingSlugService.getSlugMapping()).rejects.toThrow('Base service error')
       expect(mockBase.getSlugMapping).toHaveBeenCalledTimes(1)
-      expect(cachingSlugService.isCached()).toBe(false)
     })
   })
 
@@ -127,48 +121,18 @@ describe('CachingSlugService', () => {
     })
   })
 
-  describe('cache management', () => {
-    it('should clear all caches', async () => {
-      // Set up caches
-      mockBase.getSlugMapping.mockResolvedValueOnce(mockMapping)
-      await cachingSlugService.getSlugMapping()
-      cache.set(999, 'manual-entry')
-
-      expect(cachingSlugService.isCached()).toBe(true)
-      expect(cache.size()).toBe(3) // 2 from mapping + 1 manual
-
-      cachingSlugService.clearCache()
-
-      expect(cachingSlugService.isCached()).toBe(false)
-      expect(cache.size()).toBe(0)
-    })
-
-    it('should report cache status correctly', () => {
-      expect(cachingSlugService.isCached()).toBe(false)
-    })
-
-    it('should report cached after mapping is fetched', async () => {
-      mockBase.getSlugMapping.mockResolvedValueOnce(mockMapping)
-
-      await cachingSlugService.getSlugMapping()
-
-      expect(cachingSlugService.isCached()).toBe(true)
-    })
-  })
-
   describe('integration scenarios', () => {
-    it('should work when both mapping and individual caches are used', async () => {
-      // First, get mapping which populates both caches
-      mockBase.getSlugMapping.mockResolvedValueOnce(mockMapping)
-      const mapping = await cachingSlugService.getSlugMapping()
+    it('should cache individual slugs when fetched separately', async () => {
+      // Get individual slug which should delegate and cache
+      mockBase.getSlugForUserId.mockResolvedValueOnce('test-author')
+      const slug1 = await cachingSlugService.getSlugForUserId(123)
 
-      // Then get individual slug which should use individual cache
-      const slug = await cachingSlugService.getSlugForUserId(123)
+      // Second call should use cache
+      const slug2 = await cachingSlugService.getSlugForUserId(123)
 
-      expect(mapping.get(123)).toBe('test-author')
-      expect(slug).toBe('test-author')
-      expect(mockBase.getSlugForUserId).not.toHaveBeenCalled() // Used cache
-      expect(mockBase.getSlugMapping).toHaveBeenCalledTimes(1)
+      expect(slug1).toBe('test-author')
+      expect(slug2).toBe('test-author')
+      expect(mockBase.getSlugForUserId).toHaveBeenCalledTimes(1) // Only called once
     })
 
     it('should handle mixed cache scenarios', async () => {

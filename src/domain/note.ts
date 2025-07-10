@@ -1,5 +1,5 @@
 import type { SubstackNote, SubstackNoteComment } from '../internal'
-import type { SubstackHttpClient } from '../http-client'
+import type { SubstackHttpClient } from '../internal/http-client'
 import { Comment } from './comment'
 
 /**

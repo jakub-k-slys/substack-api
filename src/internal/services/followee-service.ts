@@ -1,4 +1,4 @@
-import type { SubstackHttpClient } from '../../http-client'
+import type { SubstackHttpClient } from '../http-client'
 
 /**
  * Service responsible for followee-related HTTP operations

@@ -1,5 +1,5 @@
 import type { SubstackPublicProfile, SubstackFullProfile } from '../internal'
-import type { SubstackHttpClient } from '../http-client'
+import type { SubstackHttpClient } from '../internal/http-client'
 import type { ProfileService, CommentService, PostService, NoteService } from '../internal/services'
 import { Post } from './post'
 import { Note } from './note'

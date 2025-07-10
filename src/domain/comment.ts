@@ -1,5 +1,5 @@
 import type { SubstackComment } from '../internal'
-import type { SubstackHttpClient } from '../http-client'
+import type { SubstackHttpClient } from '../internal/http-client'
 
 /**
  * Comment entity representing a comment on a post or note

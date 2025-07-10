@@ -1,5 +1,5 @@
 import { PublishNoteRequest, PublishNoteResponse } from './internal'
-import { SubstackHttpClient } from './http-client'
+import { SubstackHttpClient } from './internal/http-client'
 
 interface TextSegment {
   text: string

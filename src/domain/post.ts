@@ -1,5 +1,5 @@
 import type { SubstackPost } from '../internal'
-import type { SubstackHttpClient } from '../http-client'
+import type { SubstackHttpClient } from '../internal/http-client'
 import type { PostService, CommentService } from '../internal/services'
 import { Comment } from './comment'
 
