@@ -41,3 +41,15 @@ export type {
   SubstackTrackingParameters,
   SubstackProfileItemContext
 } from './common'
+
+// Export io-ts codecs for runtime validation
+export {
+  RawPostCodec,
+  RawCommentCodec,
+  RawCommentResponseCodec,
+  RawAuthorCodec,
+  RawUserCodec
+} from './io-ts-codecs'
+
+// Export io-ts derived types for validated data
+export type { RawPost, RawComment, RawCommentResponse, RawAuthor, RawUser } from './io-ts-codecs'

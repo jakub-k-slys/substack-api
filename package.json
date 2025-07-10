@@ -60,5 +60,9 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "fp-ts": "^2.16.10",
+    "io-ts": "^2.2.22"
   }
 }

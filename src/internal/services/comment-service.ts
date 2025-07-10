@@ -1,4 +1,6 @@
-import type { SubstackComment, SubstackCommentResponse } from '../types'
+import type { SubstackComment } from '../types'
+import { RawCommentCodec, RawCommentResponseCodec } from '../types'
+import { decodeOrThrow } from '../validation'
 import type { HttpClient } from '../http-client'
 
 /**
@@ -11,28 +13,35 @@ export class CommentService {
   /**
    * Get comments for a post
    * @param postId - The post ID
-   * @returns Promise<SubstackComment[]> - Raw comment data from API
-   * @throws {Error} When comments cannot be retrieved
+   * @returns Promise<SubstackComment[]> - Raw comment data from API (validated)
+   * @throws {Error} When comments cannot be retrieved or validation fails
    */
   async getCommentsForPost(postId: number): Promise<SubstackComment[]> {
-    const response = await this.httpClient.get<{ comments?: SubstackComment[] }>(
+    const response = await this.httpClient.get<{ comments?: unknown[] }>(
       `/api/v1/post/${postId}/comments`
     )
-    return response.comments || []
+
+    const comments = response.comments || []
+
+    // Validate each comment with io-ts
+    return comments.map((comment, index) =>
+      decodeOrThrow(RawCommentCodec, comment, `Comment ${index} in post response`)
+    )
   }
 
   /**
    * Get a specific comment by ID
    * @param id - The comment ID
-   * @returns Promise<SubstackComment> - Raw comment data from API
-   * @throws {Error} When comment is not found or API request fails
+   * @returns Promise<SubstackComment> - Raw comment data from API (validated)
+   * @throws {Error} When comment is not found, API request fails, or validation fails
    */
   async getCommentById(id: number): Promise<SubstackComment> {
-    const response = await this.httpClient.get<SubstackCommentResponse>(
-      `/api/v1/reader/comment/${id}`
-    )
+    const rawResponse = await this.httpClient.get<unknown>(`/api/v1/reader/comment/${id}`)
 
-    // Transform the API response to match SubstackComment interface
+    // Validate the response structure with io-ts
+    const response = decodeOrThrow(RawCommentResponseCodec, rawResponse, 'Comment response')
+
+    // Transform the validated API response to match SubstackComment interface
     const commentData: SubstackComment = {
       id: response.item.comment.id,
       body: response.item.comment.body,
@@ -40,9 +49,10 @@ export class CommentService {
       parent_post_id: response.item.comment.post_id || 0,
       author_id: response.item.comment.user_id,
       author_name: response.item.comment.name,
-      author_is_admin: false // Default value as this info is not available in the API response
+      author_is_admin: false // Default value since not in response
     }
 
-    return commentData
+    // Validate the transformed data as well
+    return decodeOrThrow(RawCommentCodec, commentData, 'Transformed comment data')
   }
 }
