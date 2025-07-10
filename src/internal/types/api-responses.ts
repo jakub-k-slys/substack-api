@@ -31,6 +31,7 @@ export interface SubstackPost {
   type: 'newsletter' | 'podcast' | 'thread'
   published?: boolean
   paywalled?: boolean
+  truncated_body_text?: string
 }
 
 /**
