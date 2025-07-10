@@ -1,5 +1,5 @@
 import type { SubstackComment } from '../types'
-import { RawCommentCodec, RawCommentResponseCodec } from '../types'
+import { SubstackCommentCodec, SubstackCommentResponseCodec } from '../types'
 import { decodeOrThrow } from '../validation'
 import type { HttpClient } from '../http-client'
 
@@ -25,7 +25,7 @@ export class CommentService {
 
     // Validate each comment with io-ts
     return comments.map((comment, index) =>
-      decodeOrThrow(RawCommentCodec, comment, `Comment ${index} in post response`)
+      decodeOrThrow(SubstackCommentCodec, comment, `Comment ${index} in post response`)
     )
   }
 
@@ -39,7 +39,7 @@ export class CommentService {
     const rawResponse = await this.httpClient.get<unknown>(`/api/v1/reader/comment/${id}`)
 
     // Validate the response structure with io-ts
-    const response = decodeOrThrow(RawCommentResponseCodec, rawResponse, 'Comment response')
+    const response = decodeOrThrow(SubstackCommentResponseCodec, rawResponse, 'Comment response')
 
     // Transform the validated API response to match SubstackComment interface
     const commentData: SubstackComment = {
@@ -53,6 +53,6 @@ export class CommentService {
     }
 
     // Validate the transformed data as well
-    return decodeOrThrow(RawCommentCodec, commentData, 'Transformed comment data')
+    return decodeOrThrow(SubstackCommentCodec, commentData, 'Transformed comment data')
   }
 }

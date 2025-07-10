@@ -1,5 +1,5 @@
 import type { SubstackNote, PaginatedSubstackNotes } from '../types'
-import { RawCommentResponseCodec } from '../types'
+import { SubstackCommentResponseCodec } from '../types'
 import { decodeOrThrow } from '../validation'
 import type { HttpClient } from '../http-client'
 
@@ -21,7 +21,11 @@ export class NoteService {
     const rawResponse = await this.httpClient.get<unknown>(`/api/v1/reader/comment/${id}`)
 
     // Validate the response structure with io-ts
-    const response = decodeOrThrow(RawCommentResponseCodec, rawResponse, 'Note comment response')
+    const response = decodeOrThrow(
+      SubstackCommentResponseCodec,
+      rawResponse,
+      'Note comment response'
+    )
 
     // Transform the validated comment response to the SubstackNote structure expected by Note entity
     const noteData: SubstackNote = {
@@ -35,10 +39,12 @@ export class NoteService {
             id: response.item.comment.user_id,
             name: response.item.comment.name,
             handle: '', // Not available in comment response
+            previous_name: undefined, // Not available in comment response
             photo_url: (response.item.comment as any).photo_url || '',
-            bio: '',
+            bio: '', // Not available in comment response
             profile_set_up_at: response.item.comment.date,
-            reader_installed_at: response.item.comment.date
+            reader_installed_at: response.item.comment.date,
+            bestseller_tier: undefined // Not available in comment response
           }
         ],
         isFresh: false,

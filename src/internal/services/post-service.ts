@@ -1,5 +1,5 @@
 import type { SubstackPost } from '../types'
-import { RawPostCodec } from '../types'
+import { SubstackPostCodec } from '../types'
 import { decodeOrThrow } from '../validation'
 import type { HttpClient } from '../http-client'
 
@@ -24,7 +24,7 @@ export class PostService {
     const rawResponse = await this.globalHttpClient.get<unknown>(`/api/v1/posts/by-id/${id}`)
 
     // Validate the response with io-ts before returning
-    return decodeOrThrow(RawPostCodec, rawResponse, 'Post response')
+    return decodeOrThrow(SubstackPostCodec, rawResponse, 'Post response')
   }
 
   /**
@@ -46,7 +46,7 @@ export class PostService {
 
     // Validate each post with io-ts
     return posts.map((post, index) =>
-      decodeOrThrow(RawPostCodec, post, `Post ${index} in profile response`)
+      decodeOrThrow(SubstackPostCodec, post, `Post ${index} in profile response`)
     )
   }
 }

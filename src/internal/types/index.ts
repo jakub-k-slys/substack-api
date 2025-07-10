@@ -15,6 +15,15 @@ export type {
   SubstackSubscriptionsResponse
 } from './api-responses'
 
+// Export io-ts codecs for runtime validation
+export {
+  SubstackPublicationCodec,
+  SubstackPostCodec,
+  SubstackCommentCodec,
+  SubstackCommentResponseCodec,
+  SubstackSearchResultCodec
+} from './api-responses'
+
 export type { NoteBodyJson, PublishNoteRequest, PublishNoteResponse } from './note-api'
 
 export type {
@@ -42,14 +51,3 @@ export type {
   SubstackProfileItemContext
 } from './common'
 
-// Export io-ts codecs for runtime validation
-export {
-  RawPostCodec,
-  RawCommentCodec,
-  RawCommentResponseCodec,
-  RawAuthorCodec,
-  RawUserCodec
-} from './io-ts-codecs'
-
-// Export io-ts derived types for validated data
-export type { RawPost, RawComment, RawCommentResponse, RawAuthor, RawUser } from './io-ts-codecs'

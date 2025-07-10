@@ -1,79 +1,105 @@
 /**
  * Internal API response types - not exported from the public API
  * These represent raw response shapes from Substack's API endpoints
+ * Using io-ts codecs for runtime validation
  */
+
+import * as t from 'io-ts'
 
 /**
  * Raw API response shape for publications - flattened
  */
-export interface SubstackPublication {
-  name: string
-  hostname: string
-  subdomain: string
-  logo_url?: string
-  description?: string
-}
+export const SubstackPublicationCodec = t.intersection([
+  t.type({
+    name: t.string,
+    hostname: t.string,
+    subdomain: t.string
+  }),
+  t.partial({
+    logo_url: t.string,
+    description: t.string
+  })
+])
+
+export type SubstackPublication = t.TypeOf<typeof SubstackPublicationCodec>
 
 /**
  * Raw API response shape for posts
  */
-export interface SubstackPost {
-  id: number
-  title: string
-  subtitle?: string
-  slug: string
-  post_date: string
-  description?: string
-  audience?: string
-  canonical_url: string
-  cover_image?: string
-  podcast_url?: string
-  type: 'newsletter' | 'podcast' | 'thread'
-  published?: boolean
-  paywalled?: boolean
-  truncated_body_text?: string
-  /** Full HTML body content - available when fetching individual posts */
-  htmlBody?: string
-}
+export const SubstackPostCodec = t.intersection([
+  t.type({
+    id: t.number,
+    title: t.string,
+    slug: t.string,
+    post_date: t.string,
+    canonical_url: t.string,
+    type: t.union([t.literal('newsletter'), t.literal('podcast'), t.literal('thread')])
+  }),
+  t.partial({
+    subtitle: t.string,
+    description: t.string,
+    audience: t.string,
+    cover_image: t.string,
+    podcast_url: t.string,
+    published: t.boolean,
+    paywalled: t.boolean,
+    truncated_body_text: t.string,
+    htmlBody: t.string
+  })
+])
+
+export type SubstackPost = t.TypeOf<typeof SubstackPostCodec>
 
 /**
  * Raw API response shape for comments - flattened
  */
-export interface SubstackComment {
-  id: number
-  body: string
-  created_at: string
-  parent_post_id: number
-  author_id: number
-  author_name: string
-  author_is_admin?: boolean
-}
+export const SubstackCommentCodec = t.intersection([
+  t.type({
+    id: t.number,
+    body: t.string,
+    created_at: t.string,
+    parent_post_id: t.number,
+    author_id: t.number,
+    author_name: t.string
+  }),
+  t.partial({
+    author_is_admin: t.boolean
+  })
+])
+
+export type SubstackComment = t.TypeOf<typeof SubstackCommentCodec>
 
 /**
  * Response structure from /api/v1/reader/comment/{id} endpoint - keeping wrapper structure
  */
-export interface SubstackCommentResponse {
-  item: {
-    comment: {
-      id: number
-      body: string
-      user_id: number
-      name: string
-      date: string
-      post_id?: number | null
-      // Additional fields that may be present but not needed for our Comment entity
-      [key: string]: unknown
-    }
-  }
-}
+export const SubstackCommentResponseCodec = t.type({
+  item: t.type({
+    comment: t.intersection([
+      t.type({
+        id: t.number,
+        body: t.string,
+        user_id: t.number,
+        name: t.string,
+        date: t.string
+      }),
+      t.partial({
+        post_id: t.union([t.number, t.null])
+      })
+    ])
+  })
+})
+
+export type SubstackCommentResponse = t.TypeOf<typeof SubstackCommentResponseCodec>
 
 /**
  * Raw API response shape for search results
  */
-export interface SubstackSearchResult {
-  total: number
-  results: SubstackPost[]
-}
+export const SubstackSearchResultCodec = t.type({
+  total: t.number,
+  results: t.array(SubstackPostCodec)
+})
+
+export type SubstackSearchResult = t.TypeOf<typeof SubstackSearchResultCodec>
 
 /**
  * Subscription types for internal API responses
