@@ -1,5 +1,5 @@
 import { SubstackClient } from '../../src/substack-client'
-import { Profile, Post, Comment } from '../../src/domain'
+import { Profile, PreviewPost, Comment } from '../../src/domain'
 import {
   PostService,
   ProfileService,
@@ -110,7 +110,7 @@ describe('SubstackClient Entity Model', () => {
       expect(profile.slug).toBe('testuser')
     })
 
-    it('should create Post entity', () => {
+    it('should create PreviewPost entity', () => {
       const mockData = {
         id: 456,
         title: 'Test Post',
@@ -127,9 +127,14 @@ describe('SubstackClient Entity Model', () => {
         getCommentById: jest.fn()
       } as unknown as CommentService
 
-      const post = new Post(mockData, httpClient, mockCommentService)
+      const mockPostService = {
+        getPostById: jest.fn(),
+        getPostsForProfile: jest.fn()
+      } as unknown as PostService
 
-      expect(post).toBeInstanceOf(Post)
+      const post = new PreviewPost(mockData, httpClient, mockCommentService, mockPostService)
+
+      expect(post).toBeInstanceOf(PreviewPost)
       expect(post.id).toBe(456)
       expect(post.title).toBe('Test Post')
     })

@@ -1,12 +1,12 @@
 import type { SubstackPost } from '../internal'
 import type { HttpClient } from '../internal/http-client'
-import type { CommentService } from '../internal/services'
+import type { CommentService, PostService } from '../internal/services'
 import { Comment } from './comment'
 
 /**
- * Post entity representing a Substack post
+ * PreviewPost entity representing a Substack post with truncated content
  */
-export class Post {
+export class PreviewPost {
   public readonly id: number
   public readonly title: string
   public readonly subtitle: string
@@ -24,7 +24,8 @@ export class Post {
   constructor(
     rawData: SubstackPost,
     private readonly client: HttpClient,
-    private readonly commentService: CommentService
+    private readonly commentService: CommentService,
+    private readonly postService: PostService
   ) {
     this.id = rawData.id
     this.title = rawData.title
@@ -41,6 +42,20 @@ export class Post {
       name: 'Unknown Author',
       handle: 'unknown',
       avatarUrl: ''
+    }
+  }
+
+  /**
+   * Fetch the full post data with HTML body content
+   * @returns Promise<FullPost> - A FullPost instance with complete content
+   * @throws {Error} When full post retrieval fails
+   */
+  async fullPost(): Promise<FullPost> {
+    try {
+      const fullPostData = await this.postService.getPostById(this.id)
+      return new FullPost(fullPostData, this.client, this.commentService, this.postService)
+    } catch (error) {
+      throw new Error(`Failed to fetch full post ${this.id}: ${(error as Error).message}`)
     }
   }
 
@@ -77,5 +92,22 @@ export class Post {
   async addComment(_data: { body: string }): Promise<Comment> {
     // Implementation will add comment via the client
     throw new Error('Comment creation not implemented yet - requires comment creation API')
+  }
+}
+
+/**
+ * FullPost entity representing a Substack post with complete HTML content
+ */
+export class FullPost extends PreviewPost {
+  public readonly htmlBody: string
+
+  constructor(
+    rawData: SubstackPost,
+    client: HttpClient,
+    commentService: CommentService,
+    postService: PostService
+  ) {
+    super(rawData, client, commentService, postService)
+    this.htmlBody = rawData.htmlBody || ''
   }
 }

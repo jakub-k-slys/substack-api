@@ -1,5 +1,5 @@
 import { SubstackClient } from '../../src/substack-client'
-import { Post } from '../../src/domain'
+import { FullPost } from '../../src/domain'
 
 // Mock the global fetch function
 global.fetch = jest.fn()
@@ -39,7 +39,7 @@ describe('SubstackClient - Global Post Endpoint', () => {
 
       const post = await client.postForId(123)
 
-      expect(post).toBeInstanceOf(Post)
+      expect(post).toBeInstanceOf(FullPost)
       expect(mockFetch).toHaveBeenCalledTimes(1)
 
       // Verify the URL uses global substack.com domain, not the configured publication hostname
