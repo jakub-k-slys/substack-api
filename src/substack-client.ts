@@ -155,7 +155,7 @@ export class SubstackClient {
 
     try {
       const post = await this.postService.getPostById(id)
-      return new Post(post, this.publicationClient, this.postService, this.commentService)
+      return new Post(post, this.publicationClient, this.commentService)
     } catch (error) {
       throw new Error(`Post with ID ${id} not found: ${(error as Error).message}`)
     }
