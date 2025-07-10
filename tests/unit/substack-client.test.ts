@@ -84,8 +84,8 @@ describe('SubstackClient', () => {
       hostname: 'test.substack.com'
     })
     // Replace the internal http clients and services with our mocks
-    ;(client as unknown as { httpClient: HttpClient }).httpClient = mockHttpClient
-    ;(client as unknown as { globalHttpClient: HttpClient }).globalHttpClient = mockGlobalHttpClient
+    ;(client as unknown as { publicationClient: HttpClient }).publicationClient = mockHttpClient
+    ;(client as unknown as { substackClient: HttpClient }).substackClient = mockGlobalHttpClient
     ;(client as unknown as { postService: PostService }).postService = mockPostService
     ;(client as unknown as { noteService: NoteService }).noteService = mockNoteService
     ;(client as unknown as { profileService: ProfileService }).profileService = mockProfileService

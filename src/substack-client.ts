@@ -68,7 +68,9 @@ export class SubstackClient {
       const profile = await this.profileService.getOwnProfile()
 
       // Get user_id for slug resolution
-      const subscription = await this.publicationClient.get<{ user_id: number }>('/api/v1/subscription')
+      const subscription = await this.publicationClient.get<{ user_id: number }>(
+        '/api/v1/subscription'
+      )
       const userId = subscription.user_id
 
       // Resolve slug from slug service
