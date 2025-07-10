@@ -1,4 +1,6 @@
-import type { SubstackNote, SubstackCommentResponse, PaginatedSubstackNotes } from '../types'
+import type { SubstackNote, PaginatedSubstackNotes } from '../types'
+import { RawCommentResponseCodec } from '../types'
+import { decodeOrThrow } from '../validation'
 import type { HttpClient } from '../http-client'
 
 /**
@@ -16,11 +18,12 @@ export class NoteService {
    */
   async getNoteById(id: number): Promise<SubstackNote> {
     // Notes are fetched using the comment endpoint
-    const response = await this.httpClient.get<SubstackCommentResponse>(
-      `/api/v1/reader/comment/${id}`
-    )
+    const rawResponse = await this.httpClient.get<unknown>(`/api/v1/reader/comment/${id}`)
 
-    // Transform the comment response to the SubstackNote structure expected by Note entity
+    // Validate the response structure with io-ts
+    const response = decodeOrThrow(RawCommentResponseCodec, rawResponse, 'Note comment response')
+
+    // Transform the validated comment response to the SubstackNote structure expected by Note entity
     const noteData: SubstackNote = {
       entity_key: String(id),
       type: 'note',
