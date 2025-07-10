@@ -252,7 +252,7 @@ describe('NoteService', () => {
         notes: mockResponse.items,
         nextCursor: 'next-cursor-456'
       })
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/feed/profile/123')
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/feed/profile/123?types=note')
     })
 
     it('should return paginated notes for profile with cursor', async () => {
@@ -270,7 +270,7 @@ describe('NoteService', () => {
         nextCursor: undefined
       })
       expect(mockHttpClient.get).toHaveBeenCalledWith(
-        '/api/v1/reader/feed/profile/456?cursor=profile-cursor'
+        '/api/v1/reader/feed/profile/456?types=note&cursor=profile-cursor'
       )
     })
 
@@ -286,7 +286,7 @@ describe('NoteService', () => {
       await noteService.getNotesForProfile(789, { cursor: cursorWithSpecialChars })
 
       expect(mockHttpClient.get).toHaveBeenCalledWith(
-        `/api/v1/reader/feed/profile/789?cursor=${encodeURIComponent(cursorWithSpecialChars)}`
+        `/api/v1/reader/feed/profile/789?types=note&cursor=${encodeURIComponent(cursorWithSpecialChars)}`
       )
     })
   })

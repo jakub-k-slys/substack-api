@@ -103,12 +103,12 @@ export class NoteService {
 
     const response = await this.httpClient.get<{
       items?: SubstackNote[]
-      nextCursor?: string
+      next_cursor?: string
     }>(url)
 
     return {
       notes: response.items || [],
-      nextCursor: response.nextCursor
+      nextCursor: response.next_cursor
     }
   }
 
@@ -129,11 +129,11 @@ export class NoteService {
 
     const response = await this.httpClient.get<{
       items?: SubstackNote[]
-      nextCursor?: string
+      next_cursor?: string
     }>(url)
     return {
       notes: response.items || [],
-      nextCursor: response.nextCursor
+      nextCursor: response.next_cursor
     }
   }
 }
