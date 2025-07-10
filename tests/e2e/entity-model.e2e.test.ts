@@ -233,13 +233,13 @@ describe('SubstackClient Entity Model E2E', () => {
   })
 
   test('should fetch 99 notes using cursor-based pagination', async () => {
-    const ownProfile = await client.ownProfile()
+    const foreignProfile = await client.profileForId(343074721)    
     const notes = []
     let count = 0
 
     try {
       // Test fetching exactly 99 notes with the limit parameter
-      for await (const note of ownProfile.notes({ limit: 99 })) {
+      for await (const note of foreignProfile.notes({ limit: 99 })) {
         notes.push(note)
         count++
 

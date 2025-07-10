@@ -178,7 +178,7 @@ describe('NoteService', () => {
             }
           }
         ],
-        next_cursor: 'next-cursor-123'
+        nextCursor: 'next-cursor-123'
       }
 
       mockHttpClient.get.mockResolvedValueOnce(mockResponse)
@@ -211,7 +211,7 @@ describe('NoteService', () => {
 
     it('should handle missing items in response', async () => {
       const mockResponse = {
-        next_cursor: 'next-cursor'
+        nextCursor: 'next-cursor'
       }
 
       mockHttpClient.get.mockResolvedValueOnce(mockResponse)
@@ -241,7 +241,7 @@ describe('NoteService', () => {
             }
           }
         ],
-        next_cursor: 'next-cursor-456'
+        nextCursor: 'next-cursor-456'
       }
 
       mockHttpClient.get.mockResolvedValueOnce(mockResponse)
