@@ -1,5 +1,5 @@
 import type { SubstackSubscriptionsResponse, SubstackSubscriptionPublication } from '../types'
-import type { SubstackHttpClient } from '../http-client'
+import type { HttpClient } from '../http-client'
 import type { SlugResolver } from './slug-resolver'
 
 /**
@@ -8,7 +8,7 @@ import type { SlugResolver } from './slug-resolver'
  * This is a pure service without caching - use CachingSlugService for cached behavior
  */
 export class SlugService implements SlugResolver {
-  constructor(private readonly httpClient: SubstackHttpClient) {}
+  constructor(private readonly httpClient: HttpClient) {}
 
   /**
    * Get or build the user_id to slug mapping from subscriptions

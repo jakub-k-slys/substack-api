@@ -1,4 +1,4 @@
-import { SubstackHttpClient } from './internal/http-client'
+import { HttpClient } from './internal/http-client'
 import { Profile, OwnProfile, Post, Note, Comment } from './domain'
 import {
   PostService,
@@ -16,8 +16,8 @@ import type { SubstackConfig } from './types'
  * Modern SubstackClient with entity-based API
  */
 export class SubstackClient {
-  private readonly httpClient: SubstackHttpClient
-  private readonly globalHttpClient: SubstackHttpClient
+  private readonly httpClient: HttpClient
+  private readonly globalHttpClient: HttpClient
   private readonly postService: PostService
   private readonly noteService: NoteService
   private readonly profileService: ProfileService
@@ -29,11 +29,11 @@ export class SubstackClient {
     // Create HTTP client for publication-specific endpoints
     const protocol = config.protocol || 'https'
     const publicationBaseUrl = `${protocol}://${config.hostname || 'substack.com'}`
-    this.httpClient = new SubstackHttpClient(publicationBaseUrl, config)
+    this.httpClient = new HttpClient(publicationBaseUrl, config)
 
     // Create HTTP client for global Substack endpoints
     const substackBaseUrl = config.substackBaseUrl || 'https://substack.com'
-    this.globalHttpClient = new SubstackHttpClient(substackBaseUrl, config)
+    this.globalHttpClient = new HttpClient(substackBaseUrl, config)
 
     // Initialize services
     this.postService = new PostService(this.globalHttpClient, this.httpClient)

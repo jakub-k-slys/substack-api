@@ -1,12 +1,12 @@
 import type { SubstackComment, SubstackCommentResponse } from '../types'
-import type { SubstackHttpClient } from '../http-client'
+import type { HttpClient } from '../http-client'
 
 /**
  * Service responsible for comment-related HTTP operations
  * Returns internal types that can be transformed into domain models
  */
 export class CommentService {
-  constructor(private readonly httpClient: SubstackHttpClient) {}
+  constructor(private readonly httpClient: HttpClient) {}
 
   /**
    * Get comments for a post

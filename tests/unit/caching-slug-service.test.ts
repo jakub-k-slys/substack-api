@@ -4,7 +4,6 @@ import type { SlugResolver } from '../../src/internal/services/slug-resolver'
 
 // Mock SlugResolver for testing
 const mockSlugResolver = (): jest.Mocked<SlugResolver> => ({
-  getSlugMapping: jest.fn(),
   getSlugForUserId: jest.fn()
 })
 
@@ -13,56 +12,11 @@ describe('CachingSlugService', () => {
   let mockBase: jest.Mocked<SlugResolver>
   let cache: InMemoryCache<number, string>
 
-  const mockMapping = new Map([
-    [123, 'test-author'],
-    [456, 'another-author']
-  ])
-
   beforeEach(() => {
     jest.clearAllMocks()
     cache = new InMemoryCache<number, string>()
     mockBase = mockSlugResolver()
     cachingSlugService = new CachingSlugService(cache, mockBase)
-  })
-
-  describe('getSlugMapping', () => {
-    it('should delegate to base service', async () => {
-      mockBase.getSlugMapping.mockResolvedValueOnce(mockMapping)
-
-      const result = await cachingSlugService.getSlugMapping()
-
-      expect(result).toBe(mockMapping)
-      expect(mockBase.getSlugMapping).toHaveBeenCalledTimes(1)
-    })
-
-    it('should call base service every time (no mapping cache)', async () => {
-      mockBase.getSlugMapping.mockResolvedValueOnce(mockMapping).mockResolvedValueOnce(mockMapping)
-
-      const result1 = await cachingSlugService.getSlugMapping()
-      const result2 = await cachingSlugService.getSlugMapping()
-
-      expect(result1).toBe(mockMapping)
-      expect(result2).toBe(mockMapping)
-      expect(mockBase.getSlugMapping).toHaveBeenCalledTimes(2) // Called twice
-    })
-
-    it('should handle empty mapping', async () => {
-      const emptyMapping = new Map<number, string>()
-      mockBase.getSlugMapping.mockResolvedValueOnce(emptyMapping)
-
-      const result = await cachingSlugService.getSlugMapping()
-
-      expect(result).toBe(emptyMapping)
-      expect(result.size).toBe(0)
-    })
-
-    it('should propagate errors from base service', async () => {
-      const error = new Error('Base service error')
-      mockBase.getSlugMapping.mockRejectedValueOnce(error)
-
-      await expect(cachingSlugService.getSlugMapping()).rejects.toThrow('Base service error')
-      expect(mockBase.getSlugMapping).toHaveBeenCalledTimes(1)
-    })
   })
 
   describe('getSlugForUserId', () => {

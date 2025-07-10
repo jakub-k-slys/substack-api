@@ -6,10 +6,10 @@ import {
   NoteService,
   CommentService
 } from '../../src/internal/services'
-import type { SubstackHttpClient } from '../../src/http-client'
+import type { HttpClient } from '../../src/internal/http-client'
 
 describe('Profile Entity', () => {
-  let mockHttpClient: jest.Mocked<SubstackHttpClient>
+  let mockHttpClient: jest.Mocked<HttpClient>
   let mockProfileService: jest.Mocked<ProfileService>
   let mockPostService: jest.Mocked<PostService>
   let mockNoteService: jest.Mocked<NoteService>
@@ -22,7 +22,7 @@ describe('Profile Entity', () => {
       post: jest.fn(),
       request: jest.fn(),
       getPerPage: jest.fn().mockReturnValue(25)
-    } as unknown as jest.Mocked<SubstackHttpClient>
+    } as unknown as jest.Mocked<HttpClient>
 
     mockProfileService = {
       getOwnProfile: jest.fn(),

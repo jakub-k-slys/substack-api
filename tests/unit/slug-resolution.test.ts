@@ -1,25 +1,25 @@
 import { SubstackClient } from '../../src/substack-client'
-import { SubstackHttpClient } from '../../src/http-client'
+import { HttpClient } from '../../src/internal/http-client'
 import { OwnProfile, Profile } from '../../src/domain'
 import { SlugService, ProfileService } from '../../src/internal/services'
 import type { SubstackFullProfile } from '../../src/internal'
 
 // Mock the HTTP client and services
-jest.mock('../../src/http-client')
+jest.mock('../../src/internal/http-client')
 jest.mock('../../src/internal/services')
 
 describe('SubstackClient - Slug Resolution', () => {
   let client: SubstackClient
-  let mockHttpClient: jest.Mocked<SubstackHttpClient>
+  let mockHttpClient: jest.Mocked<HttpClient>
   let mockSlugService: jest.Mocked<SlugService>
   let mockProfileService: jest.Mocked<ProfileService>
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockHttpClient = new SubstackHttpClient('https://test.com', {
+    mockHttpClient = new HttpClient('https://test.com', {
       apiKey: 'test',
       hostname: 'test.com'
-    }) as jest.Mocked<SubstackHttpClient>
+    }) as jest.Mocked<HttpClient>
     mockHttpClient.get = jest.fn()
     mockHttpClient.post = jest.fn()
     mockHttpClient.request = jest.fn()
@@ -37,7 +37,7 @@ describe('SubstackClient - Slug Resolution', () => {
       hostname: 'test.substack.com'
     })
     // Replace the internal services with our mocks
-    ;(client as unknown as { httpClient: SubstackHttpClient }).httpClient = mockHttpClient
+    ;(client as unknown as { httpClient: HttpClient }).httpClient = mockHttpClient
     ;(client as unknown as { slugService: SlugService }).slugService = mockSlugService
     ;(client as unknown as { profileService: ProfileService }).profileService = mockProfileService
   })

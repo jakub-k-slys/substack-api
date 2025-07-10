@@ -3,7 +3,7 @@
  */
 import type { SubstackConfig } from '../types'
 
-export class SubstackHttpClient {
+export class HttpClient {
   private readonly baseUrl: string
   private readonly cookie: string
   private readonly perPage: number

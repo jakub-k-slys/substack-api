@@ -1,5 +1,5 @@
 import { PublishNoteRequest, PublishNoteResponse } from './internal'
-import { SubstackHttpClient } from './internal/http-client'
+import { HttpClient } from './internal/http-client'
 
 interface TextSegment {
   text: string
@@ -82,7 +82,7 @@ export class NoteBuilder {
   private paragraphs: Paragraph[] = []
 
   constructor(
-    private readonly client: SubstackHttpClient,
+    private readonly client: HttpClient,
     text?: string
   ) {
     if (text) {

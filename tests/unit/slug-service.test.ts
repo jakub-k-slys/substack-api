@@ -1,13 +1,13 @@
 import { SlugService } from '../../src/internal/services/slug-service'
-import { SubstackHttpClient } from '../../src/http-client'
+import { HttpClient } from '../../src/internal/http-client'
 import type { SubstackSubscriptionsResponse } from '../../src/internal'
 
 // Mock the http client
-jest.mock('../../src/http-client')
+jest.mock('../../src/internal/http-client')
 
 describe('SlugService', () => {
   let slugService: SlugService
-  let mockHttpClient: jest.Mocked<SubstackHttpClient>
+  let mockHttpClient: jest.Mocked<HttpClient>
 
   const mockSubscriptionsResponse: SubstackSubscriptionsResponse = {
     subscriptions: [],
@@ -100,10 +100,10 @@ describe('SlugService', () => {
   beforeEach(() => {
     jest.clearAllMocks()
 
-    mockHttpClient = new SubstackHttpClient('https://test.com', {
+    mockHttpClient = new HttpClient('https://test.com', {
       apiKey: 'test',
       hostname: 'test.com'
-    }) as jest.Mocked<SubstackHttpClient>
+    }) as jest.Mocked<HttpClient>
     mockHttpClient.get = jest.fn()
 
     slugService = new SlugService(mockHttpClient)

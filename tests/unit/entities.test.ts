@@ -6,7 +6,7 @@ import {
   NoteService,
   CommentService
 } from '../../src/internal/services'
-import type { SubstackHttpClient } from '../../src/http-client'
+import type { HttpClient } from '../../src/internal/http-client'
 
 describe('SubstackClient Entity Model', () => {
   let client: SubstackClient
@@ -70,7 +70,7 @@ describe('SubstackClient Entity Model', () => {
         can_dm: false,
         dm_upgrade_options: []
       }
-      const httpClient = (client as unknown as { httpClient: SubstackHttpClient }).httpClient
+      const httpClient = (client as unknown as { httpClient: HttpClient }).httpClient
 
       // Create mock services
       const mockProfileService = {
@@ -119,7 +119,7 @@ describe('SubstackClient Entity Model', () => {
         canonical_url: 'https://example.com/post',
         type: 'newsletter' as const
       }
-      const httpClient = (client as unknown as { httpClient: SubstackHttpClient }).httpClient
+      const httpClient = (client as unknown as { httpClient: HttpClient }).httpClient
 
       // Create mock services
       const mockPostService = {
@@ -147,7 +147,7 @@ describe('SubstackClient Entity Model', () => {
         author_id: 123,
         author_name: 'Test User'
       }
-      const httpClient = (client as unknown as { httpClient: SubstackHttpClient }).httpClient
+      const httpClient = (client as unknown as { httpClient: HttpClient }).httpClient
       const comment = new Comment(mockData, httpClient)
 
       expect(comment).toBeInstanceOf(Comment)
