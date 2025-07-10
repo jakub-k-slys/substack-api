@@ -233,7 +233,7 @@ describe('SubstackClient Entity Model E2E', () => {
   })
 
   test('should fetch 99 notes using cursor-based pagination', async () => {
-    const foreignProfile = await client.profileForId(343074721)    
+    const foreignProfile = await client.profileForId(343074721)
     const notes = []
     let count = 0
 
