@@ -1,20 +1,20 @@
 import { FolloweeService } from '../../src/internal/services/followee-service'
-import { SubstackHttpClient } from '../../src/http-client'
+import { HttpClient } from '../../src/internal/http-client'
 
 // Mock the http client
-jest.mock('../../src/http-client')
+jest.mock('../../src/internal/http-client')
 
 describe('FolloweeService', () => {
   let followeeService: FolloweeService
-  let mockHttpClient: jest.Mocked<SubstackHttpClient>
+  let mockHttpClient: jest.Mocked<HttpClient>
 
   beforeEach(() => {
     jest.clearAllMocks()
 
-    mockHttpClient = new SubstackHttpClient('https://test.substack.com', {
+    mockHttpClient = new HttpClient('https://test.substack.com', {
       apiKey: 'test',
       hostname: 'test.com'
-    }) as jest.Mocked<SubstackHttpClient>
+    }) as jest.Mocked<HttpClient>
     mockHttpClient.get = jest.fn()
 
     followeeService = new FolloweeService(mockHttpClient)

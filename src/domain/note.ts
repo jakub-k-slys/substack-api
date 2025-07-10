@@ -1,5 +1,5 @@
 import type { SubstackNote, SubstackNoteComment } from '../internal'
-import type { SubstackHttpClient } from '../http-client'
+import type { HttpClient } from '../internal/http-client'
 import { Comment } from './comment'
 
 /**
@@ -19,7 +19,7 @@ export class Note {
 
   constructor(
     private readonly rawData: SubstackNote,
-    private readonly client: SubstackHttpClient
+    private readonly client: HttpClient
   ) {
     this.id = rawData.entity_key
     this.body = rawData.comment?.body || ''

@@ -10,7 +10,7 @@ import {
   FolloweeService
 } from '../../src/internal/services'
 import type { SubstackFullProfile } from '../../src/internal'
-import type { SubstackHttpClient } from '../../src/http-client'
+import type { HttpClient } from '../../src/internal/http-client'
 
 describe('OwnProfile Entity', () => {
   let mockProfileData: SubstackFullProfile
@@ -64,7 +64,7 @@ describe('OwnProfile Entity', () => {
       post: jest.fn(),
       request: jest.fn(),
       getPerPage: jest.fn().mockReturnValue(25)
-    } as unknown as jest.Mocked<SubstackHttpClient>
+    } as unknown as jest.Mocked<HttpClient>
 
     mockProfileService = {
       getOwnProfile: jest.fn(),
@@ -373,7 +373,7 @@ describe('OwnProfile Entity', () => {
         post: jest.fn(),
         request: jest.fn(),
         getPerPage: jest.fn().mockReturnValue(25)
-      } as unknown as jest.Mocked<SubstackHttpClient>,
+      } as unknown as jest.Mocked<HttpClient>,
       localProfileService,
       mockPostService,
       mockNoteService,
@@ -714,7 +714,7 @@ describe('OwnProfile Entity', () => {
 
     it('should handle empty notes response', async () => {
       const mockResponse = { notes: [] }
-      const mockClient = ownProfile['client'] as jest.Mocked<SubstackHttpClient>
+      const mockClient = ownProfile['client'] as jest.Mocked<HttpClient>
       mockClient.get.mockResolvedValue(mockResponse)
 
       const notes = []
@@ -727,7 +727,7 @@ describe('OwnProfile Entity', () => {
 
     it('should handle missing notes property', async () => {
       const mockResponse = {}
-      const mockClient = ownProfile['client'] as jest.Mocked<SubstackHttpClient>
+      const mockClient = ownProfile['client'] as jest.Mocked<HttpClient>
       mockClient.get.mockResolvedValue(mockResponse)
 
       const notes = []
@@ -739,7 +739,7 @@ describe('OwnProfile Entity', () => {
     })
 
     it('should handle API error gracefully for notes', async () => {
-      const mockClient = ownProfile['client'] as jest.Mocked<SubstackHttpClient>
+      const mockClient = ownProfile['client'] as jest.Mocked<HttpClient>
       mockClient.get.mockRejectedValue(new Error('API error'))
 
       const notes = []

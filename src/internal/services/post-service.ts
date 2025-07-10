@@ -1,5 +1,5 @@
 import type { SubstackPost } from '../types'
-import type { SubstackHttpClient } from '../../http-client'
+import type { HttpClient } from '../http-client'
 
 /**
  * Service responsible for post-related HTTP operations
@@ -7,8 +7,8 @@ import type { SubstackHttpClient } from '../../http-client'
  */
 export class PostService {
   constructor(
-    private readonly globalHttpClient: SubstackHttpClient,
-    private readonly httpClient: SubstackHttpClient
+    private readonly globalHttpClient: HttpClient,
+    private readonly httpClient: HttpClient
   ) {}
 
   /**

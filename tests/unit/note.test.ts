@@ -1,10 +1,10 @@
 import { Note } from '../../src/domain/note'
 import { Comment } from '../../src/domain/comment'
-import type { SubstackHttpClient } from '../../src/http-client'
+import type { HttpClient } from '../../src/internal/http-client'
 import type { SubstackNoteComment } from '../../src/internal'
 
 describe('Note Entity', () => {
-  let mockHttpClient: jest.Mocked<SubstackHttpClient>
+  let mockHttpClient: jest.Mocked<HttpClient>
   let note: Note
 
   beforeEach(() => {
@@ -12,7 +12,7 @@ describe('Note Entity', () => {
       get: jest.fn(),
       post: jest.fn(),
       request: jest.fn()
-    } as unknown as jest.Mocked<SubstackHttpClient>
+    } as unknown as jest.Mocked<HttpClient>
 
     const mockNoteData = {
       entity_key: '789',

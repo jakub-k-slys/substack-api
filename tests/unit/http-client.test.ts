@@ -1,15 +1,15 @@
-import { SubstackHttpClient } from '../../src/http-client'
+import { HttpClient } from '../../src/internal/http-client'
 
 // Mock fetch globally
 global.fetch = jest.fn()
 
-describe('SubstackHttpClient', () => {
-  let client: SubstackHttpClient
+describe('HttpClient', () => {
+  let client: HttpClient
   const mockFetch = fetch as jest.MockedFunction<typeof fetch>
 
   beforeEach(() => {
     jest.clearAllMocks()
-    client = new SubstackHttpClient('https://test.substack.com', {
+    client = new HttpClient('https://test.substack.com', {
       apiKey: 'test-api-key',
       hostname: 'test.substack.com'
     })
@@ -18,12 +18,12 @@ describe('SubstackHttpClient', () => {
   describe('constructor', () => {
     it('should throw error when apiKey is missing', () => {
       expect(
-        () => new SubstackHttpClient('https://test.com', { apiKey: '', hostname: 'test.com' })
+        () => new HttpClient('https://test.com', { apiKey: '', hostname: 'test.com' })
       ).toThrow('apiKey is required in SubstackConfig')
     })
 
     it('should use provided base URL', () => {
-      const clientWithCustomBaseUrl = new SubstackHttpClient('https://custom.example.com', {
+      const clientWithCustomBaseUrl = new HttpClient('https://custom.example.com', {
         apiKey: 'test-key',
         hostname: 'default.substack.com'
       })

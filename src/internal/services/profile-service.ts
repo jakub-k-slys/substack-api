@@ -1,12 +1,12 @@
 import type { SubstackFullProfile } from '../types'
-import type { SubstackHttpClient } from '../../http-client'
+import type { HttpClient } from '../http-client'
 
 /**
  * Service responsible for profile-related HTTP operations
  * Returns internal types that can be transformed into domain models
  */
 export class ProfileService {
-  constructor(private readonly httpClient: SubstackHttpClient) {}
+  constructor(private readonly httpClient: HttpClient) {}
 
   /**
    * Get authenticated user's own profile

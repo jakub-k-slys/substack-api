@@ -1,11 +1,11 @@
-import type { SubstackHttpClient } from '../../http-client'
+import type { HttpClient } from '../http-client'
 
 /**
  * Service responsible for followee-related HTTP operations
  * Returns internal types that can be transformed into domain models
  */
 export class FolloweeService {
-  constructor(private readonly httpClient: SubstackHttpClient) {}
+  constructor(private readonly httpClient: HttpClient) {}
 
   /**
    * Get users that the authenticated user follows

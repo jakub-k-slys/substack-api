@@ -1,12 +1,12 @@
 import type { SubstackNote, SubstackCommentResponse } from '../types'
-import type { SubstackHttpClient } from '../../http-client'
+import type { HttpClient } from '../http-client'
 
 /**
  * Service responsible for note-related HTTP operations
  * Returns internal types that can be transformed into domain models
  */
 export class NoteService {
-  constructor(private readonly httpClient: SubstackHttpClient) {}
+  constructor(private readonly httpClient: HttpClient) {}
 
   /**
    * Get a note by ID from the API

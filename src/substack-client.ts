@@ -1,25 +1,27 @@
-import { SubstackHttpClient } from './http-client'
+import { HttpClient } from './internal/http-client'
 import { Profile, OwnProfile, Post, Note, Comment } from './domain'
 import {
   PostService,
   NoteService,
   ProfileService,
   SlugService,
+  CachingSlugService,
   CommentService,
   FolloweeService
 } from './internal/services'
+import { InMemoryCache } from './internal/cache'
 import type { SubstackConfig } from './types'
 
 /**
  * Modern SubstackClient with entity-based API
  */
 export class SubstackClient {
-  private readonly httpClient: SubstackHttpClient
-  private readonly globalHttpClient: SubstackHttpClient
+  private readonly httpClient: HttpClient
+  private readonly globalHttpClient: HttpClient
   private readonly postService: PostService
   private readonly noteService: NoteService
   private readonly profileService: ProfileService
-  private readonly slugService: SlugService
+  private readonly slugService: CachingSlugService
   private readonly commentService: CommentService
   private readonly followeeService: FolloweeService
 
@@ -27,17 +29,22 @@ export class SubstackClient {
     // Create HTTP client for publication-specific endpoints
     const protocol = config.protocol || 'https'
     const publicationBaseUrl = `${protocol}://${config.hostname || 'substack.com'}`
-    this.httpClient = new SubstackHttpClient(publicationBaseUrl, config)
+    this.httpClient = new HttpClient(publicationBaseUrl, config)
 
     // Create HTTP client for global Substack endpoints
     const substackBaseUrl = config.substackBaseUrl || 'https://substack.com'
-    this.globalHttpClient = new SubstackHttpClient(substackBaseUrl, config)
+    this.globalHttpClient = new HttpClient(substackBaseUrl, config)
 
     // Initialize services
     this.postService = new PostService(this.globalHttpClient, this.httpClient)
     this.noteService = new NoteService(this.httpClient)
     this.profileService = new ProfileService(this.httpClient)
-    this.slugService = new SlugService(this.httpClient)
+
+    // Create caching slug service using decorator pattern
+    const baseSlugService = new SlugService(this.httpClient)
+    const slugCache = new InMemoryCache<number, string>()
+    this.slugService = new CachingSlugService(slugCache, baseSlugService)
+
     this.commentService = new CommentService(this.httpClient)
     this.followeeService = new FolloweeService(this.httpClient)
   }

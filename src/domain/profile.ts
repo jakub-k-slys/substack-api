@@ -1,5 +1,5 @@
 import type { SubstackPublicProfile, SubstackFullProfile } from '../internal'
-import type { SubstackHttpClient } from '../http-client'
+import type { HttpClient } from '../internal/http-client'
 import type { ProfileService, CommentService, PostService, NoteService } from '../internal/services'
 import { Post } from './post'
 import { Note } from './note'
@@ -17,7 +17,7 @@ export class Profile {
 
   constructor(
     protected readonly rawData: SubstackPublicProfile | SubstackFullProfile,
-    protected readonly client: SubstackHttpClient,
+    protected readonly client: HttpClient,
     protected readonly profileService: ProfileService,
     protected readonly postService: PostService,
     protected readonly noteService: NoteService,

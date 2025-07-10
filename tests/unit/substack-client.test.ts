@@ -1,6 +1,6 @@
 import { SubstackClient } from '../../src/substack-client'
 import { Profile, Post, Note, Comment, OwnProfile } from '../../src/domain'
-import { SubstackHttpClient } from '../../src/http-client'
+import { HttpClient } from '../../src/internal/http-client'
 import {
   PostService,
   NoteService,
@@ -12,7 +12,7 @@ import {
 import type { SubstackFullProfile } from '../../src/internal'
 
 // Mock the http client and services
-jest.mock('../../src/http-client')
+jest.mock('../../src/internal/http-client')
 jest.mock('../../src/internal/services')
 
 // Mock the global fetch function
@@ -20,8 +20,8 @@ global.fetch = jest.fn()
 
 describe('SubstackClient', () => {
   let client: SubstackClient
-  let mockHttpClient: jest.Mocked<SubstackHttpClient>
-  let mockGlobalHttpClient: jest.Mocked<SubstackHttpClient>
+  let mockHttpClient: jest.Mocked<HttpClient>
+  let mockGlobalHttpClient: jest.Mocked<HttpClient>
   let mockPostService: jest.Mocked<PostService>
   let mockNoteService: jest.Mocked<NoteService>
   let mockProfileService: jest.Mocked<ProfileService>
@@ -31,18 +31,18 @@ describe('SubstackClient', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockHttpClient = new SubstackHttpClient('https://test.com', {
+    mockHttpClient = new HttpClient('https://test.com', {
       apiKey: 'test',
       hostname: 'test.com'
-    }) as jest.Mocked<SubstackHttpClient>
+    }) as jest.Mocked<HttpClient>
     mockHttpClient.get = jest.fn()
     mockHttpClient.post = jest.fn()
     mockHttpClient.request = jest.fn()
 
-    mockGlobalHttpClient = new SubstackHttpClient('https://substack.com', {
+    mockGlobalHttpClient = new HttpClient('https://substack.com', {
       apiKey: 'test',
       hostname: 'test.com'
-    }) as jest.Mocked<SubstackHttpClient>
+    }) as jest.Mocked<HttpClient>
     mockGlobalHttpClient.get = jest.fn()
     mockGlobalHttpClient.post = jest.fn()
     mockGlobalHttpClient.request = jest.fn()
@@ -64,8 +64,6 @@ describe('SubstackClient', () => {
     mockSlugService = new SlugService(mockHttpClient) as jest.Mocked<SlugService>
     mockSlugService.getSlugForUserId = jest.fn()
     mockSlugService.getSlugMapping = jest.fn()
-    mockSlugService.clearCache = jest.fn()
-    mockSlugService.isCached = jest.fn()
 
     mockCommentService = new CommentService(mockHttpClient) as jest.Mocked<CommentService>
     mockCommentService.getCommentById = jest.fn()
@@ -79,9 +77,8 @@ describe('SubstackClient', () => {
       hostname: 'test.substack.com'
     })
     // Replace the internal http clients and services with our mocks
-    ;(client as unknown as { httpClient: SubstackHttpClient }).httpClient = mockHttpClient
-    ;(client as unknown as { globalHttpClient: SubstackHttpClient }).globalHttpClient =
-      mockGlobalHttpClient
+    ;(client as unknown as { httpClient: HttpClient }).httpClient = mockHttpClient
+    ;(client as unknown as { globalHttpClient: HttpClient }).globalHttpClient = mockGlobalHttpClient
     ;(client as unknown as { postService: PostService }).postService = mockPostService
     ;(client as unknown as { noteService: NoteService }).noteService = mockNoteService
     ;(client as unknown as { profileService: ProfileService }).profileService = mockProfileService

@@ -2,10 +2,10 @@ import { Post } from '../../src/domain/post'
 import { Comment } from '../../src/domain/comment'
 import { PostService } from '../../src/internal/services/post-service'
 import { CommentService } from '../../src/internal/services/comment-service'
-import type { SubstackHttpClient } from '../../src/http-client'
+import type { HttpClient } from '../../src/internal/http-client'
 
 describe('Post Entity', () => {
-  let mockHttpClient: jest.Mocked<SubstackHttpClient>
+  let mockHttpClient: jest.Mocked<HttpClient>
   let mockPostService: jest.Mocked<PostService>
   let mockCommentService: jest.Mocked<CommentService>
   let post: Post
@@ -15,7 +15,7 @@ describe('Post Entity', () => {
       get: jest.fn(),
       post: jest.fn(),
       request: jest.fn()
-    } as unknown as jest.Mocked<SubstackHttpClient>
+    } as unknown as jest.Mocked<HttpClient>
 
     mockPostService = {
       getPostById: jest.fn()

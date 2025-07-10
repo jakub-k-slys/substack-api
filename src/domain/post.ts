@@ -1,5 +1,5 @@
 import type { SubstackPost } from '../internal'
-import type { SubstackHttpClient } from '../http-client'
+import type { HttpClient } from '../internal/http-client'
 import type { PostService, CommentService } from '../internal/services'
 import { Comment } from './comment'
 
@@ -21,7 +21,7 @@ export class Post {
 
   constructor(
     private readonly rawData: SubstackPost,
-    private readonly client: SubstackHttpClient,
+    private readonly client: HttpClient,
     private readonly postService: PostService,
     private readonly commentService: CommentService
   ) {

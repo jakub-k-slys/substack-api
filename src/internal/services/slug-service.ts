@@ -1,15 +1,14 @@
 import type { SubstackSubscriptionsResponse, SubstackSubscriptionPublication } from '../types'
-import type { SubstackHttpClient } from '../../http-client'
+import type { HttpClient } from '../http-client'
+import type { SlugResolver } from './slug-resolver'
 
 /**
  * Service responsible for slug resolution and user handle management
  * Returns internal types that can be transformed into domain models
+ * This is a pure service without caching - use CachingSlugService for cached behavior
  */
-export class SlugService {
-  private subscriptionsCache: Map<number, string> | null = null // user_id -> slug mapping
-  private subscriptionsCacheTimestamp: number | null = null
-
-  constructor(private readonly httpClient: SubstackHttpClient) {}
+export class SlugService implements SlugResolver {
+  constructor(private readonly httpClient: HttpClient) {}
 
   /**
    * Get or build the user_id to slug mapping from subscriptions
@@ -17,11 +16,6 @@ export class SlugService {
    * @throws {Error} When subscriptions cannot be fetched (falls back to empty mapping)
    */
   async getSlugMapping(): Promise<Map<number, string>> {
-    // Return cached mapping if available and fresh (within session)
-    if (this.subscriptionsCache && this.subscriptionsCacheTimestamp) {
-      return this.subscriptionsCache
-    }
-
     try {
       // Fetch subscriptions data
       const subscriptionsResponse =
@@ -40,18 +34,11 @@ export class SlugService {
         }
       }
 
-      // Cache the mapping
-      this.subscriptionsCache = mapping
-      this.subscriptionsCacheTimestamp = Date.now()
-
       return mapping
     } catch {
       // If subscriptions endpoint fails, return empty mapping
       // This ensures graceful fallback
-      const emptyMapping = new Map<number, string>()
-      this.subscriptionsCache = emptyMapping
-      this.subscriptionsCacheTimestamp = Date.now()
-      return emptyMapping
+      return new Map<number, string>()
     }
   }
 
@@ -64,22 +51,5 @@ export class SlugService {
   async getSlugForUserId(userId: number, fallbackHandle?: string): Promise<string | undefined> {
     const slugMapping = await this.getSlugMapping()
     return slugMapping.get(userId) || fallbackHandle
-  }
-
-  /**
-   * Clear the cached slug mapping
-   * Useful for forcing a refresh of the subscriptions data
-   */
-  clearCache(): void {
-    this.subscriptionsCache = null
-    this.subscriptionsCacheTimestamp = null
-  }
-
-  /**
-   * Check if the slug mapping cache is populated
-   * @returns boolean - True if cache has data
-   */
-  isCached(): boolean {
-    return this.subscriptionsCache !== null && this.subscriptionsCacheTimestamp !== null
   }
 }

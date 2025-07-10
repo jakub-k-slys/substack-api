@@ -1,21 +1,21 @@
 import { CommentService } from '../../src/internal/services/comment-service'
-import { SubstackHttpClient } from '../../src/http-client'
+import { HttpClient } from '../../src/internal/http-client'
 import type { SubstackComment, SubstackCommentResponse } from '../../src/internal'
 
 // Mock the http client
-jest.mock('../../src/http-client')
+jest.mock('../../src/internal/http-client')
 
 describe('CommentService', () => {
   let commentService: CommentService
-  let mockHttpClient: jest.Mocked<SubstackHttpClient>
+  let mockHttpClient: jest.Mocked<HttpClient>
 
   beforeEach(() => {
     jest.clearAllMocks()
 
-    mockHttpClient = new SubstackHttpClient('https://test.substack.com', {
+    mockHttpClient = new HttpClient('https://test.substack.com', {
       apiKey: 'test',
       hostname: 'test.com'
-    }) as jest.Mocked<SubstackHttpClient>
+    }) as jest.Mocked<HttpClient>
     mockHttpClient.get = jest.fn()
 
     commentService = new CommentService(mockHttpClient)

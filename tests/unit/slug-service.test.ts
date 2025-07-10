@@ -1,13 +1,13 @@
 import { SlugService } from '../../src/internal/services/slug-service'
-import { SubstackHttpClient } from '../../src/http-client'
+import { HttpClient } from '../../src/internal/http-client'
 import type { SubstackSubscriptionsResponse } from '../../src/internal'
 
 // Mock the http client
-jest.mock('../../src/http-client')
+jest.mock('../../src/internal/http-client')
 
 describe('SlugService', () => {
   let slugService: SlugService
-  let mockHttpClient: jest.Mocked<SubstackHttpClient>
+  let mockHttpClient: jest.Mocked<HttpClient>
 
   const mockSubscriptionsResponse: SubstackSubscriptionsResponse = {
     subscriptions: [],
@@ -100,10 +100,10 @@ describe('SlugService', () => {
   beforeEach(() => {
     jest.clearAllMocks()
 
-    mockHttpClient = new SubstackHttpClient('https://test.com', {
+    mockHttpClient = new HttpClient('https://test.com', {
       apiKey: 'test',
       hostname: 'test.com'
-    }) as jest.Mocked<SubstackHttpClient>
+    }) as jest.Mocked<HttpClient>
     mockHttpClient.get = jest.fn()
 
     slugService = new SlugService(mockHttpClient)
@@ -123,14 +123,15 @@ describe('SlugService', () => {
       expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/subscriptions')
     })
 
-    it('should return cached mapping on second call', async () => {
+    it('should fetch fresh mapping on each call (no caching)', async () => {
+      mockHttpClient.get.mockResolvedValueOnce(mockSubscriptionsResponse)
       mockHttpClient.get.mockResolvedValueOnce(mockSubscriptionsResponse)
 
       const result1 = await slugService.getSlugMapping()
       const result2 = await slugService.getSlugMapping()
 
-      expect(result1).toBe(result2) // Same object reference (cached)
-      expect(mockHttpClient.get).toHaveBeenCalledTimes(1) // Only called once
+      expect(result1).not.toBe(result2) // Different objects (not cached)
+      expect(mockHttpClient.get).toHaveBeenCalledTimes(2) // Called twice (no caching)
     })
 
     it('should handle empty publications array', async () => {
@@ -224,17 +225,18 @@ describe('SlugService', () => {
       expect(result).toBeUndefined()
     })
 
-    it('should use cached mapping from previous call', async () => {
+    it('should fetch mapping for each call (no caching)', async () => {
+      mockHttpClient.get.mockResolvedValueOnce(mockSubscriptionsResponse)
       mockHttpClient.get.mockResolvedValueOnce(mockSubscriptionsResponse)
 
       // First call should fetch subscriptions
       const result1 = await slugService.getSlugForUserId(123)
-      // Second call should use cache
+      // Second call should fetch again (no caching)
       const result2 = await slugService.getSlugForUserId(456)
 
       expect(result1).toBe('test-author')
       expect(result2).toBe('another-author')
-      expect(mockHttpClient.get).toHaveBeenCalledTimes(1) // Only called once
+      expect(mockHttpClient.get).toHaveBeenCalledTimes(2) // Called twice (no caching)
     })
 
     it('should handle API failure and return fallback', async () => {
@@ -243,48 +245,6 @@ describe('SlugService', () => {
       const result = await slugService.getSlugForUserId(123, 'fallback-handle')
 
       expect(result).toBe('fallback-handle') // Should fallback when API fails
-    })
-  })
-
-  describe('clearCache', () => {
-    it('should clear the cached mapping', async () => {
-      mockHttpClient.get.mockResolvedValueOnce(mockSubscriptionsResponse)
-
-      // Build cache
-      await slugService.getSlugMapping()
-      expect(slugService.isCached()).toBe(true)
-
-      // Clear cache
-      slugService.clearCache()
-      expect(slugService.isCached()).toBe(false)
-
-      // Next call should fetch again
-      mockHttpClient.get.mockResolvedValueOnce(mockSubscriptionsResponse)
-      await slugService.getSlugMapping()
-
-      expect(mockHttpClient.get).toHaveBeenCalledTimes(2) // Called twice after clear
-    })
-  })
-
-  describe('isCached', () => {
-    it('should return false initially', () => {
-      expect(slugService.isCached()).toBe(false)
-    })
-
-    it('should return true after fetching mapping', async () => {
-      mockHttpClient.get.mockResolvedValueOnce(mockSubscriptionsResponse)
-
-      await slugService.getSlugMapping()
-
-      expect(slugService.isCached()).toBe(true)
-    })
-
-    it('should return true even with empty cache after API failure', async () => {
-      mockHttpClient.get.mockRejectedValueOnce(new Error('API Error'))
-
-      await slugService.getSlugMapping()
-
-      expect(slugService.isCached()).toBe(true) // Still cached even with empty mapping
     })
   })
 })
