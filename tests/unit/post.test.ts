@@ -216,25 +216,6 @@ describe('PreviewPost Entity', () => {
       expect(mockPostService.getPostById).toHaveBeenCalledWith(456)
     })
 
-    it('should throw error when PostService is not available', async () => {
-      const postWithoutService = new PreviewPost(
-        {
-          id: 456,
-          title: 'Test Post',
-          slug: 'test-post',
-          post_date: '2023-01-01T00:00:00Z',
-          canonical_url: 'https://example.com/post',
-          type: 'newsletter' as const
-        },
-        mockHttpClient,
-        mockCommentService
-      )
-
-      await expect(postWithoutService.fullPost()).rejects.toThrow(
-        'PostService is required to fetch full post content'
-      )
-    })
-
     it('should throw error when PostService fails', async () => {
       mockPostService.getPostById.mockRejectedValue(new Error('API error'))
 

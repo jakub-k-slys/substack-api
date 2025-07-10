@@ -127,7 +127,12 @@ describe('SubstackClient Entity Model', () => {
         getCommentById: jest.fn()
       } as unknown as CommentService
 
-      const post = new PreviewPost(mockData, httpClient, mockCommentService)
+      const mockPostService = {
+        getPostById: jest.fn(),
+        getPostsForProfile: jest.fn()
+      } as unknown as PostService
+
+      const post = new PreviewPost(mockData, httpClient, mockCommentService, mockPostService)
 
       expect(post).toBeInstanceOf(PreviewPost)
       expect(post.id).toBe(456)

@@ -1,5 +1,5 @@
 import { HttpClient } from './internal/http-client'
-import { Profile, OwnProfile, PreviewPost, Note, Comment } from './domain'
+import { Profile, OwnProfile, FullPost, Note, Comment } from './domain'
 import {
   PostService,
   NoteService,
@@ -150,14 +150,14 @@ export class SubstackClient {
   /**
    * Get a specific post by ID
    */
-  async postForId(id: number): Promise<PreviewPost> {
+  async postForId(id: number): Promise<FullPost> {
     if (typeof id !== 'number') {
       throw new TypeError('Post ID must be a number')
     }
 
     try {
       const post = await this.postService.getPostById(id)
-      return new PreviewPost(post, this.publicationClient, this.commentService, this.postService)
+      return new FullPost(post, this.publicationClient, this.commentService, this.postService)
     } catch (error) {
       throw new Error(`Post with ID ${id} not found: ${(error as Error).message}`)
     }

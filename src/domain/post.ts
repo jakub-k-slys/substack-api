@@ -25,7 +25,7 @@ export class PreviewPost {
     rawData: SubstackPost,
     private readonly client: HttpClient,
     private readonly commentService: CommentService,
-    private readonly postService?: PostService
+    private readonly postService: PostService
   ) {
     this.id = rawData.id
     this.title = rawData.title
@@ -48,13 +48,9 @@ export class PreviewPost {
   /**
    * Fetch the full post data with HTML body content
    * @returns Promise<FullPost> - A FullPost instance with complete content
-   * @throws {Error} When full post retrieval fails or PostService is unavailable
+   * @throws {Error} When full post retrieval fails
    */
   async fullPost(): Promise<FullPost> {
-    if (!this.postService) {
-      throw new Error('PostService is required to fetch full post content')
-    }
-
     try {
       const fullPostData = await this.postService.getPostById(this.id)
       return new FullPost(fullPostData, this.client, this.commentService, this.postService)
@@ -109,7 +105,7 @@ export class FullPost extends PreviewPost {
     rawData: SubstackPost,
     client: HttpClient,
     commentService: CommentService,
-    postService?: PostService
+    postService: PostService
   ) {
     super(rawData, client, commentService, postService)
     this.htmlBody = rawData.htmlBody || ''
