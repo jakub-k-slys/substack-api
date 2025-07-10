@@ -554,7 +554,10 @@ describe('OwnProfile Entity', () => {
         }
       ]
 
-      mockNoteService.getNotesForLoggedUser.mockResolvedValue(mockNotes)
+      mockNoteService.getNotesForLoggedUser.mockResolvedValue({
+        notes: mockNotes,
+        nextCursor: undefined
+      })
 
       const notes = []
       for await (const note of ownProfile.notes({ limit: 2 })) {
@@ -701,7 +704,10 @@ describe('OwnProfile Entity', () => {
       }
 
       // Mock the NoteService instead of the HTTP client
-      mockNoteService.getNotesForLoggedUser.mockResolvedValue(mockResponse.items)
+      mockNoteService.getNotesForLoggedUser.mockResolvedValue({
+        notes: mockResponse.items,
+        nextCursor: undefined
+      })
 
       const notes = []
       for await (const note of ownProfile.notes({ limit: 1 })) {

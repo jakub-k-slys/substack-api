@@ -442,7 +442,10 @@ describe('Profile Entity', () => {
           }
         }
       ]
-      mockNoteService.getNotesForProfile.mockResolvedValue(mockResponse)
+      mockNoteService.getNotesForProfile.mockResolvedValue({
+        notes: mockResponse,
+        nextCursor: undefined
+      })
 
       const notes = []
       for await (const note of profile.notes({ limit: 2 })) {
@@ -454,8 +457,7 @@ describe('Profile Entity', () => {
       expect(notes[0].body).toBe('Test note content')
       expect(notes[1].body).toBe('Another test note')
       expect(mockNoteService.getNotesForProfile).toHaveBeenCalledWith(123, {
-        limit: 25,
-        offset: 0
+        cursor: undefined
       })
     })
 
@@ -586,7 +588,10 @@ describe('Profile Entity', () => {
           }
         }
       ]
-      mockNoteService.getNotesForProfile.mockResolvedValue(mockResponse)
+      mockNoteService.getNotesForProfile.mockResolvedValue({
+        notes: mockResponse,
+        nextCursor: undefined
+      })
 
       const notes = []
       for await (const note of profile.notes({ limit: 1 })) {
@@ -662,7 +667,10 @@ describe('Profile Entity', () => {
           }
         }
       ]
-      mockNoteService.getNotesForProfile.mockResolvedValue(mockResponse)
+      mockNoteService.getNotesForProfile.mockResolvedValue({
+        notes: mockResponse,
+        nextCursor: undefined
+      })
 
       const notes = []
       for await (const note of profile.notes()) {
@@ -776,7 +784,10 @@ describe('Profile Entity', () => {
           }
         }
       ]
-      mockNoteService.getNotesForProfile.mockResolvedValue(mockResponse)
+      mockNoteService.getNotesForProfile.mockResolvedValue({
+        notes: mockResponse,
+        nextCursor: undefined
+      })
 
       const notes = []
       for await (const note of profile.notes()) {
@@ -785,12 +796,11 @@ describe('Profile Entity', () => {
 
       expect(notes).toHaveLength(1)
       expect(mockNoteService.getNotesForProfile).toHaveBeenCalledWith(123, {
-        limit: 10,
-        offset: 0
+        cursor: undefined
       })
     })
 
-    it('should implement pagination with offset for multiple pages', async () => {
+    it('should implement pagination with cursor for multiple pages', async () => {
       // Reset the mock to avoid interference from other tests
       mockNoteService.getNotesForProfile.mockReset()
       mockHttpClient.getPerPage.mockReturnValue(2) // Set perPage to 2 for this test
@@ -991,8 +1001,14 @@ describe('Profile Entity', () => {
 
       // Setup sequential responses for pagination
       mockNoteService.getNotesForProfile
-        .mockResolvedValueOnce(firstPageResponse) // offset=0, returns 2 notes (full page)
-        .mockResolvedValueOnce(secondPageResponse) // offset=2, returns 1 note (partial page - end)
+        .mockResolvedValueOnce({
+          notes: firstPageResponse,
+          nextCursor: 'cursor1'
+        }) // offset=0, returns 2 notes (full page)
+        .mockResolvedValueOnce({
+          notes: secondPageResponse,
+          nextCursor: undefined
+        }) // offset=2, returns 1 note (partial page - end)
 
       const notes = []
       for await (const note of profile.notes()) {
@@ -1007,12 +1023,10 @@ describe('Profile Entity', () => {
       // Verify both service calls were made with correct offsets
       expect(mockNoteService.getNotesForProfile).toHaveBeenCalledTimes(2)
       expect(mockNoteService.getNotesForProfile).toHaveBeenNthCalledWith(1, 123, {
-        limit: 2,
-        offset: 0
+        cursor: undefined
       })
       expect(mockNoteService.getNotesForProfile).toHaveBeenNthCalledWith(2, 123, {
-        limit: 2,
-        offset: 2
+        cursor: 'cursor1'
       })
     })
   })

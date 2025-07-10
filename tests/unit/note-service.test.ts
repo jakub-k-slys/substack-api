@@ -161,4 +161,133 @@ describe('NoteService', () => {
       expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/comment/123')
     })
   })
+
+  describe('getNotesForLoggedUser', () => {
+    it('should return paginated notes without cursor', async () => {
+      const mockResponse = {
+        items: [
+          {
+            entity_key: 'note-1',
+            type: 'comment',
+            context: {
+              type: 'feed',
+              timestamp: '2023-01-01T00:00:00Z',
+              users: [],
+              isFresh: false,
+              page_rank: 1
+            }
+          }
+        ],
+        nextCursor: 'next-cursor-123'
+      }
+
+      mockHttpClient.get.mockResolvedValueOnce(mockResponse)
+
+      const result = await noteService.getNotesForLoggedUser()
+
+      expect(result).toEqual({
+        notes: mockResponse.items,
+        nextCursor: 'next-cursor-123'
+      })
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/notes')
+    })
+
+    it('should return paginated notes with cursor', async () => {
+      const mockResponse = {
+        items: [],
+        next_cursor: undefined
+      }
+
+      mockHttpClient.get.mockResolvedValueOnce(mockResponse)
+
+      const result = await noteService.getNotesForLoggedUser({ cursor: 'test-cursor' })
+
+      expect(result).toEqual({
+        notes: [],
+        nextCursor: undefined
+      })
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/notes?cursor=test-cursor')
+    })
+
+    it('should handle missing items in response', async () => {
+      const mockResponse = {
+        nextCursor: 'next-cursor'
+      }
+
+      mockHttpClient.get.mockResolvedValueOnce(mockResponse)
+
+      const result = await noteService.getNotesForLoggedUser()
+
+      expect(result).toEqual({
+        notes: [],
+        nextCursor: 'next-cursor'
+      })
+    })
+  })
+
+  describe('getNotesForProfile', () => {
+    it('should return paginated notes for profile without cursor', async () => {
+      const mockResponse = {
+        items: [
+          {
+            entity_key: 'note-1',
+            type: 'comment',
+            context: {
+              type: 'feed',
+              timestamp: '2023-01-01T00:00:00Z',
+              users: [],
+              isFresh: false,
+              page_rank: 1
+            }
+          }
+        ],
+        nextCursor: 'next-cursor-456'
+      }
+
+      mockHttpClient.get.mockResolvedValueOnce(mockResponse)
+
+      const result = await noteService.getNotesForProfile(123)
+
+      expect(result).toEqual({
+        notes: mockResponse.items,
+        nextCursor: 'next-cursor-456'
+      })
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/feed/profile/123?types=note')
+    })
+
+    it('should return paginated notes for profile with cursor', async () => {
+      const mockResponse = {
+        items: [],
+        next_cursor: undefined
+      }
+
+      mockHttpClient.get.mockResolvedValueOnce(mockResponse)
+
+      const result = await noteService.getNotesForProfile(456, { cursor: 'profile-cursor' })
+
+      expect(result).toEqual({
+        notes: [],
+        nextCursor: undefined
+      })
+      expect(mockHttpClient.get).toHaveBeenCalledWith(
+        '/api/v1/reader/feed/profile/456?types=note&cursor=profile-cursor'
+      )
+    })
+
+    it('should handle URL encoding of cursor', async () => {
+      const mockResponse = {
+        items: [],
+        next_cursor: undefined
+      }
+
+      mockHttpClient.get.mockResolvedValueOnce(mockResponse)
+
+      const cursorWithSpecialChars = 'cursor+with special=chars&more'
+      await noteService.getNotesForProfile(789, { cursor: cursorWithSpecialChars })
+
+      expect(mockHttpClient.get).toHaveBeenCalledWith(
+        `/api/v1/reader/feed/profile/789?types=note&cursor=${encodeURIComponent(cursorWithSpecialChars)}`
+      )
+    })
+  })
 })

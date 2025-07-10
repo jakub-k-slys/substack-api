@@ -68,3 +68,11 @@ export interface SubstackNote {
   isMuted: boolean
   trackingParameters: SubstackNoteTracking
 }
+
+/**
+ * Paginated response for notes API that supports cursor-based pagination
+ */
+export interface PaginatedSubstackNotes {
+  notes: SubstackNote[]
+  nextCursor?: string
+}

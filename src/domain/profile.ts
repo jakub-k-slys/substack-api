@@ -54,7 +54,7 @@ export class Profile {
           offset
         })
 
-        if (!postsData || postsData.length === 0) {
+        if (!postsData) {
           break // No more posts to fetch
         }
 
@@ -84,39 +84,33 @@ export class Profile {
    */
   async *notes(options: { limit?: number } = {}): AsyncIterable<Note> {
     try {
-      // Get the perPage configuration from the client
-      const perPageConfig = this.client.getPerPage()
-      let offset = 0
+      let cursor: string | undefined = undefined
       let totalYielded = 0
 
       while (true) {
-        // Use NoteService to get notes for this profile
-        const notesData = await this.noteService.getNotesForProfile(this.id, {
-          limit: perPageConfig,
-          offset
+        // Use NoteService to get notes for this profile with cursor-based pagination
+        const paginatedNotes = await this.noteService.getNotesForProfile(this.id, {
+          cursor
         })
 
-        if (!notesData || notesData.length === 0) {
+        if (!paginatedNotes.notes) {
           break // No more notes to fetch
         }
 
-        for (const item of notesData) {
-          // Filter for note items (type: "comment" with comment.type: "feed")
-          if (item.type === 'comment' && item.comment?.type === 'feed') {
-            if (options.limit && totalYielded >= options.limit) {
-              return // Stop if we've reached the requested limit
-            }
-            yield new Note(item, this.client)
-            totalYielded++
+        for (const item of paginatedNotes.notes) {
+          if (options.limit && totalYielded >= options.limit) {
+            return // Stop if we've reached the requested limit
           }
+          yield new Note(item, this.client)
+          totalYielded++
         }
 
-        // If we got fewer items than requested, we've reached the end
-        if (notesData.length < perPageConfig) {
+        // If there's no next cursor, we've reached the end
+        if (!paginatedNotes.nextCursor) {
           break
         }
 
-        offset += perPageConfig
+        cursor = paginatedNotes.nextCursor
       }
     } catch {
       // If both endpoints fail, return empty iterator

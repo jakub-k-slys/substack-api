@@ -91,14 +91,33 @@ export class OwnProfile extends Profile {
    */
   async *notes(options: { limit?: number } = {}): AsyncIterable<Note> {
     try {
-      // Use NoteService to fetch notes for the authenticated user
-      const notesData = await this.noteService.getNotesForLoggedUser()
+      let cursor: string | undefined = undefined
+      let totalYielded = 0
 
-      let count = 0
-      for (const noteData of notesData) {
-        if (options.limit && count >= options.limit) break
-        yield new Note(noteData, this.client)
-        count++
+      while (true) {
+        // Use NoteService to fetch notes for the authenticated user with cursor-based pagination
+        const paginatedNotes = await this.noteService.getNotesForLoggedUser({
+          cursor
+        })
+
+        if (!paginatedNotes.notes) {
+          break // No more notes to fetch
+        }
+
+        for (const noteData of paginatedNotes.notes) {
+          if (options.limit && totalYielded >= options.limit) {
+            return // Stop if we've reached the requested limit
+          }
+          yield new Note(noteData, this.client)
+          totalYielded++
+        }
+
+        // If there's no next cursor, we've reached the end
+        if (!paginatedNotes.nextCursor) {
+          break
+        }
+
+        cursor = paginatedNotes.nextCursor
       }
     } catch {
       // If the endpoint doesn't exist or fails, return empty iterator

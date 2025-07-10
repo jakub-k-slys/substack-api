@@ -21,7 +21,8 @@ export type {
   SubstackNote,
   SubstackNoteContext,
   SubstackNoteComment,
-  SubstackNoteTracking
+  SubstackNoteTracking,
+  PaginatedSubstackNotes
 } from './note-details'
 
 export type { SubstackPublicProfile, SubstackFullProfile, SubstackUserProfile } from './profile-api'
