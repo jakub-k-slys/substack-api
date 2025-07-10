@@ -17,8 +17,8 @@ import type { SubstackConfig } from './types'
  * Modern SubstackClient with entity-based API
  */
 export class SubstackClient {
-  private readonly httpClient: HttpClient
-  private readonly globalHttpClient: HttpClient
+  private readonly publicationClient: HttpClient
+  private readonly substackClient: HttpClient
   private readonly postService: PostService
   private readonly noteService: NoteService
   private readonly profileService: ProfileService
@@ -31,25 +31,25 @@ export class SubstackClient {
     // Create HTTP client for publication-specific endpoints
     const protocol = config.protocol || 'https'
     const publicationBaseUrl = `${protocol}://${config.hostname || 'substack.com'}`
-    this.httpClient = new HttpClient(publicationBaseUrl, config)
+    this.publicationClient = new HttpClient(publicationBaseUrl, config)
 
     // Create HTTP client for global Substack endpoints
     const substackBaseUrl = config.substackBaseUrl || 'https://substack.com'
-    this.globalHttpClient = new HttpClient(substackBaseUrl, config)
+    this.substackClient = new HttpClient(substackBaseUrl, config)
 
     // Initialize services
-    this.postService = new PostService(this.globalHttpClient, this.httpClient)
-    this.noteService = new NoteService(this.httpClient)
-    this.profileService = new ProfileService(this.httpClient)
+    this.postService = new PostService(this.substackClient, this.publicationClient)
+    this.noteService = new NoteService(this.publicationClient)
+    this.profileService = new ProfileService(this.publicationClient)
 
     // Create caching slug service using decorator pattern
-    const baseSlugService = new SlugService(this.httpClient)
+    const baseSlugService = new SlugService(this.publicationClient)
     const slugCache = new InMemoryCache<number, string>()
     this.slugService = new CachingSlugService(slugCache, baseSlugService)
 
-    this.commentService = new CommentService(this.httpClient)
-    this.followeeService = new FolloweeService(this.httpClient)
-    this.connectivityService = new ConnectivityService(this.httpClient)
+    this.commentService = new CommentService(this.publicationClient)
+    this.followeeService = new FolloweeService(this.publicationClient)
+    this.connectivityService = new ConnectivityService(this.publicationClient)
   }
 
   /**
@@ -68,7 +68,7 @@ export class SubstackClient {
       const profile = await this.profileService.getOwnProfile()
 
       // Get user_id for slug resolution
-      const subscription = await this.httpClient.get<{ user_id: number }>('/api/v1/subscription')
+      const subscription = await this.publicationClient.get<{ user_id: number }>('/api/v1/subscription')
       const userId = subscription.user_id
 
       // Resolve slug from slug service
@@ -76,7 +76,7 @@ export class SubstackClient {
 
       return new OwnProfile(
         profile,
-        this.httpClient,
+        this.publicationClient,
         this.profileService,
         this.postService,
         this.noteService,
@@ -102,7 +102,7 @@ export class SubstackClient {
 
       return new Profile(
         profile,
-        this.httpClient,
+        this.publicationClient,
         this.profileService,
         this.postService,
         this.noteService,
@@ -132,7 +132,7 @@ export class SubstackClient {
 
       return new Profile(
         profile,
-        this.httpClient,
+        this.publicationClient,
         this.profileService,
         this.postService,
         this.noteService,
@@ -155,7 +155,7 @@ export class SubstackClient {
 
     try {
       const post = await this.postService.getPostById(id)
-      return new Post(post, this.httpClient, this.postService, this.commentService)
+      return new Post(post, this.publicationClient, this.postService, this.commentService)
     } catch (error) {
       throw new Error(`Post with ID ${id} not found: ${(error as Error).message}`)
     }
@@ -171,7 +171,7 @@ export class SubstackClient {
 
     try {
       const noteData = await this.noteService.getNoteById(id)
-      return new Note(noteData, this.httpClient)
+      return new Note(noteData, this.publicationClient)
     } catch {
       throw new Error(`Note with ID ${id} not found`)
     }
@@ -187,7 +187,7 @@ export class SubstackClient {
 
     try {
       const commentData = await this.commentService.getCommentById(id)
-      return new Comment(commentData, this.httpClient)
+      return new Comment(commentData, this.publicationClient)
     } catch (error) {
       throw new Error(`Comment with ID ${id} not found: ${(error as Error).message}`)
     }
