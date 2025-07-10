@@ -7,7 +7,8 @@ import {
   SlugService,
   CachingSlugService,
   CommentService,
-  FolloweeService
+  FolloweeService,
+  ConnectivityService
 } from './internal/services'
 import { InMemoryCache } from './internal/cache'
 import type { SubstackConfig } from './types'
@@ -24,6 +25,7 @@ export class SubstackClient {
   private readonly slugService: CachingSlugService
   private readonly commentService: CommentService
   private readonly followeeService: FolloweeService
+  private readonly connectivityService: ConnectivityService
 
   constructor(config: SubstackConfig) {
     // Create HTTP client for publication-specific endpoints
@@ -47,18 +49,14 @@ export class SubstackClient {
 
     this.commentService = new CommentService(this.httpClient)
     this.followeeService = new FolloweeService(this.httpClient)
+    this.connectivityService = new ConnectivityService(this.httpClient)
   }
 
   /**
    * Test API connectivity
    */
   async testConnectivity(): Promise<boolean> {
-    try {
-      await this.httpClient.get('/api/v1/feed/following')
-      return true
-    } catch {
-      return false
-    }
+    return await this.connectivityService.isConnected()
   }
 
   /**
