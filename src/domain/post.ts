@@ -1,6 +1,6 @@
 import type { SubstackPost } from '../internal'
 import type { HttpClient } from '../internal/http-client'
-import type { PostService, CommentService } from '../internal/services'
+import type { CommentService } from '../internal/services'
 import { Comment } from './comment'
 
 /**
@@ -9,7 +9,9 @@ import { Comment } from './comment'
 export class Post {
   public readonly id: number
   public readonly title: string
+  public readonly subtitle: string
   public readonly body: string
+  public readonly truncatedBody: string
   public readonly likesCount: number
   public readonly author: {
     id: number
@@ -20,14 +22,15 @@ export class Post {
   public readonly publishedAt: Date
 
   constructor(
-    private readonly rawData: SubstackPost,
+    rawData: SubstackPost,
     private readonly client: HttpClient,
-    private readonly postService: PostService,
     private readonly commentService: CommentService
   ) {
     this.id = rawData.id
     this.title = rawData.title
-    this.body = rawData.description || rawData.subtitle || ''
+    this.subtitle = rawData.subtitle || ''
+    this.truncatedBody = rawData.truncated_body_text || ''
+    this.body = rawData.truncated_body_text || ''
     this.likesCount = 0 // TODO: Extract from rawData when available
     this.publishedAt = new Date(rawData.post_date)
 

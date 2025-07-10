@@ -1,12 +1,10 @@
 import { Post } from '../../src/domain/post'
 import { Comment } from '../../src/domain/comment'
-import { PostService } from '../../src/internal/services/post-service'
 import { CommentService } from '../../src/internal/services/comment-service'
 import type { HttpClient } from '../../src/internal/http-client'
 
 describe('Post Entity', () => {
   let mockHttpClient: jest.Mocked<HttpClient>
-  let mockPostService: jest.Mocked<PostService>
   let mockCommentService: jest.Mocked<CommentService>
   let post: Post
 
@@ -16,10 +14,6 @@ describe('Post Entity', () => {
       post: jest.fn(),
       request: jest.fn()
     } as unknown as jest.Mocked<HttpClient>
-
-    mockPostService = {
-      getPostById: jest.fn()
-    } as unknown as jest.Mocked<PostService>
 
     mockCommentService = {
       getCommentsForPost: jest.fn(),
@@ -63,7 +57,7 @@ describe('Post Entity', () => {
       theme: { background_pop: 'blue' }
     }
 
-    post = new Post(mockPostData, mockHttpClient, mockPostService, mockCommentService)
+    post = new Post(mockPostData, mockHttpClient, mockCommentService)
   })
 
   describe('comments()', () => {

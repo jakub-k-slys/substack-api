@@ -37,7 +37,7 @@ describe('SubstackClient - Slug Resolution', () => {
       hostname: 'test.substack.com'
     })
     // Replace the internal services with our mocks
-    ;(client as unknown as { httpClient: HttpClient }).httpClient = mockHttpClient
+    ;(client as unknown as { publicationClient: HttpClient }).publicationClient = mockHttpClient
     ;(client as unknown as { slugService: SlugService }).slugService = mockSlugService
     ;(client as unknown as { profileService: ProfileService }).profileService = mockProfileService
   })

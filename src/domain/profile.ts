@@ -62,7 +62,7 @@ export class Profile {
           if (options.limit && totalYielded >= options.limit) {
             return // Stop if we've reached the requested limit
           }
-          yield new Post(postData, this.client, this.postService, this.commentService)
+          yield new Post(postData, this.client, this.commentService)
           totalYielded++
         }
 

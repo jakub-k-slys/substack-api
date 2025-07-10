@@ -7,7 +7,8 @@ import {
   ProfileService,
   SlugService,
   CommentService,
-  FolloweeService
+  FolloweeService,
+  ConnectivityService
 } from '../../src/internal/services'
 import type { SubstackFullProfile } from '../../src/internal'
 
@@ -28,6 +29,7 @@ describe('SubstackClient', () => {
   let mockSlugService: jest.Mocked<SlugService>
   let mockCommentService: jest.Mocked<CommentService>
   let mockFolloweeService: jest.Mocked<FolloweeService>
+  let mockConnectivityService: jest.Mocked<ConnectivityService>
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -72,13 +74,18 @@ describe('SubstackClient', () => {
     mockFolloweeService = new FolloweeService(mockHttpClient) as jest.Mocked<FolloweeService>
     mockFolloweeService.getFollowees = jest.fn()
 
+    mockConnectivityService = new ConnectivityService(
+      mockHttpClient
+    ) as jest.Mocked<ConnectivityService>
+    mockConnectivityService.isConnected = jest.fn()
+
     client = new SubstackClient({
       apiKey: 'test-api-key',
       hostname: 'test.substack.com'
     })
     // Replace the internal http clients and services with our mocks
-    ;(client as unknown as { httpClient: HttpClient }).httpClient = mockHttpClient
-    ;(client as unknown as { globalHttpClient: HttpClient }).globalHttpClient = mockGlobalHttpClient
+    ;(client as unknown as { publicationClient: HttpClient }).publicationClient = mockHttpClient
+    ;(client as unknown as { substackClient: HttpClient }).substackClient = mockGlobalHttpClient
     ;(client as unknown as { postService: PostService }).postService = mockPostService
     ;(client as unknown as { noteService: NoteService }).noteService = mockNoteService
     ;(client as unknown as { profileService: ProfileService }).profileService = mockProfileService
@@ -86,20 +93,23 @@ describe('SubstackClient', () => {
     ;(client as unknown as { commentService: CommentService }).commentService = mockCommentService
     ;(client as unknown as { followeeService: FolloweeService }).followeeService =
       mockFolloweeService
+    ;(client as unknown as { connectivityService: ConnectivityService }).connectivityService =
+      mockConnectivityService
   })
 
   describe('testConnectivity', () => {
     it('should return true when API is accessible', async () => {
-      mockHttpClient.get.mockResolvedValue({})
+      mockConnectivityService.isConnected.mockResolvedValue(true)
       const result = await client.testConnectivity()
       expect(result).toBe(true)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/feed/following')
+      expect(mockConnectivityService.isConnected).toHaveBeenCalled()
     })
 
     it('should return false when API is not accessible', async () => {
-      mockHttpClient.get.mockRejectedValue(new Error('Network error'))
+      mockConnectivityService.isConnected.mockResolvedValue(false)
       const result = await client.testConnectivity()
       expect(result).toBe(false)
+      expect(mockConnectivityService.isConnected).toHaveBeenCalled()
     })
   })
 
