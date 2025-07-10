@@ -64,8 +64,6 @@ describe('SubstackClient', () => {
     mockSlugService = new SlugService(mockHttpClient) as jest.Mocked<SlugService>
     mockSlugService.getSlugForUserId = jest.fn()
     mockSlugService.getSlugMapping = jest.fn()
-    mockSlugService.clearCache = jest.fn()
-    mockSlugService.isCached = jest.fn()
 
     mockCommentService = new CommentService(mockHttpClient) as jest.Mocked<CommentService>
     mockCommentService.getCommentById = jest.fn()

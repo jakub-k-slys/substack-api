@@ -5,9 +5,11 @@ import {
   NoteService,
   ProfileService,
   SlugService,
+  CachingSlugService,
   CommentService,
   FolloweeService
 } from './internal/services'
+import { InMemoryCache } from './internal/cache'
 import type { SubstackConfig } from './types'
 
 /**
@@ -19,7 +21,7 @@ export class SubstackClient {
   private readonly postService: PostService
   private readonly noteService: NoteService
   private readonly profileService: ProfileService
-  private readonly slugService: SlugService
+  private readonly slugService: CachingSlugService
   private readonly commentService: CommentService
   private readonly followeeService: FolloweeService
 
@@ -37,7 +39,12 @@ export class SubstackClient {
     this.postService = new PostService(this.globalHttpClient, this.httpClient)
     this.noteService = new NoteService(this.httpClient)
     this.profileService = new ProfileService(this.httpClient)
-    this.slugService = new SlugService(this.httpClient)
+
+    // Create caching slug service using decorator pattern
+    const baseSlugService = new SlugService(this.httpClient)
+    const slugCache = new InMemoryCache<number, string>()
+    this.slugService = new CachingSlugService(slugCache, baseSlugService)
+
     this.commentService = new CommentService(this.httpClient)
     this.followeeService = new FolloweeService(this.httpClient)
   }
