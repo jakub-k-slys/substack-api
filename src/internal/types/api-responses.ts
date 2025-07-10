@@ -32,6 +32,8 @@ export interface SubstackPost {
   published?: boolean
   paywalled?: boolean
   truncated_body_text?: string
+  /** Full HTML body content - available when fetching individual posts */
+  htmlBody?: string
 }
 
 /**

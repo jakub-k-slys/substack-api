@@ -1,5 +1,5 @@
 export { Profile } from './profile'
 export { OwnProfile } from './own-profile'
-export { Post } from './post'
+export { PreviewPost, FullPost } from './post'
 export { Note } from './note'
 export { Comment } from './comment'

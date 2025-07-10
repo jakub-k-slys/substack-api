@@ -1,7 +1,7 @@
 import type { SubstackPublicProfile, SubstackFullProfile } from '../internal'
 import type { HttpClient } from '../internal/http-client'
 import type { ProfileService, CommentService, PostService, NoteService } from '../internal/services'
-import { Post } from './post'
+import { PreviewPost } from './post'
 import { Note } from './note'
 
 /**
@@ -40,7 +40,7 @@ export class Profile {
   /**
    * Get posts from this profile's publications
    */
-  async *posts(options: { limit?: number } = {}): AsyncIterable<Post> {
+  async *posts(options: { limit?: number } = {}): AsyncIterable<PreviewPost> {
     try {
       // Get the perPage configuration from the client
       const perPageConfig = this.client.getPerPage()
@@ -62,7 +62,7 @@ export class Profile {
           if (options.limit && totalYielded >= options.limit) {
             return // Stop if we've reached the requested limit
           }
-          yield new Post(postData, this.client, this.commentService)
+          yield new PreviewPost(postData, this.client, this.commentService, this.postService)
           totalYielded++
         }
 

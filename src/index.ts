@@ -1,5 +1,5 @@
 export { SubstackClient } from './substack-client'
-export { Profile, OwnProfile, Post, Note, Comment } from './domain'
+export { Profile, OwnProfile, PreviewPost, FullPost, Note, Comment } from './domain'
 
 export type {
   SubstackConfig,

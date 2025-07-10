@@ -1,5 +1,5 @@
 import { Profile } from '../../src/domain/profile'
-import { Post, Note } from '../../src/domain'
+import { PreviewPost, Note } from '../../src/domain'
 import {
   ProfileService,
   PostService,
@@ -120,7 +120,7 @@ describe('Profile Entity', () => {
       }
 
       expect(posts).toHaveLength(2)
-      expect(posts[0]).toBeInstanceOf(Post)
+      expect(posts[0]).toBeInstanceOf(PreviewPost)
       expect(posts[0].title).toBe('Post 1')
       expect(posts[1].title).toBe('Post 2')
       expect(mockPostService.getPostsForProfile).toHaveBeenCalledWith(123, {

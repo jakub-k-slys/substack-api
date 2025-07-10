@@ -1,5 +1,5 @@
 import { SubstackClient } from '../../src/substack-client'
-import { Profile, Post, Note, Comment, OwnProfile } from '../../src/domain'
+import { Profile, PreviewPost, Note, Comment, OwnProfile } from '../../src/domain'
 import { HttpClient } from '../../src/internal/http-client'
 import {
   PostService,
@@ -337,7 +337,7 @@ describe('SubstackClient', () => {
       mockPostService.getPostById.mockResolvedValueOnce(mockPost)
 
       const post = await client.postForId(456)
-      expect(post).toBeInstanceOf(Post)
+      expect(post).toBeInstanceOf(PreviewPost)
 
       // Verify that PostService was called with the correct ID
       expect(mockPostService.getPostById).toHaveBeenCalledWith(456)
