@@ -54,7 +54,7 @@ export class Profile {
           offset
         })
 
-        if (!postsData || postsData.length === 0) {
+        if (!postsData) {
           break // No more posts to fetch
         }
 
@@ -93,19 +93,16 @@ export class Profile {
           cursor
         })
 
-        if (!paginatedNotes.notes || paginatedNotes.notes.length === 0) {
+        if (!paginatedNotes.notes) {
           break // No more notes to fetch
         }
 
         for (const item of paginatedNotes.notes) {
-          // Filter for note items (type: "comment" with comment.type: "feed")
-          if (item.type === 'comment' && item.comment?.type === 'feed') {
-            if (options.limit && totalYielded >= options.limit) {
-              return // Stop if we've reached the requested limit
-            }
-            yield new Note(item, this.client)
-            totalYielded++
+          if (options.limit && totalYielded >= options.limit) {
+            return // Stop if we've reached the requested limit
           }
+          yield new Note(item, this.client)
+          totalYielded++
         }
 
         // If there's no next cursor, we've reached the end

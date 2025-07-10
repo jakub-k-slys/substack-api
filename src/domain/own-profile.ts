@@ -100,7 +100,7 @@ export class OwnProfile extends Profile {
           cursor
         })
 
-        if (!paginatedNotes.notes || paginatedNotes.notes.length === 0) {
+        if (!paginatedNotes.notes) {
           break // No more notes to fetch
         }
 

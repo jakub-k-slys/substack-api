@@ -103,12 +103,12 @@ export class NoteService {
 
     const response = await this.httpClient.get<{
       items?: SubstackNote[]
-      next_cursor?: string
+      nextCursor?: string
     }>(url)
 
     return {
       notes: response.items || [],
-      nextCursor: response.next_cursor
+      nextCursor: response.nextCursor
     }
   }
 
@@ -124,17 +124,16 @@ export class NoteService {
     options?: { cursor?: string }
   ): Promise<PaginatedSubstackNotes> {
     const url = options?.cursor
-      ? `/api/v1/reader/feed/profile/${profileId}?cursor=${encodeURIComponent(options.cursor)}`
-      : `/api/v1/reader/feed/profile/${profileId}`
+      ? `/api/v1/reader/feed/profile/${profileId}?types=note&cursor=${options.cursor}`
+      : `/api/v1/reader/feed/profile/${profileId}?types=note`
 
     const response = await this.httpClient.get<{
       items?: SubstackNote[]
-      next_cursor?: string
+      nextCursor?: string
     }>(url)
-
     return {
       notes: response.items || [],
-      nextCursor: response.next_cursor
+      nextCursor: response.nextCursor
     }
   }
 }
