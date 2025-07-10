@@ -98,7 +98,7 @@ export class NoteService {
    */
   async getNotesForLoggedUser(options?: { cursor?: string }): Promise<PaginatedSubstackNotes> {
     const url = options?.cursor
-      ? `/api/v1/notes?cursor=${encodeURIComponent(options.cursor)}`
+      ? `/api/v1/notes?cursor=${options.cursor}`
       : '/api/v1/notes'
 
     const response = await this.httpClient.get<{
