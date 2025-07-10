@@ -1,4 +1,4 @@
-import type { SubstackNote, SubstackCommentResponse } from '../types'
+import type { SubstackNote, SubstackCommentResponse, PaginatedSubstackNotes } from '../types'
 import type { HttpClient } from '../http-client'
 
 /**
@@ -91,29 +91,50 @@ export class NoteService {
   }
 
   /**
-   * Get notes for the authenticated user
-   * @returns Promise<SubstackNote[]> - Raw note data from API
+   * Get notes for the authenticated user with cursor-based pagination
+   * @param options - Pagination options with optional cursor
+   * @returns Promise<PaginatedSubstackNotes> - Paginated note data from API
    * @throws {Error} When notes cannot be retrieved
    */
-  async getNotesForLoggedUser(): Promise<SubstackNote[]> {
-    const response = await this.httpClient.get<{ items?: SubstackNote[] }>('/api/v1/notes')
-    return response.items || []
+  async getNotesForLoggedUser(options?: { cursor?: string }): Promise<PaginatedSubstackNotes> {
+    const url = options?.cursor
+      ? `/api/v1/notes?cursor=${encodeURIComponent(options.cursor)}`
+      : '/api/v1/notes'
+
+    const response = await this.httpClient.get<{
+      items?: SubstackNote[]
+      next_cursor?: string
+    }>(url)
+
+    return {
+      notes: response.items || [],
+      nextCursor: response.next_cursor
+    }
   }
 
   /**
-   * Get notes for a profile
+   * Get notes for a profile with cursor-based pagination
    * @param profileId - The profile user ID
-   * @param options - Pagination options
-   * @returns Promise<SubstackNote[]> - Raw note data from API
+   * @param options - Pagination options with optional cursor
+   * @returns Promise<PaginatedSubstackNotes> - Paginated note data from API
    * @throws {Error} When notes cannot be retrieved
    */
   async getNotesForProfile(
     profileId: number,
-    options: { limit: number; offset: number }
-  ): Promise<SubstackNote[]> {
-    const response = await this.httpClient.get<{ items?: SubstackNote[] }>(
-      `/api/v1/reader/feed/profile/${profileId}?types=note&limit=${options.limit}&offset=${options.offset}`
-    )
-    return response.items || []
+    options?: { cursor?: string }
+  ): Promise<PaginatedSubstackNotes> {
+    const url = options?.cursor
+      ? `/api/v1/reader/feed/profile/${profileId}?cursor=${encodeURIComponent(options.cursor)}`
+      : `/api/v1/reader/feed/profile/${profileId}`
+
+    const response = await this.httpClient.get<{
+      items?: SubstackNote[]
+      next_cursor?: string
+    }>(url)
+
+    return {
+      notes: response.items || [],
+      nextCursor: response.next_cursor
+    }
   }
 }
