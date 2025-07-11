@@ -374,6 +374,84 @@ describe('Substack', () => {
 });
 ```
 
+### Runtime Type Validation
+
+The library uses io-ts for runtime type validation of API responses to ensure data safety beyond TypeScript's compile-time checks.
+
+#### Why Runtime Validation?
+
+While TypeScript provides excellent static typing, API responses are dynamic and can change without notice. Runtime validation with io-ts provides:
+
+- **Type safety at runtime**: Validates that API responses match expected shapes
+- **Early error detection**: Catches data inconsistencies before they reach domain models
+- **Robust error handling**: Provides detailed error messages for invalid data
+- **Composable validation**: Uses composable codecs for complex nested structures
+
+#### Using io-ts Codecs
+
+The library defines io-ts codecs for key internal types in `src/internal/types/io-ts-codecs.ts`:
+
+```typescript
+// Raw Post codec
+export const RawPostCodec = t.type({
+  id: t.number,
+  title: t.string,
+  slug: t.string,
+  post_date: t.string,
+  canonical_url: t.string,
+  type: t.union([t.literal('newsletter'), t.literal('podcast'), t.literal('thread')])
+  // ... other fields
+})
+
+export type RawPost = t.TypeOf<typeof RawPostCodec>
+```
+
+#### Validation in Services
+
+Services use validation utilities to validate API responses:
+
+```typescript
+import { decodeOrThrow } from '../validation'
+import { RawPostCodec } from '../types'
+
+async getPostById(id: number): Promise<SubstackPost> {
+  const rawResponse = await this.httpClient.get<unknown>(`/api/v1/posts/by-id/${id}`)
+  
+  // Validate the response with io-ts before returning
+  return decodeOrThrow(RawPostCodec, rawResponse, 'Post response')
+}
+```
+
+#### Validation Utilities
+
+Two main utilities are provided in `src/internal/validation.ts`:
+
+- **`decodeOrThrow`**: Validates data and throws an error on failure (used in production code)
+- **`decodeEither`**: Returns an Either type for error handling (used in tests and error-safe contexts)
+
+#### Adding New Codecs
+
+When adding new API endpoints or modifying existing ones:
+
+1. Define io-ts codecs for the expected response shapes
+2. Use `decodeOrThrow` in service methods to validate responses
+3. Add tests for both successful and failing validation scenarios
+
+Example test:
+
+```typescript
+it('should validate valid post data', () => {
+  const validPost = { id: 123, title: 'Test', /* ... */ }
+  const result = decodeEither(RawPostCodec, validPost)
+  expect(isRight(result)).toBe(true)
+})
+
+it('should reject invalid post data', () => {
+  const invalidPost = { id: 'not-a-number', /* ... */ }
+  expect(() => decodeOrThrow(RawPostCodec, invalidPost, 'test')).toThrow()
+})
+```
+
 ### Debugging
 
 For debugging during development:
