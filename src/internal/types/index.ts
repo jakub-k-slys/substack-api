@@ -50,4 +50,3 @@ export type {
   SubstackTrackingParameters,
   SubstackProfileItemContext
 } from './common'
-
