@@ -15,6 +15,15 @@ export type {
   SubstackSubscriptionsResponse
 } from './api-responses'
 
+// Export io-ts codecs for runtime validation
+export {
+  SubstackPublicationCodec,
+  SubstackPostCodec,
+  SubstackCommentCodec,
+  SubstackCommentResponseCodec,
+  SubstackSearchResultCodec
+} from './api-responses'
+
 export type { NoteBodyJson, PublishNoteRequest, PublishNoteResponse } from './note-api'
 
 export type {
