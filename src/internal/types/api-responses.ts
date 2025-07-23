@@ -53,7 +53,7 @@ export type SubstackPost = t.TypeOf<typeof SubstackPostCodec>
 /**
  * Raw API response shape for full posts from /posts/by-id/:id endpoint
  * Includes body_html and additional fields not present in preview responses
- * 
+ *
  * Key differences from SubstackPostCodec:
  * - body_html is required (contains full HTML content)
  * - Includes postTags, reactions, restacks, and publication fields
