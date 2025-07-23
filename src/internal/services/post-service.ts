@@ -1,5 +1,5 @@
-import type { SubstackPost } from '../types'
-import { SubstackPostCodec } from '../types'
+import type { SubstackPost, SubstackFullPost } from '../types'
+import { SubstackPostCodec, SubstackFullPostCodec } from '../types'
 import { decodeOrThrow } from '../validation'
 import type { HttpClient } from '../http-client'
 
@@ -16,15 +16,19 @@ export class PostService {
   /**
    * Get a post by ID from the API
    * @param id - The post ID
-   * @returns Promise<SubstackPost> - Raw post data from API (validated)
+   * @returns Promise<SubstackFullPost> - Raw full post data from API (validated)
    * @throws {Error} When post is not found, API request fails, or validation fails
+   * 
+   * Note: Uses SubstackFullPostCodec to validate the full post response from /posts/by-id/:id
+   * which includes body_html, postTags, reactions, and other fields not present in preview responses.
+   * This codec is specifically designed for FullPost construction.
    */
-  async getPostById(id: number): Promise<SubstackPost> {
+  async getPostById(id: number): Promise<SubstackFullPost> {
     // Post lookup by ID must use the global substack.com endpoint, not publication-specific hostnames
     const rawResponse = await this.globalHttpClient.get<unknown>(`/api/v1/posts/by-id/${id}`)
 
-    // Validate the response with io-ts before returning
-    return decodeOrThrow(SubstackPostCodec, rawResponse, 'Post response')
+    // Validate the response with SubstackFullPostCodec for full post data including body_html
+    return decodeOrThrow(SubstackFullPostCodec, rawResponse, 'Full post response')
   }
 
   /**

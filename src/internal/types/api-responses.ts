@@ -51,6 +51,49 @@ export const SubstackPostCodec = t.intersection([
 export type SubstackPost = t.TypeOf<typeof SubstackPostCodec>
 
 /**
+ * Raw API response shape for full posts from /posts/by-id/:id endpoint
+ * Includes body_html and additional fields not present in preview responses
+ * 
+ * Key differences from SubstackPostCodec:
+ * - body_html is required (contains full HTML content)
+ * - Includes postTags, reactions, restacks, and publication fields
+ * - Used specifically for FullPost construction via getPostById()
+ * - SubstackPostCodec should be used for preview/list responses
+ */
+export const SubstackFullPostCodec = t.intersection([
+  t.type({
+    id: t.number,
+    title: t.string,
+    slug: t.string,
+    post_date: t.string,
+    canonical_url: t.string,
+    type: t.union([t.literal('newsletter'), t.literal('podcast'), t.literal('thread')]),
+    body_html: t.string
+  }),
+  t.partial({
+    subtitle: t.string,
+    description: t.string,
+    audience: t.string,
+    cover_image: t.string,
+    podcast_url: t.string,
+    published: t.boolean,
+    paywalled: t.boolean,
+    truncated_body_text: t.string,
+    htmlBody: t.string, // Legacy field for backward compatibility
+    postTags: t.array(t.string),
+    reactions: t.record(t.string, t.number),
+    restacks: t.number,
+    publication: t.type({
+      id: t.number,
+      name: t.string,
+      subdomain: t.string
+    })
+  })
+])
+
+export type SubstackFullPost = t.TypeOf<typeof SubstackFullPostCodec>
+
+/**
  * Raw API response shape for comments - flattened
  */
 export const SubstackCommentCodec = t.intersection([

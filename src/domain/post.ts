@@ -1,4 +1,4 @@
-import type { SubstackPost } from '../internal'
+import type { SubstackPost, SubstackFullPost } from '../internal'
 import type { HttpClient } from '../internal/http-client'
 import type { CommentService, PostService } from '../internal/services'
 import { Comment } from './comment'
@@ -102,12 +102,13 @@ export class FullPost extends PreviewPost {
   public readonly htmlBody: string
 
   constructor(
-    rawData: SubstackPost,
+    rawData: SubstackFullPost,
     client: HttpClient,
     commentService: CommentService,
     postService: PostService
   ) {
     super(rawData, client, commentService, postService)
-    this.htmlBody = rawData.htmlBody || ''
+    // Prefer body_html from the full post response, fall back to htmlBody for backward compatibility
+    this.htmlBody = rawData.body_html || rawData.htmlBody || ''
   }
 }

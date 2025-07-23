@@ -26,7 +26,8 @@ describe('SubstackClient - Global Post Endpoint', () => {
         slug: 'test-post',
         post_date: '2023-01-01T00:00:00Z',
         canonical_url: 'https://example.com/post',
-        type: 'newsletter' as const
+        type: 'newsletter' as const,
+        body_html: '<p>Test post body content</p>'
       }
 
       // Mock successful response
@@ -62,7 +63,8 @@ describe('SubstackClient - Global Post Endpoint', () => {
         slug: 'another-test-post',
         post_date: '2023-01-01T00:00:00Z',
         canonical_url: 'https://example.com/post',
-        type: 'newsletter' as const
+        type: 'newsletter' as const,
+        body_html: '<p>Another test post body content</p>'
       }
 
       mockFetch.mockResolvedValueOnce({
@@ -90,7 +92,8 @@ describe('SubstackClient - Global Post Endpoint', () => {
         slug: 'auth-test-post',
         post_date: '2023-01-01T00:00:00Z',
         canonical_url: 'https://example.com/post',
-        type: 'newsletter' as const
+        type: 'newsletter' as const,
+        body_html: '<p>Auth test post body content</p>'
       }
 
       mockFetch.mockResolvedValueOnce({

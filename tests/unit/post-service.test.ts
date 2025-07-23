@@ -1,6 +1,6 @@
 import { PostService } from '../../src/internal/services/post-service'
 import { HttpClient } from '../../src/internal/http-client'
-import type { SubstackPost } from '../../src/internal'
+import type { SubstackFullPost } from '../../src/internal'
 
 // Mock the http client
 jest.mock('../../src/internal/http-client')
@@ -30,13 +30,14 @@ describe('PostService', () => {
 
   describe('getPostById', () => {
     it('should return post data from the global HTTP client', async () => {
-      const mockPost: SubstackPost = {
+      const mockPost: SubstackFullPost = {
         id: 123,
         title: 'Test Post',
         slug: 'test-post',
         post_date: '2023-01-01T00:00:00Z',
         canonical_url: 'https://example.com/post',
-        type: 'newsletter'
+        type: 'newsletter',
+        body_html: '<p>Test post body content</p>'
       }
 
       mockGlobalHttpClient.get.mockResolvedValueOnce(mockPost)
@@ -56,13 +57,14 @@ describe('PostService', () => {
     })
 
     it('should use global HTTP client instead of publication-specific client', async () => {
-      const mockPost: SubstackPost = {
+      const mockPost: SubstackFullPost = {
         id: 456,
         title: 'Another Test Post',
         slug: 'another-test-post',
         post_date: '2023-02-01T00:00:00Z',
         canonical_url: 'https://example.com/another-post',
-        type: 'podcast'
+        type: 'podcast',
+        body_html: '<p>Another test post body content</p>'
       }
 
       mockGlobalHttpClient.get.mockResolvedValueOnce(mockPost)
