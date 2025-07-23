@@ -1,5 +1,5 @@
 import { SubstackClient } from '../../src/substack-client'
-import { Profile, OwnProfile, Comment } from '../../src/domain'
+import { Profile, OwnProfile, Comment, FullPost } from '../../src/domain'
 import { get } from 'http'
 
 describe('SubstackClient Integration Tests', () => {
@@ -14,7 +14,8 @@ describe('SubstackClient Integration Tests', () => {
     client = new SubstackClient({
       hostname: hostname,
       apiKey: 'test-key',
-      protocol: 'http' // Use HTTP for local test server
+      protocol: 'http', // Use HTTP for local test server
+      substackBaseUrl: global.INTEGRATION_SERVER.url // Configure global client to use mock server too
     })
   })
 
@@ -187,6 +188,64 @@ describe('SubstackClient Integration Tests', () => {
     describe('postForId', () => {
       test('should handle non-existent post ID', async () => {
         await expect(client.postForId(999999999)).rejects.toThrow()
+      })
+
+      test('should retrieve full post by ID with sample data', async () => {
+        // Test with a real post ID - we have sample data for this
+        const postId = 167180194
+
+        const post = await client.postForId(postId)
+        expect(post).toBeInstanceOf(FullPost)
+        expect(post.id).toBe(postId)
+        expect(post.title).toBe('Week of June 24, 2025: Build SaaS Without Code')
+        expect(post.subtitle).toBe('The New Blueprint for Solopreneurs')
+        expect(post.htmlBody).toContain('<div class="captioned-image-container">')
+        expect(post.htmlBody).toContain('content shatters the myth')
+        expect(post.createdAt).toBeInstanceOf(Date)
+        expect(post.slug).toBe('week-of-june-24-2025-build-saas-without')
+
+        // Verify full post specific fields
+        expect(post.reactions).toEqual({ '❤': 4 })
+        expect(post.restacks).toBe(1)
+        expect(post.postTags).toEqual([
+          'tldr',
+          'workflows',
+          'content',
+          'digest',
+          'solopreneur',
+          'entrepreneur',
+          'agency'
+        ])
+        expect(post.coverImage).toContain('substack-post-media.s3.amazonaws.com')
+      })
+
+      test('should handle full post workflow with all expected properties', async () => {
+        const postId = 167180194
+
+        const post = await client.postForId(postId)
+
+        // Verify it's a FullPost instance
+        expect(post).toBeInstanceOf(FullPost)
+
+        // Verify core post properties
+        expect(post.id).toBe(postId)
+        expect(typeof post.title).toBe('string')
+        expect(post.title).toBeTruthy()
+        expect(typeof post.htmlBody).toBe('string')
+        expect(post.htmlBody).toBeTruthy()
+        expect(post.createdAt).toBeInstanceOf(Date)
+
+        // Verify full post specific properties
+        expect(typeof post.reactions).toBe('object')
+        expect(typeof post.restacks).toBe('number')
+        expect(Array.isArray(post.postTags)).toBe(true)
+        expect(typeof post.coverImage).toBe('string')
+        expect(post.coverImage).toBeTruthy()
+
+        // Verify methods are available
+        expect(typeof post.comments).toBe('function')
+
+        console.log(`✅ Full post workflow validated for "${post.title}" (ID: ${post.id})`)
       })
     })
 

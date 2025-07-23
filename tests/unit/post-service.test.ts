@@ -40,7 +40,7 @@ describe('PostService', () => {
         body_html: '<p>Test post body content</p>'
       }
 
-      mockGlobalHttpClient.get.mockResolvedValueOnce(mockPost)
+      mockGlobalHttpClient.get.mockResolvedValueOnce({ post: mockPost })
 
       const result = await postService.getPostById(123)
 
@@ -67,7 +67,7 @@ describe('PostService', () => {
         body_html: '<p>Another test post body content</p>'
       }
 
-      mockGlobalHttpClient.get.mockResolvedValueOnce(mockPost)
+      mockGlobalHttpClient.get.mockResolvedValueOnce({ post: mockPost })
 
       await postService.getPostById(456)
 

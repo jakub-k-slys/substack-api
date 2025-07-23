@@ -33,7 +33,7 @@ describe('SubstackClient - Global Post Endpoint', () => {
       // Mock successful response
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockPost,
+        json: async () => ({ post: mockPost }),
         status: 200,
         statusText: 'OK'
       } as Response)
@@ -69,7 +69,7 @@ describe('SubstackClient - Global Post Endpoint', () => {
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockPost,
+        json: async () => ({ post: mockPost }),
         status: 200,
         statusText: 'OK'
       } as Response)
@@ -98,7 +98,7 @@ describe('SubstackClient - Global Post Endpoint', () => {
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockPost,
+        json: async () => ({ post: mockPost }),
         status: 200,
         statusText: 'OK'
       } as Response)

@@ -100,6 +100,12 @@ export class PreviewPost {
  */
 export class FullPost extends PreviewPost {
   public readonly htmlBody: string
+  public readonly slug: string
+  public readonly createdAt: Date
+  public readonly reactions?: Record<string, number>
+  public readonly restacks?: number
+  public readonly postTags?: string[]
+  public readonly coverImage?: string
 
   constructor(
     rawData: SubstackFullPost,
@@ -110,5 +116,11 @@ export class FullPost extends PreviewPost {
     super(rawData, client, commentService, postService)
     // Prefer body_html from the full post response, fall back to htmlBody for backward compatibility
     this.htmlBody = rawData.body_html || rawData.htmlBody || ''
+    this.slug = rawData.slug
+    this.createdAt = new Date(rawData.post_date)
+    this.reactions = rawData.reactions
+    this.restacks = rawData.restacks
+    this.postTags = rawData.postTags
+    this.coverImage = rawData.cover_image
   }
 }
