@@ -1,5 +1,5 @@
-import type { SubstackPost } from '../types'
-import { SubstackPostCodec } from '../types'
+import type { SubstackPost, SubstackFullPost } from '../types'
+import { SubstackPostCodec, SubstackFullPostCodec } from '../types'
 import { decodeOrThrow } from '../validation'
 import type { HttpClient } from '../http-client'
 
@@ -16,15 +16,43 @@ export class PostService {
   /**
    * Get a post by ID from the API
    * @param id - The post ID
-   * @returns Promise<SubstackPost> - Raw post data from API (validated)
+   * @returns Promise<SubstackFullPost> - Raw full post data from API (validated)
    * @throws {Error} When post is not found, API request fails, or validation fails
+   *
+   * Note: Uses SubstackFullPostCodec to validate the full post response from /posts/by-id/:id
+   * which includes body_html, postTags, reactions, and other fields not present in preview responses.
+   * This codec is specifically designed for FullPost construction.
    */
-  async getPostById(id: number): Promise<SubstackPost> {
+  async getPostById(id: number): Promise<SubstackFullPost> {
     // Post lookup by ID must use the global substack.com endpoint, not publication-specific hostnames
-    const rawResponse = await this.globalHttpClient.get<unknown>(`/api/v1/posts/by-id/${id}`)
+    const rawResponse = await this.globalHttpClient.get<{ post: unknown }>(
+      `/api/v1/posts/by-id/${id}`
+    )
 
-    // Validate the response with io-ts before returning
-    return decodeOrThrow(SubstackPostCodec, rawResponse, 'Post response')
+    // Extract the post data from the wrapper object
+    if (!rawResponse.post) {
+      throw new Error('Invalid response format: missing post data')
+    }
+
+    // Transform the raw post data to match our codec expectations
+    const postData = this.transformPostData(rawResponse.post as any)
+
+    // Validate the response with SubstackFullPostCodec for full post data including body_html
+    return decodeOrThrow(SubstackFullPostCodec, postData, 'Full post response')
+  }
+
+  /**
+   * Transform raw API post data to match our codec structure
+   */
+  private transformPostData(rawPost: any): any {
+    const transformedPost = { ...rawPost }
+
+    // Transform postTags from objects to string array
+    if (rawPost.postTags && Array.isArray(rawPost.postTags)) {
+      transformedPost.postTags = rawPost.postTags.map((tag: any) => tag.name || tag)
+    }
+
+    return transformedPost
   }
 
   /**

@@ -6,6 +6,7 @@
 export type {
   SubstackPublication,
   SubstackPost,
+  SubstackFullPost,
   SubstackComment,
   SubstackCommentResponse,
   SubstackSearchResult,
@@ -19,6 +20,7 @@ export type {
 export {
   SubstackPublicationCodec,
   SubstackPostCodec,
+  SubstackFullPostCodec,
   SubstackCommentCodec,
   SubstackCommentResponseCodec,
   SubstackSearchResultCodec

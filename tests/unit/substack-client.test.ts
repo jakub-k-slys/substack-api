@@ -330,7 +330,8 @@ describe('SubstackClient', () => {
         slug: 'test-post',
         post_date: '2023-01-01T00:00:00Z',
         canonical_url: 'https://example.com/post',
-        type: 'newsletter' as const
+        type: 'newsletter' as const,
+        body_html: '<p>Test post body content</p>'
       }
 
       // Mock the PostService's getPostById method

@@ -205,6 +205,49 @@ async function runExample(): Promise<void> {
       console.log(`   ⚠️  Could not fetch posts: ${(error as Error).message}`)
     }
 
+    // 8. Fetching a full post by ID
+    console.log('\n📄 Fetching a specific full post by ID...')
+    try {
+      const postId = 167180194 // Real post ID from sample data
+      const fullPost = await client.postForId(postId)
+      
+      console.log(`📋 Full Post Information:`)
+      console.log(`   Title: "${fullPost.title}"`)
+      console.log(`   Subtitle: "${fullPost.subtitle}"`)
+      console.log(`   Slug: ${fullPost.slug}`)
+      console.log(`   Published: ${fullPost.publishedAt.toLocaleDateString()}`)
+      console.log(`   Created: ${fullPost.createdAt.toLocaleDateString()}`)
+      
+      if (fullPost.htmlBody) {
+        const htmlPreview = fullPost.htmlBody.length > 200 ? 
+          fullPost.htmlBody.substring(0, 197) + '...' : 
+          fullPost.htmlBody
+        console.log(`   HTML Content: ${htmlPreview}`)
+      }
+      
+      if (fullPost.postTags && fullPost.postTags.length > 0) {
+        console.log(`   Tags: [${fullPost.postTags.join(', ')}]`)
+      }
+      
+      if (fullPost.reactions && Object.keys(fullPost.reactions).length > 0) {
+        const reactionsStr = Object.entries(fullPost.reactions)
+          .map(([emoji, count]) => `${emoji}: ${count}`)
+          .join(', ')
+        console.log(`   Reactions: {${reactionsStr}}`)
+      }
+      
+      if (fullPost.restacks !== undefined) {
+        console.log(`   Restacks: ${fullPost.restacks}`)
+      }
+      
+      if (fullPost.coverImage) {
+        console.log(`   Cover Image: ${fullPost.coverImage}`)
+      }
+      
+    } catch (error) {
+      console.log(`   ⚠️  Could not fetch full post: ${(error as Error).message}`)
+    }
+
     console.log('\n✨ Example completed successfully!')
     console.log('💡 This example demonstrates basic Substack API usage.')
     console.log('   For more advanced features, check out the full documentation.')

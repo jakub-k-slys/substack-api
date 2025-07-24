@@ -4,6 +4,7 @@
 
 import {
   SubstackPostCodec,
+  SubstackFullPostCodec,
   SubstackCommentCodec,
   SubstackCommentResponseCodec
 } from '../../src/internal/types'
@@ -87,6 +88,176 @@ describe('io-ts validation codecs', () => {
       }
 
       const result = decodeEither(SubstackPostCodec, invalidTypePost)
+      expect(isLeft(result)).toBe(true)
+    })
+  })
+
+  describe('SubstackFullPostCodec', () => {
+    it('should validate valid full post data with required body_html', () => {
+      const validFullPost = {
+        id: 123,
+        title: 'Test Full Post',
+        slug: 'test-full-post',
+        post_date: '2023-01-01T00:00:00Z',
+        canonical_url: 'https://example.substack.com/p/test-full-post',
+        type: 'newsletter' as const,
+        body_html: '<p>This is the full HTML body content</p>',
+        subtitle: 'A test full post',
+        description: 'Full post description',
+        audience: 'everyone',
+        cover_image: 'https://example.com/image.jpg',
+        published: true,
+        paywalled: false,
+        truncated_body_text: 'This is a test...',
+        htmlBody: '<p>Legacy HTML body</p>',
+        postTags: ['tech', 'newsletter'],
+        reactions: { '❤️': 10, '👍': 5, '👎': 1 },
+        restacks: 3,
+        publication: {
+          id: 456,
+          name: 'Test Publication',
+          subdomain: 'testpub'
+        }
+      }
+
+      const result = decodeEither(SubstackFullPostCodec, validFullPost)
+      expect(isRight(result)).toBe(true)
+
+      const decoded = decodeOrThrow(SubstackFullPostCodec, validFullPost, 'test full post')
+      expect(decoded.id).toBe(123)
+      expect(decoded.title).toBe('Test Full Post')
+      expect(decoded.type).toBe('newsletter')
+      expect(decoded.body_html).toBe('<p>This is the full HTML body content</p>')
+      expect(decoded.postTags).toEqual(['tech', 'newsletter'])
+      expect(decoded.reactions).toEqual({ '❤️': 10, '👍': 5, '👎': 1 })
+      expect(decoded.restacks).toBe(3)
+      expect(decoded.publication?.name).toBe('Test Publication')
+    })
+
+    it('should validate minimal full post data with only required fields', () => {
+      const minimalFullPost = {
+        id: 456,
+        title: 'Minimal Full Post',
+        slug: 'minimal-full-post',
+        post_date: '2023-01-01T00:00:00Z',
+        canonical_url: 'https://example.substack.com/p/minimal-full-post',
+        type: 'podcast' as const,
+        body_html: '<p>Required HTML body content</p>'
+      }
+
+      const result = decodeEither(SubstackFullPostCodec, minimalFullPost)
+      expect(isRight(result)).toBe(true)
+
+      const decoded = decodeOrThrow(SubstackFullPostCodec, minimalFullPost, 'minimal full post')
+      expect(decoded.id).toBe(456)
+      expect(decoded.body_html).toBe('<p>Required HTML body content</p>')
+      expect(decoded.subtitle).toBeUndefined()
+      expect(decoded.postTags).toBeUndefined()
+      expect(decoded.reactions).toBeUndefined()
+      expect(decoded.publication).toBeUndefined()
+    })
+
+    it('should reject full post data missing required body_html', () => {
+      const invalidFullPost = {
+        id: 123,
+        title: 'Test Post',
+        slug: 'test-post',
+        post_date: '2023-01-01T00:00:00Z',
+        canonical_url: 'https://example.substack.com/p/test-post',
+        type: 'newsletter'
+        // Missing required body_html field
+      }
+
+      const result = decodeEither(SubstackFullPostCodec, invalidFullPost)
+      expect(isLeft(result)).toBe(true)
+
+      expect(() => {
+        decodeOrThrow(SubstackFullPostCodec, invalidFullPost, 'test full post')
+      }).toThrow('Invalid test full post')
+    })
+
+    it('should reject full post with invalid postTags type', () => {
+      const invalidFullPost = {
+        id: 123,
+        title: 'Test Post',
+        slug: 'test-post',
+        post_date: '2023-01-01T00:00:00Z',
+        canonical_url: 'https://example.substack.com/p/test-post',
+        type: 'newsletter',
+        body_html: '<p>Valid body content</p>',
+        postTags: 'invalid-tags' // Should be array of strings
+      }
+
+      const result = decodeEither(SubstackFullPostCodec, invalidFullPost)
+      expect(isLeft(result)).toBe(true)
+    })
+
+    it('should reject full post with invalid reactions type', () => {
+      const invalidFullPost = {
+        id: 123,
+        title: 'Test Post',
+        slug: 'test-post',
+        post_date: '2023-01-01T00:00:00Z',
+        canonical_url: 'https://example.substack.com/p/test-post',
+        type: 'newsletter',
+        body_html: '<p>Valid body content</p>',
+        reactions: ['invalid'] // Should be record of string to number
+      }
+
+      const result = decodeEither(SubstackFullPostCodec, invalidFullPost)
+      expect(isLeft(result)).toBe(true)
+    })
+
+    it('should reject full post with invalid publication structure', () => {
+      const invalidFullPost = {
+        id: 123,
+        title: 'Test Post',
+        slug: 'test-post',
+        post_date: '2023-01-01T00:00:00Z',
+        canonical_url: 'https://example.substack.com/p/test-post',
+        type: 'newsletter',
+        body_html: '<p>Valid body content</p>',
+        publication: {
+          id: 'not-a-number', // Should be number
+          name: 'Test Publication',
+          subdomain: 'testpub'
+        }
+      }
+
+      const result = decodeEither(SubstackFullPostCodec, invalidFullPost)
+      expect(isLeft(result)).toBe(true)
+    })
+
+    it('should handle thread type posts', () => {
+      const threadPost = {
+        id: 789,
+        title: 'Test Thread',
+        slug: 'test-thread',
+        post_date: '2023-01-01T00:00:00Z',
+        canonical_url: 'https://example.substack.com/p/test-thread',
+        type: 'thread' as const,
+        body_html: '<p>Thread content</p>'
+      }
+
+      const result = decodeEither(SubstackFullPostCodec, threadPost)
+      expect(isRight(result)).toBe(true)
+
+      const decoded = decodeOrThrow(SubstackFullPostCodec, threadPost, 'thread post')
+      expect(decoded.type).toBe('thread')
+    })
+
+    it('should reject invalid post type', () => {
+      const invalidTypePost = {
+        id: 123,
+        title: 'Test Post',
+        slug: 'test-post',
+        post_date: '2023-01-01T00:00:00Z',
+        canonical_url: 'https://example.substack.com/p/test-post',
+        type: 'invalid-type', // Invalid type
+        body_html: '<p>Valid body content</p>'
+      }
+
+      const result = decodeEither(SubstackFullPostCodec, invalidTypePost)
       expect(isLeft(result)).toBe(true)
     })
   })

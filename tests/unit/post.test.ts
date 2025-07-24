@@ -202,7 +202,8 @@ describe('PreviewPost Entity', () => {
         subtitle: 'Test subtitle',
         description: 'Test description',
         truncated_body_text: 'Truncated content',
-        htmlBody: '<p>Full HTML content</p>'
+        body_html: '<p>Full HTML content</p>',
+        htmlBody: '<p>Full HTML content</p>' // For backward compatibility
       }
 
       mockPostService.getPostById.mockResolvedValue(mockFullPostData)
@@ -257,7 +258,8 @@ describe('FullPost Entity', () => {
       subtitle: 'Full test subtitle',
       description: 'Full test description',
       truncated_body_text: 'Truncated content',
-      htmlBody: '<p>Full HTML content with <strong>formatting</strong></p>'
+      body_html: '<p>Full HTML content with <strong>formatting</strong></p>',
+      htmlBody: '<p>Full HTML content with <strong>formatting</strong></p>' // For backward compatibility
     }
 
     fullPost = new FullPost(mockFullPostData, mockHttpClient, mockCommentService, mockPostService)
@@ -284,7 +286,8 @@ describe('FullPost Entity', () => {
         slug: 'test-post',
         post_date: '2023-01-01T00:00:00Z',
         canonical_url: 'https://example.com/post',
-        type: 'newsletter' as const
+        type: 'newsletter' as const,
+        body_html: '<p>Body from body_html field</p>' // body_html is required, but htmlBody is optional
       }
 
       const postWithoutHtmlBody = new FullPost(
@@ -294,7 +297,7 @@ describe('FullPost Entity', () => {
         mockPostService
       )
 
-      expect(postWithoutHtmlBody.htmlBody).toBe('')
+      expect(postWithoutHtmlBody.htmlBody).toBe('<p>Body from body_html field</p>')
     })
   })
 

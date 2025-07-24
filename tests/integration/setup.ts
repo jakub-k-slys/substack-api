@@ -149,7 +149,8 @@ function mapUrlToSampleFile(url: string): string | null {
     'api/v1/reader/feed/profile/282291554': 'reader/feed/profile/282291554',
     'api/v1/profile/posts': 'profile/posts?profile_user_id=27968736&limit=50',
     'api/v1/feed/following': 'feed/following',
-    'api/v1/reader/comment/131648795': 'reader/comment/131648795'
+    'api/v1/reader/comment/131648795': 'reader/comment/131648795',
+    'api/v1/posts/by-id/167180194': 'posts/by-id/167180194'
   }
 
   const sampleFile = mappings[cleanUrl]
