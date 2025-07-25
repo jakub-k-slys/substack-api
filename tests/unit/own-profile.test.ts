@@ -121,11 +121,6 @@ describe('OwnProfile Entity', () => {
     expect(builder).toBeInstanceOf(NoteBuilder)
   })
 
-  it('should create a note builder with initial text', () => {
-    const builder = ownProfile.newNote('Initial text')
-    expect(builder).toBeInstanceOf(NoteBuilder)
-  })
-
   it('should iterate through followees using correct endpoint chain', async () => {
     // Mock the response from /api/v1/feed/following (returns array of user IDs)
     const mockFollowingIds = [1, 2]

@@ -2,7 +2,7 @@ import { NoteBuilder, ParagraphBuilder } from '../../src/note-builder'
 import type { HttpClient } from '../../src/internal/http-client'
 import type { PublishNoteResponse } from '../../src/internal'
 
-describe('NoteBuilder', () => {
+describe('NoteBuilder (Legacy Test Suite)', () => {
   let mockHttpClient: jest.Mocked<HttpClient>
   let mockPublishResponse: PublishNoteResponse
 
@@ -50,21 +50,16 @@ describe('NoteBuilder', () => {
   })
 
   describe('Constructor', () => {
-    it('should create empty note builder', () => {
+    it('should create empty post builder', () => {
       const builder = new NoteBuilder(mockHttpClient)
-      expect(builder).toBeInstanceOf(NoteBuilder)
-    })
-
-    it('should create note builder with initial text', () => {
-      const builder = new NoteBuilder(mockHttpClient, 'Initial text')
       expect(builder).toBeInstanceOf(NoteBuilder)
     })
   })
 
   describe('Simple use case', () => {
     it('should create note with simple text and publish', async () => {
-      const builder = new NoteBuilder(mockHttpClient, 'my test text')
-      const result = await builder.publish()
+      const builder = new NoteBuilder(mockHttpClient)
+      const result = await builder.newNode().paragraph().text('my test text').publish()
 
       expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/comment/feed', {
         bodyJson: {
@@ -93,7 +88,14 @@ describe('NoteBuilder', () => {
   describe('Two paragraphs', () => {
     it('should create note with two simple paragraphs', async () => {
       const builder = new NoteBuilder(mockHttpClient)
-      const result = await builder.paragraph('my test text1').paragraph('my test text2').publish()
+      const result = await builder
+        .newNode()
+        .paragraph()
+        .text('my test text1')
+        .newNode()
+        .paragraph()
+        .text('my test text2')
+        .publish()
 
       expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/comment/feed', {
         bodyJson: {
@@ -132,11 +134,14 @@ describe('NoteBuilder', () => {
     it('should create note with rich formatting', async () => {
       const builder = new NoteBuilder(mockHttpClient)
       const result = await builder
+        .newNode()
         .paragraph()
         .text('adasd')
         .bold('this is bold')
         .text('regular again')
-        .paragraph('my test text2')
+        .newNode()
+        .paragraph()
+        .text('my test text2')
         .publish()
 
       expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/comment/feed', {
@@ -185,10 +190,12 @@ describe('NoteBuilder', () => {
     it('should create note with multiple rich paragraphs', async () => {
       const builder = new NoteBuilder(mockHttpClient)
       const result = await builder
+        .newNode()
         .paragraph()
         .text('adasd')
         .bold('this is bold')
         .text('regular again')
+        .newNode()
         .paragraph()
         .text('adasd')
         .italic('this is italic')
@@ -250,6 +257,7 @@ describe('NoteBuilder', () => {
     it('should support code formatting in paragraphs', async () => {
       const builder = new NoteBuilder(mockHttpClient)
       const result = await builder
+        .newNode()
         .paragraph()
         .text('Here is some ')
         .code('code()')
@@ -293,6 +301,7 @@ describe('NoteBuilder', () => {
     it('should support all formatting types in one paragraph', async () => {
       const builder = new NoteBuilder(mockHttpClient)
       const result = await builder
+        .newNode()
         .paragraph()
         .text('Plain text, ')
         .bold('bold text, ')
@@ -342,16 +351,19 @@ describe('NoteBuilder', () => {
   describe('ParagraphBuilder', () => {
     it('should return ParagraphBuilder instance for rich formatting', () => {
       const builder = new NoteBuilder(mockHttpClient)
-      const paragraphBuilder = builder.paragraph()
+      const paragraphBuilder = builder.newNode().paragraph()
       expect(paragraphBuilder).toBeInstanceOf(ParagraphBuilder)
     })
 
-    it('should allow chaining from paragraph builder back to note builder', async () => {
+    it('should allow chaining from paragraph builder to new node', async () => {
       const builder = new NoteBuilder(mockHttpClient)
       const result = await builder
+        .newNode()
         .paragraph()
         .text('First paragraph')
-        .paragraph('Second paragraph')
+        .newNode()
+        .paragraph()
+        .text('Second paragraph')
         .publish()
 
       expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/comment/feed', {
@@ -388,7 +400,7 @@ describe('NoteBuilder', () => {
 
     it('should publish directly from paragraph builder', async () => {
       const builder = new NoteBuilder(mockHttpClient)
-      const result = await builder.paragraph().text('Only paragraph').publish()
+      const result = await builder.newNode().paragraph().text('Only paragraph').publish()
 
       expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/comment/feed', {
         bodyJson: {
@@ -415,21 +427,9 @@ describe('NoteBuilder', () => {
   })
 
   describe('Empty content handling', () => {
-    it('should handle empty note builder', async () => {
+    it('should throw error when trying to publish empty note', () => {
       const builder = new NoteBuilder(mockHttpClient)
-      const result = await builder.publish()
-
-      expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/comment/feed', {
-        bodyJson: {
-          type: 'doc',
-          attrs: { schemaVersion: 'v1' },
-          content: []
-        },
-        tabId: 'for-you',
-        surface: 'feed',
-        replyMinimumRole: 'everyone'
-      })
-      expect(result).toBe(mockPublishResponse)
+      expect(() => builder.build()).toThrow('Note must contain at least one paragraph')
     })
   })
 })
