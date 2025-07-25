@@ -431,5 +431,10 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
       const builder = new NoteBuilder(mockHttpClient)
       expect(() => builder.build()).toThrow('Note must contain at least one paragraph')
     })
+
+    it('should throw error when trying to publish without a paragraph', async () => {
+      const builder = new NoteBuilder(mockHttpClient)
+      await expect(builder.publish()).rejects.toThrow('Note must contain at least one paragraph')
+    })
   })
 })
