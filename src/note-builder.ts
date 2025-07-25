@@ -140,7 +140,7 @@ export class ParagraphBuilder {
   private segments: TextSegment[] = []
   private lists: List[] = []
 
-  constructor(private readonly noteBuilder: PostBuilder) {}
+  constructor(private readonly noteBuilder: NoteBuilder) {}
 
   /**
    * Add plain text to the current paragraph
@@ -212,7 +212,7 @@ export class ParagraphBuilder {
   }
 
   /**
-   * Get the current paragraph content (used by PostBuilder)
+   * Get the current paragraph content (used by NoteBuilder)
    */
   getParagraphContent(): { segments: TextSegment[]; lists: List[] } {
     return { segments: this.segments, lists: this.lists }
@@ -250,7 +250,7 @@ export class ParagraphBuilder {
  * Restricted builder returned by newNode() that requires calling paragraph() next
  */
 export class NodeBuilder {
-  constructor(private readonly noteBuilder: PostBuilder) {}
+  constructor(private readonly noteBuilder: NoteBuilder) {}
 
   /**
    * Start a paragraph - required after newNode()
@@ -260,7 +260,7 @@ export class NodeBuilder {
   }
 }
 
-export class PostBuilder {
+export class NoteBuilder {
   private paragraphs: Array<{ segments: TextSegment[]; lists: List[] }> = []
 
   constructor(private readonly client: HttpClient) {
