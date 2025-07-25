@@ -70,7 +70,7 @@ console.log(`Welcome ${myProfile.name}! (@${myProfile.slug})`);
 console.log(`Followers: ${myProfile.followerCount}`);
 
 // Create content using builder pattern
-const note = await myProfile.newNote().newNode().paragraph().text('Just published something amazing! 🚀').publish();
+const note = await myProfile.newNote().paragraph().text('Just published something amazing! 🚀').publish();
 console.log(`Note created: ${note.id}`);
 ```
 
@@ -297,15 +297,13 @@ Create a new note using the builder pattern (recommended approach).
 **Example:**
 ```typescript
 // Simple note
-const note = await myProfile.newNote().newNode().paragraph().text('Just shipped a new feature! 🚀').publish();
+const note = await myProfile.newNote().paragraph().text('Just shipped a new feature! 🚀').publish();
 
 // Complex note with formatting
 const complexNote = await myProfile
   .newNote()
-  .newNode()
   .paragraph()
   .text('Building something amazing...')
-  .newNode()
   .paragraph()
   .bold('Important update: ')
   .text('Check out our latest release!')
@@ -517,7 +515,7 @@ try {
   const profile = await client.ownProfile();
   
   // Try to create content using builder pattern
-  const note = await profile.newNote().newNode().paragraph().text('My first note! 🎉').publish();
+  const note = await profile.newNote().paragraph().text('My first note! 🎉').publish();
   
   console.log(`Note created: ${note.id}`);
 } catch (error) {

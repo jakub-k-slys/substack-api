@@ -1,10 +1,4 @@
-import {
-  NoteBuilder,
-  NodeBuilder,
-  ParagraphBuilder,
-  ListBuilder,
-  ListItemBuilder
-} from '../../src/note-builder'
+import { NoteBuilder, ParagraphBuilder, ListBuilder, ListItemBuilder } from '../../src/note-builder'
 import type { HttpClient } from '../../src/internal/http-client'
 import type { PublishNoteResponse } from '../../src/internal'
 
@@ -62,18 +56,18 @@ describe('NoteBuilder', () => {
     })
   })
 
-  describe('newNode() method', () => {
-    it('should return NodeBuilder instance', () => {
+  describe('paragraph() method', () => {
+    it('should return ParagraphBuilder instance', () => {
       const builder = new NoteBuilder(mockHttpClient)
-      const nodeBuilder = builder.newNode()
-      expect(nodeBuilder).toBeInstanceOf(NodeBuilder)
+      const paragraphBuilder = builder.paragraph()
+      expect(paragraphBuilder).toBeInstanceOf(ParagraphBuilder)
     })
   })
 
   describe('Basic paragraph creation', () => {
     it('should create note with simple text content', async () => {
       const builder = new NoteBuilder(mockHttpClient)
-      const result = await builder.newNode().paragraph().text('Hello world').build()
+      const result = await builder.paragraph().text('Hello world').build()
 
       expect(result).toEqual({
         bodyJson: {
@@ -100,7 +94,6 @@ describe('NoteBuilder', () => {
     it('should create note with mixed formatting', async () => {
       const builder = new NoteBuilder(mockHttpClient)
       const result = await builder
-        .newNode()
         .paragraph()
         .text('This is ')
         .bold('bold')
@@ -128,7 +121,6 @@ describe('NoteBuilder', () => {
     it('should support links', async () => {
       const builder = new NoteBuilder(mockHttpClient)
       const result = await builder
-        .newNode()
         .paragraph()
         .text('Visit ')
         .link('Google', 'https://google.com')
@@ -154,10 +146,8 @@ describe('NoteBuilder', () => {
     it('should create note with multiple paragraphs', async () => {
       const builder = new NoteBuilder(mockHttpClient)
       const result = await builder
-        .newNode()
         .paragraph()
         .text('First paragraph')
-        .newNode()
         .paragraph()
         .text('Second paragraph')
         .build()
@@ -178,7 +168,6 @@ describe('NoteBuilder', () => {
     it('should create bullet list', async () => {
       const builder = new NoteBuilder(mockHttpClient)
       const result = await builder
-        .newNode()
         .paragraph()
         .text('My list:')
         .bulletList()
@@ -222,7 +211,6 @@ describe('NoteBuilder', () => {
     it('should create numbered list', async () => {
       const builder = new NoteBuilder(mockHttpClient)
       const result = await builder
-        .newNode()
         .paragraph()
         .text('Steps:')
         .numberedList()
@@ -261,7 +249,6 @@ describe('NoteBuilder', () => {
     it('should support formatting in list items', async () => {
       const builder = new NoteBuilder(mockHttpClient)
       const result = await builder
-        .newNode()
         .paragraph()
         .text('List:')
         .bulletList()
@@ -312,12 +299,10 @@ describe('NoteBuilder', () => {
   describe('Builder types and scoping', () => {
     it('should return correct builder types', () => {
       const builder = new NoteBuilder(mockHttpClient)
-      const nodeBuilder = builder.newNode()
-      const paragraphBuilder = nodeBuilder.paragraph()
+      const paragraphBuilder = builder.paragraph()
       const listBuilder = paragraphBuilder.bulletList()
       const listItemBuilder = listBuilder.item()
 
-      expect(nodeBuilder).toBeInstanceOf(NodeBuilder)
       expect(paragraphBuilder).toBeInstanceOf(ParagraphBuilder)
       expect(listBuilder).toBeInstanceOf(ListBuilder)
       expect(listItemBuilder).toBeInstanceOf(ListItemBuilder)
@@ -327,7 +312,7 @@ describe('NoteBuilder', () => {
   describe('Publishing', () => {
     it('should publish note directly from paragraph builder', async () => {
       const builder = new NoteBuilder(mockHttpClient)
-      const result = await builder.newNode().paragraph().text('Test content').publish()
+      const result = await builder.paragraph().text('Test content').publish()
 
       expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/comment/feed', {
         bodyJson: {

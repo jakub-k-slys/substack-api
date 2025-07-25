@@ -155,27 +155,24 @@ Create short-form notes using the builder pattern (recommended approach):
 
 ```typescript
 // Simple note
-const note = await myProfile.newNote().newNode().paragraph().text('🚀 Just shipped a new feature! Excited to share what we\'ve been working on.').publish();
+const note = await myProfile.newNote().paragraph().text('🚀 Just shipped a new feature! Excited to share what we\'ve been working on.').publish();
 console.log(`Note published: ${note.id}`);
 
 // Complex note with formatting
 const formattedNote = await myProfile
   .newNote()
-  .newNode()
   .paragraph()
   .text('Great discussion with the community today!')
-  .newNode()
   .paragraph()
   .text('Key takeaways: ')
   .bold('engagement is everything')
-  .newNode()
   .paragraph()
   .text('Check out our latest updates at: ')
   .link('our blog', 'https://example.com')
   .publish();
 
 // Note with mentions or hashtags
-const socialNote = await myProfile.newNote().newNode().paragraph().text('Building the future of newsletters #substack #writing').publish();
+const socialNote = await myProfile.newNote().paragraph().text('Building the future of newsletters #substack #writing').publish();
 ```
 
 #### Following Management
