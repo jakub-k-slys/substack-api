@@ -1,6 +1,6 @@
 import { Profile } from './profile'
 import { Note } from './note'
-import { NoteBuilder } from '../note-builder'
+import { PostBuilder } from '../note-builder'
 import type { SubstackFullProfile } from '../internal'
 import type {
   ProfileService,
@@ -39,10 +39,8 @@ export class OwnProfile extends Profile {
   /**
    * Create a new note using the builder pattern
    */
-  newNote(): NoteBuilder
-  newNote(text: string): NoteBuilder
-  newNote(text?: string): NoteBuilder {
-    return new NoteBuilder(this.client, text)
+  newNote(): PostBuilder {
+    return new PostBuilder(this.client)
   }
 
   /**

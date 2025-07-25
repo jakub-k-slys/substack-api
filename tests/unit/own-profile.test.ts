@@ -1,7 +1,7 @@
 import { OwnProfile } from '../../src/domain/own-profile'
 import { Note } from '../../src/domain/note'
 import { Profile } from '../../src/domain/profile'
-import { NoteBuilder } from '../../src/note-builder'
+import { PostBuilder } from '../../src/note-builder'
 import {
   ProfileService,
   PostService,
@@ -118,12 +118,7 @@ describe('OwnProfile Entity', () => {
 
   it('should create a note builder without initial text', () => {
     const builder = ownProfile.newNote()
-    expect(builder).toBeInstanceOf(NoteBuilder)
-  })
-
-  it('should create a note builder with initial text', () => {
-    const builder = ownProfile.newNote('Initial text')
-    expect(builder).toBeInstanceOf(NoteBuilder)
+    expect(builder).toBeInstanceOf(PostBuilder)
   })
 
   it('should iterate through followees using correct endpoint chain', async () => {
