@@ -123,15 +123,20 @@ Create notes and manage content through your authenticated profile:
 const myProfile = await client.ownProfile();
 
 // Create a simple note using builder pattern
-const note = await myProfile.newNote('🚀 Just shipped a new feature! Excited to share what we\'ve been working on.').publish();
+const note = await myProfile.newNote().paragraph().text('🚀 Just shipped a new feature! Excited to share what we\'ve been working on.').publish();
 console.log(`Note published: ${note.id}`);
 
 // Create a complex note with formatting
 const formattedNote = await myProfile
   .newNote()
-  .addParagraph('Building something amazing...')
-  .addParagraph().bold('Key insight: ').text('User feedback drives everything')
-  .addParagraph().text('Read more: ').link('https://example.com', 'our latest update')
+  .paragraph()
+  .text('Building something amazing...')
+  .paragraph()
+  .bold('Key insight: ')
+  .text('User feedback drives everything')
+  .paragraph()
+  .text('Read more: ')
+  .link('our latest update', 'https://example.com')
   .publish();
 
 console.log(`Formatted note created: ${formattedNote.id}`);

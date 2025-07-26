@@ -221,10 +221,10 @@ export class ParagraphBuilder {
   /**
    * Start a new paragraph
    */
-  newNode(): NodeBuilder {
+  paragraph(): ParagraphBuilder {
     // Commit the current paragraph
     this.noteBuilder.addParagraph(this.getParagraphContent())
-    return this.noteBuilder.newNode()
+    return this.noteBuilder.paragraph()
   }
 
   /**
@@ -246,32 +246,11 @@ export class ParagraphBuilder {
   }
 }
 
-/**
- * Restricted builder returned by newNode() that requires calling paragraph() next
- */
-export class NodeBuilder {
-  constructor(private readonly noteBuilder: NoteBuilder) {}
-
-  /**
-   * Start a paragraph - required after newNode()
-   */
-  paragraph(): ParagraphBuilder {
-    return this.noteBuilder.paragraph()
-  }
-}
-
 export class NoteBuilder {
   private paragraphs: Array<{ segments: TextSegment[]; lists: List[] }> = []
 
   constructor(private readonly client: HttpClient) {
     // Constructor no longer accepts text parameter
-  }
-
-  /**
-   * Start building a new node - required first step
-   */
-  newNode(): NodeBuilder {
-    return new NodeBuilder(this)
   }
 
   /**
@@ -282,7 +261,7 @@ export class NoteBuilder {
   }
 
   /**
-   * Start a paragraph (called by NodeBuilder)
+   * Start a paragraph
    */
   paragraph(): ParagraphBuilder {
     return new ParagraphBuilder(this)

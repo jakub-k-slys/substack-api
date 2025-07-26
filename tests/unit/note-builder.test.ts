@@ -59,7 +59,7 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
   describe('Simple use case', () => {
     it('should create note with simple text and publish', async () => {
       const builder = new NoteBuilder(mockHttpClient)
-      const result = await builder.newNode().paragraph().text('my test text').publish()
+      const result = await builder.paragraph().text('my test text').publish()
 
       expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/comment/feed', {
         bodyJson: {
@@ -89,10 +89,8 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
     it('should create note with two simple paragraphs', async () => {
       const builder = new NoteBuilder(mockHttpClient)
       const result = await builder
-        .newNode()
         .paragraph()
         .text('my test text1')
-        .newNode()
         .paragraph()
         .text('my test text2')
         .publish()
@@ -134,12 +132,10 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
     it('should create note with rich formatting', async () => {
       const builder = new NoteBuilder(mockHttpClient)
       const result = await builder
-        .newNode()
         .paragraph()
         .text('adasd')
         .bold('this is bold')
         .text('regular again')
-        .newNode()
         .paragraph()
         .text('my test text2')
         .publish()
@@ -190,12 +186,10 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
     it('should create note with multiple rich paragraphs', async () => {
       const builder = new NoteBuilder(mockHttpClient)
       const result = await builder
-        .newNode()
         .paragraph()
         .text('adasd')
         .bold('this is bold')
         .text('regular again')
-        .newNode()
         .paragraph()
         .text('adasd')
         .italic('this is italic')
@@ -257,7 +251,6 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
     it('should support code formatting in paragraphs', async () => {
       const builder = new NoteBuilder(mockHttpClient)
       const result = await builder
-        .newNode()
         .paragraph()
         .text('Here is some ')
         .code('code()')
@@ -301,7 +294,6 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
     it('should support all formatting types in one paragraph', async () => {
       const builder = new NoteBuilder(mockHttpClient)
       const result = await builder
-        .newNode()
         .paragraph()
         .text('Plain text, ')
         .bold('bold text, ')
@@ -351,17 +343,15 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
   describe('ParagraphBuilder', () => {
     it('should return ParagraphBuilder instance for rich formatting', () => {
       const builder = new NoteBuilder(mockHttpClient)
-      const paragraphBuilder = builder.newNode().paragraph()
+      const paragraphBuilder = builder.paragraph()
       expect(paragraphBuilder).toBeInstanceOf(ParagraphBuilder)
     })
 
     it('should allow chaining from paragraph builder to new node', async () => {
       const builder = new NoteBuilder(mockHttpClient)
       const result = await builder
-        .newNode()
         .paragraph()
         .text('First paragraph')
-        .newNode()
         .paragraph()
         .text('Second paragraph')
         .publish()
@@ -400,7 +390,7 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
 
     it('should publish directly from paragraph builder', async () => {
       const builder = new NoteBuilder(mockHttpClient)
-      const result = await builder.newNode().paragraph().text('Only paragraph').publish()
+      const result = await builder.paragraph().text('Only paragraph').publish()
 
       expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/comment/feed', {
         bodyJson: {
