@@ -288,9 +288,9 @@ describe('NoteBuilder', () => {
 
       // This should be impossible with our API design, but let's test the validation
       // We'll need to call addParagraph directly to simulate this edge case
-      ;(builder as any).addParagraph({ segments: [], lists: [] })
+      const builderWithEmptyParagraph = (builder as any).addParagraph({ segments: [], lists: [] })
 
-      expect(() => builder.build()).toThrow(
+      expect(() => builderWithEmptyParagraph.build()).toThrow(
         'Each paragraph must contain at least one content block'
       )
     })

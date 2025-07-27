@@ -16,67 +16,96 @@ interface List {
   items: ListItem[]
 }
 
+interface ListItemBuilderState {
+  segments: TextSegment[]
+}
+
+interface ListBuilderState {
+  type: 'bullet' | 'numbered'
+  items: ListItem[]
+}
+
+interface ParagraphBuilderState {
+  segments: TextSegment[]
+  lists: List[]
+}
+
+interface NoteBuilderState {
+  paragraphs: Array<{ segments: TextSegment[]; lists: List[] }>
+}
+
 /**
  * Builder for constructing list items - similar to paragraph but no nested lists allowed
  */
 export class ListItemBuilder {
-  private segments: TextSegment[] = []
+  private readonly state: ListItemBuilderState
 
-  constructor(private readonly listBuilder: ListBuilder) {}
+  constructor(
+    private readonly listBuilder: ListBuilder,
+    state: ListItemBuilderState = { segments: [] }
+  ) {
+    this.state = state
+  }
 
   /**
    * Add plain text to the current list item
    */
   text(text: string): ListItemBuilder {
-    this.segments.push({ text, type: 'simple' })
-    return this
+    return new ListItemBuilder(this.listBuilder, {
+      segments: [...this.state.segments, { text, type: 'simple' }]
+    })
   }
 
   /**
    * Add bold text to the current list item
    */
   bold(text: string): ListItemBuilder {
-    this.segments.push({ text, type: 'bold' })
-    return this
+    return new ListItemBuilder(this.listBuilder, {
+      segments: [...this.state.segments, { text, type: 'bold' }]
+    })
   }
 
   /**
    * Add italic text to the current list item
    */
   italic(text: string): ListItemBuilder {
-    this.segments.push({ text, type: 'italic' })
-    return this
+    return new ListItemBuilder(this.listBuilder, {
+      segments: [...this.state.segments, { text, type: 'italic' }]
+    })
   }
 
   /**
    * Add code text to the current list item
    */
   code(text: string): ListItemBuilder {
-    this.segments.push({ text, type: 'code' })
-    return this
+    return new ListItemBuilder(this.listBuilder, {
+      segments: [...this.state.segments, { text, type: 'code' }]
+    })
   }
 
   /**
    * Add underlined text to the current list item
    */
   underline(text: string): ListItemBuilder {
-    this.segments.push({ text, type: 'underline' })
-    return this
+    return new ListItemBuilder(this.listBuilder, {
+      segments: [...this.state.segments, { text, type: 'underline' }]
+    })
   }
 
   /**
    * Add a link to the current list item
    */
   link(text: string, url: string): ListItemBuilder {
-    this.segments.push({ text, type: 'link', url })
-    return this
+    return new ListItemBuilder(this.listBuilder, {
+      segments: [...this.state.segments, { text, type: 'link', url }]
+    })
   }
 
   /**
    * Get the current segments (used by ListBuilder)
    */
   getSegments(): TextSegment[] {
-    return this.segments
+    return this.state.segments
   }
 
   /**
@@ -84,8 +113,7 @@ export class ListItemBuilder {
    */
   item(): ListItemBuilder {
     // Commit current item and create new one
-    this.listBuilder.addItem({ segments: this.segments })
-    return this.listBuilder.item()
+    return this.listBuilder.addItem({ segments: this.state.segments }).item()
   }
 
   /**
@@ -93,8 +121,7 @@ export class ListItemBuilder {
    */
   finish(): ParagraphBuilder {
     // Commit current item
-    this.listBuilder.addItem({ segments: this.segments })
-    return this.listBuilder.finish()
+    return this.listBuilder.addItem({ segments: this.state.segments }).finish()
   }
 }
 
@@ -102,18 +129,24 @@ export class ListItemBuilder {
  * Builder for constructing lists within a paragraph
  */
 export class ListBuilder {
-  private items: ListItem[] = []
+  private readonly state: ListBuilderState
 
   constructor(
-    private readonly type: 'bullet' | 'numbered',
-    private readonly paragraphBuilder: ParagraphBuilder
-  ) {}
+    type: 'bullet' | 'numbered',
+    private readonly paragraphBuilder: ParagraphBuilder,
+    state?: ListBuilderState
+  ) {
+    this.state = state || { type, items: [] }
+  }
 
   /**
    * Add an item to the current list
    */
-  addItem(item: ListItem): void {
-    this.items.push(item)
+  addItem(item: ListItem): ListBuilder {
+    return new ListBuilder(this.state.type, this.paragraphBuilder, {
+      type: this.state.type,
+      items: [...this.state.items, item]
+    })
   }
 
   /**
@@ -128,8 +161,7 @@ export class ListBuilder {
    */
   finish(): ParagraphBuilder {
     // Add the completed list to the paragraph
-    this.paragraphBuilder.addList({ type: this.type, items: this.items })
-    return this.paragraphBuilder
+    return this.paragraphBuilder.addList({ type: this.state.type, items: this.state.items })
   }
 }
 
@@ -137,57 +169,73 @@ export class ListBuilder {
  * Builder for constructing rich text within a paragraph
  */
 export class ParagraphBuilder {
-  private segments: TextSegment[] = []
-  private lists: List[] = []
+  private readonly state: ParagraphBuilderState
 
-  constructor(private readonly noteBuilder: NoteBuilder) {}
+  constructor(
+    private readonly noteBuilder: NoteBuilder,
+    state: ParagraphBuilderState = { segments: [], lists: [] }
+  ) {
+    this.state = state
+  }
 
   /**
    * Add plain text to the current paragraph
    */
   text(text: string): ParagraphBuilder {
-    this.segments.push({ text, type: 'simple' })
-    return this
+    return new ParagraphBuilder(this.noteBuilder, {
+      segments: [...this.state.segments, { text, type: 'simple' }],
+      lists: [...this.state.lists]
+    })
   }
 
   /**
    * Add bold text to the current paragraph
    */
   bold(text: string): ParagraphBuilder {
-    this.segments.push({ text, type: 'bold' })
-    return this
+    return new ParagraphBuilder(this.noteBuilder, {
+      segments: [...this.state.segments, { text, type: 'bold' }],
+      lists: [...this.state.lists]
+    })
   }
 
   /**
    * Add italic text to the current paragraph
    */
   italic(text: string): ParagraphBuilder {
-    this.segments.push({ text, type: 'italic' })
-    return this
+    return new ParagraphBuilder(this.noteBuilder, {
+      segments: [...this.state.segments, { text, type: 'italic' }],
+      lists: [...this.state.lists]
+    })
   }
 
   /**
    * Add code text to the current paragraph
    */
   code(text: string): ParagraphBuilder {
-    this.segments.push({ text, type: 'code' })
-    return this
+    return new ParagraphBuilder(this.noteBuilder, {
+      segments: [...this.state.segments, { text, type: 'code' }],
+      lists: [...this.state.lists]
+    })
   }
 
   /**
    * Add underlined text to the current paragraph
    */
   underline(text: string): ParagraphBuilder {
-    this.segments.push({ text, type: 'underline' })
-    return this
+    return new ParagraphBuilder(this.noteBuilder, {
+      segments: [...this.state.segments, { text, type: 'underline' }],
+      lists: [...this.state.lists]
+    })
   }
 
   /**
    * Add a link to the current paragraph
    */
   link(text: string, url: string): ParagraphBuilder {
-    this.segments.push({ text, type: 'link', url })
-    return this
+    return new ParagraphBuilder(this.noteBuilder, {
+      segments: [...this.state.segments, { text, type: 'link', url }],
+      lists: [...this.state.lists]
+    })
   }
 
   /**
@@ -207,15 +255,18 @@ export class ParagraphBuilder {
   /**
    * Add a list to the current paragraph (used by ListBuilder)
    */
-  addList(list: List): void {
-    this.lists.push(list)
+  addList(list: List): ParagraphBuilder {
+    return new ParagraphBuilder(this.noteBuilder, {
+      segments: [...this.state.segments],
+      lists: [...this.state.lists, list]
+    })
   }
 
   /**
    * Get the current paragraph content (used by NoteBuilder)
    */
   getParagraphContent(): { segments: TextSegment[]; lists: List[] } {
-    return { segments: this.segments, lists: this.lists }
+    return { segments: this.state.segments, lists: this.state.lists }
   }
 
   /**
@@ -223,8 +274,7 @@ export class ParagraphBuilder {
    */
   paragraph(): ParagraphBuilder {
     // Commit the current paragraph
-    this.noteBuilder.addParagraph(this.getParagraphContent())
-    return this.noteBuilder.paragraph()
+    return this.noteBuilder.addParagraph(this.getParagraphContent()).paragraph()
   }
 
   /**
@@ -232,8 +282,7 @@ export class ParagraphBuilder {
    */
   build(): PublishNoteRequest {
     // Commit the current paragraph before building
-    this.noteBuilder.addParagraph(this.getParagraphContent())
-    return this.noteBuilder.build()
+    return this.noteBuilder.addParagraph(this.getParagraphContent()).build()
   }
 
   /**
@@ -241,23 +290,27 @@ export class ParagraphBuilder {
    */
   async publish(): Promise<PublishNoteResponse> {
     // Commit the current paragraph before publishing
-    this.noteBuilder.addParagraph(this.getParagraphContent())
-    return this.noteBuilder.publish()
+    return this.noteBuilder.addParagraph(this.getParagraphContent()).publish()
   }
 }
 
 export class NoteBuilder {
-  private paragraphs: Array<{ segments: TextSegment[]; lists: List[] }> = []
+  private readonly state: NoteBuilderState
 
-  constructor(private readonly client: HttpClient) {
-    // Constructor no longer accepts text parameter
+  constructor(
+    private readonly client: HttpClient,
+    state: NoteBuilderState = { paragraphs: [] }
+  ) {
+    this.state = state
   }
 
   /**
    * Add a paragraph to the note (used by ParagraphBuilder)
    */
-  addParagraph(paragraph: { segments: TextSegment[]; lists: List[] }): void {
-    this.paragraphs.push(paragraph)
+  addParagraph(paragraph: { segments: TextSegment[]; lists: List[] }): NoteBuilder {
+    return new NoteBuilder(this.client, {
+      paragraphs: [...this.state.paragraphs, paragraph]
+    })
   }
 
   /**
@@ -272,18 +325,18 @@ export class NoteBuilder {
    */
   private toNoteRequest(): PublishNoteRequest {
     // Validation: must have at least one paragraph
-    if (this.paragraphs.length === 0) {
+    if (this.state.paragraphs.length === 0) {
       throw new Error('Note must contain at least one paragraph')
     }
 
     // Validation: each paragraph must have content
-    for (const paragraph of this.paragraphs) {
+    for (const paragraph of this.state.paragraphs) {
       if (paragraph.segments.length === 0 && paragraph.lists.length === 0) {
         throw new Error('Each paragraph must contain at least one content block')
       }
     }
 
-    const content = this.paragraphs.flatMap((paragraph) => {
+    const content = this.state.paragraphs.flatMap((paragraph) => {
       const elements = []
 
       // Add paragraph content if it has segments
