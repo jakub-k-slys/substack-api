@@ -16,6 +16,9 @@ interface List {
   items: ListItem[]
 }
 
+// Export the public types for consumers
+export type { TextSegment, ListItem, List }
+
 interface ListItemBuilderState {
   segments: TextSegment[]
 }
