@@ -1,6 +1,16 @@
 export { SubstackClient } from './substack-client'
-export { Profile, OwnProfile, PreviewPost, FullPost, Note, Comment } from './domain'
-export { NoteBuilder, ParagraphBuilder, ListBuilder, ListItemBuilder } from './note-builder'
+export {
+  Profile,
+  OwnProfile,
+  PreviewPost,
+  FullPost,
+  Note,
+  Comment,
+  NoteBuilder,
+  ParagraphBuilder,
+  ListBuilder,
+  ListItemBuilder
+} from './domain'
 
 export type {
   SubstackConfig,
@@ -11,4 +21,4 @@ export type {
   NotesIteratorOptions
 } from './types'
 
-export type { TextSegment, ListItem, List } from './note-builder'
+export type { TextSegment, ListItem, List } from './domain'

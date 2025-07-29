@@ -1,6 +1,6 @@
 import { Profile } from './profile'
 import { Note } from './note'
-import { NoteBuilder } from '../note-builder'
+import { NoteBuilder } from './note-builder'
 import type { SubstackFullProfile } from '../internal'
 import type { HttpClient } from '../internal/http-client'
 import type {

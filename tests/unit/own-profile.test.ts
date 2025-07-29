@@ -1,7 +1,7 @@
 import { OwnProfile } from '../../src/domain/own-profile'
 import { Note } from '../../src/domain/note'
 import { Profile } from '../../src/domain/profile'
-import { NoteBuilder } from '../../src/note-builder'
+import { NoteBuilder } from '../../src/domain/note-builder'
 import {
   ProfileService,
   PostService,

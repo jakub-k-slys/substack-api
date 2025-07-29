@@ -1,5 +1,5 @@
-import { PublishNoteRequest, PublishNoteResponse } from './internal'
-import { HttpClient } from './internal/http-client'
+import { PublishNoteRequest, PublishNoteResponse } from '../internal'
+import { HttpClient } from '../internal/http-client'
 
 interface TextSegment {
   text: string
