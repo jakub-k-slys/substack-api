@@ -80,10 +80,10 @@ describe('NoteBuilder - Coverage Tests', () => {
       const paragraph = listItem.content[0]
       expect(paragraph.content).toEqual([
         { type: 'text', text: 'Check out ' },
-        { 
-          type: 'text', 
-          text: 'this link', 
-          marks: [{ type: 'link', attrs: { href: 'https://example.com' } }] 
+        {
+          type: 'text',
+          text: 'this link',
+          marks: [{ type: 'link', attrs: { href: 'https://example.com' } }]
         },
         { type: 'text', text: '!' }
       ])
@@ -145,10 +145,10 @@ describe('NoteBuilder - Coverage Tests', () => {
 
       // Third item: link
       expect(orderedList.content[2].content[0].content).toEqual([
-        { 
-          type: 'text', 
-          text: 'link', 
-          marks: [{ type: 'link', attrs: { href: 'https://test.com' } }] 
+        {
+          type: 'text',
+          text: 'link',
+          marks: [{ type: 'link', attrs: { href: 'https://test.com' } }]
         }
       ])
     })
@@ -180,10 +180,10 @@ describe('NoteBuilder - Coverage Tests', () => {
 
       expect(request.bodyJson.content[0].content).toEqual([
         { type: 'text', text: 'Visit ' },
-        { 
-          type: 'text', 
-          text: 'our website', 
-          marks: [{ type: 'link', attrs: { href: 'https://example.com' } }] 
+        {
+          type: 'text',
+          text: 'our website',
+          marks: [{ type: 'link', attrs: { href: 'https://example.com' } }]
         },
         { type: 'text', text: ' for more info.' }
       ])
@@ -201,16 +201,20 @@ describe('NoteBuilder - Coverage Tests', () => {
         paragraphs: [{ segments: [], lists: [] }]
       })
 
-      expect(() => builderWithEmptyParagraph.build()).toThrow('Each paragraph must contain at least one content block')
+      expect(() => builderWithEmptyParagraph.build()).toThrow(
+        'Each paragraph must contain at least one content block'
+      )
     })
 
     it('should throw error for links without URL', () => {
       // Test the segmentToContent method directly for link validation
       const testBuilder = new NoteBuilder(mockClient, {
-        paragraphs: [{
-          segments: [{ text: 'test', type: 'link' }], // Missing URL
-          lists: []
-        }]
+        paragraphs: [
+          {
+            segments: [{ text: 'test', type: 'link' }], // Missing URL
+            lists: []
+          }
+        ]
       })
 
       expect(() => testBuilder.build()).toThrow('Link segments must have a URL')
@@ -248,16 +252,16 @@ describe('NoteBuilder - Coverage Tests', () => {
 
     it('should test NoteWithLinkBuilder validation errors', () => {
       const noteWithLinkBuilder = new NoteWithLinkBuilder(mockClient, 'https://example.com')
-      
+
       // Test empty note validation in NoteWithLinkBuilder's toNoteRequestWithState
       expect(() => {
-        (noteWithLinkBuilder as any).toNoteRequestWithState({ paragraphs: [] })
+        ;(noteWithLinkBuilder as any).toNoteRequestWithState({ paragraphs: [] })
       }).toThrow('Note must contain at least one paragraph')
 
       // Test empty paragraph validation in NoteWithLinkBuilder's toNoteRequestWithState
       expect(() => {
-        (noteWithLinkBuilder as any).toNoteRequestWithState({ 
-          paragraphs: [{ segments: [], lists: [] }] 
+        ;(noteWithLinkBuilder as any).toNoteRequestWithState({
+          paragraphs: [{ segments: [], lists: [] }]
         })
       }).toThrow('Each paragraph must contain at least one content block')
     })
@@ -274,9 +278,7 @@ describe('NoteBuilder - Coverage Tests', () => {
     })
 
     it('should override addParagraph to return NoteWithLinkBuilder', () => {
-      const result = noteWithLinkBuilder
-        .paragraph()
-        .text('Test paragraph')
+      const result = noteWithLinkBuilder.paragraph().text('Test paragraph')
 
       // The paragraph builder should still chain correctly
       expect(result).toBeDefined()
@@ -369,12 +371,7 @@ describe('NoteBuilder - Coverage Tests', () => {
 
     it('should handle empty list gracefully', () => {
       // This tests the edge case of starting a list but finishing without items
-      const request = builder
-        .paragraph()
-        .text('Text before list')
-        .bulletList()
-        .finish()
-        .build()
+      const request = builder.paragraph().text('Text before list').bulletList().finish().build()
 
       // Should still create the list structure even if empty
       expect(request.bodyJson.content).toHaveLength(2)
@@ -385,10 +382,7 @@ describe('NoteBuilder - Coverage Tests', () => {
 
   describe('Segment to content conversion', () => {
     it('should handle simple text segments', () => {
-      const request = builder
-        .paragraph()
-        .text('Simple text')
-        .build()
+      const request = builder.paragraph().text('Simple text').build()
 
       expect(request.bodyJson.content[0].content[0]).toEqual({
         type: 'text',
@@ -414,11 +408,15 @@ describe('NoteBuilder - Coverage Tests', () => {
       expect(content[0]).toEqual({ type: 'text', text: 'bold', marks: [{ type: 'bold' }] })
       expect(content[2]).toEqual({ type: 'text', text: 'italic', marks: [{ type: 'italic' }] })
       expect(content[4]).toEqual({ type: 'text', text: 'code', marks: [{ type: 'code' }] })
-      expect(content[6]).toEqual({ type: 'text', text: 'underline', marks: [{ type: 'underline' }] })
-      expect(content[8]).toEqual({ 
-        type: 'text', 
-        text: 'link', 
-        marks: [{ type: 'link', attrs: { href: 'https://example.com' } }] 
+      expect(content[6]).toEqual({
+        type: 'text',
+        text: 'underline',
+        marks: [{ type: 'underline' }]
+      })
+      expect(content[8]).toEqual({
+        type: 'text',
+        text: 'link',
+        marks: [{ type: 'link', attrs: { href: 'https://example.com' } }]
       })
     })
   })
