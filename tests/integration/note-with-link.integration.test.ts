@@ -39,7 +39,7 @@ describe('note with link attachment integration tests', () => {
     const attachmentRequest = global.INTEGRATION_SERVER.capturedRequests[0]
     expect(attachmentRequest.method).toBe('POST')
     expect(attachmentRequest.url).toBe('/api/v1/comment/attachment')
-    
+
     const expectedAttachmentRequestPath = join(
       process.cwd(),
       'samples',
@@ -57,7 +57,7 @@ describe('note with link attachment integration tests', () => {
     expect(noteRequest.url).toBe('/api/v1/comment/feed')
 
     const capturedNoteBody = noteRequest.body as any
-    
+
     // Verify the structure matches our expected format
     expect(capturedNoteBody).toMatchObject({
       bodyJson: {
@@ -111,10 +111,10 @@ describe('note with link attachment integration tests', () => {
 
     const noteRequest = global.INTEGRATION_SERVER.capturedRequests[1]
     const noteBody = noteRequest.body as any
-    
+
     // Verify the complex structure was built correctly
     expect(noteBody.bodyJson.content).toHaveLength(2) // Two paragraphs
-    
+
     // First paragraph
     expect(noteBody.bodyJson.content[0].content).toEqual([
       { type: 'text', text: 'This is a ' },
@@ -127,10 +127,10 @@ describe('note with link attachment integration tests', () => {
     // Second paragraph
     expect(noteBody.bodyJson.content[1].content).toEqual([
       { type: 'text', text: 'It includes ' },
-      { 
-        type: 'text', 
-        text: 'internal links', 
-        marks: [{ type: 'link', attrs: { href: 'https://internal.example.com' } }] 
+      {
+        type: 'text',
+        text: 'internal links',
+        marks: [{ type: 'link', attrs: { href: 'https://internal.example.com' } }]
       },
       { type: 'text', text: ' and ' },
       { type: 'text', text: 'code snippets', marks: [{ type: 'code' }] },
@@ -160,7 +160,7 @@ describe('note with link attachment integration tests', () => {
         .publish()
 
       expect(global.INTEGRATION_SERVER.capturedRequests).toHaveLength(2)
-      
+
       const attachmentRequest = global.INTEGRATION_SERVER.capturedRequests[0]
       expect(attachmentRequest.body).toEqual({
         url: testUrl,

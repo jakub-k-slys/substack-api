@@ -248,6 +248,120 @@ async function runExample(): Promise<void> {
       console.log(`   ⚠️  Could not fetch full post: ${(error as Error).message}`)
     }
 
+    // 9. Creating notes (COMMENTED OUT - uncomment to test note creation)
+    console.log('\n📝 Note Creation Examples (commented out to prevent accidental publishing)')
+    
+    /*
+    // Example: Create a simple note
+    console.log('\n📝 Creating a simple note...')
+    try {
+      const noteResponse = await profile
+        .newNote()
+        .paragraph()
+        .text('This is a test note created via the ')
+        .bold('Substack API')
+        .text('! 🚀')
+        .paragraph()
+        .text('It supports various formatting options like ')
+        .italic('italic text')
+        .text(', ')
+        .code('code snippets')
+        .text(', and ')
+        .link('external links', 'https://substack.com')
+        .text('.')
+        .publish()
+
+      console.log(`✅ Note published successfully!`)
+      console.log(`   Note ID: ${noteResponse.id}`)
+      console.log(`   Published at: ${noteResponse.date}`)
+      
+    } catch (error) {
+      console.log(`   ❌ Failed to create note: ${(error as Error).message}`)
+    }
+
+    // Example: Create a note with link attachment
+    console.log('\n🔗 Creating a note with link attachment...')
+    try {
+      const noteWithLinkResponse = await profile
+        .newNoteWithLink('https://docs.substack.com/docs/api-introduction')
+        .paragraph()
+        .text('Check out the ')
+        .bold('Substack API documentation')
+        .text(' - it has everything you need to get started!')
+        .paragraph()
+        .text('Key features covered:')
+        .bulletList()
+        .item()
+        .text('Authentication and setup')
+        .item()
+        .text('Profile and content management')
+        .item()
+        .text('Social features like following users')
+        .item()
+        .text('Advanced formatting options')
+        .finish()
+        .paragraph()
+        .text('The link is automatically attached to this note. 📎')
+        .publish()
+
+      console.log(`✅ Note with link attachment published successfully!`)
+      console.log(`   Note ID: ${noteWithLinkResponse.id}`)
+      console.log(`   Published at: ${noteWithLinkResponse.date}`)
+      console.log(`   Attachments: ${noteWithLinkResponse.attachments?.length || 0}`)
+      
+    } catch (error) {
+      console.log(`   ❌ Failed to create note with link: ${(error as Error).message}`)
+    }
+
+    // Example: Create a complex formatted note
+    console.log('\n✨ Creating a complex formatted note...')
+    try {
+      const complexNoteResponse = await profile
+        .newNote()
+        .paragraph()
+        .text('🎯 ')
+        .bold('Weekly Development Update')
+        .paragraph()
+        .text('This week I focused on:')
+        .numberedList()
+        .item()
+        .bold('API Integration')
+        .text(' - Connected to ')
+        .link('Substack API', 'https://substack.com/api')
+        .item()
+        .italic('Code Quality')
+        .text(' - Added comprehensive ')
+        .code('unit tests')
+        .item()
+        .underline('Documentation')
+        .text(' - Updated README and examples')
+        .finish()
+        .paragraph()
+        .text('Next week\'s priorities:')
+        .bulletList()
+        .item()
+        .text('Performance optimization')
+        .item()
+        .text('Error handling improvements')
+        .item()
+        .text('Integration testing')
+        .finish()
+        .paragraph()
+        .text('Feel free to reach out with any questions! 💬')
+        .publish()
+
+      console.log(`✅ Complex formatted note published successfully!`)
+      console.log(`   Note ID: ${complexNoteResponse.id}`)
+      console.log(`   Content length: ${complexNoteResponse.body?.length || 0} characters`)
+      
+    } catch (error) {
+      console.log(`   ❌ Failed to create complex note: ${(error as Error).message}`)
+    }
+    */
+
+    console.log('   💡 To test note creation, uncomment the examples above')
+    console.log('   ⚠️  Warning: Uncommenting will publish real notes to your Substack!')
+
     console.log('\n✨ Example completed successfully!')
     console.log('💡 This example demonstrates basic Substack API usage.')
     console.log('   For more advanced features, check out the full documentation.')
