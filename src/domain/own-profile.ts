@@ -1,6 +1,6 @@
 import { Profile } from './profile'
 import { Note } from './note'
-import { NoteBuilder } from './note-builder'
+import { NoteBuilder, NoteWithLinkBuilder } from './note-builder'
 import type { SubstackFullProfile } from '../internal'
 import type { HttpClient } from '../internal/http-client'
 import type {
@@ -43,6 +43,13 @@ export class OwnProfile extends Profile {
    */
   newNote(): NoteBuilder {
     return new NoteBuilder(this.client)
+  }
+
+  /**
+   * Create a new note with a link attachment using the builder pattern
+   */
+  newNoteWithLink(link: string): NoteWithLinkBuilder {
+    return new NoteWithLinkBuilder(this.client, link)
   }
 
   /**

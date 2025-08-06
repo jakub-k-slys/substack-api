@@ -7,6 +7,7 @@ export {
   Note,
   Comment,
   NoteBuilder,
+  NoteWithLinkBuilder,
   ParagraphBuilder,
   ListBuilder,
   ListItemBuilder
