@@ -48,6 +48,53 @@ const createMockServer = (): Promise<{
         return
       }
 
+      // Handle POST requests to /api/v1/comment/attachment (attachment creation)
+      if (req.method === 'POST' && req.url === '/api/v1/comment/attachment') {
+        let body = ''
+        req.on('data', (chunk) => {
+          body += chunk.toString()
+        })
+        req.on('end', () => {
+          try {
+            // Parse and capture the request for verification
+            const requestData = JSON.parse(body)
+
+            // Capture the request for test verification
+            capturedRequests.push({
+              method: req.method!,
+              url: req.url!,
+              headers: req.headers as Record<string, string>,
+              body: requestData
+            })
+
+            // Basic validation that we received some data
+            if (!requestData) {
+              res.writeHead(400)
+              res.end(JSON.stringify({ error: 'Empty request body' }))
+              return
+            }
+
+            // Return the sample attachment response
+            const sampleResponsePath = join(
+              process.cwd(),
+              'samples',
+              'api',
+              'v1',
+              'comment',
+              'attachment-response'
+            )
+            const sampleData = readFileSync(sampleResponsePath, 'utf8')
+            res.writeHead(200)
+            res.end(sampleData)
+          } catch (error) {
+            console.error('Error processing attachment creation request:', error)
+            res.writeHead(400)
+            res.end(JSON.stringify({ error: 'Invalid JSON' }))
+          }
+        })
+        return
+      }
+
       // Handle POST requests to /api/v1/comment/feed (note publishing)
       if (req.method === 'POST' && req.url === '/api/v1/comment/feed') {
         let body = ''
