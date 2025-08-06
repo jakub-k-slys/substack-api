@@ -249,9 +249,9 @@ async function runExample(): Promise<void> {
     }
 
     // 9. Creating notes (COMMENTED OUT - uncomment to test note creation)
-    console.log('\n📝 Note Creation Examples (commented out to prevent accidental publishing)')
-    
     /*
+    console.log('\n📝 Note Creation Examples (commented out to prevent accidental publishing)')
+
     // Example: Create a simple note
     console.log('\n📝 Creating a simple note...')
     try {
@@ -283,7 +283,7 @@ async function runExample(): Promise<void> {
     console.log('\n🔗 Creating a note with link attachment...')
     try {
       const noteWithLinkResponse = await profile
-        .newNoteWithLink('https://docs.substack.com/docs/api-introduction')
+        .newNoteWithLink('https://iam.slys.dev/p/friends-bring-friends')
         .paragraph()
         .text('Check out the ')
         .bold('Substack API documentation')
@@ -357,11 +357,10 @@ async function runExample(): Promise<void> {
     } catch (error) {
       console.log(`   ❌ Failed to create complex note: ${(error as Error).message}`)
     }
-    */
 
     console.log('   💡 To test note creation, uncomment the examples above')
     console.log('   ⚠️  Warning: Uncommenting will publish real notes to your Substack!')
-
+    */
     console.log('\n✨ Example completed successfully!')
     console.log('💡 This example demonstrates basic Substack API usage.')
     console.log('   For more advanced features, check out the full documentation.')
