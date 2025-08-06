@@ -26,7 +26,13 @@ export {
   SubstackSearchResultCodec
 } from './api-responses'
 
-export type { NoteBodyJson, PublishNoteRequest, PublishNoteResponse } from './note-api'
+export type {
+  NoteBodyJson,
+  PublishNoteRequest,
+  PublishNoteResponse,
+  CreateAttachmentRequest,
+  CreateAttachmentResponse
+} from './note-api'
 
 export type {
   SubstackNote,

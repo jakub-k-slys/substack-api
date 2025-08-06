@@ -47,6 +47,19 @@ export interface PublishNoteRequest {
   tabId: string
   surface: string
   replyMinimumRole: 'everyone'
+  attachmentIds?: string[]
+}
+
+export interface CreateAttachmentRequest {
+  url: string
+  type: 'link'
+}
+
+export interface CreateAttachmentResponse {
+  id: string
+  type: string
+  publication: any
+  post: any
 }
 
 export interface PublishNoteResponse {
