@@ -143,10 +143,10 @@ describe('SubstackClient Entity Model', () => {
       const mockData = {
         id: 789,
         body: 'Test comment',
-        created_at: '2023-01-01T00:00:00Z',
-        parent_post_id: 456,
-        author_id: 123,
-        author_name: 'Test User'
+        date: '2023-01-01T00:00:00Z',
+        post_id: 456,
+        user_id: 123,
+        name: 'Test User'
       }
       const httpClient = (client as unknown as { httpClient: HttpClient }).httpClient
       const comment = new Comment(mockData, httpClient)

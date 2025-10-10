@@ -27,19 +27,19 @@ describe('CommentService', () => {
         {
           id: 1,
           body: 'Test comment 1',
-          created_at: '2023-01-01T00:00:00Z',
-          parent_post_id: 123,
-          author_id: 456,
-          author_name: 'Test Author',
+          date: '2023-01-01T00:00:00Z',
+          post_id: 123,
+          user_id: 456,
+          name: 'Test Author',
           author_is_admin: false
         },
         {
           id: 2,
           body: 'Test comment 2',
-          created_at: '2023-01-02T00:00:00Z',
-          parent_post_id: 123,
-          author_id: 789,
-          author_name: 'Another Author',
+          date: '2023-01-02T00:00:00Z',
+          post_id: 123,
+          user_id: 789,
+          name: 'Another Author',
           author_is_admin: true
         }
       ]
@@ -105,10 +105,10 @@ describe('CommentService', () => {
       expect(result).toEqual({
         id: 123,
         body: 'Test comment body',
-        created_at: '2023-01-01T00:00:00Z',
-        parent_post_id: 789,
-        author_id: 456,
-        author_name: 'Test Author',
+        date: '2023-01-01T00:00:00Z',
+        post_id: 789,
+        user_id: 456,
+        name: 'Test Author',
         author_is_admin: false
       })
     })
@@ -132,7 +132,7 @@ describe('CommentService', () => {
       const result = await commentService.getCommentById(123)
 
       expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/comment/123')
-      expect(result.parent_post_id).toBe(0)
+      expect(result.post_id).toBe(0)
     })
 
     it('should throw error when comment is not found', async () => {

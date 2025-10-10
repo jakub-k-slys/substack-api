@@ -73,18 +73,18 @@ describe('PreviewPost Entity', () => {
         {
           id: 1,
           body: 'Comment 1',
-          created_at: '2023-01-01T00:00:00Z',
-          parent_post_id: 456,
-          author_id: 123,
-          author_name: 'User 1'
+          date: '2023-01-01T00:00:00Z',
+          post_id: 456,
+          user_id: 123,
+          name: 'User 1'
         },
         {
           id: 2,
           body: 'Comment 2',
-          created_at: '2023-01-02T00:00:00Z',
-          parent_post_id: 456,
-          author_id: 124,
-          author_name: 'User 2'
+          date: '2023-01-02T00:00:00Z',
+          post_id: 456,
+          user_id: 124,
+          name: 'User 2'
         }
       ]
       mockCommentService.getCommentsForPost.mockResolvedValue(mockComments)
@@ -106,18 +106,18 @@ describe('PreviewPost Entity', () => {
         {
           id: 1,
           body: 'Comment 1',
-          created_at: '2023-01-01T00:00:00Z',
-          parent_post_id: 456,
-          author_id: 123,
-          author_name: 'User 1'
+          date: '2023-01-01T00:00:00Z',
+          post_id: 456,
+          user_id: 123,
+          name: 'User 1'
         },
         {
           id: 2,
           body: 'Comment 2',
-          created_at: '2023-01-02T00:00:00Z',
-          parent_post_id: 456,
-          author_id: 124,
-          author_name: 'User 2'
+          date: '2023-01-02T00:00:00Z',
+          post_id: 456,
+          user_id: 124,
+          name: 'User 2'
         }
       ]
       mockCommentService.getCommentsForPost.mockResolvedValue(mockComments)

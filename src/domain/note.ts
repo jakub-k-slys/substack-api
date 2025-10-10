@@ -48,10 +48,10 @@ export class Note {
         const commentData = {
           id: comment.id,
           body: comment.body,
-          created_at: comment.date,
-          parent_post_id: comment.post_id || 0,
-          author_id: comment.user_id,
-          author_name: comment.name,
+          date: comment.date,
+          post_id: comment.post_id || 0,
+          user_id: comment.user_id,
+          name: comment.name,
           author_is_admin: false // Not available in note comment format
         }
         yield new Comment(commentData, this.client)

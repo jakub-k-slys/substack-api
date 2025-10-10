@@ -267,10 +267,10 @@ describe('io-ts validation codecs', () => {
       const validComment = {
         id: 789,
         body: 'This is a comment',
-        created_at: '2023-01-01T00:00:00Z',
-        parent_post_id: 123,
-        author_id: 456,
-        author_name: 'John Doe',
+        date: '2023-01-01T00:00:00Z',
+        post_id: 123,
+        user_id: 456,
+        name: 'John Doe',
         author_is_admin: false
       }
 
@@ -287,10 +287,10 @@ describe('io-ts validation codecs', () => {
       const commentWithoutAdmin = {
         id: 789,
         body: 'This is a comment',
-        created_at: '2023-01-01T00:00:00Z',
-        parent_post_id: 123,
-        author_id: 456,
-        author_name: 'John Doe'
+        date: '2023-01-01T00:00:00Z',
+        post_id: 123,
+        user_id: 456,
+        name: 'John Doe'
       }
 
       const result = decodeEither(SubstackCommentCodec, commentWithoutAdmin)
@@ -304,10 +304,10 @@ describe('io-ts validation codecs', () => {
       const invalidComment = {
         id: 789,
         body: 'This is a comment',
-        created_at: '2023-01-01T00:00:00Z',
-        parent_post_id: 'not-a-number', // Invalid - should be number
-        author_id: 456,
-        author_name: 'John Doe'
+        date: '2023-01-01T00:00:00Z',
+        post_id: 'not-a-number', // Invalid - should be number
+        user_id: 456,
+        name: 'John Doe'
       }
 
       const result = decodeEither(SubstackCommentCodec, invalidComment)
