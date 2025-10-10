@@ -33,7 +33,7 @@ export const SubstackPostCodec = t.intersection([
     slug: t.string,
     post_date: t.string,
     canonical_url: t.string,
-    type: t.union([t.literal('newsletter'), t.literal('podcast'), t.literal('thread')])
+    type: t.union([t.literal('newsletter'), t.literal('podcast'), t.literal('thread'), t.literal('restack')])
   }),
   t.partial({
     subtitle: t.string,
@@ -67,7 +67,7 @@ export const SubstackFullPostCodec = t.intersection([
     slug: t.string,
     post_date: t.string,
     canonical_url: t.string,
-    type: t.union([t.literal('newsletter'), t.literal('podcast'), t.literal('thread')]),
+    type: t.union([t.literal('newsletter'), t.literal('podcast'), t.literal('thread'), t.literal('restack')]),
     body_html: t.string
   }),
   t.partial({
