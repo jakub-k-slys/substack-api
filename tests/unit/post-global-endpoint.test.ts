@@ -1,5 +1,5 @@
-import { SubstackClient } from '../../src/substack-client'
 import { FullPost } from '../../src/domain'
+import { SubstackClient } from '../../src/substack-client'
 
 // Mock the global fetch function
 global.fetch = jest.fn()
@@ -112,7 +112,7 @@ describe('SubstackClient - Global Post Endpoint', () => {
       const requestInit = fetchCall[1] as RequestInit
       expect(requestInit.headers).toEqual(
         expect.objectContaining({
-          Cookie: 'connect.sid=test-api-key',
+          Cookie: 'substack.sid=test-api-key',
           'Content-Type': 'application/json'
         })
       )

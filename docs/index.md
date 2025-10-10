@@ -7,7 +7,7 @@ Welcome to the Substack API client documentation. This modern TypeScript library
 - 🏗️ **Modern Entity Model** - Object-oriented API with fluent navigation (`profile.posts()`, `post.comments()`)
 - 🔄 **Async Iterators** - Seamless pagination with `for await` syntax  
 - 🛡️ **Type Safety** - Full TypeScript support with entity classes (Profile, Post, Note, Comment)
-- 🔐 **Cookie Authentication** - Secure authentication using connect.sid cookies
+- 🔐 **Cookie Authentication** - Secure authentication using substack.sid cookies
 - 📝 **Content Creation** - Create posts, notes, and comments through OwnProfile
 - 💬 **Social Features** - Like, comment, follow, and subscribe functionality
 - 📄 **Smart Pagination** - Built-in pagination with configurable limits

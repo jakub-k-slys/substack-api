@@ -16,7 +16,7 @@ Creates a new SubstackClient instance with cookie-based authentication.
 
 **Parameters:**
 - `config`: Configuration object (required)
-  - `apiKey`: Your connect.sid cookie value (required)
+  - `apiKey`: Your substack.sid cookie value (required)
   - `hostname` (optional): Publication hostname (default: 'substack.com')
 
 **Example:**
@@ -520,7 +520,7 @@ try {
   console.log(`Note created: ${note.id}`);
 } catch (error) {
   if (error.message.includes('401')) {
-    console.error('Authentication failed - check your connect.sid cookie');
+    console.error('Authentication failed - check your substack.sid cookie');
   } else if (error.message.includes('403')) {
     console.error('Permission denied - check your account permissions');
   } else {
@@ -535,7 +535,7 @@ try {
 
 ```typescript
 interface SubstackConfig {
-  apiKey: string;        // connect.sid cookie value
+  apiKey: string;        // substack.sid cookie value
   hostname?: string;     // publication hostname (optional)
 }
 ```
@@ -558,7 +558,7 @@ interface IteratorOptions {
 
 ### Authentication
 
-- Always use environment variables for your connect.sid cookie
+- Always use environment variables for your substack.sid cookie
 - Test connectivity before performing operations
 - Handle authentication errors gracefully
 

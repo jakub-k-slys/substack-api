@@ -13,7 +13,7 @@ export class HttpClient {
       throw new Error('apiKey is required in SubstackConfig')
     }
     this.baseUrl = baseUrl
-    this.cookie = `connect.sid=${config.apiKey}`
+    this.cookie = `substack.sid=${config.apiKey}`
     this.perPage = config.perPage || 25
   }
 
