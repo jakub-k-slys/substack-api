@@ -1,16 +1,16 @@
+import { Comment, FullPost, Note, OwnProfile, Profile } from './domain'
+import { InMemoryCache } from './internal/cache'
 import { HttpClient } from './internal/http-client'
-import { Profile, OwnProfile, FullPost, Note, Comment } from './domain'
 import {
-  PostService,
-  NoteService,
-  ProfileService,
-  SlugService,
   CachingSlugService,
   CommentService,
+  ConnectivityService,
   FolloweeService,
-  ConnectivityService
+  NoteService,
+  PostService,
+  ProfileService,
+  SlugService
 } from './internal/services'
-import { InMemoryCache } from './internal/cache'
 import type { SubstackConfig } from './types'
 
 /**
@@ -100,7 +100,7 @@ export class SubstackClient {
       const profile = await this.profileService.getProfileById(id)
 
       // Resolve slug from slug service
-      const resolvedSlug = await this.slugService.getSlugForUserId(id, profile.handle)
+      const resolvedSlug = await this.slugService.getSlugForUserId(id)
 
       return new Profile(
         profile,

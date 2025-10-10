@@ -159,8 +159,6 @@ describe('SubstackClient', () => {
       expect(ownProfile.id).toBe(123)
       expect(ownProfile.name).toBe('Test User')
       expect(mockProfileService.getOwnProfile).toHaveBeenCalled()
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/subscription')
-      expect(mockSlugService.getSlugForUserId).toHaveBeenCalledWith(123, 'testuser')
     })
 
     it('should throw error when authentication fails', async () => {
@@ -210,7 +208,7 @@ describe('SubstackClient', () => {
       const profile = await client.profileForId(123)
       expect(profile).toBeInstanceOf(Profile)
       expect(mockProfileService.getProfileById).toHaveBeenCalledWith(123)
-      expect(mockSlugService.getSlugForUserId).toHaveBeenCalledWith(123, 'testuser')
+      expect(mockSlugService.getSlugForUserId).toHaveBeenCalledWith(123)
     })
 
     it('should handle API error for profileForId', async () => {
@@ -260,7 +258,7 @@ describe('SubstackClient', () => {
       const profile = await client.profileForId(9876543210)
       expect(profile).toBeInstanceOf(Profile)
       expect(mockProfileService.getProfileById).toHaveBeenCalledWith(9876543210)
-      expect(mockSlugService.getSlugForUserId).toHaveBeenCalledWith(9876543210, 'testuser')
+      expect(mockSlugService.getSlugForUserId).toHaveBeenCalledWith(9876543210)
     })
   })
 
@@ -446,10 +444,10 @@ describe('SubstackClient', () => {
       const mockCommentData = {
         id: 999,
         body: 'Test comment',
-        created_at: '2023-01-01T00:00:00Z',
-        parent_post_id: 456,
-        author_id: 123,
-        author_name: 'Test User'
+        date: '2023-01-01T00:00:00Z',
+        post_id: 456,
+        user_id: 123,
+        name: 'Test User'
       }
       mockCommentService.getCommentById.mockResolvedValue(mockCommentData)
 

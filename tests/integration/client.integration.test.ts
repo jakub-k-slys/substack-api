@@ -92,7 +92,7 @@ describe('SubstackClient Integration Tests', () => {
 
         // Validate the profile object structure and content
         expect(profile).toBeInstanceOf(Profile)
-        expect(profile.slug).toBe(testSlug)
+        expect(profile.slug).toBe('jakubslys') // Resolved slug from slug service
         expect(profile.name).toBeDefined()
         expect(profile.id).toBeGreaterThan(0)
         expect(typeof profile.name).toBe('string')

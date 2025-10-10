@@ -1,5 +1,5 @@
-import { SubstackClient } from '../../src/substack-client'
 import { Profile } from '../../src/domain'
+import { SubstackClient } from '../../src/substack-client'
 
 describe('SubstackClient Entity Model E2E', () => {
   let client: SubstackClient
@@ -35,10 +35,10 @@ describe('SubstackClient Entity Model E2E', () => {
 
     expect(profile).toBeInstanceOf(Profile)
     expect(profile.name).toBeTruthy()
-    expect(profile.slug).toBe('platformer')
+    expect(profile.handle).toBe('platformer')
     expect(profile.id).toBeGreaterThan(0)
 
-    console.log(`✅ Retrieved profile: ${profile.name} (@${profile.slug})`)
+    console.log(`✅ Retrieved profile: ${profile.name} (@${profile.handle})`)
   })
 
   test('should get profile by slug - jakubslys', async () => {
@@ -47,10 +47,10 @@ describe('SubstackClient Entity Model E2E', () => {
 
     expect(profile).toBeInstanceOf(Profile)
     expect(profile.name).toBeTruthy()
-    expect(profile.slug).toBe('jakubslys')
+    expect(profile.handle).toBe('jakubslys')
     expect(profile.id).toBeGreaterThan(0)
 
-    console.log(`✅ Retrieved jakubslys profile: ${profile.name} (@${profile.slug})`)
+    console.log(`✅ Retrieved jakubslys profile: ${profile.name} (@${profile.handle})`)
   })
 
   test('should get profile by ID', async () => {
@@ -70,7 +70,7 @@ describe('SubstackClient Entity Model E2E', () => {
 
     // The profiles should match
     expect(profileById.name).toBe(profileBySlug.name)
-    expect(profileById.slug).toBe(profileBySlug.slug)
+    expect(profileById.handle).toBe(profileBySlug.handle)
 
     console.log(`✅ Retrieved profile by ID: ${profileById.name} (ID: ${profileById.id})`)
   })
@@ -142,7 +142,7 @@ describe('SubstackClient Entity Model E2E', () => {
   })
 
   test('should handle post comments iteration', async () => {
-    const profile = await client.profileForSlug('jakubslys')
+    const profile = await client.ownProfile()
 
     // Get a post from the profile
     let testPost = null

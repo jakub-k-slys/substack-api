@@ -10,6 +10,7 @@ import { Note } from './note'
 export class Profile {
   public readonly id: number
   public readonly slug: string
+  public readonly handle: string
   public readonly name: string
   public readonly url: string
   public readonly avatarUrl: string
@@ -31,8 +32,9 @@ export class Profile {
     this.id = rawData.id
     // Use resolved slug from subscriptions cache if available, otherwise fallback to handle
     this.slug = resolvedSlug || rawData.handle
+    this.handle = rawData.handle
     this.name = rawData.name
-    this.url = `https://substack.com/@${this.slug}`
+    this.url = `https://substack.com/@${this.handle}`
     this.avatarUrl = rawData.photo_url
     this.bio = rawData.bio
   }

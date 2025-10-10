@@ -1,5 +1,5 @@
-import type { SubstackFullProfile } from '../types'
 import type { HttpClient } from '../http-client'
+import type { SubstackFullProfile, SubstackUserProfile } from '../types'
 
 /**
  * Service responsible for profile-related HTTP operations
@@ -14,12 +14,7 @@ export class ProfileService {
    * @throws {Error} When authentication fails or profile cannot be retrieved
    */
   async getOwnProfile(): Promise<SubstackFullProfile> {
-    // Step 1: Get user_id from subscription endpoint
-    const subscription = await this.httpClient.get<{ user_id: number }>('/api/v1/subscription')
-    const userId = subscription.user_id
-
-    // Step 2: Get full profile using the user_id
-    return await this.httpClient.get<SubstackFullProfile>(`/api/v1/user/${userId}/profile`)
+    return await this.httpClient.get<SubstackFullProfile>('/api/v1/user/profile/self')
   }
 
   /**
@@ -29,7 +24,21 @@ export class ProfileService {
    * @throws {Error} When profile is not found or API request fails
    */
   async getProfileById(id: number): Promise<SubstackFullProfile> {
-    return await this.httpClient.get<SubstackFullProfile>(`/api/v1/user/${id}/profile`)
+    const profileFeed = await this.httpClient.get<SubstackUserProfile>(
+      `/api/v1/reader/feed/profile/${id}`
+    )
+
+    for (const item of profileFeed.items) {
+      if (item.context?.users.length > 0) {
+        for (const user of item.context.users) {
+          if (user.id === id) {
+            return await this.getProfileBySlug(user.handle)
+          }
+        }
+      }
+    }
+
+    throw new Error(`Profile with ID ${id} not found`)
   }
 
   /**
