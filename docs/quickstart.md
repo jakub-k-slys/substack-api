@@ -6,7 +6,7 @@ This guide will help you get started with the Substack API client quickly using 
 
 You'll need:
 - A Substack account with publication access
-- Your connect.sid cookie value for authentication  
+- Your substack.sid cookie value for authentication  
 - Node.js 16+ or a modern browser environment
 - TypeScript (recommended) or JavaScript
 
@@ -18,12 +18,12 @@ npm install substack-api
 
 ## Authentication Setup
 
-The Substack API uses cookie-based authentication. You need to extract your `connect.sid` cookie value:
+The Substack API uses cookie-based authentication. You need to extract your `substack.sid` cookie value:
 
 1. **Login to Substack** in your browser
 2. **Open Developer Tools** (F12 or right-click → "Inspect")
 3. **Go to Application/Storage tab** → Cookies → `https://substack.com`
-4. **Find the `connect.sid` cookie** and copy its value
+4. **Find the `substack.sid` cookie** and copy its value
 5. **Use this value** as your `apiKey` in the client configuration
 
 ## Basic Setup
@@ -223,7 +223,7 @@ try {
   console.log(`Authenticated as: ${profile.name}`);
 } catch (error) {
   if (error.message.includes('401')) {
-    console.error('Authentication failed - check your connect.sid cookie');
+    console.error('Authentication failed - check your substack.sid cookie');
   } else if (error.message.includes('404')) {
     console.error('Resource not found');
   } else {

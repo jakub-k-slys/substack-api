@@ -188,8 +188,10 @@ function mapUrlToSampleFile(url: string): string | null {
   const mappings: Record<string, string | null> = {
     'api/v1/subscription': 'subscription',
     'api/v1/subscriptions': 'subscriptions',
+    'api/v1/user/profile/self': 'user/282291554/profile', // New endpoint for own profile
     'api/v1/user/282291554/profile': 'user/282291554/profile',
     'api/v1/user/254824415/profile': 'user/282291554/profile', // Map the subscription user_id to existing profile
+    'api/v1/user/jennyouyang/public_profile': 'user/282291554/profile', // Map jennyouyang handle to profile
     'api/v1/user/jakubslys/public_profile': 'user/jakubslys/public_profile',
     'api/v1/users/282291554': 'user/282291554/profile',
     'api/v1/users/254824415': 'user/282291554/profile', // Map the subscription user_id to existing profile

@@ -23,7 +23,6 @@ describe('ProfileService', () => {
 
   describe('getOwnProfile', () => {
     it('should return own profile data from the HTTP client', async () => {
-      const mockSubscription = { user_id: 123 }
       const mockProfile: SubstackFullProfile = {
         id: 123,
         name: 'Test User',
@@ -61,37 +60,53 @@ describe('ProfileService', () => {
         dm_upgrade_options: []
       }
 
-      mockHttpClient.get.mockResolvedValueOnce(mockSubscription).mockResolvedValueOnce(mockProfile)
+      mockHttpClient.get.mockResolvedValueOnce(mockProfile)
 
       const result = await profileService.getOwnProfile()
 
       expect(result).toEqual(mockProfile)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/subscription')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/123/profile')
-    })
-
-    it('should throw error when subscription request fails', async () => {
-      const error = new Error('Subscription API Error')
-      mockHttpClient.get.mockRejectedValueOnce(error)
-
-      await expect(profileService.getOwnProfile()).rejects.toThrow('Subscription API Error')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/subscription')
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/profile/self')
     })
 
     it('should throw error when profile request fails', async () => {
-      const mockSubscription = { user_id: 123 }
       const error = new Error('Profile API Error')
-
-      mockHttpClient.get.mockResolvedValueOnce(mockSubscription).mockRejectedValueOnce(error)
+      mockHttpClient.get.mockRejectedValueOnce(error)
 
       await expect(profileService.getOwnProfile()).rejects.toThrow('Profile API Error')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/subscription')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/123/profile')
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/profile/self')
     })
   })
 
   describe('getProfileById', () => {
     it('should return profile data by ID from the HTTP client', async () => {
+      const mockFeedResponse = {
+        items: [
+          {
+            entity_key: 'test',
+            type: 'post',
+            context: {
+              users: [
+                {
+                  id: 456,
+                  handle: 'otheruser',
+                  name: 'Other User',
+                  photo_url: 'https://example.com/other.jpg'
+                }
+              ]
+            },
+            publication: null,
+            post: null,
+            comment: null,
+            parentComments: [],
+            canReply: false,
+            isMuted: false,
+            trackingParameters: {}
+          }
+        ],
+        originalCursorTimestamp: '2023-01-01T00:00:00Z',
+        nextCursor: 'abc123'
+      }
+
       const mockProfile: SubstackFullProfile = {
         id: 456,
         name: 'Other User',
@@ -129,12 +144,13 @@ describe('ProfileService', () => {
         dm_upgrade_options: []
       }
 
-      mockHttpClient.get.mockResolvedValueOnce(mockProfile)
+      mockHttpClient.get.mockResolvedValueOnce(mockFeedResponse).mockResolvedValueOnce(mockProfile)
 
       const result = await profileService.getProfileById(456)
 
       expect(result).toEqual(mockProfile)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/456/profile')
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/feed/profile/456')
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/otheruser/public_profile')
     })
 
     it('should throw error when HTTP request fails', async () => {
@@ -142,7 +158,7 @@ describe('ProfileService', () => {
       mockHttpClient.get.mockRejectedValueOnce(error)
 
       await expect(profileService.getProfileById(456)).rejects.toThrow('API Error')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/456/profile')
+      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/feed/profile/456')
     })
   })
 

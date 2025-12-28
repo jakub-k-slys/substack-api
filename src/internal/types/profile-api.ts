@@ -23,6 +23,7 @@ export interface SubstackPublicProfile extends SubstackUser {
   hasGuestPost: boolean
   primaryPublication?: SubstackPublicationBase
   max_pub_tier: number
+  handle: string
   hasActivity: boolean
   hasLikes: boolean
   lists: unknown[]

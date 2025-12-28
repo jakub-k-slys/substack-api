@@ -57,11 +57,11 @@ SUBSTACK_API_KEY=your-connect-sid-cookie-value
 SUBSTACK_HOSTNAME=example.substack.com
 ```
 
-To get your connect.sid cookie value:
+To get your substack.sid cookie value:
 1. Login to Substack in your browser
 2. Open Developer Tools (F12)
 3. Go to Application/Storage → Cookies → `https://substack.com`
-4. Copy the `connect.sid` value
+4. Copy the `substack.sid` value
 
 ## Project Structure
 
@@ -170,7 +170,7 @@ The project includes end-to-end (E2E) tests that validate integration with the r
    cp .env.example .env
    ```
 
-   Edit the `.env` file and add your connect.sid cookie:
+   Edit the `.env` file and add your substack.sid cookie:
 
    ```bash
    SUBSTACK_API_KEY=your-connect-sid-cookie-value
@@ -179,11 +179,11 @@ The project includes end-to-end (E2E) tests that validate integration with the r
 
    **Important**: Never commit your `.env` file to version control. It's already included in `.gitignore`.
 
-2. **Obtain credentials**: Get your connect.sid cookie value:
+2. **Obtain credentials**: Get your substack.sid cookie value:
    - Login to Substack in your browser
    - Open Developer Tools (F12)  
    - Go to Application/Storage → Cookies → `https://substack.com`
-   - Copy the `connect.sid` value
+   - Copy the `substack.sid` value
 
 #### Running E2E Tests
 

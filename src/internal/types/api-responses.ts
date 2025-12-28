@@ -33,7 +33,7 @@ export const SubstackPostCodec = t.intersection([
     slug: t.string,
     post_date: t.string,
     canonical_url: t.string,
-    type: t.union([t.literal('newsletter'), t.literal('podcast'), t.literal('thread')])
+    type: t.union([t.literal('newsletter'), t.literal('podcast'), t.literal('thread'), t.literal('restack')])
   }),
   t.partial({
     subtitle: t.string,
@@ -67,7 +67,7 @@ export const SubstackFullPostCodec = t.intersection([
     slug: t.string,
     post_date: t.string,
     canonical_url: t.string,
-    type: t.union([t.literal('newsletter'), t.literal('podcast'), t.literal('thread')]),
+    type: t.union([t.literal('newsletter'), t.literal('podcast'), t.literal('thread'), t.literal('restack')]),
     body_html: t.string
   }),
   t.partial({
@@ -94,16 +94,17 @@ export const SubstackFullPostCodec = t.intersection([
 export type SubstackFullPost = t.TypeOf<typeof SubstackFullPostCodec>
 
 /**
- * Raw API response shape for comments - flattened
+ * Raw API response shape for comments from /api/v1/post/{id}/comments endpoint
+ * Uses actual field names from the API response
  */
 export const SubstackCommentCodec = t.intersection([
   t.type({
     id: t.number,
     body: t.string,
-    created_at: t.string,
-    parent_post_id: t.number,
-    author_id: t.number,
-    author_name: t.string
+    date: t.string,
+    post_id: t.number,
+    user_id: t.number,
+    name: t.string
   }),
   t.partial({
     author_is_admin: t.boolean
