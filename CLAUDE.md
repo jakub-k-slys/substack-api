@@ -5,26 +5,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ### Build & Development
-- `npm run build` - Compile TypeScript to JavaScript
-- `npm run clean` - Remove dist/ directory
-- `npm run sample` - Run example code from samples/
+- `pnpm build` - Compile TypeScript to JavaScript
+- `pnpm clean` - Remove dist/ directory
+- `pnpm sample` - Run example code from samples/
 
 ### Testing
-- `npm test` - Run all tests (unit, integration, e2e)
-- `npm run test:unit` - Unit tests only
-- `npm run test:integration` - Integration tests only  
-- `npm run test:e2e` - End-to-end tests only
-- `npm run test:watch` - Unit tests in watch mode
-- `npm run test:integration:watch` - Integration tests in watch mode
-- `npm run test:e2e:watch` - E2E tests in watch mode
+- `pnpm test` - Run all tests (unit, integration, e2e)
+- `pnpm test:unit` - Unit tests only
+- `pnpm test:integration` - Integration tests only
+- `pnpm test:e2e` - End-to-end tests only
+- `pnpm test:watch` - Unit tests in watch mode
+- `pnpm test:integration:watch` - Integration tests in watch mode
+- `pnpm test:e2e:watch` - E2E tests in watch mode
 
 ### Code Quality
-- `npm run lint` - Check code style and formatting
-- `npm run lint:fix` - Auto-fix linting issues
-- `npm run format` - Format code with Prettier
-- `npm run format:check` - Check formatting without changing files
+- `pnpm lint` - Check code style and formatting
+- `pnpm lint:fix` - Auto-fix linting issues
+- `pnpm format` - Format code with Prettier
+- `pnpm format:check` - Check formatting without changing files
 
-**Required before committing:** Run `npm run lint`, `npm run build`, and `npm test`
+**Required before committing:** Run `pnpm lint`, `pnpm build`, and `pnpm test`
 
 ## Architecture
 

@@ -16,7 +16,8 @@ describe('note publishing tests', () => {
     client = new SubstackClient({
       hostname: hostname,
       apiKey: 'test-key',
-      protocol: 'http' // Use HTTP for local test server
+      protocol: 'http', // Use HTTP for local test server
+      substackBaseUrl: global.INTEGRATION_SERVER.url // Configure global client to use mock server too
     })
   })
 

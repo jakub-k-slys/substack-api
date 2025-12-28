@@ -23,11 +23,7 @@ export class Profile {
     protected readonly postService: PostService,
     protected readonly noteService: NoteService,
     protected readonly commentService: CommentService,
-    resolvedSlug?: string,
-    protected readonly slugResolver?: (
-      userId: number,
-      fallbackHandle?: string
-    ) => Promise<string | undefined>
+    resolvedSlug?: string
   ) {
     this.id = rawData.id
     // Use resolved slug from subscriptions cache if available, otherwise fallback to handle
@@ -50,7 +46,6 @@ export class Profile {
       let totalYielded = 0
 
       while (true) {
-        // Use PostService to get posts
         const postsData = await this.postService.getPostsForProfile(this.id, {
           limit: perPageConfig,
           offset
@@ -75,7 +70,8 @@ export class Profile {
 
         offset += perPageConfig
       }
-    } catch {
+    } catch (error) {
+      console.log(error)
       // If the endpoint doesn't exist or fails, return empty iterator
       yield* []
     }

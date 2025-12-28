@@ -45,10 +45,6 @@ export class CommentService {
     const commentData: SubstackComment = {
       id: response.item.comment.id,
       body: response.item.comment.body,
-      date: response.item.comment.date,
-      post_id: response.item.comment.post_id || 0,
-      user_id: response.item.comment.user_id,
-      name: response.item.comment.name,
       author_is_admin: false // Default value since not in response
     }
 

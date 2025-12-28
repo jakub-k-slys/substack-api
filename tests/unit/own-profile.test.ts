@@ -28,34 +28,7 @@ describe('OwnProfile Entity', () => {
       handle: 'testuser',
       photo_url: 'https://example.com/photo.jpg',
       bio: 'Test bio',
-      profile_set_up_at: '2023-01-01T00:00:00Z',
-      reader_installed_at: '2023-01-01T00:00:00Z',
-      profile_disabled: false,
-      publicationUsers: [],
-      userLinks: [],
-      subscriptions: [],
-      subscriptionsTruncated: false,
-      hasGuestPost: false,
-      max_pub_tier: 1,
-      hasActivity: false,
-      hasLikes: false,
-      lists: [],
-      rough_num_free_subscribers_int: 0,
-      rough_num_free_subscribers: '0',
-      bestseller_badge_disabled: false,
-      subscriberCountString: '0',
-      subscriberCount: '0',
-      subscriberCountNumber: 0,
-      hasHiddenPublicationUsers: false,
-      visibleSubscriptionsCount: 0,
-      slug: 'testuser',
-      primaryPublicationIsPledged: false,
-      primaryPublicationSubscriptionState: 'none',
-      isSubscribed: false,
-      isFollowing: false,
-      followsViewer: false,
-      can_dm: false,
-      dm_upgrade_options: []
+
     } as SubstackFullProfile
 
     // Mock the legacy client
@@ -112,7 +85,7 @@ describe('OwnProfile Entity', () => {
 
   it('should have additional write methods', () => {
     expect(typeof ownProfile.newNote).toBe('function')
-    expect(typeof ownProfile.followees).toBe('function')
+    expect(typeof ownProfile.following).toBe('function')
     expect(typeof ownProfile.notes).toBe('function')
   })
 
@@ -122,8 +95,11 @@ describe('OwnProfile Entity', () => {
   })
 
   it('should iterate through followees using correct endpoint chain', async () => {
-    // Mock the response from /api/v1/feed/following (returns array of user IDs)
-    const mockFollowingIds = [1, 2]
+    // Mock the response from /api/v1/feed/following (returns array of FollowingUser objects)
+    const mockFollowingIds = [
+      { id: 1, handle: 'user1' },
+      { id: 2, handle: 'user2' }
+    ]
 
     // Mock the responses from /api/v1/user/{id}/profile
     const mockProfile1 = {
@@ -132,34 +108,7 @@ describe('OwnProfile Entity', () => {
       name: 'User One',
       photo_url: 'https://example.com/user1.jpg',
       bio: 'Bio for User One',
-      profile_set_up_at: '2023-01-01T00:00:00Z',
-      reader_installed_at: '2023-01-01T00:00:00Z',
-      profile_disabled: false,
-      publicationUsers: [],
-      userLinks: [],
-      subscriptions: [],
-      subscriptionsTruncated: false,
-      hasGuestPost: false,
-      max_pub_tier: 1,
-      hasActivity: false,
-      hasLikes: false,
-      lists: [],
-      rough_num_free_subscribers_int: 0,
-      rough_num_free_subscribers: '0',
-      bestseller_badge_disabled: false,
-      subscriberCountString: '0',
-      subscriberCount: '0',
-      subscriberCountNumber: 0,
-      hasHiddenPublicationUsers: false,
-      visibleSubscriptionsCount: 0,
-      slug: 'user1',
-      primaryPublicationIsPledged: false,
-      primaryPublicationSubscriptionState: 'none',
-      isSubscribed: false,
-      isFollowing: false,
-      followsViewer: false,
-      can_dm: false,
-      dm_upgrade_options: []
+
     } as SubstackFullProfile
 
     const mockProfile2 = {
@@ -168,44 +117,17 @@ describe('OwnProfile Entity', () => {
       name: 'User Two',
       photo_url: 'https://example.com/user2.jpg',
       bio: 'Bio for User Two',
-      profile_set_up_at: '2023-01-01T00:00:00Z',
-      reader_installed_at: '2023-01-01T00:00:00Z',
-      profile_disabled: false,
-      publicationUsers: [],
-      userLinks: [],
-      subscriptions: [],
-      subscriptionsTruncated: false,
-      hasGuestPost: false,
-      max_pub_tier: 1,
-      hasActivity: false,
-      hasLikes: false,
-      lists: [],
-      rough_num_free_subscribers_int: 0,
-      rough_num_free_subscribers: '0',
-      bestseller_badge_disabled: false,
-      subscriberCountString: '0',
-      subscriberCount: '0',
-      subscriberCountNumber: 0,
-      hasHiddenPublicationUsers: false,
-      visibleSubscriptionsCount: 0,
-      slug: 'user2',
-      primaryPublicationIsPledged: false,
-      primaryPublicationSubscriptionState: 'none',
-      isSubscribed: false,
-      isFollowing: false,
-      followsViewer: false,
-      can_dm: false,
-      dm_upgrade_options: []
+
     } as SubstackFullProfile
 
     // Setup service mocks
     mockFolloweeService.getFollowees.mockResolvedValue(mockFollowingIds)
-    mockProfileService.getProfileById
+    mockProfileService.getProfileBySlug
       .mockResolvedValueOnce(mockProfile1)
       .mockResolvedValueOnce(mockProfile2)
 
     const followees = []
-    for await (const profile of ownProfile.followees()) {
+    for await (const profile of ownProfile.following()) {
       followees.push(profile)
     }
 
@@ -216,32 +138,36 @@ describe('OwnProfile Entity', () => {
 
     // Verify correct service calls were made
     expect(mockFolloweeService.getFollowees).toHaveBeenCalledTimes(1)
-    expect(mockProfileService.getProfileById).toHaveBeenCalledWith(1)
-    expect(mockProfileService.getProfileById).toHaveBeenCalledWith(2)
-    expect(mockProfileService.getProfileById).toHaveBeenCalledTimes(2)
+    expect(mockProfileService.getProfileBySlug).toHaveBeenCalledWith('user1')
+    expect(mockProfileService.getProfileBySlug).toHaveBeenCalledWith('user2')
+    expect(mockProfileService.getProfileBySlug).toHaveBeenCalledTimes(2)
   })
 
   it('should handle empty followees response', async () => {
     mockFolloweeService.getFollowees.mockResolvedValue([]) // Empty array of user IDs
 
     const followees = []
-    for await (const profile of ownProfile.followees()) {
+    for await (const profile of ownProfile.following()) {
       followees.push(profile)
     }
 
     expect(followees).toHaveLength(0)
     expect(mockFolloweeService.getFollowees).toHaveBeenCalledTimes(1)
-    expect(mockProfileService.getProfileById).not.toHaveBeenCalled() // No profile calls should be made
+    expect(mockProfileService.getProfileBySlug).not.toHaveBeenCalled() // No profile calls should be made
   })
 
   it('should handle profile fetch errors gracefully', async () => {
-    // Mock the FolloweeService to return user IDs
-    const mockFollowingIds = [1, 2, 3]
+    // Mock the FolloweeService to return FollowingUser objects
+    const mockFollowingIds = [
+      { id: 1, handle: 'user1' },
+      { id: 2, handle: 'user2' },
+      { id: 3, handle: 'user3' }
+    ]
     mockFolloweeService.getFollowees.mockResolvedValue(mockFollowingIds)
 
     // Mock ProfileService where one profile fetch fails
-    mockProfileService.getProfileById.mockImplementation((userId: number) => {
-      if (userId === 1) {
+    mockProfileService.getProfileBySlug.mockImplementation((slug: string) => {
+      if (slug === 'user1') {
         return Promise.resolve({
           id: 1,
           handle: 'user1',
@@ -277,10 +203,10 @@ describe('OwnProfile Entity', () => {
           can_dm: false,
           dm_upgrade_options: []
         } as SubstackFullProfile)
-      } else if (userId === 2) {
+      } else if (slug === 'user2') {
         // This one fails (e.g., deleted account)
         return Promise.reject(new Error('Profile not found'))
-      } else if (userId === 3) {
+      } else if (slug === 'user3') {
         return Promise.resolve({
           id: 3,
           handle: 'user3',
@@ -317,11 +243,11 @@ describe('OwnProfile Entity', () => {
           dm_upgrade_options: []
         } as SubstackFullProfile)
       }
-      return Promise.reject(new Error(`Unexpected userId: ${userId}`))
+      return Promise.reject(new Error(`Unexpected slug: ${slug}`))
     })
 
     const followees = []
-    for await (const profile of ownProfile.followees()) {
+    for await (const profile of ownProfile.following()) {
       followees.push(profile)
     }
 
@@ -332,23 +258,13 @@ describe('OwnProfile Entity', () => {
 
     // Verify service calls were made
     expect(mockFolloweeService.getFollowees).toHaveBeenCalledTimes(1)
-    expect(mockProfileService.getProfileById).toHaveBeenCalledWith(1)
-    expect(mockProfileService.getProfileById).toHaveBeenCalledWith(2)
-    expect(mockProfileService.getProfileById).toHaveBeenCalledWith(3)
-    expect(mockProfileService.getProfileById).toHaveBeenCalledTimes(3)
+    expect(mockProfileService.getProfileBySlug).toHaveBeenCalledWith('user1')
+    expect(mockProfileService.getProfileBySlug).toHaveBeenCalledWith('user2')
+    expect(mockProfileService.getProfileBySlug).toHaveBeenCalledWith('user3')
+    expect(mockProfileService.getProfileBySlug).toHaveBeenCalledTimes(3)
   })
 
-  it('should use slug resolver for followees when available', async () => {
-    // Create a mock slug resolver
-    const mockSlugResolver = jest.fn()
-
-    // Setup mock slug resolver to return different slugs than the handle
-    mockSlugResolver.mockImplementation((userId: number, fallbackHandle?: string) => {
-      if (userId === 1) return Promise.resolve('resolved-slug-1')
-      if (userId === 2) return Promise.resolve('resolved-slug-2')
-      return Promise.resolve(fallbackHandle)
-    })
-
+  it('should use handles as slugs for followees', async () => {
     // Create fresh service mocks for this test
     const localFolloweeService = {
       getFollowees: jest.fn()
@@ -360,7 +276,7 @@ describe('OwnProfile Entity', () => {
       getProfileBySlug: jest.fn()
     } as unknown as jest.Mocked<ProfileService>
 
-    // Create OwnProfile with the slug resolver
+    // Create OwnProfile
     const ownProfileWithResolver = new OwnProfile(
       mockProfileData,
       {
@@ -374,23 +290,25 @@ describe('OwnProfile Entity', () => {
       mockNoteService,
       mockCommentService,
       localFolloweeService,
-      'resolved-own-slug',
-      mockSlugResolver
+      'resolved-own-slug'
     )
 
     // Mock the services
-    const mockFollowingIds = [1, 2]
+    const mockFollowingIds = [
+      { id: 1, handle: 'user1' },
+      { id: 2, handle: 'user2' }
+    ]
     localFolloweeService.getFollowees.mockResolvedValue(mockFollowingIds)
 
-    localProfileService.getProfileById.mockImplementation((userId: number) => {
-      if (userId === 1) {
+    localProfileService.getProfileBySlug.mockImplementation((slug: string) => {
+      if (slug === 'user1') {
         return Promise.resolve({
           id: 1,
           handle: 'user1',
           name: 'User One',
           photo_url: 'https://example.com/user1.jpg'
         } as SubstackFullProfile)
-      } else if (userId === 2) {
+      } else if (slug === 'user2') {
         return Promise.resolve({
           id: 2,
           handle: 'user2',
@@ -398,24 +316,23 @@ describe('OwnProfile Entity', () => {
           photo_url: 'https://example.com/user2.jpg'
         } as SubstackFullProfile)
       }
-      return Promise.reject(new Error(`Unexpected userId: ${userId}`))
+      return Promise.reject(new Error(`Unexpected slug: ${slug}`))
     })
 
     const followees = []
-    for await (const profile of ownProfileWithResolver.followees()) {
+    for await (const profile of ownProfileWithResolver.following()) {
       followees.push(profile)
     }
 
     expect(followees).toHaveLength(2)
 
-    // Check that the slug resolver was called for each user
-    expect(mockSlugResolver).toHaveBeenCalledWith(1, 'user1')
-    expect(mockSlugResolver).toHaveBeenCalledWith(2, 'user2')
-    expect(mockSlugResolver).toHaveBeenCalledTimes(2)
+    // The handle from the FollowingUser is used directly as the slug
+    expect(followees[0].slug).toBe('user1')
+    expect(followees[1].slug).toBe('user2')
 
-    // Check that the resolved slugs are used
-    expect(followees[0].slug).toBe('resolved-slug-1')
-    expect(followees[1].slug).toBe('resolved-slug-2')
+    // Verify that Profile instances are created correctly
+    expect(followees[0]).toBeInstanceOf(Profile)
+    expect(followees[1]).toBeInstanceOf(Profile)
   })
 
   describe('notes()', () => {

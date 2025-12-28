@@ -9,22 +9,22 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "npm run test:unit && npm run test:integration && npm run test:e2e",
+    "test": "pnpm test:unit && pnpm test:integration && pnpm test:e2e",
     "test:unit": "jest",
     "test:integration": "jest --config jest.integration.config.js",
     "test:e2e": "jest --config jest.e2e.config.js",
     "test:watch": "jest --watch",
     "test:integration:watch": "jest --config jest.integration.config.js --watch",
     "test:e2e:watch": "jest --config jest.e2e.config.js --watch",
-    "test:all": "npm run test:unit && npm run test:integration && npm run test:e2e",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm run lint && npm test",
+    "test:all": "pnpm test:unit && pnpm test:integration && pnpm test:e2e",
+    "prepare": "pnpm build",
+    "prepublishOnly": "pnpm lint && pnpm test",
     "clean": "rm -rf dist",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write \"src/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\"",
-    "sample": "npx ts-node samples/index.ts"
+    "sample": "pnpm exec ts-node samples/index.ts"
   },
   "repository": {
     "type": "git",

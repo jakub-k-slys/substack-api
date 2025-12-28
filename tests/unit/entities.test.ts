@@ -61,7 +61,6 @@ describe('SubstackClient Entity Model', () => {
         subscriberCountNumber: 0,
         hasHiddenPublicationUsers: false,
         visibleSubscriptionsCount: 0,
-        slug: 'testuser',
         primaryPublicationIsPledged: false,
         primaryPublicationSubscriptionState: 'not_subscribed',
         isSubscribed: false,
@@ -114,9 +113,8 @@ describe('SubstackClient Entity Model', () => {
       const mockData = {
         id: 456,
         title: 'Test Post',
-        slug: 'test-post',
+        slug: "test-slug",
         post_date: '2023-01-01T00:00:00Z',
-        canonical_url: 'https://example.com/post',
         type: 'newsletter' as const
       }
       const httpClient = (client as unknown as { httpClient: HttpClient }).httpClient

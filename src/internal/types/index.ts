@@ -9,11 +9,10 @@ export type {
   SubstackFullPost,
   SubstackComment,
   SubstackCommentResponse,
-  SubstackSearchResult,
-  SubstackSubscription,
-  SubstackPublicationUser as SubstackAPIPublicationUser,
   SubstackSubscriptionPublication,
-  SubstackSubscriptionsResponse
+  SubstackSubscriptionsResponse,
+  SubstackFullProfile,
+  SubstackNote
 } from './api-responses'
 
 // Export io-ts codecs for runtime validation
@@ -23,7 +22,8 @@ export {
   SubstackFullPostCodec,
   SubstackCommentCodec,
   SubstackCommentResponseCodec,
-  SubstackSearchResultCodec
+  SubstackFullProfileCodec,
+  SubstackNoteCodec
 } from './api-responses'
 
 export type {
@@ -35,14 +35,13 @@ export type {
 } from './note-api'
 
 export type {
-  SubstackNote,
   SubstackNoteContext,
   SubstackNoteComment,
   SubstackNoteTracking,
   PaginatedSubstackNotes
 } from './note-details'
 
-export type { SubstackPublicProfile, SubstackFullProfile, SubstackUserProfile } from './profile-api'
+export type { SubstackPublicProfile, SubstackUserProfile } from './profile-api'
 
 export type {
   SubstackUser,

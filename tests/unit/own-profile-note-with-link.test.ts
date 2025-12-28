@@ -98,7 +98,10 @@ describe('OwnProfile - newNoteWithLink', () => {
     mockPostService = new MockPostService(mockClient, mockClient) as jest.Mocked<PostService>
     mockNoteService = new MockNoteService(mockClient) as jest.Mocked<NoteService>
     mockCommentService = new MockCommentService(mockClient) as jest.Mocked<CommentService>
-    mockFolloweeService = new MockFolloweeService(mockClient) as jest.Mocked<FolloweeService>
+    mockFolloweeService = new MockFolloweeService(
+      mockClient,
+      mockClient
+    ) as jest.Mocked<FolloweeService>
 
     ownProfile = new OwnProfile(
       mockProfileData,

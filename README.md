@@ -10,7 +10,7 @@ A modern, type-safe TypeScript client for the Substack API. Build newsletter aut
 ## QuickStart
 
 ```bash
-npm install substack-api
+pnpm add substack-api
 ```
 
 ```typescript

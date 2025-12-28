@@ -7,12 +7,7 @@ import type { HttpClient } from '../internal/http-client'
 export class Comment {
   public readonly id: number
   public readonly body: string
-  public readonly author: {
-    id: number
-    name: string
-    isAdmin?: boolean
-  }
-  public readonly createdAt: Date
+  public readonly isAdmin?: boolean
   public readonly likesCount?: number
 
   constructor(
@@ -21,12 +16,7 @@ export class Comment {
   ) {
     this.id = rawData.id
     this.body = rawData.body
-    this.author = {
-      id: rawData.user_id,
-      name: rawData.name,
-      isAdmin: rawData.author_is_admin
-    }
-    this.createdAt = new Date(rawData.date)
+    this.isAdmin = rawData.author_is_admin
     this.likesCount = undefined // TODO: Extract from rawData when available
   }
 }

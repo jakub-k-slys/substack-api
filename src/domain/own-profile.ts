@@ -23,8 +23,7 @@ export class OwnProfile extends Profile {
     noteService: NoteService,
     commentService: CommentService,
     private readonly followeeService: FolloweeService,
-    resolvedSlug?: string,
-    slugResolver?: (userId: number, fallbackHandle?: string) => Promise<string | undefined>
+    resolvedSlug?: string
   ) {
     super(
       rawData,
@@ -33,8 +32,7 @@ export class OwnProfile extends Profile {
       postService,
       noteService,
       commentService,
-      resolvedSlug,
-      slugResolver
+      resolvedSlug
     )
   }
 
@@ -55,25 +53,15 @@ export class OwnProfile extends Profile {
   /**
    * Get users that the authenticated user follows
    */
-  async *followees(options: { limit?: number } = {}): AsyncIterable<Profile> {
-    // Use FolloweeService to get the list of user IDs that the user follows
-    const followingUserIds = await this.followeeService.getFollowees()
+  async *following(options: { limit?: number } = {}): AsyncIterable<Profile> {
+    const followingUsers = await this.followeeService.getFollowees()
 
-    // Then, for each user ID, fetch their detailed profile
     let count = 0
-    for (const userId of followingUserIds) {
+    for (const user of followingUsers) {
       if (options.limit && count >= options.limit) break
 
       try {
-        const profileResponse = await this.profileService.getProfileById(userId)
-
-        // Use the same slug resolution as the main client if available
-        let resolvedSlug = profileResponse.handle
-        if (this.slugResolver) {
-          resolvedSlug =
-            (await this.slugResolver(userId, profileResponse.handle)) || profileResponse.handle
-        }
-
+        const profileResponse = await this.profileService.getProfileBySlug(user.handle)
         yield new Profile(
           profileResponse,
           this.client,
@@ -81,14 +69,11 @@ export class OwnProfile extends Profile {
           this.postService,
           this.noteService,
           this.commentService,
-          resolvedSlug,
-          this.slugResolver
+          user.handle
         )
         count++
       } catch {
-        // Skip profiles that can't be fetched (e.g., deleted accounts, private profiles)
-        // This ensures the iterator continues working even if some profiles are inaccessible
-        continue
+        /* empty */
       }
     }
   }

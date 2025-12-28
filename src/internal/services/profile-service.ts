@@ -1,5 +1,6 @@
 import type { HttpClient } from '../http-client'
 import type { SubstackFullProfile, SubstackUserProfile } from '../types'
+import type { PotentialHandles } from '../types/potential-handles'
 
 /**
  * Service responsible for profile-related HTTP operations
@@ -8,13 +9,19 @@ import type { SubstackFullProfile, SubstackUserProfile } from '../types'
 export class ProfileService {
   constructor(private readonly httpClient: HttpClient) {}
 
+  async getOwnSlug(): Promise<string> {
+    const data = await this.httpClient.get<PotentialHandles>('/api/v1/handle/options')
+    const existingHandle = data.potentialHandles.filter((handle) => handle.type == 'existing')[0]
+    return existingHandle.handle
+  }
   /**
    * Get authenticated user's own profile
    * @returns Promise<SubstackFullProfile> - Raw profile data from API
    * @throws {Error} When authentication fails or profile cannot be retrieved
    */
   async getOwnProfile(): Promise<SubstackFullProfile> {
-    return await this.httpClient.get<SubstackFullProfile>('/api/v1/user/profile/self')
+    const ownSlug = await this.getOwnSlug()
+    return await this.httpClient.get<SubstackFullProfile>(`/api/v1/user/${ownSlug}/public_profile`)
   }
 
   /**

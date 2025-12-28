@@ -186,6 +186,7 @@ function mapUrlToSampleFile(url: string): string | null {
 
   // Map common API endpoints to sample files
   const mappings: Record<string, string | null> = {
+    'api/v1/handle/options': 'handle/options',
     'api/v1/subscription': 'subscription',
     'api/v1/subscriptions': 'subscriptions',
     'api/v1/user/profile/self': 'user/282291554/profile', // New endpoint for own profile

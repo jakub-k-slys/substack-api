@@ -141,7 +141,7 @@ async function runExample(): Promise<void> {
     // 6. List followees
     console.log('\n🤝 Fetching users you follow...')
     try {
-      for await (const followee of profile.followees({ limit: 3 })) {
+      for await (const followee of profile.following({ limit: 3 })) {
         console.log(`   ${followee.name} (@${followee.slug})`)
         if (followee.bio) {
           const bioPrev = followee.bio.length > 80 ? 

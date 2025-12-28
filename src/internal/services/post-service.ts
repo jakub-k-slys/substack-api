@@ -66,8 +66,8 @@ export class PostService {
     profileId: number,
     options: { limit: number; offset: number }
   ): Promise<SubstackPost[]> {
-    const response = await this.httpClient.get<{ posts?: unknown[] }>(
-      `/api/v1/profile/posts?profile_user_id=${profileId}&limit=${options.limit}&offset=${options.offset}`
+    const response = await this.globalHttpClient.get<{ posts: unknown[] }>(
+      `/api/v1/profile/posts?profile_user_id=${profileId}`
     )
 
     const posts = response.posts || []

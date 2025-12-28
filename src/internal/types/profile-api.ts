@@ -46,10 +46,6 @@ export interface SubstackPublicProfile extends SubstackUser {
   dm_upgrade_options: string[]
 }
 
-export interface SubstackFullProfile extends SubstackPublicProfile {
-  userProfile?: SubstackUserProfile
-}
-
 export interface SubstackUserProfile {
   items: Array<{
     entity_key: string

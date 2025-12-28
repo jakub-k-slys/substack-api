@@ -3,8 +3,8 @@
  */
 
 export interface RequiredEnvVars {
-  SUBSTACK_API_KEY: string
-  SUBSTACK_HOSTNAME?: string
+  apiKey: string
+  hostname: string
 }
 
 /**
@@ -12,10 +12,10 @@ export interface RequiredEnvVars {
  * @throws Error with descriptive message if required variables are missing
  */
 export function validateE2ECredentials(): RequiredEnvVars {
-  const apiKey = process.env.SUBSTACK_API_KEY || process.env.E2E_API_KEY
-  const hostname = process.env.SUBSTACK_HOSTNAME || process.env.E2E_HOSTNAME
+  const apiKey = process.env.SUBSTACK_API_KEY
+  const hostname = process.env.SUBSTACK_HOSTNAME
 
-  if (!apiKey) {
+  if (!apiKey || !hostname) {
     throw new Error(`
 ❌ Missing required Substack credentials. Set SUBSTACK_API_KEY and SUBSTACK_HOSTNAME.
 
@@ -31,9 +31,8 @@ You can set these variables:
 For more information, see tests/e2e/README.md
 `)
   }
-
   return {
-    SUBSTACK_API_KEY: apiKey,
-    SUBSTACK_HOSTNAME: hostname
+    apiKey,
+    hostname
   }
 }
