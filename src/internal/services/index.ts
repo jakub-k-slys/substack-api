@@ -3,9 +3,9 @@
  * Services handle HTTP communication and return internal types
  */
 
-export { PostService } from './post-service'
-export { NoteService } from './note-service'
-export { ProfileService } from './profile-service'
-export { CommentService } from './comment-service'
-export { FollowingService } from './following-service'
-export { ConnectivityService } from './connectivity-service'
+export { PostService } from '@/internal/services/post-service'
+export { NoteService } from '@/internal/services/note-service'
+export { ProfileService } from '@/internal/services/profile-service'
+export { CommentService } from '@/internal/services/comment-service'
+export { FollowingService } from '@/internal/services/following-service'
+export { ConnectivityService } from '@/internal/services/connectivity-service'

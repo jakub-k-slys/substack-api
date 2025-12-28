@@ -61,7 +61,7 @@ export default [
       }],
       'no-restricted-imports': ['error', {
         'patterns': [{
-          'group': ['../*', '../../*', '../../../*'],
+          'group': ['./*', '../*', '../../*', '../../../*'],
           'message': 'Relative imports are forbidden. Use @/ path alias instead (e.g., @/domain, @/internal/services).'
         }]
       }],
@@ -118,7 +118,7 @@ export default [
       }],
       'no-restricted-imports': ['error', {
         'patterns': [{
-          'group': ['../*', '../../*', '../../../*'],
+          'group': ['./*', '../*', '../../*', '../../../*'],
           'message': 'Relative imports are forbidden. Use @/ path alias instead (e.g., @/domain, @/internal/services).'
         }]
       }],
@@ -175,7 +175,7 @@ export default [
       }],
       'no-restricted-imports': ['error', {
         'patterns': [{
-          'group': ['../*', '../../*', '../../../*'],
+          'group': ['./*', '../*', '../../*', '../../../*'],
           'message': 'Relative imports are forbidden. Use @/ path alias instead (e.g., @/domain, @/internal/services).'
         }]
       }],

@@ -13,7 +13,7 @@ export type {
   SubstackSubscriptionsResponse,
   SubstackFullProfile,
   SubstackNote
-} from './api-responses'
+} from '@/internal/types/api-responses'
 
 // Export io-ts codecs for runtime validation
 export {
@@ -24,7 +24,7 @@ export {
   SubstackCommentResponseCodec,
   SubstackFullProfileCodec,
   SubstackNoteCodec
-} from './api-responses'
+} from '@/internal/types/api-responses'
 
 export type {
   NoteBodyJson,
@@ -32,16 +32,16 @@ export type {
   PublishNoteResponse,
   CreateAttachmentRequest,
   CreateAttachmentResponse
-} from './note-api'
+} from '@/internal/types/note-api'
 
 export type {
   SubstackNoteContext,
   SubstackNoteComment,
   SubstackNoteTracking,
   PaginatedSubstackNotes
-} from './note-details'
+} from '@/internal/types/note-details'
 
-export type { SubstackPublicProfile, SubstackUserProfile } from './profile-api'
+export type { SubstackPublicProfile, SubstackUserProfile } from '@/internal/types/profile-api'
 
 export type {
   SubstackUser,
@@ -56,4 +56,4 @@ export type {
   SubstackProfileSubscription,
   SubstackTrackingParameters,
   SubstackProfileItemContext
-} from './common'
+} from '@/internal/types/common'

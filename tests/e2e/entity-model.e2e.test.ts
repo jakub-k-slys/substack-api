@@ -1,6 +1,6 @@
 import { SubstackClient } from '@/substack-client'
 import { PreviewPost, Profile, Comment } from '@/domain'
-import { validateE2ECredentials } from './checkEnv'
+import { validateE2ECredentials } from '@test/e2e/checkEnv'
 
 describe('SubstackClient Entity Model E2E', () => {
   let client: SubstackClient
