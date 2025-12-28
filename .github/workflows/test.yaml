@@ -147,7 +147,8 @@ jobs:
             - name: Install
               run: pnpm install
             - name: Running E2E tests
-              run: pnpm test:e2e
+              run: |
+                SUBSTACK_API_KEY=${{ secrets.SUBSTACK_API_KEY }} SUBSTACK_HOSTNAME=${{ secrets.SUBSTACK_HOSTNAME }} pnpm test:e2e
               env:
                 SUBSTACK_API_KEY: ${{ secrets.SUBSTACK_API_KEY }}
                 SUBSTACK_HOSTNAME: ${{ secrets.SUBSTACK_HOSTNAME }}
