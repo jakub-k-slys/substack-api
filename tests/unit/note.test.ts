@@ -1,7 +1,7 @@
-import { Note } from '../../src/domain/note'
-import { Comment } from '../../src/domain/comment'
-import type { HttpClient } from '../../src/internal/http-client'
-import type { SubstackNoteComment } from '../../src/internal'
+import { Note } from '@/domain/note'
+import { Comment } from '@/domain/comment'
+import type { HttpClient } from '@/internal/http-client'
+import type { SubstackNoteComment } from '@/internal'
 
 describe('Note Entity', () => {
   let mockHttpClient: jest.Mocked<HttpClient>
@@ -134,9 +134,7 @@ describe('Note Entity', () => {
       expect(comments).toHaveLength(2)
       expect(comments[0]).toBeInstanceOf(Comment)
       expect(comments[0].body).toBe('Parent comment 1')
-      expect(comments[0].author.name).toBe('Commenter 1')
       expect(comments[1].body).toBe('Parent comment 2')
-      expect(comments[1].author.name).toBe('Commenter 2')
     })
 
     it('should handle empty parent comments', async () => {

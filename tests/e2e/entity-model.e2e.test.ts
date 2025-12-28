@@ -1,33 +1,24 @@
-import { Profile } from '../../src/domain'
-import { SubstackClient } from '../../src/substack-client'
+import { SubstackClient } from '@/substack-client'
+import { PreviewPost, Profile, Comment } from '@/domain'
+import { validateE2ECredentials } from '@test/e2e/checkEnv'
 
 describe('SubstackClient Entity Model E2E', () => {
   let client: SubstackClient
 
   beforeAll(() => {
-    if (!global.E2E_CONFIG.hasCredentials) {
-      throw new Error(
-        'E2E tests require credentials. Set SUBSTACK_API_KEY environment variable to run E2E tests.'
-      )
-    }
-
+    const { apiKey, hostname } = validateE2ECredentials()
     client = new SubstackClient({
-      apiKey: global.E2E_CONFIG.apiKey!,
-      hostname: global.E2E_CONFIG.hostname || 'substack.com'
+      apiKey: apiKey,
+      hostname: hostname
     })
   })
 
   test('should test connectivity', async () => {
     const isConnected = await client.testConnectivity()
-    // In CI environment with real credentials, this should be true
-    // In local testing with fake credentials, this might be false
-    if (process.env.CI && global.E2E_CONFIG.apiKey !== 'test_key') {
-      expect(isConnected).toBe(true)
-    } else {
-      // For local testing or fake credentials, just verify it returns a boolean
-      expect(typeof isConnected).toBe('boolean')
-      console.log(`✅ Connectivity test returned: ${isConnected}`)
-    }
+
+    expect(typeof isConnected).toBe('boolean')
+    expect(isConnected).toBeTruthy()
+    console.log(`✅ Connectivity test returned: ${isConnected}`)
   })
 
   test('should get profile by slug', async () => {
@@ -35,75 +26,34 @@ describe('SubstackClient Entity Model E2E', () => {
 
     expect(profile).toBeInstanceOf(Profile)
     expect(profile.name).toBeTruthy()
-    expect(profile.handle).toBe('platformer')
+    expect(profile.slug).toBe('platformer')
     expect(profile.id).toBeGreaterThan(0)
 
-    console.log(`✅ Retrieved profile: ${profile.name} (@${profile.handle})`)
+    console.log(`✅ Retrieved profile: ${profile.name} (@${profile.slug})`)
   })
 
   test('should get profile by slug - jakubslys', async () => {
-    // Test with jakubslys profile as requested
     const profile = await client.profileForSlug('jakubslys')
 
     expect(profile).toBeInstanceOf(Profile)
     expect(profile.name).toBeTruthy()
-    expect(profile.handle).toBe('jakubslys')
-    expect(profile.id).toBeGreaterThan(0)
+    expect(profile.slug).toBe('jakubslys')
+    expect(profile.id).toBe(254824415)
 
-    console.log(`✅ Retrieved jakubslys profile: ${profile.name} (@${profile.handle})`)
+    console.log(`✅ Retrieved jakubslys profile: ${profile.name} (@${profile.slug})`)
   })
 
-  test('should get profile by ID', async () => {
-    // Get a profile by slug first to get a known user ID
-    const profileBySlug = await client.profileForSlug('jakubslys')
-    const userId = profileBySlug.id
-
-    // Now test profileForId with that user ID
-    const profileById = await client.profileForId(userId)
-
-    expect(profileById).toBeInstanceOf(Profile)
-    expect(profileById.id).toBe(userId)
-    expect(profileById.name).toBeTruthy()
-    expect(profileById.slug).toBeTruthy()
-    expect(typeof profileById.name).toBe('string')
-    expect(typeof profileById.slug).toBe('string')
-
-    // The profiles should match
-    expect(profileById.name).toBe(profileBySlug.name)
-    expect(profileById.handle).toBe(profileBySlug.handle)
-
-    console.log(`✅ Retrieved profile by ID: ${profileById.name} (ID: ${profileById.id})`)
-  })
-
-  test('should handle invalid profile ID gracefully', async () => {
-    try {
-      // Test with a user ID that should not exist
-      const invalidUserId = 999999999999
-      await client.profileForId(invalidUserId)
-
-      // If we reach here, the API might return a default or the ID exists
-      console.log('ℹ️ Profile lookup completed (may be default profile)')
-    } catch (error) {
-      // Check if it's a proper error
-      const errorName = error?.constructor?.name
-      const isValidError =
-        errorName === 'Error' ||
-        errorName === 'TypeError' ||
-        errorName === 'FetchError' ||
-        error instanceof Error
-      expect(isValidError).toBe(true)
-      console.log('✅ Properly handles invalid profile ID lookup')
-    }
-  })
-
-  test('should iterate through followees', async () => {
+  test('should iterate through following users', async () => {
     const ownProfile = await client.ownProfile()
-    for await (const profile of ownProfile.followees({ limit: 3 })) {
+    let counter = 0
+    for await (const profile of ownProfile.following({ limit: 3 })) {
       expect(profile).toBeInstanceOf(Profile)
       expect(profile.name).toBeTruthy()
-      //expect(profile.slug).toBeTruthy()
+      expect(profile.slug).toBeTruthy()
+      ++counter
     }
-    console.log('✅ Retrieved 3 followee profiles')
+    expect(counter).toEqual(3)
+    console.log('✅ Retrieved 3 following profiles')
   })
 
   test('should get own profile', async () => {
@@ -112,14 +62,14 @@ describe('SubstackClient Entity Model E2E', () => {
     expect(ownProfile.name).toBeTruthy()
     expect(ownProfile.slug).toBeTruthy()
     expect(typeof ownProfile.newNote).toBe('function')
-    expect(typeof ownProfile.followees).toBe('function')
+    expect(typeof ownProfile.following).toBe('function')
 
     console.log(`✅ Retrieved own profile: ${ownProfile.name} (@${ownProfile.slug})`)
   })
 
   test('should handle profile posts iteration', async () => {
     const profile = await client.profileForSlug('jakubslys')
-    const posts = []
+    const posts: PreviewPost[] = []
     let count = 0
 
     for await (const post of profile.posts({ limit: 3 })) {
@@ -132,44 +82,25 @@ describe('SubstackClient Entity Model E2E', () => {
 
       if (count >= 3) break
     }
-
+    expect(count).toEqual(3)
     console.log(`✅ Retrieved ${posts.length} posts from profile`)
-
-    if (posts.length > 0) {
-      const firstPost = posts[0]
-      console.log(`First post: "${firstPost.title}"`)
-    }
+    console.log(`First post: "${posts[0].title}"`)
   })
 
   test('should handle post comments iteration', async () => {
-    const profile = await client.ownProfile()
+    const testPost = await client.postForId(176729823)
+    expect(testPost).not.toBeNull()
 
-    // Get a post from the profile
-    let testPost = null
-    for await (const post of profile.posts({ limit: 5 })) {
-      testPost = post
-      break
+    let comments: Comment[] = []
+    let count = 0
+
+    for await (const comment of testPost.comments({ limit: 3 })) {
+      comments.push(comment)
+      count++
+      expect(comment.body).toBeTruthy()
+      if (count >= 3) break
     }
-
-    if (testPost) {
-      const comments = []
-      let count = 0
-
-      for await (const comment of testPost.comments({ limit: 3 })) {
-        comments.push(comment)
-        count++
-
-        expect(comment.body).toBeTruthy()
-        expect(comment.author.name).toBeTruthy()
-        expect(comment.createdAt).toBeInstanceOf(Date)
-
-        if (count >= 3) break
-      }
-
-      console.log(`✅ Retrieved ${comments.length} comments from post "${testPost.title}"`)
-    } else {
-      console.log('ℹ️ No posts available to test comments')
-    }
+    console.log(`✅ Retrieved ${comments.length} comments from post "${testPost!.title}"`)
   })
 
   test('should handle error cases gracefully - invalid profile slug', async () => {
@@ -233,7 +164,7 @@ describe('SubstackClient Entity Model E2E', () => {
   })
 
   test('should fetch 99 notes using cursor-based pagination', async () => {
-    const foreignProfile = await client.profileForId(343074721)
+    const foreignProfile = await client.profileForSlug('jakubslys')
     const notes = []
     let count = 0
 

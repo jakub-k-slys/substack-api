@@ -1,24 +1,24 @@
-import { OwnProfile } from '../../src/domain/own-profile'
-import { NoteWithLinkBuilder } from '../../src/domain/note-builder'
-import { HttpClient } from '../../src/internal/http-client'
+import { OwnProfile } from '@/domain/own-profile'
+import { NoteWithLinkBuilder } from '@/domain/note-builder'
+import { HttpClient } from '@/internal/http-client'
 import {
   ProfileService,
   PostService,
   NoteService,
-  FolloweeService,
+  FollowingService,
   CommentService
-} from '../../src/internal/services'
+} from '@/internal/services'
 
 // Mock dependencies
-jest.mock('../../src/internal/http-client')
-jest.mock('../../src/internal/services')
+jest.mock('@/internal/http-client')
+jest.mock('@/internal/services')
 
 const MockHttpClient = HttpClient as jest.MockedClass<typeof HttpClient>
 const MockProfileService = ProfileService as jest.MockedClass<typeof ProfileService>
 const MockPostService = PostService as jest.MockedClass<typeof PostService>
 const MockNoteService = NoteService as jest.MockedClass<typeof NoteService>
 const MockCommentService = CommentService as jest.MockedClass<typeof CommentService>
-const MockFolloweeService = FolloweeService as jest.MockedClass<typeof FolloweeService>
+const MockFollowingService = FollowingService as jest.MockedClass<typeof FollowingService>
 
 describe('OwnProfile - newNoteWithLink', () => {
   let mockClient: jest.Mocked<HttpClient>
@@ -26,7 +26,7 @@ describe('OwnProfile - newNoteWithLink', () => {
   let mockPostService: jest.Mocked<PostService>
   let mockNoteService: jest.Mocked<NoteService>
   let mockCommentService: jest.Mocked<CommentService>
-  let mockFolloweeService: jest.Mocked<FolloweeService>
+  let mockFollowingService: jest.Mocked<FollowingService>
   let ownProfile: OwnProfile
 
   const mockProfileData = {
@@ -98,7 +98,10 @@ describe('OwnProfile - newNoteWithLink', () => {
     mockPostService = new MockPostService(mockClient, mockClient) as jest.Mocked<PostService>
     mockNoteService = new MockNoteService(mockClient) as jest.Mocked<NoteService>
     mockCommentService = new MockCommentService(mockClient) as jest.Mocked<CommentService>
-    mockFolloweeService = new MockFolloweeService(mockClient) as jest.Mocked<FolloweeService>
+    mockFollowingService = new MockFollowingService(
+      mockClient,
+      mockClient
+    ) as jest.Mocked<FollowingService>
 
     ownProfile = new OwnProfile(
       mockProfileData,
@@ -107,7 +110,7 @@ describe('OwnProfile - newNoteWithLink', () => {
       mockPostService,
       mockNoteService,
       mockCommentService,
-      mockFolloweeService,
+      mockFollowingService,
       'testuser'
     )
   })

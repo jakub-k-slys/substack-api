@@ -2,8 +2,8 @@
  * Internal API request/response types for notes
  */
 
-import type { SubstackPublication } from './api-responses'
-import type { SubstackAttachment } from './common'
+import type { SubstackPublication } from '@/internal/types/api-responses'
+import type { SubstackAttachment } from '@/internal/types/common'
 
 export interface NoteBodyJson {
   type: 'doc'

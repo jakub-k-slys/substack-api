@@ -1,2 +1,2 @@
-export type { Cache } from './cache'
-export { InMemoryCache } from './in-memory-cache'
+export type { Cache } from '@/internal/cache/cache'
+export { InMemoryCache } from '@/internal/cache/in-memory-cache'

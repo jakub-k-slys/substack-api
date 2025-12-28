@@ -1,20 +1,19 @@
-import { SubstackClient } from '../../src/substack-client'
-import { Profile, FullPost, Note, Comment, OwnProfile } from '../../src/domain'
-import { HttpClient } from '../../src/internal/http-client'
+import { SubstackClient } from '@/substack-client'
+import { Profile, FullPost, Note, Comment, OwnProfile } from '@/domain'
+import { HttpClient } from '@/internal/http-client'
 import {
   PostService,
   NoteService,
   ProfileService,
-  SlugService,
   CommentService,
-  FolloweeService,
+  FollowingService,
   ConnectivityService
-} from '../../src/internal/services'
-import type { SubstackFullProfile } from '../../src/internal'
+} from '@/internal/services'
+import type { SubstackFullProfile } from '@/internal'
 
 // Mock the http client and services
-jest.mock('../../src/internal/http-client')
-jest.mock('../../src/internal/services')
+jest.mock('@/internal/http-client')
+jest.mock('@/internal/services')
 
 // Mock the global fetch function
 global.fetch = jest.fn()
@@ -26,9 +25,8 @@ describe('SubstackClient', () => {
   let mockPostService: jest.Mocked<PostService>
   let mockNoteService: jest.Mocked<NoteService>
   let mockProfileService: jest.Mocked<ProfileService>
-  let mockSlugService: jest.Mocked<SlugService>
   let mockCommentService: jest.Mocked<CommentService>
-  let mockFolloweeService: jest.Mocked<FolloweeService>
+  let mockFollowingService: jest.Mocked<FollowingService>
   let mockConnectivityService: jest.Mocked<ConnectivityService>
 
   beforeEach(() => {
@@ -63,16 +61,15 @@ describe('SubstackClient', () => {
     mockProfileService.getProfileById = jest.fn()
     mockProfileService.getProfileBySlug = jest.fn()
 
-    mockSlugService = new SlugService(mockHttpClient) as jest.Mocked<SlugService>
-    mockSlugService.getSlugForUserId = jest.fn()
-    mockSlugService.getSlugMapping = jest.fn()
-
     mockCommentService = new CommentService(mockHttpClient) as jest.Mocked<CommentService>
     mockCommentService.getCommentById = jest.fn()
     mockCommentService.getCommentsForPost = jest.fn()
 
-    mockFolloweeService = new FolloweeService(mockHttpClient) as jest.Mocked<FolloweeService>
-    mockFolloweeService.getFollowees = jest.fn()
+    mockFollowingService = new FollowingService(
+      mockHttpClient,
+      mockGlobalHttpClient
+    ) as jest.Mocked<FollowingService>
+    mockFollowingService.getFollowing = jest.fn()
 
     mockConnectivityService = new ConnectivityService(
       mockHttpClient
@@ -89,10 +86,9 @@ describe('SubstackClient', () => {
     ;(client as unknown as { postService: PostService }).postService = mockPostService
     ;(client as unknown as { noteService: NoteService }).noteService = mockNoteService
     ;(client as unknown as { profileService: ProfileService }).profileService = mockProfileService
-    ;(client as unknown as { slugService: SlugService }).slugService = mockSlugService
     ;(client as unknown as { commentService: CommentService }).commentService = mockCommentService
-    ;(client as unknown as { followeeService: FolloweeService }).followeeService =
-      mockFolloweeService
+    ;(client as unknown as { followingService: FollowingService }).followingService =
+      mockFollowingService
     ;(client as unknown as { connectivityService: ConnectivityService }).connectivityService =
       mockConnectivityService
   })
@@ -115,44 +111,13 @@ describe('SubstackClient', () => {
 
   describe('ownProfile', () => {
     it('should get own profile when authenticated', async () => {
-      const mockSubscription = { user_id: 123 }
       const mockProfile = {
         id: 123,
         name: 'Test User',
         handle: 'testuser',
-        photo_url: 'https://example.com/photo.jpg',
-        profile_set_up_at: '2023-01-01T00:00:00Z',
-        reader_installed_at: '2023-01-01T00:00:00Z',
-        profile_disabled: false,
-        publicationUsers: [],
-        userLinks: [],
-        subscriptions: [],
-        subscriptionsTruncated: false,
-        hasGuestPost: false,
-        max_pub_tier: 0,
-        hasActivity: false,
-        hasLikes: false,
-        lists: [],
-        rough_num_free_subscribers_int: 0,
-        rough_num_free_subscribers: '0',
-        bestseller_badge_disabled: false,
-        subscriberCountString: '0',
-        subscriberCount: '0',
-        subscriberCountNumber: 0,
-        hasHiddenPublicationUsers: false,
-        visibleSubscriptionsCount: 0,
-        slug: 'testuser',
-        primaryPublicationIsPledged: false,
-        primaryPublicationSubscriptionState: 'not_subscribed',
-        isSubscribed: false,
-        isFollowing: false,
-        followsViewer: false,
-        can_dm: false,
-        dm_upgrade_options: []
+        photo_url: 'https://example.com/photo.jpg'
       }
       mockProfileService.getOwnProfile.mockResolvedValueOnce(mockProfile)
-      mockHttpClient.get.mockResolvedValueOnce(mockSubscription) // For getUserId
-      mockSlugService.getSlugForUserId.mockResolvedValueOnce('resolved-slug')
 
       const ownProfile = await client.ownProfile()
       expect(ownProfile).toBeInstanceOf(OwnProfile)
@@ -174,41 +139,13 @@ describe('SubstackClient', () => {
         id: 123,
         handle: 'testuser',
         name: 'Test User',
-        photo_url: 'https://example.com/photo.jpg',
-        profile_disabled: false,
-        publicationUsers: [],
-        userLinks: [],
-        subscriptions: [],
-        subscriptionsTruncated: false,
-        hasGuestPost: false,
-        max_pub_tier: 0,
-        hasActivity: false,
-        hasLikes: false,
-        lists: [],
-        rough_num_free_subscribers_int: 0,
-        rough_num_free_subscribers: '0',
-        bestseller_badge_disabled: false,
-        subscriberCountString: '0',
-        subscriberCount: '0',
-        subscriberCountNumber: 0,
-        hasHiddenPublicationUsers: false,
-        visibleSubscriptionsCount: 0,
-        slug: 'testuser',
-        primaryPublicationIsPledged: false,
-        primaryPublicationSubscriptionState: 'none',
-        isSubscribed: false,
-        isFollowing: false,
-        followsViewer: false,
-        can_dm: false,
-        dm_upgrade_options: []
+        photo_url: 'https://example.com/photo.jpg'
       }
       mockProfileService.getProfileById.mockResolvedValue(mockProfile as any)
-      mockSlugService.getSlugForUserId.mockResolvedValueOnce('resolved-slug')
 
       const profile = await client.profileForId(123)
       expect(profile).toBeInstanceOf(Profile)
       expect(mockProfileService.getProfileById).toHaveBeenCalledWith(123)
-      expect(mockSlugService.getSlugForUserId).toHaveBeenCalledWith(123)
     })
 
     it('should handle API error for profileForId', async () => {
@@ -224,41 +161,13 @@ describe('SubstackClient', () => {
         id: 9876543210,
         handle: 'testuser',
         name: 'Test User',
-        photo_url: 'https://example.com/photo.jpg',
-        profile_disabled: false,
-        publicationUsers: [],
-        userLinks: [],
-        subscriptions: [],
-        subscriptionsTruncated: false,
-        hasGuestPost: false,
-        max_pub_tier: 0,
-        hasActivity: false,
-        hasLikes: false,
-        lists: [],
-        rough_num_free_subscribers_int: 0,
-        rough_num_free_subscribers: '0',
-        bestseller_badge_disabled: false,
-        subscriberCountString: '0',
-        subscriberCount: '0',
-        subscriberCountNumber: 0,
-        hasHiddenPublicationUsers: false,
-        visibleSubscriptionsCount: 0,
-        slug: 'testuser',
-        primaryPublicationIsPledged: false,
-        primaryPublicationSubscriptionState: 'none',
-        isSubscribed: false,
-        isFollowing: false,
-        followsViewer: false,
-        can_dm: false,
-        dm_upgrade_options: []
+        photo_url: 'https://example.com/photo.jpg'
       }
       mockProfileService.getProfileById.mockResolvedValue(mockProfile as any)
-      mockSlugService.getSlugForUserId.mockResolvedValueOnce('resolved-slug')
 
       const profile = await client.profileForId(9876543210)
       expect(profile).toBeInstanceOf(Profile)
       expect(mockProfileService.getProfileById).toHaveBeenCalledWith(9876543210)
-      expect(mockSlugService.getSlugForUserId).toHaveBeenCalledWith(9876543210)
     })
   })
 
@@ -268,41 +177,13 @@ describe('SubstackClient', () => {
         id: 123,
         handle: 'testuser',
         name: 'Test User',
-        photo_url: 'https://example.com/photo.jpg',
-        profile_disabled: false,
-        publicationUsers: [],
-        userLinks: [],
-        subscriptions: [],
-        subscriptionsTruncated: false,
-        hasGuestPost: false,
-        max_pub_tier: 0,
-        hasActivity: false,
-        hasLikes: false,
-        lists: [],
-        rough_num_free_subscribers_int: 0,
-        rough_num_free_subscribers: '0',
-        bestseller_badge_disabled: false,
-        subscriberCountString: '0',
-        subscriberCount: '0',
-        subscriberCountNumber: 0,
-        hasHiddenPublicationUsers: false,
-        visibleSubscriptionsCount: 0,
-        slug: 'testuser',
-        primaryPublicationIsPledged: false,
-        primaryPublicationSubscriptionState: 'none',
-        isSubscribed: false,
-        isFollowing: false,
-        followsViewer: false,
-        can_dm: false,
-        dm_upgrade_options: []
+        photo_url: 'https://example.com/photo.jpg'
       }
       mockProfileService.getProfileBySlug.mockResolvedValue(mockProfile as any)
-      mockSlugService.getSlugForUserId.mockResolvedValueOnce('resolved-slug')
 
       const profile = await client.profileForSlug('testuser')
       expect(profile).toBeInstanceOf(Profile)
       expect(mockProfileService.getProfileBySlug).toHaveBeenCalledWith('testuser')
-      expect(mockSlugService.getSlugForUserId).toHaveBeenCalledWith(123, 'testuser')
     })
 
     it('should handle empty slug', async () => {
@@ -325,10 +206,8 @@ describe('SubstackClient', () => {
       const mockPost = {
         id: 456,
         title: 'Test Post',
-        slug: 'test-post',
+        slug: 'test-slug',
         post_date: '2023-01-01T00:00:00Z',
-        canonical_url: 'https://example.com/post',
-        type: 'newsletter' as const,
         body_html: '<p>Test post body content</p>'
       }
 
@@ -366,9 +245,7 @@ describe('SubstackClient', () => {
               name: 'Test User',
               handle: '',
               photo_url: '',
-              bio: '',
-              profile_set_up_at: '2023-01-01T00:00:00Z',
-              reader_installed_at: '2023-01-01T00:00:00Z'
+              bio: ''
             }
           ],
           isFresh: false,
@@ -444,10 +321,10 @@ describe('SubstackClient', () => {
       const mockCommentData = {
         id: 999,
         body: 'Test comment',
-        date: '2023-01-01T00:00:00Z',
-        post_id: 456,
-        user_id: 123,
-        name: 'Test User'
+        created_at: '2023-01-01T00:00:00Z',
+        parent_post_id: 456,
+        author_id: 123,
+        author_name: 'Test User'
       }
       mockCommentService.getCommentById.mockResolvedValue(mockCommentData)
 

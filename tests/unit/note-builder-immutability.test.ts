@@ -1,6 +1,6 @@
-import { NoteBuilder, ParagraphBuilder } from '../../src/domain/note-builder'
-import type { HttpClient } from '../../src/internal/http-client'
-import type { PublishNoteResponse } from '../../src/internal'
+import { NoteBuilder, ParagraphBuilder } from '@/domain/note-builder'
+import type { HttpClient } from '@/internal/http-client'
+import type { PublishNoteResponse } from '@/internal'
 
 describe('NoteBuilder Immutability', () => {
   let mockHttpClient: jest.Mocked<HttpClient>

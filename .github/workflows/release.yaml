@@ -18,11 +18,15 @@ jobs:
                   fetch-depth: 0
                   ref: ${{ github.ref_name }}
                   token: ${{ secrets.GH_ACCESS_TOKEN }}
+            - uses: pnpm/action-setup@v4
+              with:
+                  version: 10
             - uses: actions/setup-node@v4
               with:
                   node-version: 20
+                  cache: 'pnpm'
             - name: Install
-              run: npm install
+              run: pnpm install
             - name: set NODE_AUTH_TOKEN env
               run: echo "NODE_AUTH_TOKEN=${{ secrets.NPM_TOKEN }}" >> $GITHUB_ENV
             - name: set NPM_TOKEN env

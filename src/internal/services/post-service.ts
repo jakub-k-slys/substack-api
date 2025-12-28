@@ -1,7 +1,7 @@
-import type { SubstackPost, SubstackFullPost } from '../types'
-import { SubstackPostCodec, SubstackFullPostCodec } from '../types'
-import { decodeOrThrow } from '../validation'
-import type { HttpClient } from '../http-client'
+import type { SubstackPost, SubstackFullPost } from '@/internal/types'
+import { SubstackPostCodec, SubstackFullPostCodec } from '@/internal/types'
+import { decodeOrThrow } from '@/internal/validation'
+import type { HttpClient } from '@/internal/http-client'
 
 /**
  * Service responsible for post-related HTTP operations
@@ -64,10 +64,10 @@ export class PostService {
    */
   async getPostsForProfile(
     profileId: number,
-    options: { limit: number; offset: number }
+    _options: { limit: number; offset: number }
   ): Promise<SubstackPost[]> {
-    const response = await this.httpClient.get<{ posts?: unknown[] }>(
-      `/api/v1/profile/posts?profile_user_id=${profileId}&limit=${options.limit}&offset=${options.offset}`
+    const response = await this.globalHttpClient.get<{ posts: unknown[] }>(
+      `/api/v1/profile/posts?profile_user_id=${profileId}`
     )
 
     const posts = response.posts || []

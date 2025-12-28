@@ -3,5 +3,5 @@
  * These are the clean, stable types that users should depend on
  */
 
-export * from './domain-config'
-export * from './domain-options'
+export * from '@/types/domain-config'
+export * from '@/types/domain-options'

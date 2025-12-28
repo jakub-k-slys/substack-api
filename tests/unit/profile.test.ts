@@ -1,12 +1,7 @@
-import { Profile } from '../../src/domain/profile'
-import { PreviewPost, Note } from '../../src/domain'
-import {
-  ProfileService,
-  PostService,
-  NoteService,
-  CommentService
-} from '../../src/internal/services'
-import type { HttpClient } from '../../src/internal/http-client'
+import { Profile } from '@/domain/profile'
+import { PreviewPost, Note } from '@/domain'
+import { ProfileService, PostService, NoteService, CommentService } from '@/internal/services'
+import type { HttpClient } from '@/internal/http-client'
 
 describe('Profile Entity', () => {
   let mockHttpClient: jest.Mocked<HttpClient>

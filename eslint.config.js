@@ -55,9 +55,15 @@ export default [
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
       'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': ['error', { 
+      '@typescript-eslint/no-unused-vars': ['error', {
         'argsIgnorePattern': '^_',
         'varsIgnorePattern': '^_'
+      }],
+      'no-restricted-imports': ['error', {
+        'patterns': [{
+          'group': ['./*', '../*', '../../*', '../../../*'],
+          'message': 'Relative imports are forbidden. Use @/ path alias instead (e.g., @/domain, @/internal/services).'
+        }]
       }],
       'prettier/prettier': ['error', {
         'semi': false,
@@ -106,9 +112,15 @@ export default [
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
       'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': ['error', { 
+      '@typescript-eslint/no-unused-vars': ['error', {
         'argsIgnorePattern': '^_',
         'varsIgnorePattern': '^_'
+      }],
+      'no-restricted-imports': ['error', {
+        'patterns': [{
+          'group': ['./*', '../*', '../../*', '../../../*'],
+          'message': 'Relative imports are forbidden. Use @/ path alias instead (e.g., @/domain, @/internal/services).'
+        }]
       }],
       'prettier/prettier': ['error', {
         'semi': false,
@@ -157,9 +169,15 @@ export default [
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
       'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': ['error', { 
+      '@typescript-eslint/no-unused-vars': ['error', {
         'argsIgnorePattern': '^_',
         'varsIgnorePattern': '^_'
+      }],
+      'no-restricted-imports': ['error', {
+        'patterns': [{
+          'group': ['./*', '../*', '../../*', '../../../*'],
+          'message': 'Relative imports are forbidden. Use @/ path alias instead (e.g., @/domain, @/internal/services).'
+        }]
       }],
       'prettier/prettier': ['error', {
         'semi': false,

@@ -39,7 +39,7 @@ The `index.ts` example showcases the following features:
 3. **👤 Profile Management** - Fetching your own profile information
 4. **📰 Content Fetching** - Listing recent posts with titles and metadata
 5. **📝 Notes Management** - Retrieving and displaying recent notes
-6. **🤝 Social Features** - Listing users you follow (followees)
+6. **🤝 Social Features** - Listing users you follow
 
 ## Example Output
 

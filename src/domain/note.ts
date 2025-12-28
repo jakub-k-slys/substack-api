@@ -1,6 +1,6 @@
-import type { SubstackNote, SubstackNoteComment } from '../internal'
-import type { HttpClient } from '../internal/http-client'
-import { Comment } from './comment'
+import type { SubstackNote } from '@/internal'
+import type { HttpClient } from '@/internal/http-client'
+import { Comment } from '@/domain/comment'
 
 /**
  * Note entity representing a Substack note
@@ -43,15 +43,10 @@ export class Note {
     // Convert parent comments to Comment entities
     for (const parentComment of this.rawData.parentComments || []) {
       if (parentComment) {
-        // Convert note comment format to SubstackComment format
-        const comment = parentComment as SubstackNoteComment
+        // Convert note comment format to SubstackComment format - minimal fields only
         const commentData = {
-          id: comment.id,
-          body: comment.body,
-          date: comment.date,
-          post_id: comment.post_id || 0,
-          user_id: comment.user_id,
-          name: comment.name,
+          id: parentComment.id,
+          body: parentComment.body,
           author_is_admin: false // Not available in note comment format
         }
         yield new Comment(commentData, this.client)

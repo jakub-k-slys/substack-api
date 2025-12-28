@@ -1,7 +1,7 @@
 /**
  * HTTP client utility for Substack API requests
  */
-import type { SubstackConfig } from '../types'
+import type { SubstackConfig } from '@/types'
 
 export class HttpClient {
   private readonly baseUrl: string
@@ -53,6 +53,13 @@ export class HttpClient {
   async post<T>(path: string, data?: unknown): Promise<T> {
     return this.request<T>(path, {
       method: 'POST',
+      body: data ? JSON.stringify(data) : undefined
+    })
+  }
+
+  async put<T>(path: string, data?: unknown): Promise<T> {
+    return this.request<T>(path, {
+      method: 'PUT',
       body: data ? JSON.stringify(data) : undefined
     })
   }

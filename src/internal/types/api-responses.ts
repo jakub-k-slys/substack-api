@@ -24,27 +24,18 @@ export const SubstackPublicationCodec = t.intersection([
 export type SubstackPublication = t.TypeOf<typeof SubstackPublicationCodec>
 
 /**
- * Raw API response shape for posts
+ * Raw API response shape for posts - minimal validation
+ * Only validates fields actually used by PreviewPost domain class
  */
 export const SubstackPostCodec = t.intersection([
   t.type({
     id: t.number,
     title: t.string,
-    slug: t.string,
-    post_date: t.string,
-    canonical_url: t.string,
-    type: t.union([t.literal('newsletter'), t.literal('podcast'), t.literal('thread'), t.literal('restack')])
+    post_date: t.string
   }),
   t.partial({
     subtitle: t.string,
-    description: t.string,
-    audience: t.string,
-    cover_image: t.string,
-    podcast_url: t.string,
-    published: t.boolean,
-    paywalled: t.boolean,
-    truncated_body_text: t.string,
-    htmlBody: t.string
+    truncated_body_text: t.string
   })
 ])
 
@@ -52,42 +43,24 @@ export type SubstackPost = t.TypeOf<typeof SubstackPostCodec>
 
 /**
  * Raw API response shape for full posts from /posts/by-id/:id endpoint
- * Includes body_html and additional fields not present in preview responses
- *
- * Key differences from SubstackPostCodec:
- * - body_html is required (contains full HTML content)
- * - Includes postTags, reactions, restacks, and publication fields
- * - Used specifically for FullPost construction via getPostById()
- * - SubstackPostCodec should be used for preview/list responses
+ * Only validates fields actually used by FullPost domain class
  */
 export const SubstackFullPostCodec = t.intersection([
   t.type({
     id: t.number,
     title: t.string,
     slug: t.string,
-    post_date: t.string,
-    canonical_url: t.string,
-    type: t.union([t.literal('newsletter'), t.literal('podcast'), t.literal('thread'), t.literal('restack')]),
-    body_html: t.string
+    post_date: t.string
   }),
   t.partial({
     subtitle: t.string,
-    description: t.string,
-    audience: t.string,
-    cover_image: t.string,
-    podcast_url: t.string,
-    published: t.boolean,
-    paywalled: t.boolean,
     truncated_body_text: t.string,
-    htmlBody: t.string, // Legacy field for backward compatibility
-    postTags: t.array(t.string),
+    body_html: t.string,
+    htmlBody: t.string,
     reactions: t.record(t.string, t.number),
     restacks: t.number,
-    publication: t.type({
-      id: t.number,
-      name: t.string,
-      subdomain: t.string
-    })
+    postTags: t.array(t.string),
+    cover_image: t.string
   })
 ])
 
@@ -100,11 +73,7 @@ export type SubstackFullPost = t.TypeOf<typeof SubstackFullPostCodec>
 export const SubstackCommentCodec = t.intersection([
   t.type({
     id: t.number,
-    body: t.string,
-    date: t.string,
-    post_id: t.number,
-    user_id: t.number,
-    name: t.string
+    body: t.string
   }),
   t.partial({
     author_is_admin: t.boolean
@@ -136,59 +105,8 @@ export const SubstackCommentResponseCodec = t.type({
 export type SubstackCommentResponse = t.TypeOf<typeof SubstackCommentResponseCodec>
 
 /**
- * Raw API response shape for search results
+ * Subscription publication type - raw API response
  */
-export const SubstackSearchResultCodec = t.type({
-  total: t.number,
-  results: t.array(SubstackPostCodec)
-})
-
-export type SubstackSearchResult = t.TypeOf<typeof SubstackSearchResultCodec>
-
-/**
- * Subscription types for internal API responses
- */
-export interface SubstackSubscription {
-  id: number
-  user_id: number
-  publication_id: number
-  expiry: string | null
-  email_disabled: boolean
-  membership_state: string
-  type: string | null
-  gift_user_id: number | null
-  created_at: string
-  gifted_at: string | null
-  paused: string | null
-  is_group_parent: boolean
-  visibility: string
-  is_founding: boolean
-  is_favorite: boolean
-  podcast_rss_token: string
-  email_settings: Record<string, unknown> | null
-  section_podcasts_enabled: string[] | null
-}
-
-export interface SubstackPublicationUser {
-  id: number
-  publication_id: number
-  user_id: number
-  public: boolean
-  created_at: string
-  updated_at: string
-  public_rank: number
-  name: string | null
-  bio: string | null
-  photo_url: string | null
-  role: string
-  is_primary: boolean
-  show_badge: boolean | null
-  is_in_notes_feed: boolean
-  twitter_screen_name: string | null
-  email: string | null
-  primary_section_id: number | null
-}
-
 export interface SubstackSubscriptionPublication {
   id: number
   name: string
@@ -218,7 +136,71 @@ export interface SubstackSubscriptionPublication {
 }
 
 export interface SubstackSubscriptionsResponse {
-  subscriptions: SubstackSubscription[]
-  publicationUsers: SubstackPublicationUser[]
   publications: SubstackSubscriptionPublication[]
 }
+
+/**
+ * Minimal codec for Profile API responses - only validates fields we actually use
+ * This is for /api/v1/user/{slug}/public_profile endpoint
+ */
+export const SubstackFullProfileCodec = t.intersection([
+  t.type({
+    id: t.number,
+    name: t.string,
+    handle: t.string,
+    photo_url: t.string
+  }),
+  t.partial({
+    bio: t.string
+  })
+])
+
+export type SubstackFullProfile = t.TypeOf<typeof SubstackFullProfileCodec>
+
+/**
+ * Minimal codec for Note user in context - only validates fields we actually use
+ */
+const SubstackNoteUserCodec = t.type({
+  id: t.number,
+  name: t.string,
+  handle: t.string,
+  photo_url: t.string
+})
+
+/**
+ * Minimal codec for Note context - only validates fields we actually use
+ */
+const SubstackNoteContextCodec = t.type({
+  timestamp: t.string,
+  users: t.array(SubstackNoteUserCodec)
+})
+
+/**
+ * Minimal codec for Note comment - only validates fields we actually use
+ */
+const SubstackNoteCommentCodec = t.intersection([
+  t.type({
+    id: t.number,
+    body: t.string
+  }),
+  t.partial({
+    reaction_count: t.number
+  })
+])
+
+/**
+ * Minimal codec for Note API responses - only validates fields we actually use
+ * This is for /api/v1/reader/feed/profile/{id} and similar note endpoints
+ */
+export const SubstackNoteCodec = t.intersection([
+  t.type({
+    entity_key: t.string,
+    context: SubstackNoteContextCodec
+  }),
+  t.partial({
+    comment: SubstackNoteCommentCodec,
+    parentComments: t.array(SubstackNoteCommentCodec)
+  })
+])
+
+export type SubstackNote = t.TypeOf<typeof SubstackNoteCodec>

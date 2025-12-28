@@ -9,12 +9,11 @@ export type {
   SubstackFullPost,
   SubstackComment,
   SubstackCommentResponse,
-  SubstackSearchResult,
-  SubstackSubscription,
-  SubstackPublicationUser as SubstackAPIPublicationUser,
   SubstackSubscriptionPublication,
-  SubstackSubscriptionsResponse
-} from './api-responses'
+  SubstackSubscriptionsResponse,
+  SubstackFullProfile,
+  SubstackNote
+} from '@/internal/types/api-responses'
 
 // Export io-ts codecs for runtime validation
 export {
@@ -23,8 +22,9 @@ export {
   SubstackFullPostCodec,
   SubstackCommentCodec,
   SubstackCommentResponseCodec,
-  SubstackSearchResultCodec
-} from './api-responses'
+  SubstackFullProfileCodec,
+  SubstackNoteCodec
+} from '@/internal/types/api-responses'
 
 export type {
   NoteBodyJson,
@@ -32,17 +32,16 @@ export type {
   PublishNoteResponse,
   CreateAttachmentRequest,
   CreateAttachmentResponse
-} from './note-api'
+} from '@/internal/types/note-api'
 
 export type {
-  SubstackNote,
   SubstackNoteContext,
   SubstackNoteComment,
   SubstackNoteTracking,
   PaginatedSubstackNotes
-} from './note-details'
+} from '@/internal/types/note-details'
 
-export type { SubstackPublicProfile, SubstackFullProfile, SubstackUserProfile } from './profile-api'
+export type { SubstackPublicProfile, SubstackUserProfile } from '@/internal/types/profile-api'
 
 export type {
   SubstackUser,
@@ -57,4 +56,4 @@ export type {
   SubstackProfileSubscription,
   SubstackTrackingParameters,
   SubstackProfileItemContext
-} from './common'
+} from '@/internal/types/common'

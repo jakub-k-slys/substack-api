@@ -1,4 +1,4 @@
-import { SubstackClient } from '../../src/substack-client'
+import { SubstackClient } from '@/substack-client'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 
@@ -16,7 +16,8 @@ describe('note with link attachment integration tests', () => {
     client = new SubstackClient({
       hostname: hostname,
       apiKey: 'test-key',
-      protocol: 'http' // Use HTTP for local test server
+      protocol: 'http', // Use HTTP for local test server
+      substackBaseUrl: global.INTEGRATION_SERVER.url // Configure global client to use mock server too
     })
   })
 

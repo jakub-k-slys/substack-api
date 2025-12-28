@@ -3,8 +3,8 @@ import {
   PublishNoteResponse,
   CreateAttachmentRequest,
   CreateAttachmentResponse
-} from '../internal'
-import { HttpClient } from '../internal/http-client'
+} from '@/internal'
+import { HttpClient } from '@/internal/http-client'
 
 interface TextSegment {
   text: string

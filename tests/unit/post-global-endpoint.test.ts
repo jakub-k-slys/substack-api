@@ -1,5 +1,5 @@
-import { FullPost } from '../../src/domain'
-import { SubstackClient } from '../../src/substack-client'
+import { FullPost } from '@/domain'
+import { SubstackClient } from '@/substack-client'
 
 // Mock the global fetch function
 global.fetch = jest.fn()

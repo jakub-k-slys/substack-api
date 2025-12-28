@@ -1,5 +1,5 @@
-import { SubstackClient } from '../../src/substack-client'
-import { Profile, OwnProfile, Comment, FullPost } from '../../src/domain'
+import { SubstackClient } from '@/substack-client'
+import { Profile, OwnProfile, Comment, FullPost } from '@/domain'
 import { get } from 'http'
 
 describe('SubstackClient Integration Tests', () => {
@@ -179,9 +179,6 @@ describe('SubstackClient Integration Tests', () => {
         expect(comment.id).toBe(131648795)
         expect(comment.body).toContain('🧨 DO YOU KNOW WHAT REAL AUTOMATION LOOKS LIKE?')
         expect(comment.body).toContain('n8n-operator')
-        expect(comment.author.name).toBe('Jakub Slys 🎖️')
-        expect(comment.author.id).toBe(254824415)
-        expect(comment.createdAt).toBeInstanceOf(Date)
       })
     })
 

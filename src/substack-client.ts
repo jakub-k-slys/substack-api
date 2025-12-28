@@ -1,17 +1,14 @@
-import { Comment, FullPost, Note, OwnProfile, Profile } from './domain'
-import { InMemoryCache } from './internal/cache'
-import { HttpClient } from './internal/http-client'
+import { HttpClient } from '@/internal/http-client'
+import { Profile, OwnProfile, FullPost, Note, Comment } from '@/domain'
 import {
-  CachingSlugService,
-  CommentService,
-  ConnectivityService,
-  FolloweeService,
-  NoteService,
   PostService,
+  NoteService,
   ProfileService,
-  SlugService
-} from './internal/services'
-import type { SubstackConfig } from './types'
+  CommentService,
+  FollowingService,
+  ConnectivityService
+} from '@/internal/services'
+import type { SubstackConfig } from '@/types'
 
 /**
  * Modern SubstackClient with entity-based API
@@ -22,9 +19,8 @@ export class SubstackClient {
   private readonly postService: PostService
   private readonly noteService: NoteService
   private readonly profileService: ProfileService
-  private readonly slugService: CachingSlugService
   private readonly commentService: CommentService
-  private readonly followeeService: FolloweeService
+  private readonly followingService: FollowingService
   private readonly connectivityService: ConnectivityService
 
   constructor(config: SubstackConfig) {
@@ -40,16 +36,10 @@ export class SubstackClient {
     // Initialize services
     this.postService = new PostService(this.substackClient, this.publicationClient)
     this.noteService = new NoteService(this.publicationClient)
-    this.profileService = new ProfileService(this.publicationClient)
-
-    // Create caching slug service using decorator pattern
-    const baseSlugService = new SlugService(this.publicationClient)
-    const slugCache = new InMemoryCache<number, string>()
-    this.slugService = new CachingSlugService(slugCache, baseSlugService)
-
+    this.profileService = new ProfileService(this.substackClient)
     this.commentService = new CommentService(this.publicationClient)
-    this.followeeService = new FolloweeService(this.publicationClient)
-    this.connectivityService = new ConnectivityService(this.publicationClient)
+    this.followingService = new FollowingService(this.publicationClient, this.substackClient)
+    this.connectivityService = new ConnectivityService(this.substackClient)
   }
 
   /**
@@ -67,15 +57,6 @@ export class SubstackClient {
     try {
       const profile = await this.profileService.getOwnProfile()
 
-      // Get user_id for slug resolution
-      const subscription = await this.publicationClient.get<{ user_id: number }>(
-        '/api/v1/subscription'
-      )
-      const userId = subscription.user_id
-
-      // Resolve slug from slug service
-      const resolvedSlug = await this.slugService.getSlugForUserId(userId, profile.handle)
-
       return new OwnProfile(
         profile,
         this.publicationClient,
@@ -83,37 +64,11 @@ export class SubstackClient {
         this.postService,
         this.noteService,
         this.commentService,
-        this.followeeService,
-        resolvedSlug,
-        this.slugService.getSlugForUserId.bind(this.slugService)
+        this.followingService,
+        profile.handle
       )
     } catch (error) {
       throw new Error(`Failed to get own profile: ${(error as Error).message}`)
-    }
-  }
-
-  /**
-   * Get a profile by user ID
-   */
-  async profileForId(id: number): Promise<Profile> {
-    try {
-      const profile = await this.profileService.getProfileById(id)
-
-      // Resolve slug from slug service
-      const resolvedSlug = await this.slugService.getSlugForUserId(id)
-
-      return new Profile(
-        profile,
-        this.publicationClient,
-        this.profileService,
-        this.postService,
-        this.noteService,
-        this.commentService,
-        resolvedSlug,
-        this.slugService.getSlugForUserId.bind(this.slugService)
-      )
-    } catch (error) {
-      throw new Error(`Profile with ID ${id} not found: ${(error as Error).message}`)
     }
   }
 
@@ -127,11 +82,6 @@ export class SubstackClient {
 
     try {
       const profile = await this.profileService.getProfileBySlug(slug)
-
-      // For profiles fetched by slug, we can use the provided slug as the resolved slug
-      // but still check slug service for consistency
-      const resolvedSlug = await this.slugService.getSlugForUserId(profile.id, slug)
-
       return new Profile(
         profile,
         this.publicationClient,
@@ -139,11 +89,34 @@ export class SubstackClient {
         this.postService,
         this.noteService,
         this.commentService,
-        resolvedSlug,
-        this.slugService.getSlugForUserId.bind(this.slugService)
+        profile.handle
       )
     } catch (error) {
       throw new Error(`Profile with slug '${slug}' not found: ${(error as Error).message}`)
+    }
+  }
+
+  /**
+   * Get a profile by user ID
+   */
+  async profileForId(id: number): Promise<Profile> {
+    if (typeof id !== 'number') {
+      throw new TypeError('Profile ID must be a number')
+    }
+
+    try {
+      const profile = await this.profileService.getProfileById(id)
+      return new Profile(
+        profile,
+        this.publicationClient,
+        this.profileService,
+        this.postService,
+        this.noteService,
+        this.commentService,
+        profile.handle
+      )
+    } catch (error) {
+      throw new Error(`Profile with ID ${id} not found: ${(error as Error).message}`)
     }
   }
 

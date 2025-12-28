@@ -1,8 +1,8 @@
-import { NoteWithLinkBuilder } from '../../src/domain/note-builder'
-import { HttpClient } from '../../src/internal/http-client'
+import { NoteWithLinkBuilder } from '@/domain/note-builder'
+import { HttpClient } from '@/internal/http-client'
 
 // Mock HttpClient
-jest.mock('../../src/internal/http-client')
+jest.mock('@/internal/http-client')
 const MockHttpClient = HttpClient as jest.MockedClass<typeof HttpClient>
 
 describe('NoteWithLinkBuilder', () => {

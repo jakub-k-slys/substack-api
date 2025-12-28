@@ -1,9 +1,9 @@
-import { PostService } from '../../src/internal/services/post-service'
-import { HttpClient } from '../../src/internal/http-client'
-import type { SubstackFullPost, SubstackPost } from '../../src/internal'
+import { PostService } from '@/internal/services/post-service'
+import { HttpClient } from '@/internal/http-client'
+import type { SubstackFullPost, SubstackPost } from '@/internal'
 
 // Mock the http client
-jest.mock('../../src/internal/http-client')
+jest.mock('@/internal/http-client')
 
 describe('PostService', () => {
   let postService: PostService
@@ -35,8 +35,6 @@ describe('PostService', () => {
         title: 'Test Post',
         slug: 'test-post',
         post_date: '2023-01-01T00:00:00Z',
-        canonical_url: 'https://example.com/post',
-        type: 'newsletter',
         body_html: '<p>Test post body content</p>'
       }
 
@@ -62,8 +60,6 @@ describe('PostService', () => {
         title: 'Another Test Post',
         slug: 'another-test-post',
         post_date: '2023-02-01T00:00:00Z',
-        canonical_url: 'https://example.com/another-post',
-        type: 'podcast',
         body_html: '<p>Another test post body content</p>'
       }
 
@@ -111,56 +107,50 @@ describe('PostService', () => {
         {
           id: 1,
           title: 'Post 1',
-          slug: 'post-1',
-          post_date: '2023-01-01T00:00:00Z',
-          canonical_url: 'https://example.com/post1',
-          type: 'newsletter'
+          post_date: '2023-01-01T00:00:00Z'
         },
         {
           id: 2,
           title: 'Post 2',
-          slug: 'post-2',
-          post_date: '2023-01-02T00:00:00Z',
-          canonical_url: 'https://example.com/post2',
-          type: 'podcast'
+          post_date: '2023-01-02T00:00:00Z'
         }
       ]
 
-      mockHttpClient.get.mockResolvedValueOnce({ posts: mockPosts })
+      mockGlobalHttpClient.get.mockResolvedValueOnce({ posts: mockPosts })
 
       const result = await postService.getPostsForProfile(123, { limit: 10, offset: 0 })
 
       expect(result).toEqual(mockPosts)
-      expect(mockHttpClient.get).toHaveBeenCalledWith(
-        '/api/v1/profile/posts?profile_user_id=123&limit=10&offset=0'
+      expect(mockGlobalHttpClient.get).toHaveBeenCalledWith(
+        '/api/v1/profile/posts?profile_user_id=123'
       )
     })
 
     it('should handle empty posts array', async () => {
-      mockHttpClient.get.mockResolvedValueOnce({ posts: [] })
+      mockGlobalHttpClient.get.mockResolvedValueOnce({ posts: [] })
 
       const result = await postService.getPostsForProfile(456, { limit: 5, offset: 10 })
 
       expect(result).toEqual([])
-      expect(mockHttpClient.get).toHaveBeenCalledWith(
-        '/api/v1/profile/posts?profile_user_id=456&limit=5&offset=10'
+      expect(mockGlobalHttpClient.get).toHaveBeenCalledWith(
+        '/api/v1/profile/posts?profile_user_id=456'
       )
     })
 
     it('should handle missing posts property in response', async () => {
-      mockHttpClient.get.mockResolvedValueOnce({})
+      mockGlobalHttpClient.get.mockResolvedValueOnce({})
 
       const result = await postService.getPostsForProfile(789, { limit: 20, offset: 5 })
 
       expect(result).toEqual([])
-      expect(mockHttpClient.get).toHaveBeenCalledWith(
-        '/api/v1/profile/posts?profile_user_id=789&limit=20&offset=5'
+      expect(mockGlobalHttpClient.get).toHaveBeenCalledWith(
+        '/api/v1/profile/posts?profile_user_id=789'
       )
     })
 
     it('should throw error when HTTP client fails', async () => {
       const errorMessage = 'HTTP 500: Internal server error'
-      mockHttpClient.get.mockRejectedValueOnce(new Error(errorMessage))
+      mockGlobalHttpClient.get.mockRejectedValueOnce(new Error(errorMessage))
 
       await expect(postService.getPostsForProfile(123, { limit: 10, offset: 0 })).rejects.toThrow(
         errorMessage
@@ -171,10 +161,7 @@ describe('PostService', () => {
       const validPost: SubstackPost = {
         id: 1,
         title: 'Valid Post',
-        slug: 'valid-post',
-        post_date: '2023-01-01T00:00:00Z',
-        canonical_url: 'https://example.com/valid',
-        type: 'newsletter'
+        post_date: '2023-01-01T00:00:00Z'
       }
 
       const invalidPost = {
@@ -183,7 +170,7 @@ describe('PostService', () => {
         // Missing required fields
       }
 
-      mockHttpClient.get.mockResolvedValueOnce({ posts: [validPost, invalidPost] })
+      mockGlobalHttpClient.get.mockResolvedValueOnce({ posts: [validPost, invalidPost] })
 
       await expect(postService.getPostsForProfile(123, { limit: 10, offset: 0 })).rejects.toThrow(
         /Post 1 in profile response/

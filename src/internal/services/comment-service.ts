@@ -1,7 +1,7 @@
-import type { HttpClient } from '../http-client'
-import type { SubstackComment } from '../types'
-import { SubstackCommentCodec, SubstackCommentResponseCodec } from '../types'
-import { decodeOrThrow } from '../validation'
+import type { HttpClient } from '@/internal/http-client'
+import type { SubstackComment } from '@/internal/types'
+import { SubstackCommentCodec, SubstackCommentResponseCodec } from '@/internal/types'
+import { decodeOrThrow } from '@/internal/validation'
 
 /**
  * Service responsible for comment-related HTTP operations
@@ -45,10 +45,6 @@ export class CommentService {
     const commentData: SubstackComment = {
       id: response.item.comment.id,
       body: response.item.comment.body,
-      date: response.item.comment.date,
-      post_id: response.item.comment.post_id || 0,
-      user_id: response.item.comment.user_id,
-      name: response.item.comment.name,
       author_is_admin: false // Default value since not in response
     }
 

@@ -11,6 +11,10 @@ export default {
   },
   roots: ['<rootDir>/tests/e2e'],
   testMatch: ['**/*.e2e.test.ts'],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+    '^@test/(.*)$': '<rootDir>/tests/$1'
+  },
   setupFilesAfterEnv: ['<rootDir>/tests/e2e/setup.ts'],
   testTimeout: 30000, // 30 seconds for API calls
   collectCoverage: false, // E2E tests don't need coverage

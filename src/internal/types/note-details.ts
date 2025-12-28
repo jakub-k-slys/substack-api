@@ -2,13 +2,13 @@
  * Internal note context and tracking interfaces
  */
 
-import type { SubstackPublication, SubstackPost } from './api-responses'
+import type { SubstackPublication, SubstackNote } from '@/internal/types/api-responses'
 import type {
   SubstackUser,
   SubstackPublicationBase,
   SubstackAttachment,
   SubstackTrackingParameters
-} from './common'
+} from '@/internal/types/common'
 
 export interface SubstackNoteContext {
   type: string
@@ -54,19 +54,6 @@ export interface SubstackNoteComment {
 
 export interface SubstackNoteTracking extends SubstackTrackingParameters {
   // Note-specific tracking fields that extend the base tracking
-}
-
-export interface SubstackNote {
-  entity_key: string
-  type: string
-  context: SubstackNoteContext
-  publication?: SubstackPublication | null
-  post?: SubstackPost | null
-  comment?: SubstackNoteComment
-  parentComments: Array<SubstackNoteComment>
-  canReply: boolean
-  isMuted: boolean
-  trackingParameters: SubstackNoteTracking
 }
 
 /**

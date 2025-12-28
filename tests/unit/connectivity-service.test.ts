@@ -1,8 +1,8 @@
-import { ConnectivityService } from '../../src/internal/services/connectivity-service'
-import { HttpClient } from '../../src/internal/http-client'
+import { ConnectivityService } from '@/internal/services/connectivity-service'
+import { HttpClient } from '@/internal/http-client'
 
 // Mock the HttpClient
-jest.mock('../../src/internal/http-client')
+jest.mock('@/internal/http-client')
 
 describe('ConnectivityService', () => {
   let connectivityService: ConnectivityService

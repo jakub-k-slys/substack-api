@@ -1,9 +1,9 @@
-import { CommentService } from '../../src/internal/services/comment-service'
-import { HttpClient } from '../../src/internal/http-client'
-import type { SubstackComment, SubstackCommentResponse } from '../../src/internal'
+import { CommentService } from '@/internal/services/comment-service'
+import { HttpClient } from '@/internal/http-client'
+import type { SubstackComment, SubstackCommentResponse } from '@/internal'
 
 // Mock the http client
-jest.mock('../../src/internal/http-client')
+jest.mock('@/internal/http-client')
 
 describe('CommentService', () => {
   let commentService: CommentService
@@ -27,19 +27,11 @@ describe('CommentService', () => {
         {
           id: 1,
           body: 'Test comment 1',
-          date: '2023-01-01T00:00:00Z',
-          post_id: 123,
-          user_id: 456,
-          name: 'Test Author',
           author_is_admin: false
         },
         {
           id: 2,
           body: 'Test comment 2',
-          date: '2023-01-02T00:00:00Z',
-          post_id: 123,
-          user_id: 789,
-          name: 'Another Author',
           author_is_admin: true
         }
       ]
@@ -105,10 +97,6 @@ describe('CommentService', () => {
       expect(result).toEqual({
         id: 123,
         body: 'Test comment body',
-        date: '2023-01-01T00:00:00Z',
-        post_id: 789,
-        user_id: 456,
-        name: 'Test Author',
         author_is_admin: false
       })
     })
@@ -132,7 +120,9 @@ describe('CommentService', () => {
       const result = await commentService.getCommentById(123)
 
       expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/comment/123')
-      expect(result.post_id).toBe(0)
+      expect(result.id).toBe(123)
+      expect(result.body).toBe('Test comment body')
+      expect(result.author_is_admin).toBe(false)
     })
 
     it('should throw error when comment is not found', async () => {

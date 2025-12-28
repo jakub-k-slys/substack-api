@@ -1,12 +1,7 @@
-import { SubstackClient } from '../../src/substack-client'
-import { Profile, PreviewPost, Comment } from '../../src/domain'
-import {
-  PostService,
-  ProfileService,
-  NoteService,
-  CommentService
-} from '../../src/internal/services'
-import type { HttpClient } from '../../src/internal/http-client'
+import { SubstackClient } from '@/substack-client'
+import { Profile, PreviewPost, Comment } from '@/domain'
+import { PostService, ProfileService, NoteService, CommentService } from '@/internal/services'
+import type { HttpClient } from '@/internal/http-client'
 
 describe('SubstackClient Entity Model', () => {
   let client: SubstackClient
@@ -61,7 +56,6 @@ describe('SubstackClient Entity Model', () => {
         subscriberCountNumber: 0,
         hasHiddenPublicationUsers: false,
         visibleSubscriptionsCount: 0,
-        slug: 'testuser',
         primaryPublicationIsPledged: false,
         primaryPublicationSubscriptionState: 'not_subscribed',
         isSubscribed: false,
@@ -114,9 +108,8 @@ describe('SubstackClient Entity Model', () => {
       const mockData = {
         id: 456,
         title: 'Test Post',
-        slug: 'test-post',
+        slug: 'test-slug',
         post_date: '2023-01-01T00:00:00Z',
-        canonical_url: 'https://example.com/post',
         type: 'newsletter' as const
       }
       const httpClient = (client as unknown as { httpClient: HttpClient }).httpClient
