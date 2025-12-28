@@ -111,7 +111,6 @@ describe('SubstackClient', () => {
 
   describe('ownProfile', () => {
     it('should get own profile when authenticated', async () => {
-      const mockSubscription = { user_id: 123 }
       const mockProfile = {
         id: 123,
         name: 'Test User',

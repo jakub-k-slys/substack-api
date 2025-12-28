@@ -1,9 +1,4 @@
-import {
-  NoteBuilder,
-  ParagraphBuilder,
-  ListBuilder,
-  ListItemBuilder
-} from '@/domain/note-builder'
+import { NoteBuilder, ParagraphBuilder, ListBuilder, ListItemBuilder } from '@/domain/note-builder'
 import type { HttpClient } from '@/internal/http-client'
 import type { PublishNoteResponse } from '@/internal'
 

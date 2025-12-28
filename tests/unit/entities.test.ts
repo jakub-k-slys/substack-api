@@ -1,11 +1,6 @@
 import { SubstackClient } from '@/substack-client'
 import { Profile, PreviewPost, Comment } from '@/domain'
-import {
-  PostService,
-  ProfileService,
-  NoteService,
-  CommentService
-} from '@/internal/services'
+import { PostService, ProfileService, NoteService, CommentService } from '@/internal/services'
 import type { HttpClient } from '@/internal/http-client'
 
 describe('SubstackClient Entity Model', () => {

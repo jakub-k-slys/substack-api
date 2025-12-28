@@ -1,6 +1,6 @@
 import { NoteService } from '@/internal/services/note-service'
 import { HttpClient } from '@/internal/http-client'
-import type { SubstackNote, SubstackCommentResponse } from '@/internal'
+import type { SubstackCommentResponse } from '@/internal'
 
 // Mock the http client
 jest.mock('@/internal/http-client')

@@ -1,11 +1,6 @@
 import { Profile } from '@/domain/profile'
 import { PreviewPost, Note } from '@/domain'
-import {
-  ProfileService,
-  PostService,
-  NoteService,
-  CommentService
-} from '@/internal/services'
+import { ProfileService, PostService, NoteService, CommentService } from '@/internal/services'
 import type { HttpClient } from '@/internal/http-client'
 
 describe('Profile Entity', () => {
