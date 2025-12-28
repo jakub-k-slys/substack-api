@@ -1,12 +1,12 @@
-import { SubstackClient } from '../../src/substack-client'
-import { Profile, PreviewPost, Comment } from '../../src/domain'
+import { SubstackClient } from '@/substack-client'
+import { Profile, PreviewPost, Comment } from '@/domain'
 import {
   PostService,
   ProfileService,
   NoteService,
   CommentService
-} from '../../src/internal/services'
-import type { HttpClient } from '../../src/internal/http-client'
+} from '@/internal/services'
+import type { HttpClient } from '@/internal/http-client'
 
 describe('SubstackClient Entity Model', () => {
   let client: SubstackClient

@@ -1,4 +1,4 @@
-import type { Cache } from './cache'
+import type { Cache } from '@/internal/cache/cache'
 
 /**
  * Simple in-memory cache implementation using Map

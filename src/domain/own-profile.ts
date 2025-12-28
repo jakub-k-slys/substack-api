@@ -1,15 +1,15 @@
-import { Profile } from './profile'
-import { Note } from './note'
-import { NoteBuilder, NoteWithLinkBuilder } from './note-builder'
-import type { SubstackFullProfile } from '../internal'
-import type { HttpClient } from '../internal/http-client'
+import { Profile } from '@/domain/profile'
+import { Note } from '@/domain/note'
+import { NoteBuilder, NoteWithLinkBuilder } from '@/domain/note-builder'
+import type { SubstackFullProfile } from '@/internal'
+import type { HttpClient } from '@/internal/http-client'
 import type {
   ProfileService,
   PostService,
   NoteService,
   FollowingService,
   CommentService
-} from '../internal/services'
+} from '@/internal/services'
 
 /**
  * OwnProfile extends Profile with write capabilities for the authenticated user

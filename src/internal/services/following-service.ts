@@ -1,5 +1,5 @@
-import type { HttpClient } from '../http-client'
-import { SubscriberLists } from '../types/subscriber-lists'
+import type { HttpClient } from '@/internal/http-client'
+import { SubscriberLists } from '@/internal/types/subscriber-lists'
 import { isLeft } from 'fp-ts/Either'
 import { PathReporter } from 'io-ts/PathReporter'
 

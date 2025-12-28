@@ -1,7 +1,7 @@
-import type { SubstackPost, SubstackFullPost } from '../internal'
-import type { HttpClient } from '../internal/http-client'
-import type { CommentService, PostService } from '../internal/services'
-import { Comment } from './comment'
+import type { SubstackPost, SubstackFullPost } from '@/internal'
+import type { HttpClient } from '@/internal/http-client'
+import type { CommentService, PostService } from '@/internal/services'
+import { Comment } from '@/domain/comment'
 
 /**
  * PreviewPost entity representing a Substack post with truncated content

@@ -1,4 +1,4 @@
-import { InMemoryCache } from '../../src/internal/cache/in-memory-cache'
+import { InMemoryCache } from '@/internal/cache/in-memory-cache'
 
 describe('InMemoryCache', () => {
   let cache: InMemoryCache<number, string>

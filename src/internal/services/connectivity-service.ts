@@ -1,4 +1,4 @@
-import type { HttpClient } from '../http-client'
+import type { HttpClient } from '@/internal/http-client'
 
 /**
  * Service responsible for checking API connectivity and session validity

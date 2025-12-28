@@ -1,17 +1,17 @@
-import { OwnProfile } from '../../src/domain/own-profile'
-import { NoteWithLinkBuilder } from '../../src/domain/note-builder'
-import { HttpClient } from '../../src/internal/http-client'
+import { OwnProfile } from '@/domain/own-profile'
+import { NoteWithLinkBuilder } from '@/domain/note-builder'
+import { HttpClient } from '@/internal/http-client'
 import {
   ProfileService,
   PostService,
   NoteService,
   FollowingService,
   CommentService
-} from '../../src/internal/services'
+} from '@/internal/services'
 
 // Mock dependencies
-jest.mock('../../src/internal/http-client')
-jest.mock('../../src/internal/services')
+jest.mock('@/internal/http-client')
+jest.mock('@/internal/services')
 
 const MockHttpClient = HttpClient as jest.MockedClass<typeof HttpClient>
 const MockProfileService = ProfileService as jest.MockedClass<typeof ProfileService>

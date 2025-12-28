@@ -1,4 +1,4 @@
-import { HttpClient } from '../../src/internal/http-client'
+import { HttpClient } from '@/internal/http-client'
 
 // Mock fetch globally
 global.fetch = jest.fn()

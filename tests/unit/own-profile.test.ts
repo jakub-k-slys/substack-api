@@ -1,16 +1,16 @@
-import { OwnProfile } from '../../src/domain/own-profile'
-import { Note } from '../../src/domain/note'
-import { Profile } from '../../src/domain/profile'
-import { NoteBuilder } from '../../src/domain/note-builder'
+import { OwnProfile } from '@/domain/own-profile'
+import { Note } from '@/domain/note'
+import { Profile } from '@/domain/profile'
+import { NoteBuilder } from '@/domain/note-builder'
 import {
   ProfileService,
   PostService,
   NoteService,
   CommentService,
   FollowingService
-} from '../../src/internal/services'
-import type { SubstackFullProfile } from '../../src/internal'
-import type { HttpClient } from '../../src/internal/http-client'
+} from '@/internal/services'
+import type { SubstackFullProfile } from '@/internal'
+import type { HttpClient } from '@/internal/http-client'
 
 describe('OwnProfile Entity', () => {
   let mockProfileData: SubstackFullProfile

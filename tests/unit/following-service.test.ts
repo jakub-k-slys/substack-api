@@ -1,8 +1,8 @@
-import { FollowingService } from '../../src/internal/services/following-service'
-import { HttpClient } from '../../src/internal/http-client'
+import { FollowingService } from '@/internal/services/following-service'
+import { HttpClient } from '@/internal/http-client'
 
 // Mock the http client
-jest.mock('../../src/internal/http-client')
+jest.mock('@/internal/http-client')
 
 describe('FollowingService', () => {
   let followingService: FollowingService

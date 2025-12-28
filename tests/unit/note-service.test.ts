@@ -1,9 +1,9 @@
-import { NoteService } from '../../src/internal/services/note-service'
-import { HttpClient } from '../../src/internal/http-client'
-import type { SubstackNote, SubstackCommentResponse } from '../../src/internal'
+import { NoteService } from '@/internal/services/note-service'
+import { HttpClient } from '@/internal/http-client'
+import type { SubstackNote, SubstackCommentResponse } from '@/internal'
 
 // Mock the http client
-jest.mock('../../src/internal/http-client')
+jest.mock('@/internal/http-client')
 
 describe('NoteService', () => {
   let noteService: NoteService

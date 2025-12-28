@@ -11,6 +11,9 @@ export default {
   },
   roots: ['<rootDir>/tests/integration'],
   testMatch: ['**/*.integration.test.ts'],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1'
+  },
   setupFilesAfterEnv: ['<rootDir>/tests/integration/setup.ts'],
   testTimeout: 10000, // 10 seconds for local HTTP server calls
   collectCoverage: false, // Integration tests don't need coverage

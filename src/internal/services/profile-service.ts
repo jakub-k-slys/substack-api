@@ -1,6 +1,6 @@
-import type { HttpClient } from '../http-client'
-import type { SubstackFullProfile, SubstackUserProfile } from '../types'
-import type { PotentialHandles } from '../types/potential-handles'
+import type { HttpClient } from '@/internal/http-client'
+import type { SubstackFullProfile, SubstackUserProfile } from '@/internal/types'
+import type { PotentialHandles } from '@/internal/types/potential-handles'
 
 /**
  * Service responsible for profile-related HTTP operations

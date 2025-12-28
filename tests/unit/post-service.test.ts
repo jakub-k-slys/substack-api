@@ -1,9 +1,9 @@
-import { PostService } from '../../src/internal/services/post-service'
-import { HttpClient } from '../../src/internal/http-client'
-import type { SubstackFullPost, SubstackPost } from '../../src/internal'
+import { PostService } from '@/internal/services/post-service'
+import { HttpClient } from '@/internal/http-client'
+import type { SubstackFullPost, SubstackPost } from '@/internal'
 
 // Mock the http client
-jest.mock('../../src/internal/http-client')
+jest.mock('@/internal/http-client')
 
 describe('PostService', () => {
   let postService: PostService

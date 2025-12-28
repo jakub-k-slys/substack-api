@@ -1,7 +1,7 @@
 /**
  * HTTP client utility for Substack API requests
  */
-import type { SubstackConfig } from '../types'
+import type { SubstackConfig } from '@/types'
 
 export class HttpClient {
   private readonly baseUrl: string

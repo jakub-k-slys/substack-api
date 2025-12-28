@@ -3,9 +3,9 @@ import {
   ParagraphBuilder,
   ListBuilder,
   ListItemBuilder
-} from '../../src/domain/note-builder'
-import type { HttpClient } from '../../src/internal/http-client'
-import type { PublishNoteResponse } from '../../src/internal'
+} from '@/domain/note-builder'
+import type { HttpClient } from '@/internal/http-client'
+import type { PublishNoteResponse } from '@/internal'
 
 describe('NoteBuilder', () => {
   let mockHttpClient: jest.Mocked<HttpClient>

@@ -2,13 +2,17 @@
  * Internal note context and tracking interfaces
  */
 
-import type { SubstackPublication, SubstackPost, SubstackNote } from './api-responses'
+import type {
+  SubstackPublication,
+  SubstackPost,
+  SubstackNote
+} from '@/internal/types/api-responses'
 import type {
   SubstackUser,
   SubstackPublicationBase,
   SubstackAttachment,
   SubstackTrackingParameters
-} from './common'
+} from '@/internal/types/common'
 
 export interface SubstackNoteContext {
   type: string

@@ -2,7 +2,11 @@
  * Internal profile API response types
  */
 
-import type { SubstackPublication, SubstackPost, SubstackComment } from './api-responses'
+import type {
+  SubstackPublication,
+  SubstackPost,
+  SubstackComment
+} from '@/internal/types/api-responses'
 import type {
   SubstackUser,
   SubstackPublicationBase,
@@ -11,7 +15,7 @@ import type {
   SubstackProfileSubscription,
   SubstackTrackingParameters,
   SubstackProfileItemContext
-} from './common'
+} from '@/internal/types/common'
 
 export interface SubstackPublicProfile extends SubstackUser {
   tos_accepted_at?: string | null

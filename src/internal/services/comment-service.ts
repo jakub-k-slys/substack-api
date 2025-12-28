@@ -1,7 +1,7 @@
-import type { HttpClient } from '../http-client'
-import type { SubstackComment } from '../types'
-import { SubstackCommentCodec, SubstackCommentResponseCodec } from '../types'
-import { decodeOrThrow } from '../validation'
+import type { HttpClient } from '@/internal/http-client'
+import type { SubstackComment } from '@/internal/types'
+import { SubstackCommentCodec, SubstackCommentResponseCodec } from '@/internal/types'
+import { decodeOrThrow } from '@/internal/validation'
 
 /**
  * Service responsible for comment-related HTTP operations

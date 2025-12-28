@@ -1,8 +1,8 @@
-import { PreviewPost, FullPost } from '../../src/domain/post'
-import { Comment } from '../../src/domain/comment'
-import { CommentService } from '../../src/internal/services/comment-service'
-import { PostService } from '../../src/internal/services/post-service'
-import type { HttpClient } from '../../src/internal/http-client'
+import { PreviewPost, FullPost } from '@/domain/post'
+import { Comment } from '@/domain/comment'
+import { CommentService } from '@/internal/services/comment-service'
+import { PostService } from '@/internal/services/post-service'
+import type { HttpClient } from '@/internal/http-client'
 
 describe('PreviewPost Entity', () => {
   let mockHttpClient: jest.Mocked<HttpClient>

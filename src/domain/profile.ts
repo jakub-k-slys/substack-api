@@ -1,8 +1,8 @@
-import type { SubstackPublicProfile, SubstackFullProfile } from '../internal'
-import type { HttpClient } from '../internal/http-client'
-import type { ProfileService, CommentService, PostService, NoteService } from '../internal/services'
-import { PreviewPost } from './post'
-import { Note } from './note'
+import type { SubstackPublicProfile, SubstackFullProfile } from '@/internal'
+import type { HttpClient } from '@/internal/http-client'
+import type { ProfileService, CommentService, PostService, NoteService } from '@/internal/services'
+import { PreviewPost } from '@/domain/post'
+import { Note } from '@/domain/note'
 
 /**
  * Base Profile class representing a Substack user profile (read-only)

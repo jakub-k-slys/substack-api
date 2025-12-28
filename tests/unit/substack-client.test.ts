@@ -1,6 +1,6 @@
-import { SubstackClient } from '../../src/substack-client'
-import { Profile, FullPost, Note, Comment, OwnProfile } from '../../src/domain'
-import { HttpClient } from '../../src/internal/http-client'
+import { SubstackClient } from '@/substack-client'
+import { Profile, FullPost, Note, Comment, OwnProfile } from '@/domain'
+import { HttpClient } from '@/internal/http-client'
 import {
   PostService,
   NoteService,
@@ -8,12 +8,12 @@ import {
   CommentService,
   FollowingService,
   ConnectivityService
-} from '../../src/internal/services'
-import type { SubstackFullProfile } from '../../src/internal'
+} from '@/internal/services'
+import type { SubstackFullProfile } from '@/internal'
 
 // Mock the http client and services
-jest.mock('../../src/internal/http-client')
-jest.mock('../../src/internal/services')
+jest.mock('@/internal/http-client')
+jest.mock('@/internal/services')
 
 // Mock the global fetch function
 global.fetch = jest.fn()

@@ -10,6 +10,9 @@ export default {
   },
   roots: ['<rootDir>/tests'],
   testMatch: ['**/unit/**/*.test.ts'],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1'
+  },
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.test.ts'
