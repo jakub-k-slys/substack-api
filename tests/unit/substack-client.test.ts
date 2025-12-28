@@ -6,7 +6,7 @@ import {
   NoteService,
   ProfileService,
   CommentService,
-  FolloweeService,
+  FollowingService,
   ConnectivityService
 } from '../../src/internal/services'
 import type { SubstackFullProfile } from '../../src/internal'
@@ -26,7 +26,7 @@ describe('SubstackClient', () => {
   let mockNoteService: jest.Mocked<NoteService>
   let mockProfileService: jest.Mocked<ProfileService>
   let mockCommentService: jest.Mocked<CommentService>
-  let mockFolloweeService: jest.Mocked<FolloweeService>
+  let mockFollowingService: jest.Mocked<FollowingService>
   let mockConnectivityService: jest.Mocked<ConnectivityService>
 
   beforeEach(() => {
@@ -65,11 +65,11 @@ describe('SubstackClient', () => {
     mockCommentService.getCommentById = jest.fn()
     mockCommentService.getCommentsForPost = jest.fn()
 
-    mockFolloweeService = new FolloweeService(
+    mockFollowingService = new FollowingService(
       mockHttpClient,
       mockGlobalHttpClient
-    ) as jest.Mocked<FolloweeService>
-    mockFolloweeService.getFollowees = jest.fn()
+    ) as jest.Mocked<FollowingService>
+    mockFollowingService.getFollowing = jest.fn()
 
     mockConnectivityService = new ConnectivityService(
       mockHttpClient
@@ -87,8 +87,8 @@ describe('SubstackClient', () => {
     ;(client as unknown as { noteService: NoteService }).noteService = mockNoteService
     ;(client as unknown as { profileService: ProfileService }).profileService = mockProfileService
     ;(client as unknown as { commentService: CommentService }).commentService = mockCommentService
-    ;(client as unknown as { followeeService: FolloweeService }).followeeService =
-      mockFolloweeService
+    ;(client as unknown as { followingService: FollowingService }).followingService =
+      mockFollowingService
     ;(client as unknown as { connectivityService: ConnectivityService }).connectivityService =
       mockConnectivityService
   })
@@ -116,7 +116,7 @@ describe('SubstackClient', () => {
         id: 123,
         name: 'Test User',
         handle: 'testuser',
-        photo_url: 'https://example.com/photo.jpg',
+        photo_url: 'https://example.com/photo.jpg'
       }
       mockProfileService.getOwnProfile.mockResolvedValueOnce(mockProfile)
 
@@ -140,7 +140,7 @@ describe('SubstackClient', () => {
         id: 123,
         handle: 'testuser',
         name: 'Test User',
-        photo_url: 'https://example.com/photo.jpg',
+        photo_url: 'https://example.com/photo.jpg'
       }
       mockProfileService.getProfileById.mockResolvedValue(mockProfile as any)
 
@@ -162,7 +162,7 @@ describe('SubstackClient', () => {
         id: 9876543210,
         handle: 'testuser',
         name: 'Test User',
-        photo_url: 'https://example.com/photo.jpg',
+        photo_url: 'https://example.com/photo.jpg'
       }
       mockProfileService.getProfileById.mockResolvedValue(mockProfile as any)
 
@@ -178,7 +178,7 @@ describe('SubstackClient', () => {
         id: 123,
         handle: 'testuser',
         name: 'Test User',
-        photo_url: 'https://example.com/photo.jpg',
+        photo_url: 'https://example.com/photo.jpg'
       }
       mockProfileService.getProfileBySlug.mockResolvedValue(mockProfile as any)
 
@@ -207,7 +207,7 @@ describe('SubstackClient', () => {
       const mockPost = {
         id: 456,
         title: 'Test Post',
-        slug: "test-slug",
+        slug: 'test-slug',
         post_date: '2023-01-01T00:00:00Z',
         body_html: '<p>Test post body content</p>'
       }
@@ -246,7 +246,7 @@ describe('SubstackClient', () => {
               name: 'Test User',
               handle: '',
               photo_url: '',
-              bio: '',
+              bio: ''
             }
           ],
           isFresh: false,

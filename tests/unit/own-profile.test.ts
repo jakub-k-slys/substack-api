@@ -7,7 +7,7 @@ import {
   PostService,
   NoteService,
   CommentService,
-  FolloweeService
+  FollowingService
 } from '../../src/internal/services'
 import type { SubstackFullProfile } from '../../src/internal'
 import type { HttpClient } from '../../src/internal/http-client'
@@ -18,7 +18,7 @@ describe('OwnProfile Entity', () => {
   let mockPostService: jest.Mocked<PostService>
   let mockCommentService: jest.Mocked<CommentService>
   let mockNoteService: jest.Mocked<NoteService>
-  let mockFolloweeService: jest.Mocked<FolloweeService>
+  let mockFollowingService: jest.Mocked<FollowingService>
   let ownProfile: OwnProfile
 
   beforeEach(() => {
@@ -27,8 +27,7 @@ describe('OwnProfile Entity', () => {
       name: 'Test User',
       handle: 'testuser',
       photo_url: 'https://example.com/photo.jpg',
-      bio: 'Test bio',
-
+      bio: 'Test bio'
     } as SubstackFullProfile
 
     // Mock the legacy client
@@ -62,9 +61,9 @@ describe('OwnProfile Entity', () => {
       getNotesForProfile: jest.fn()
     } as unknown as jest.Mocked<NoteService>
 
-    mockFolloweeService = {
-      getFollowees: jest.fn()
-    } as unknown as jest.Mocked<FolloweeService>
+    mockFollowingService = {
+      getFollowing: jest.fn()
+    } as unknown as jest.Mocked<FollowingService>
 
     ownProfile = new OwnProfile(
       mockProfileData,
@@ -73,7 +72,7 @@ describe('OwnProfile Entity', () => {
       mockPostService,
       mockNoteService,
       mockCommentService,
-      mockFolloweeService
+      mockFollowingService
     )
   })
 
@@ -94,7 +93,7 @@ describe('OwnProfile Entity', () => {
     expect(builder).toBeInstanceOf(NoteBuilder)
   })
 
-  it('should iterate through followees using correct endpoint chain', async () => {
+  it('should iterate through following users using correct endpoint chain', async () => {
     // Mock the response from /api/v1/feed/following (returns array of FollowingUser objects)
     const mockFollowingIds = [
       { id: 1, handle: 'user1' },
@@ -107,8 +106,7 @@ describe('OwnProfile Entity', () => {
       handle: 'user1',
       name: 'User One',
       photo_url: 'https://example.com/user1.jpg',
-      bio: 'Bio for User One',
-
+      bio: 'Bio for User One'
     } as SubstackFullProfile
 
     const mockProfile2 = {
@@ -116,54 +114,53 @@ describe('OwnProfile Entity', () => {
       handle: 'user2',
       name: 'User Two',
       photo_url: 'https://example.com/user2.jpg',
-      bio: 'Bio for User Two',
-
+      bio: 'Bio for User Two'
     } as SubstackFullProfile
 
     // Setup service mocks
-    mockFolloweeService.getFollowees.mockResolvedValue(mockFollowingIds)
+    mockFollowingService.getFollowing.mockResolvedValue(mockFollowingIds)
     mockProfileService.getProfileBySlug
       .mockResolvedValueOnce(mockProfile1)
       .mockResolvedValueOnce(mockProfile2)
 
-    const followees = []
+    const followingList = []
     for await (const profile of ownProfile.following()) {
-      followees.push(profile)
+      followingList.push(profile)
     }
 
-    expect(followees).toHaveLength(2)
-    expect(followees[0]).toBeInstanceOf(Profile)
-    expect(followees[0].name).toBe('User One')
-    expect(followees[1].name).toBe('User Two')
+    expect(followingList).toHaveLength(2)
+    expect(followingList[0]).toBeInstanceOf(Profile)
+    expect(followingList[0].name).toBe('User One')
+    expect(followingList[1].name).toBe('User Two')
 
     // Verify correct service calls were made
-    expect(mockFolloweeService.getFollowees).toHaveBeenCalledTimes(1)
+    expect(mockFollowingService.getFollowing).toHaveBeenCalledTimes(1)
     expect(mockProfileService.getProfileBySlug).toHaveBeenCalledWith('user1')
     expect(mockProfileService.getProfileBySlug).toHaveBeenCalledWith('user2')
     expect(mockProfileService.getProfileBySlug).toHaveBeenCalledTimes(2)
   })
 
-  it('should handle empty followees response', async () => {
-    mockFolloweeService.getFollowees.mockResolvedValue([]) // Empty array of user IDs
+  it('should handle empty following response', async () => {
+    mockFollowingService.getFollowing.mockResolvedValue([]) // Empty array of user IDs
 
-    const followees = []
+    const followingList = []
     for await (const profile of ownProfile.following()) {
-      followees.push(profile)
+      followingList.push(profile)
     }
 
-    expect(followees).toHaveLength(0)
-    expect(mockFolloweeService.getFollowees).toHaveBeenCalledTimes(1)
+    expect(followingList).toHaveLength(0)
+    expect(mockFollowingService.getFollowing).toHaveBeenCalledTimes(1)
     expect(mockProfileService.getProfileBySlug).not.toHaveBeenCalled() // No profile calls should be made
   })
 
   it('should handle profile fetch errors gracefully', async () => {
-    // Mock the FolloweeService to return FollowingUser objects
+    // Mock the FollowingService to return FollowingUser objects
     const mockFollowingIds = [
       { id: 1, handle: 'user1' },
       { id: 2, handle: 'user2' },
       { id: 3, handle: 'user3' }
     ]
-    mockFolloweeService.getFollowees.mockResolvedValue(mockFollowingIds)
+    mockFollowingService.getFollowing.mockResolvedValue(mockFollowingIds)
 
     // Mock ProfileService where one profile fetch fails
     mockProfileService.getProfileBySlug.mockImplementation((slug: string) => {
@@ -246,29 +243,29 @@ describe('OwnProfile Entity', () => {
       return Promise.reject(new Error(`Unexpected slug: ${slug}`))
     })
 
-    const followees = []
+    const followingList = []
     for await (const profile of ownProfile.following()) {
-      followees.push(profile)
+      followingList.push(profile)
     }
 
     // Should get 2 profiles (skipping the failed one)
-    expect(followees).toHaveLength(2)
-    expect(followees[0].name).toBe('User One')
-    expect(followees[1].name).toBe('User Three')
+    expect(followingList).toHaveLength(2)
+    expect(followingList[0].name).toBe('User One')
+    expect(followingList[1].name).toBe('User Three')
 
     // Verify service calls were made
-    expect(mockFolloweeService.getFollowees).toHaveBeenCalledTimes(1)
+    expect(mockFollowingService.getFollowing).toHaveBeenCalledTimes(1)
     expect(mockProfileService.getProfileBySlug).toHaveBeenCalledWith('user1')
     expect(mockProfileService.getProfileBySlug).toHaveBeenCalledWith('user2')
     expect(mockProfileService.getProfileBySlug).toHaveBeenCalledWith('user3')
     expect(mockProfileService.getProfileBySlug).toHaveBeenCalledTimes(3)
   })
 
-  it('should use handles as slugs for followees', async () => {
+  it('should use handles as slugs for following users', async () => {
     // Create fresh service mocks for this test
-    const localFolloweeService = {
-      getFollowees: jest.fn()
-    } as unknown as jest.Mocked<FolloweeService>
+    const localFollowingService = {
+      getFollowing: jest.fn()
+    } as unknown as jest.Mocked<FollowingService>
 
     const localProfileService = {
       getOwnProfile: jest.fn(),
@@ -289,7 +286,7 @@ describe('OwnProfile Entity', () => {
       mockPostService,
       mockNoteService,
       mockCommentService,
-      localFolloweeService,
+      localFollowingService,
       'resolved-own-slug'
     )
 
@@ -298,7 +295,7 @@ describe('OwnProfile Entity', () => {
       { id: 1, handle: 'user1' },
       { id: 2, handle: 'user2' }
     ]
-    localFolloweeService.getFollowees.mockResolvedValue(mockFollowingIds)
+    localFollowingService.getFollowing.mockResolvedValue(mockFollowingIds)
 
     localProfileService.getProfileBySlug.mockImplementation((slug: string) => {
       if (slug === 'user1') {
@@ -319,20 +316,20 @@ describe('OwnProfile Entity', () => {
       return Promise.reject(new Error(`Unexpected slug: ${slug}`))
     })
 
-    const followees = []
+    const followingList = []
     for await (const profile of ownProfileWithResolver.following()) {
-      followees.push(profile)
+      followingList.push(profile)
     }
 
-    expect(followees).toHaveLength(2)
+    expect(followingList).toHaveLength(2)
 
     // The handle from the FollowingUser is used directly as the slug
-    expect(followees[0].slug).toBe('user1')
-    expect(followees[1].slug).toBe('user2')
+    expect(followingList[0].slug).toBe('user1')
+    expect(followingList[1].slug).toBe('user2')
 
     // Verify that Profile instances are created correctly
-    expect(followees[0]).toBeInstanceOf(Profile)
-    expect(followees[1]).toBeInstanceOf(Profile)
+    expect(followingList[0]).toBeInstanceOf(Profile)
+    expect(followingList[1]).toBeInstanceOf(Profile)
   })
 
   describe('notes()', () => {

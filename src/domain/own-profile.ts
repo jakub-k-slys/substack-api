@@ -7,7 +7,7 @@ import type {
   ProfileService,
   PostService,
   NoteService,
-  FolloweeService,
+  FollowingService,
   CommentService
 } from '../internal/services'
 
@@ -22,18 +22,10 @@ export class OwnProfile extends Profile {
     postService: PostService,
     noteService: NoteService,
     commentService: CommentService,
-    private readonly followeeService: FolloweeService,
+    private readonly followingService: FollowingService,
     resolvedSlug?: string
   ) {
-    super(
-      rawData,
-      client,
-      profileService,
-      postService,
-      noteService,
-      commentService,
-      resolvedSlug
-    )
+    super(rawData, client, profileService, postService, noteService, commentService, resolvedSlug)
   }
 
   /**
@@ -54,7 +46,7 @@ export class OwnProfile extends Profile {
    * Get users that the authenticated user follows
    */
   async *following(options: { limit?: number } = {}): AsyncIterable<Profile> {
-    const followingUsers = await this.followeeService.getFollowees()
+    const followingUsers = await this.followingService.getFollowing()
 
     let count = 0
     for (const user of followingUsers) {

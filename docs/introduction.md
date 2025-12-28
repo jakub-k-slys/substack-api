@@ -157,8 +157,8 @@ for await (const post of myProfile.posts({ limit: 10 })) {
 ### Content Curation Bot
 ```typescript
 // Find and engage with trending content
-for await (const followee of myProfile.followees()) {
-  for await (const post of followee.posts({ limit: 3 })) {
+for await (const user of myProfile.following()) {
+  for await (const post of user.posts({ limit: 3 })) {
     if ((post.reactions?.length || 0) > 10) {
       await post.like();
       await post.addComment('Great insights!');

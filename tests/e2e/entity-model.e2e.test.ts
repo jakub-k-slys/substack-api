@@ -43,7 +43,7 @@ describe('SubstackClient Entity Model E2E', () => {
     console.log(`✅ Retrieved jakubslys profile: ${profile.name} (@${profile.slug})`)
   })
 
-  test('should iterate through followees', async () => {
+  test('should iterate through following users', async () => {
     const ownProfile = await client.ownProfile()
     let counter = 0
     for await (const profile of ownProfile.following({ limit: 3 })) {
@@ -53,7 +53,7 @@ describe('SubstackClient Entity Model E2E', () => {
       ++counter
     }
     expect(counter).toEqual(3)
-    console.log('✅ Retrieved 3 followee profiles')
+    console.log('✅ Retrieved 3 following profiles')
   })
 
   test('should get own profile', async () => {

@@ -1,11 +1,11 @@
-import { FolloweeService } from '../../src/internal/services/followee-service'
+import { FollowingService } from '../../src/internal/services/following-service'
 import { HttpClient } from '../../src/internal/http-client'
 
 // Mock the http client
 jest.mock('../../src/internal/http-client')
 
-describe('FolloweeService', () => {
-  let followeeService: FolloweeService
+describe('FollowingService', () => {
+  let followingService: FollowingService
   let mockHttpClient: jest.Mocked<HttpClient>
   let mockSubstackClient: jest.Mocked<HttpClient>
 
@@ -24,10 +24,10 @@ describe('FolloweeService', () => {
     }) as jest.Mocked<HttpClient>
     mockSubstackClient.put = jest.fn()
 
-    followeeService = new FolloweeService(mockHttpClient, mockSubstackClient)
+    followingService = new FollowingService(mockHttpClient, mockSubstackClient)
   })
 
-  describe('getFollowees', () => {
+  describe('getFollowing', () => {
     it('should fetch following users successfully', async () => {
       const mockUserId = 12345
       const mockSubscriberLists = {
@@ -51,7 +51,7 @@ describe('FolloweeService', () => {
       mockSubstackClient.put.mockResolvedValue({ user_id: mockUserId })
       mockHttpClient.get.mockResolvedValue(mockSubscriberLists)
 
-      const result = await followeeService.getFollowees()
+      const result = await followingService.getFollowing()
 
       expect(mockSubstackClient.put).toHaveBeenCalledWith('/api/v1/user-setting', {
         type: 'last_home_tab',
@@ -86,7 +86,7 @@ describe('FolloweeService', () => {
       mockSubstackClient.put.mockResolvedValue({ user_id: mockUserId })
       mockHttpClient.get.mockResolvedValue(mockSubscriberLists)
 
-      const result = await followeeService.getFollowees()
+      const result = await followingService.getFollowing()
 
       expect(result).toEqual([])
     })
@@ -98,14 +98,14 @@ describe('FolloweeService', () => {
       mockSubstackClient.put.mockResolvedValue({ user_id: mockUserId })
       mockHttpClient.get.mockRejectedValue(error)
 
-      await expect(followeeService.getFollowees()).rejects.toThrow('Network error')
+      await expect(followingService.getFollowing()).rejects.toThrow('Network error')
     })
 
     it('should handle authentication errors gracefully', async () => {
       const error = new Error('Unauthorized')
       mockSubstackClient.put.mockRejectedValue(error)
 
-      await expect(followeeService.getFollowees()).rejects.toThrow('Unauthorized')
+      await expect(followingService.getFollowing()).rejects.toThrow('Unauthorized')
     })
   })
 })

@@ -113,7 +113,7 @@ describe('SubstackClient Entity Model', () => {
       const mockData = {
         id: 456,
         title: 'Test Post',
-        slug: "test-slug",
+        slug: 'test-slug',
         post_date: '2023-01-01T00:00:00Z',
         type: 'newsletter' as const
       }

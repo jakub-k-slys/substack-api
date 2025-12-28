@@ -24,9 +24,7 @@ describe('ProfileService', () => {
   describe('getOwnProfile', () => {
     it('should return own profile data from the HTTP client', async () => {
       const mockHandles = {
-        potentialHandles: [
-          { id: '1', handle: 'testuser', type: 'existing' as const }
-        ]
+        potentialHandles: [{ id: '1', handle: 'testuser', type: 'existing' as const }]
       }
       const mockProfile: SubstackFullProfile = {
         id: 123,
@@ -55,9 +53,7 @@ describe('ProfileService', () => {
 
     it('should throw error when profile request fails', async () => {
       const mockHandles = {
-        potentialHandles: [
-          { id: '1', handle: 'testuser', type: 'existing' as const }
-        ]
+        potentialHandles: [{ id: '1', handle: 'testuser', type: 'existing' as const }]
       }
       const error = new Error('Profile API Error')
 
@@ -76,20 +72,20 @@ describe('ProfileService', () => {
         name: 'Other User',
         handle: 'otheruser',
         photo_url: 'https://example.com/other.jpg',
-        bio: 'Other bio',
+        bio: 'Other bio'
       }
 
       const mockFeedResponse = {
-        items: [{
-          context: {
-            users: [{ id: 456, handle: 'otheruser' }]
+        items: [
+          {
+            context: {
+              users: [{ id: 456, handle: 'otheruser' }]
+            }
           }
-        }]
+        ]
       }
 
-      mockHttpClient.get
-        .mockResolvedValueOnce(mockFeedResponse)
-        .mockResolvedValueOnce(mockProfile)
+      mockHttpClient.get.mockResolvedValueOnce(mockFeedResponse).mockResolvedValueOnce(mockProfile)
 
       const result = await profileService.getProfileById(456)
 
@@ -114,7 +110,7 @@ describe('ProfileService', () => {
         name: 'Slug User',
         handle: 'sluguser',
         photo_url: 'https://example.com/slug.jpg',
-        bio: 'Slug bio',
+        bio: 'Slug bio'
       }
 
       mockHttpClient.get.mockResolvedValueOnce(mockProfile)

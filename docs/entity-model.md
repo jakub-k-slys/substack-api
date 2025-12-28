@@ -182,12 +182,12 @@ Navigate through your social connections:
 ```typescript
 // People you follow
 console.log('Following:');
-for await (const followee of myProfile.followees({ limit: 50 })) {
-  console.log(`- ${followee.name} (@${followee.slug})`);
+for await (const user of myProfile.following({ limit: 50 })) {
+  console.log(`- ${user.name} (@${user.slug})`);
   
   // Get their recent posts
   let postCount = 0;
-  for await (const post of followee.posts({ limit: 2 })) {
+  for await (const post of user.posts({ limit: 2 })) {
     console.log(`  📄 ${post.title}`);
     postCount++;
   }
@@ -498,11 +498,11 @@ async function engageWithCommunity() {
 
   // Engage with people you follow
   console.log('🤝 Engaging with community...');
-  for await (const followee of myProfile.followees({ limit: 10 })) {
-    console.log(`\nChecking ${followee.name}...`);
+  for await (const user of myProfile.following({ limit: 10 })) {
+    console.log(`\nChecking ${user.name}...`);
     
     // Like their recent post
-    for await (const post of followee.posts({ limit: 1 })) {
+    for await (const post of user.posts({ limit: 1 })) {
       await post.like();
       console.log(`  ✅ Liked: "${post.title}"`);
       

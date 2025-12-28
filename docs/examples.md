@@ -351,7 +351,7 @@ async function buildNetwork() {
     
     // Show current following count
     let followingCount = 0;
-    for await (const followee of myProfile.followees({ limit: 1000 })) {
+    for await (const user of myProfile.following({ limit: 1000 })) {
       followingCount++;
     }
     console.log(`📊 Now following ${followingCount} people`);
@@ -447,12 +447,12 @@ async function trackEngagement() {
     // Analyze who you're following
     console.log(`👥 Following Analysis:`);
     
-    const followees = [];
-    for await (const followee of myProfile.followees({ limit: 100 })) {
-      followees.push(followee);
+    const followingList = [];
+    for await (const user of myProfile.following({ limit: 100 })) {
+      followingList.push(user);
     }
     
-    console.log(`   Total following: ${followees.length}\n`);
+    console.log(`   Total following: ${followingList.length}\n`);
     
     // Check recent activity from people you follow
     console.log(`📊 Recent Activity from Network:`);
@@ -460,21 +460,21 @@ async function trackEngagement() {
     let totalNewPosts = 0;
     let totalNewNotes = 0;
     
-    for (const followee of followees.slice(0, 10)) { // Check first 10
-      console.log(`\n   👤 ${followee.name} (@${followee.slug}):`);
+    for (const user of followingList.slice(0, 10)) { // Check first 10
+      console.log(`\n   👤 ${user.name} (@${user.slug}):`);
       
       // Count recent posts (last 7 days)
       const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       
       let recentPosts = 0;
-      for await (const post of followee.posts({ limit: 10 })) {
+      for await (const post of user.posts({ limit: 10 })) {
         if (post.publishedAt && post.publishedAt > oneWeekAgo) {
           recentPosts++;
         }
       }
       
       let recentNotes = 0;
-      for await (const note of followee.notes({ limit: 10 })) {
+      for await (const note of user.notes({ limit: 10 })) {
         if (note.createdAt > oneWeekAgo) {
           recentNotes++;
         }
@@ -510,10 +510,10 @@ async function curateContent() {
     
     console.log('🔍 Curating interesting content from network...\n');
     
-    // Get followees
-    for await (const followee of myProfile.followees({ limit: 20 })) {
+    // Get following users
+    for await (const user of myProfile.following({ limit: 20 })) {
       // Look for posts with specific keywords
-      for await (const post of followee.posts({ limit: 5 })) {
+      for await (const post of user.posts({ limit: 5 })) {
         const keywords = ['AI', 'technology', 'innovation', 'future', 'insight'];
         const hasKeyword = keywords.some(keyword => 
           post.title.toLowerCase().includes(keyword.toLowerCase()) ||
@@ -523,7 +523,7 @@ async function curateContent() {
         if (hasKeyword && (post.reactions?.length || 0) >= 5) {
           interestingPosts.push({
             post,
-            author: followee,
+            author: user,
             relevanceScore: post.reactions?.length || 0
           });
         }
@@ -586,11 +586,11 @@ async function automatedEngagement() {
     const maxEngagements = 10;
     
     // Engage with recent content from network
-    for await (const followee of myProfile.followees({ limit: 50 })) {
+    for await (const user of myProfile.following({ limit: 50 })) {
       if (engagementsCount >= maxEngagements) break;
       
       // Look at their recent posts
-      for await (const post of followee.posts({ limit: 2 })) {
+      for await (const post of user.posts({ limit: 2 })) {
         if (engagementsCount >= maxEngagements) break;
         
         // Check if it's worth engaging (has some activity)
@@ -606,9 +606,9 @@ async function automatedEngagement() {
               ];
               await post.addComment(randomComment);
               
-              console.log(`💬 Commented on "${post.title}" by ${followee.name}`);
+              console.log(`💬 Commented on "${post.title}" by ${user.name}`);
             } else {
-              console.log(`💖 Liked "${post.title}" by ${followee.name}`);
+              console.log(`💖 Liked "${post.title}" by ${user.name}`);
             }
             
             engagementsCount++;
@@ -617,7 +617,7 @@ async function automatedEngagement() {
             await new Promise(resolve => setTimeout(resolve, 2000));
             
           } catch (error) {
-            console.log(`⚠️  Failed to engage with post by ${followee.name}: ${error.message}`);
+            console.log(`⚠️  Failed to engage with post by ${user.name}: ${error.message}`);
           }
         }
       }

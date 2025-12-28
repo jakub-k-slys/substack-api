@@ -138,23 +138,23 @@ async function runExample(): Promise<void> {
       console.log(`   ⚠️  Could not fetch notes: ${(error as Error).message}`)
     }
 
-    // 6. List followees
+    // 6. List following
     console.log('\n🤝 Fetching users you follow...')
     try {
-      for await (const followee of profile.following({ limit: 3 })) {
-        console.log(`   ${followee.name} (@${followee.slug})`)
-        if (followee.bio) {
-          const bioPrev = followee.bio.length > 80 ? 
-            followee.bio.substring(0, 77) + '...' : 
-            followee.bio
+      for await (const user of profile.following({ limit: 3 })) {
+        console.log(`   ${user.name} (@${user.slug})`)
+        if (user.bio) {
+          const bioPrev = user.bio.length > 80 ?
+            user.bio.substring(0, 77) + '...' :
+            user.bio
           console.log(`      Bio: ${bioPrev}`)
         }
-        console.log(`      URL: ${followee.url}`)
+        console.log(`      URL: ${user.url}`)
         console.log('')
       }
-      
+
     } catch (error) {
-      console.log(`   ⚠️  Could not fetch followees: ${(error as Error).message}`)
+      console.log(`   ⚠️  Could not fetch following: ${(error as Error).message}`)
     }
 
     // 7. Fetching foreign profile

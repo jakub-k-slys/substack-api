@@ -8,10 +8,10 @@ export type FollowingUser = {
   handle: string
 }
 /**
- * Service responsible for followee-related HTTP operations
+ * Service responsible for following-related HTTP operations
  * Returns internal types that can be transformed into domain models
  */
-export class FolloweeService {
+export class FollowingService {
   constructor(
     private readonly httpClient: HttpClient,
     private readonly substackClient: HttpClient
@@ -26,10 +26,10 @@ export class FolloweeService {
   }
   /**
    * Get users that the authenticated user follows
-   * @returns Promise<number[]> - Array of user IDs that the user follows
+   * @returns Promise<FollowingUser[]> - Array of users that the authenticated user follows
    * @throws {Error} When following list cannot be retrieved
    */
-  async getFollowees(): Promise<FollowingUser[]> {
+  async getFollowing(): Promise<FollowingUser[]> {
     const userId = await this.getOwnId()
     const data = await this.httpClient.get(
       `/api/v1/user/${userId}/subscriber-lists?lists=following`

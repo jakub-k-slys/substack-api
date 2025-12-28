@@ -5,7 +5,7 @@ import {
   NoteService,
   ProfileService,
   CommentService,
-  FolloweeService,
+  FollowingService,
   ConnectivityService
 } from './internal/services'
 import type { SubstackConfig } from './types'
@@ -20,7 +20,7 @@ export class SubstackClient {
   private readonly noteService: NoteService
   private readonly profileService: ProfileService
   private readonly commentService: CommentService
-  private readonly followeeService: FolloweeService
+  private readonly followingService: FollowingService
   private readonly connectivityService: ConnectivityService
 
   constructor(config: SubstackConfig) {
@@ -38,7 +38,7 @@ export class SubstackClient {
     this.noteService = new NoteService(this.publicationClient)
     this.profileService = new ProfileService(this.substackClient)
     this.commentService = new CommentService(this.publicationClient)
-    this.followeeService = new FolloweeService(this.publicationClient, this.substackClient)
+    this.followingService = new FollowingService(this.publicationClient, this.substackClient)
     this.connectivityService = new ConnectivityService(this.substackClient)
   }
 
@@ -64,7 +64,7 @@ export class SubstackClient {
         this.postService,
         this.noteService,
         this.commentService,
-        this.followeeService,
+        this.followingService,
         profile.handle
       )
     } catch (error) {
