@@ -1,11 +1,11 @@
 declare global {
   var E2E_CONFIG: {
     hasCredentials: boolean
-    apiKey?: string
-    hostname?: string
+    token?: string
+    publicationUrl?: string
   }
 
-  function getTestCredentials(): { apiKey: string; hostname?: string } | null
+  function getTestCredentials(): { token: string; publicationUrl?: string } | null
 }
 
 export {}

@@ -1,24 +1,24 @@
-import { CommentService } from '@/internal/services/comment-service'
-import { HttpClient } from '@/internal/http-client'
-import type { SubstackComment, SubstackCommentResponse } from '@/internal'
+import { CommentService } from '@substack-api/internal/services/comment-service'
+import { HttpClient } from '@substack-api/internal/http-client'
+import type { SubstackComment, SubstackCommentResponse } from '@substack-api/internal'
 
 // Mock the http client
-jest.mock('@/internal/http-client')
+jest.mock('@substack-api/internal/http-client')
 
 describe('CommentService', () => {
   let commentService: CommentService
-  let mockHttpClient: jest.Mocked<HttpClient>
+  let mockPublicationClient: jest.Mocked<HttpClient>
 
   beforeEach(() => {
     jest.clearAllMocks()
 
-    mockHttpClient = new HttpClient('https://test.substack.com', {
-      apiKey: 'test',
-      hostname: 'test.com'
-    }) as jest.Mocked<HttpClient>
-    mockHttpClient.get = jest.fn()
+    mockPublicationClient = new HttpClient(
+      'https://test.substack.com',
+      'test'
+    ) as jest.Mocked<HttpClient>
+    mockPublicationClient.get = jest.fn()
 
-    commentService = new CommentService(mockHttpClient)
+    commentService = new CommentService(mockPublicationClient)
   })
 
   describe('getCommentsForPost', () => {
@@ -37,40 +37,40 @@ describe('CommentService', () => {
       ]
 
       const mockResponse = { comments: mockComments }
-      mockHttpClient.get.mockResolvedValue(mockResponse)
+      mockPublicationClient.get.mockResolvedValue(mockResponse)
 
       const result = await commentService.getCommentsForPost(123)
 
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/post/123/comments')
+      expect(mockPublicationClient.get).toHaveBeenCalledWith('/post/123/comments')
       expect(result).toEqual(mockComments)
     })
 
     it('should return empty array when no comments exist', async () => {
       const mockResponse = { comments: undefined }
-      mockHttpClient.get.mockResolvedValue(mockResponse)
+      mockPublicationClient.get.mockResolvedValue(mockResponse)
 
       const result = await commentService.getCommentsForPost(123)
 
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/post/123/comments')
+      expect(mockPublicationClient.get).toHaveBeenCalledWith('/post/123/comments')
       expect(result).toEqual([])
     })
 
     it('should return empty array when comments field is null', async () => {
       const mockResponse = { comments: null }
-      mockHttpClient.get.mockResolvedValue(mockResponse)
+      mockPublicationClient.get.mockResolvedValue(mockResponse)
 
       const result = await commentService.getCommentsForPost(123)
 
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/post/123/comments')
+      expect(mockPublicationClient.get).toHaveBeenCalledWith('/post/123/comments')
       expect(result).toEqual([])
     })
 
     it('should throw error when request fails', async () => {
       const error = new Error('Network error')
-      mockHttpClient.get.mockRejectedValue(error)
+      mockPublicationClient.get.mockRejectedValue(error)
 
       await expect(commentService.getCommentsForPost(123)).rejects.toThrow('Network error')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/post/123/comments')
+      expect(mockPublicationClient.get).toHaveBeenCalledWith('/post/123/comments')
     })
   })
 
@@ -89,11 +89,11 @@ describe('CommentService', () => {
         }
       }
 
-      mockHttpClient.get.mockResolvedValue(mockCommentResponse)
+      mockPublicationClient.get.mockResolvedValue(mockCommentResponse)
 
       const result = await commentService.getCommentById(123)
 
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/comment/123')
+      expect(mockPublicationClient.get).toHaveBeenCalledWith('/reader/comment/123')
       expect(result).toEqual({
         id: 123,
         body: 'Test comment body',
@@ -115,11 +115,11 @@ describe('CommentService', () => {
         }
       }
 
-      mockHttpClient.get.mockResolvedValue(mockCommentResponse)
+      mockPublicationClient.get.mockResolvedValue(mockCommentResponse)
 
       const result = await commentService.getCommentById(123)
 
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/comment/123')
+      expect(mockPublicationClient.get).toHaveBeenCalledWith('/reader/comment/123')
       expect(result.id).toBe(123)
       expect(result.body).toBe('Test comment body')
       expect(result.author_is_admin).toBe(false)
@@ -127,10 +127,10 @@ describe('CommentService', () => {
 
     it('should throw error when comment is not found', async () => {
       const error = new Error('Comment not found')
-      mockHttpClient.get.mockRejectedValue(error)
+      mockPublicationClient.get.mockRejectedValue(error)
 
       await expect(commentService.getCommentById(123)).rejects.toThrow('Comment not found')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/comment/123')
+      expect(mockPublicationClient.get).toHaveBeenCalledWith('/reader/comment/123')
     })
   })
 })

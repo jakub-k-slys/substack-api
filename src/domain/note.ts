@@ -1,6 +1,6 @@
-import type { SubstackNote } from '@/internal'
-import type { HttpClient } from '@/internal/http-client'
-import { Comment } from '@/domain/comment'
+import type { SubstackNote } from '@substack-api/internal'
+import type { HttpClient } from '@substack-api/internal/http-client'
+import { Comment } from '@substack-api/domain/comment'
 
 /**
  * Note entity representing a Substack note
@@ -19,7 +19,7 @@ export class Note {
 
   constructor(
     private readonly rawData: SubstackNote,
-    private readonly client: HttpClient
+    private readonly publicationClient: HttpClient
   ) {
     this.id = rawData.entity_key
     this.body = rawData.comment?.body || ''
@@ -49,7 +49,7 @@ export class Note {
           body: parentComment.body,
           author_is_admin: false // Not available in note comment format
         }
-        yield new Comment(commentData, this.client)
+        yield new Comment(commentData, this.publicationClient)
       }
     }
   }

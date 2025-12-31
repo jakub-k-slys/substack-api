@@ -1,5 +1,5 @@
-import type { HttpClient } from '@/internal/http-client'
-import { SubscriberLists } from '@/internal/types/subscriber-lists'
+import type { HttpClient } from '@substack-api/internal/http-client'
+import { SubscriberLists } from '@substack-api/internal/types/subscriber-lists'
 import { isLeft } from 'fp-ts/Either'
 import { PathReporter } from 'io-ts/PathReporter'
 
@@ -13,12 +13,12 @@ export type FollowingUser = {
  */
 export class FollowingService {
   constructor(
-    private readonly httpClient: HttpClient,
+    private readonly publicationClient: HttpClient,
     private readonly substackClient: HttpClient
   ) {}
 
   async getOwnId(): Promise<number> {
-    const { user_id } = await this.substackClient.put<{ user_id: number }>('/api/v1/user-setting', {
+    const { user_id } = await this.substackClient.put<{ user_id: number }>('/user-setting', {
       type: 'last_home_tab',
       value_text: 'inbox'
     })
@@ -31,8 +31,8 @@ export class FollowingService {
    */
   async getFollowing(): Promise<FollowingUser[]> {
     const userId = await this.getOwnId()
-    const data = await this.httpClient.get(
-      `/api/v1/user/${userId}/subscriber-lists?lists=following`
+    const data = await this.publicationClient.get(
+      `/user/${userId}/subscriber-lists?lists=following`
     )
 
     const lists = SubscriberLists.decode(data)

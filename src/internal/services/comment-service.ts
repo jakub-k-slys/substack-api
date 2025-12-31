@@ -1,14 +1,14 @@
-import type { HttpClient } from '@/internal/http-client'
-import type { SubstackComment } from '@/internal/types'
-import { SubstackCommentCodec, SubstackCommentResponseCodec } from '@/internal/types'
-import { decodeOrThrow } from '@/internal/validation'
+import type { HttpClient } from '@substack-api/internal/http-client'
+import type { SubstackComment } from '@substack-api/internal/types'
+import { SubstackCommentCodec, SubstackCommentResponseCodec } from '@substack-api/internal/types'
+import { decodeOrThrow } from '@substack-api/internal/validation'
 
 /**
  * Service responsible for comment-related HTTP operations
  * Returns internal types that can be transformed into domain models
  */
 export class CommentService {
-  constructor(private readonly httpClient: HttpClient) {}
+  constructor(private readonly publicationClient: HttpClient) {}
 
   /**
    * Get comments for a post
@@ -17,8 +17,8 @@ export class CommentService {
    * @throws {Error} When comments cannot be retrieved or validation fails
    */
   async getCommentsForPost(postId: number): Promise<SubstackComment[]> {
-    const response = await this.httpClient.get<{ comments?: unknown[] }>(
-      `/api/v1/post/${postId}/comments`
+    const response = await this.publicationClient.get<{ comments?: unknown[] }>(
+      `/post/${postId}/comments`
     )
 
     const comments = response.comments || []
@@ -36,7 +36,7 @@ export class CommentService {
    * @throws {Error} When comment is not found, API request fails, or validation fails
    */
   async getCommentById(id: number): Promise<SubstackComment> {
-    const rawResponse = await this.httpClient.get<unknown>(`/api/v1/reader/comment/${id}`)
+    const rawResponse = await this.publicationClient.get<unknown>(`/reader/comment/${id}`)
 
     // Validate the response structure with io-ts
     const response = decodeOrThrow(SubstackCommentResponseCodec, rawResponse, 'Comment response')

@@ -1,14 +1,14 @@
-import { Note } from '@/domain/note'
-import { Comment } from '@/domain/comment'
-import type { HttpClient } from '@/internal/http-client'
-import type { SubstackNoteComment } from '@/internal'
+import { Note } from '@substack-api/domain/note'
+import { Comment } from '@substack-api/domain/comment'
+import type { HttpClient } from '@substack-api/internal/http-client'
+import type { SubstackNoteComment } from '@substack-api/internal'
 
 describe('Note Entity', () => {
-  let mockHttpClient: jest.Mocked<HttpClient>
+  let mockPublicationClient: jest.Mocked<HttpClient>
   let note: Note
 
   beforeEach(() => {
-    mockHttpClient = {
+    mockPublicationClient = {
       get: jest.fn(),
       post: jest.fn(),
       request: jest.fn()
@@ -121,7 +121,7 @@ describe('Note Entity', () => {
       }
     }
 
-    note = new Note(mockNoteData, mockHttpClient)
+    note = new Note(mockNoteData, mockPublicationClient)
   })
 
   describe('comments()', () => {
@@ -202,7 +202,7 @@ describe('Note Entity', () => {
         }
       }
 
-      const noteEmpty = new Note(mockNoteDataEmpty, mockHttpClient)
+      const noteEmpty = new Note(mockNoteDataEmpty, mockPublicationClient)
       const comments = []
       for await (const comment of noteEmpty.comments()) {
         comments.push(comment)
@@ -276,7 +276,7 @@ describe('Note Entity', () => {
         }
       }
 
-      const noteUndefined = new Note(mockNoteDataUndefined, mockHttpClient)
+      const noteUndefined = new Note(mockNoteDataUndefined, mockPublicationClient)
       const comments = []
       for await (const comment of noteUndefined.comments()) {
         comments.push(comment)
@@ -370,7 +370,7 @@ describe('Note Entity', () => {
         }
       }
 
-      const noteWithNull = new Note(mockNoteDataWithNull, mockHttpClient)
+      const noteWithNull = new Note(mockNoteDataWithNull, mockPublicationClient)
       const comments = []
       for await (const comment of noteWithNull.comments()) {
         comments.push(comment)

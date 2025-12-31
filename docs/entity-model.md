@@ -17,8 +17,8 @@ The entity model provides:
 import { SubstackClient } from 'substack-api';
 
 const client = new SubstackClient({
-  apiKey: 'your-connect-sid-cookie-value',
-  hostname: 'example.substack.com'
+  token: 'your-connect-sid-cookie-value',
+  publicationUrl: 'example.substack.com'
 });
 
 // Test connectivity
@@ -460,7 +460,7 @@ allPosts.forEach(processPost);  // Process later
 ```typescript
 async function contentDashboard() {
   const client = new SubstackClient({
-    apiKey: process.env.SUBSTACK_API_KEY!
+    token: process.env.SUBSTACK_TOKEN!
   });
 
   const myProfile = await client.ownProfile();
@@ -491,7 +491,7 @@ async function contentDashboard() {
 ```typescript
 async function engageWithCommunity() {
   const client = new SubstackClient({
-    apiKey: process.env.SUBSTACK_API_KEY!
+    token: process.env.SUBSTACK_TOKEN!
   });
 
   const myProfile = await client.ownProfile();
@@ -526,7 +526,7 @@ async function engageWithCommunity() {
 ```typescript
 async function analyzeContent(username: string) {
   const client = new SubstackClient({
-    apiKey: process.env.SUBSTACK_API_KEY!
+    token: process.env.SUBSTACK_TOKEN!
   });
 
   const profile = await client.profileForSlug(username);

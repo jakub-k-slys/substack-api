@@ -4,9 +4,9 @@
 
 import type {
   SubstackPublication,
-  SubstackPost,
+  SubstackPreviewPost,
   SubstackComment
-} from '@/internal/types/api-responses'
+} from '@substack-api/internal/types/api-responses'
 import type {
   SubstackUser,
   SubstackPublicationBase,
@@ -15,7 +15,7 @@ import type {
   SubstackProfileSubscription,
   SubstackTrackingParameters,
   SubstackProfileItemContext
-} from '@/internal/types/common'
+} from '@substack-api/internal/types/common'
 
 export interface SubstackPublicProfile extends SubstackUser {
   tos_accepted_at?: string | null
@@ -56,7 +56,7 @@ export interface SubstackUserProfile {
     type: string
     context: SubstackProfileItemContext
     publication?: SubstackPublication | null
-    post?: SubstackPost | null
+    post?: SubstackPreviewPost | null
     comment?: SubstackComment | null
     parentComments: SubstackComment[]
     canReply: boolean

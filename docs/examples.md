@@ -11,8 +11,8 @@ import { SubstackClient } from 'substack-api';
 
 // Initialize with substack.sid cookie
 const client = new SubstackClient({
-  apiKey: 'your-connect-sid-cookie-value',
-  hostname: 'example.substack.com'  // optional
+  token: 'your-connect-sid-cookie-value',
+  publicationUrl: 'example.substack.com'  // optional
 });
 
 // Test connection
@@ -26,15 +26,15 @@ if (!isConnected) {
 
 ```typescript
 // .env file
-// SUBSTACK_API_KEY=your-connect-sid-cookie-value
-// SUBSTACK_HOSTNAME=yoursite.substack.com
+// SUBSTACK_TOKEN=your-connect-sid-cookie-value
+// SUBSTACK_PUBLICATION_URL=yoursite.substack.com
 
 import dotenv from 'dotenv';
 dotenv.config();
 
 const client = new SubstackClient({
-  apiKey: process.env.SUBSTACK_API_KEY!,
-  hostname: process.env.SUBSTACK_HOSTNAME
+  token: process.env.SUBSTACK_TOKEN!,
+  publicationUrl: process.env.SUBSTACK_PUBLICATION_URL
 });
 ```
 
@@ -649,7 +649,7 @@ Love this community! 💙 #community #engagement`
 ```typescript
 async function robustContentAccess() {
   const client = new SubstackClient({
-    apiKey: process.env.SUBSTACK_API_KEY!
+    token: process.env.SUBSTACK_TOKEN!
   });
   
   try {
@@ -745,7 +745,7 @@ async function robustContentAccess() {
 ```typescript
 async function newsletterAnalytics() {
   const client = new SubstackClient({
-    apiKey: process.env.SUBSTACK_API_KEY!
+    token: process.env.SUBSTACK_TOKEN!
   });
   
   try {

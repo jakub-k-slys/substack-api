@@ -24,7 +24,7 @@ The Substack API uses cookie-based authentication. You need to extract your `sub
 2. **Open Developer Tools** (F12 or right-click → "Inspect")
 3. **Go to Application/Storage tab** → Cookies → `https://substack.com`
 4. **Find the `substack.sid` cookie** and copy its value
-5. **Use this value** as your `apiKey` in the client configuration
+5. **Use this value** as your `token` in the client configuration
 
 ## Basic Setup
 
@@ -35,8 +35,8 @@ import { SubstackClient } from 'substack-api';
 
 // Create client instance
 const client = new SubstackClient({
-  apiKey: 'your-connect-sid-cookie-value',
-  hostname: 'yoursite.substack.com' // optional, defaults to 'substack.com'
+  token: 'your-connect-sid-cookie-value',
+  publicationUrl: 'yoursite.substack.com' // optional, defaults to 'substack.com'
 });
 
 // Test connectivity
@@ -48,8 +48,8 @@ console.log('Connected:', isConnected);
 
 ```typescript
 const client = new SubstackClient({
-  apiKey: process.env.SUBSTACK_API_KEY!,
-  hostname: process.env.SUBSTACK_HOSTNAME
+  token: process.env.SUBSTACK_TOKEN!,
+  publicationUrl: process.env.SUBSTACK_PUBLICATION_URL
 });
 ```
 
@@ -258,8 +258,8 @@ import type {
 
 // Type-safe configuration
 const config: SubstackConfig = {
-  apiKey: process.env.SUBSTACK_API_KEY!,
-  hostname: 'example.substack.com'
+  token: process.env.SUBSTACK_TOKEN!,
+  publicationUrl: 'example.substack.com'
 };
 
 // Type-safe functions
@@ -292,8 +292,8 @@ import { SubstackClient } from 'substack-api';
 
 async function substackDashboard() {
   const client = new SubstackClient({
-    apiKey: process.env.SUBSTACK_API_KEY!,
-    hostname: 'example.substack.com'
+    token: process.env.SUBSTACK_TOKEN!,
+    publicationUrl: 'example.substack.com'
   });
 
   try {
@@ -360,8 +360,8 @@ For production use, set up your environment variables:
 
 ```bash
 # .env file
-SUBSTACK_API_KEY=your-connect-sid-cookie-value
-SUBSTACK_HOSTNAME=yoursite.substack.com
+SUBSTACK_TOKEN=your-connect-sid-cookie-value
+SUBSTACK_PUBLICATION_URL=yoursite.substack.com
 ```
 
 ```typescript
@@ -370,8 +370,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const client = new SubstackClient({
-  apiKey: process.env.SUBSTACK_API_KEY!,
-  hostname: process.env.SUBSTACK_HOSTNAME
+  token: process.env.SUBSTACK_TOKEN!,
+  publicationUrl: process.env.SUBSTACK_PUBLICATION_URL
 });
 ```
 

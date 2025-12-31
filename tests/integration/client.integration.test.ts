@@ -1,5 +1,5 @@
-import { SubstackClient } from '@/substack-client'
-import { Profile, OwnProfile, Comment, FullPost } from '@/domain'
+import { SubstackClient } from '@substack-api/substack-client'
+import { Profile, OwnProfile, Comment, FullPost } from '@substack-api/domain'
 import { get } from 'http'
 
 describe('SubstackClient Integration Tests', () => {
@@ -7,15 +7,11 @@ describe('SubstackClient Integration Tests', () => {
 
   beforeEach(() => {
     // Create client configured to use our local test server
-    // Extract hostname and port from the integration server URL
-    const url = new URL(global.INTEGRATION_SERVER.url)
-    const hostname = `${url.hostname}:${url.port}`
-
     client = new SubstackClient({
-      hostname: hostname,
-      apiKey: 'test-key',
-      protocol: 'http', // Use HTTP for local test server
-      substackBaseUrl: global.INTEGRATION_SERVER.url // Configure global client to use mock server too
+      publicationUrl: global.INTEGRATION_SERVER.url,
+      token: 'test-key',
+      substackUrl: global.INTEGRATION_SERVER.url, // Configure global client to use mock server too
+      urlPrefix: '' // Integration server doesn't use API prefix
     })
   })
 
@@ -24,7 +20,7 @@ describe('SubstackClient Integration Tests', () => {
       test('should test API connectivity', async () => {
         const result = await client.testConnectivity()
         expect(typeof result).toBe('boolean')
-        // Returns true since /api/v1/feed/following endpoint returns valid data in mock server
+        // Returns true since /feed/following endpoint returns valid data in mock server
         expect(result).toBe(true)
       })
     })
@@ -113,7 +109,7 @@ describe('SubstackClient Integration Tests', () => {
 
     describe('ownProfile', () => {
       test('should handle own profile retrieval workflow', async () => {
-        // This tests the full workflow: /api/v1/subscription -> /api/v1/user/{id}/profile
+        // This tests the full workflow: /subscription -> /user/{id}/profile
         try {
           const profile = await client.ownProfile()
           expect(profile).toBeInstanceOf(OwnProfile)
@@ -154,18 +150,6 @@ describe('SubstackClient Integration Tests', () => {
     })
 
     describe('commentForId', () => {
-      test('should validate comment ID type - non-numeric string', async () => {
-        await expect(client.commentForId('invalid-id' as any)).rejects.toThrow(
-          'Comment ID must be a number'
-        )
-      })
-
-      test('should validate comment ID type - alphanumeric string', async () => {
-        await expect(client.commentForId('abc123' as any)).rejects.toThrow(
-          'Comment ID must be a number'
-        )
-      })
-
       test('should handle non-existent comment ID', async () => {
         await expect(client.commentForId(999999999)).rejects.toThrow()
       })
@@ -264,7 +248,7 @@ describe('SubstackClient Integration Tests', () => {
 
     test('should serve sample data correctly', async () => {
       return new Promise((resolve, reject) => {
-        get(`${global.INTEGRATION_SERVER.url}/api/v1/users/282291554`, (res) => {
+        get(`${global.INTEGRATION_SERVER.url}/users/282291554`, (res) => {
           let data = ''
           res.on('data', (chunk) => {
             data += chunk

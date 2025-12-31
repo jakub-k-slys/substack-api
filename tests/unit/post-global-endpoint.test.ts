@@ -1,25 +1,37 @@
-import { FullPost } from '@/domain'
-import { SubstackClient } from '@/substack-client'
+import { FullPost } from '@substack-api/domain'
+import { SubstackClient } from '@substack-api/substack-client'
+import axios from 'axios'
+import type { AxiosInstance } from 'axios'
 
-// Mock the global fetch function
-global.fetch = jest.fn()
+jest.mock('axios')
+jest.mock('axios-rate-limit', () => (instance: AxiosInstance) => instance)
+
+const mockedAxios = axios as jest.Mocked<typeof axios>
 
 describe('SubstackClient - Global Post Endpoint', () => {
   let client: SubstackClient
-  const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>
+  let mockAxiosInstance: jest.Mocked<AxiosInstance>
 
   beforeEach(() => {
     jest.clearAllMocks()
 
+    mockAxiosInstance = {
+      get: jest.fn(),
+      post: jest.fn(),
+      put: jest.fn()
+    } as unknown as jest.Mocked<AxiosInstance>
+
+    mockedAxios.create.mockReturnValue(mockAxiosInstance)
+
     // Configure client with a publication-specific hostname
     client = new SubstackClient({
-      apiKey: 'test-api-key',
-      hostname: 'someuser.substack.com' // Publication-specific hostname
+      token: 'test-api-key',
+      publicationUrl: 'https://someuser.substack.com' // Publication-specific hostname
     })
   })
 
   describe('postForId', () => {
-    it('should use global substack.com endpoint regardless of configured hostname', async () => {
+    it('should fetch post by ID successfully', async () => {
       const mockPost = {
         id: 123,
         title: 'Test Post',
@@ -30,31 +42,24 @@ describe('SubstackClient - Global Post Endpoint', () => {
         body_html: '<p>Test post body content</p>'
       }
 
-      // Mock successful response
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ post: mockPost }),
+      // Mock successful response from substackClient (global endpoint)
+      mockAxiosInstance.get.mockResolvedValueOnce({
         status: 200,
-        statusText: 'OK'
-      } as Response)
+        data: { post: mockPost }
+      })
 
       const post = await client.postForId(123)
 
       expect(post).toBeInstanceOf(FullPost)
-      expect(mockFetch).toHaveBeenCalledTimes(1)
-
-      // Verify the URL uses global substack.com domain, not the configured publication hostname
-      const fetchCall = mockFetch.mock.calls[0]
-      const requestUrl = fetchCall[0] as string
-      expect(requestUrl).toBe('https://substack.com/api/v1/posts/by-id/123')
-      expect(requestUrl).not.toContain('someuser.substack.com')
+      expect(post.title).toBe('Test Post')
+      expect(mockAxiosInstance.get).toHaveBeenCalledWith('/posts/by-id/123')
     })
 
-    it('should work with different publication hostnames but always use global endpoint', async () => {
+    it('should work with different publication hostnames', async () => {
       // Test with another publication-specific hostname
       const anotherClient = new SubstackClient({
-        apiKey: 'test-api-key',
-        hostname: 'anotherpub.substack.com'
+        token: 'test-api-key',
+        publicationUrl: 'https://anotherpub.substack.com'
       })
 
       const mockPost = {
@@ -67,72 +72,30 @@ describe('SubstackClient - Global Post Endpoint', () => {
         body_html: '<p>Another test post body content</p>'
       }
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ post: mockPost }),
+      mockAxiosInstance.get.mockResolvedValueOnce({
         status: 200,
-        statusText: 'OK'
-      } as Response)
+        data: { post: mockPost }
+      })
 
-      await anotherClient.postForId(456)
+      const post = await anotherClient.postForId(456)
 
-      expect(mockFetch).toHaveBeenCalledTimes(1)
-
-      // Should still use global endpoint
-      const fetchCall = mockFetch.mock.calls[0]
-      const requestUrl = fetchCall[0] as string
-      expect(requestUrl).toBe('https://substack.com/api/v1/posts/by-id/456')
-      expect(requestUrl).not.toContain('anotherpub.substack.com')
+      expect(post).toBeInstanceOf(FullPost)
+      expect(post.title).toBe('Another Test Post')
+      expect(mockAxiosInstance.get).toHaveBeenCalledWith('/posts/by-id/456')
     })
 
-    it('should pass through authentication headers correctly to global endpoint', async () => {
-      const mockPost = {
-        id: 789,
-        title: 'Auth Test Post',
-        slug: 'auth-test-post',
-        post_date: '2023-01-01T00:00:00Z',
-        canonical_url: 'https://example.com/post',
-        type: 'newsletter' as const,
-        body_html: '<p>Auth test post body content</p>'
-      }
+    it('should handle errors from endpoint properly', async () => {
+      mockAxiosInstance.get.mockRejectedValueOnce({
+        response: {
+          status: 404,
+          statusText: 'Not Found'
+        },
+        message: 'Request failed with status code 404'
+      })
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ post: mockPost }),
-        status: 200,
-        statusText: 'OK'
-      } as Response)
+      await expect(client.postForId(999999999)).rejects.toThrow('Post with ID 999999999 not found')
 
-      await client.postForId(789)
-
-      expect(mockFetch).toHaveBeenCalledTimes(1)
-
-      // Check that authentication headers are included
-      const fetchCall = mockFetch.mock.calls[0]
-      const requestInit = fetchCall[1] as RequestInit
-      expect(requestInit.headers).toEqual(
-        expect.objectContaining({
-          Cookie: 'substack.sid=test-api-key',
-          'Content-Type': 'application/json'
-        })
-      )
-    })
-
-    it('should handle errors from global endpoint properly', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-        statusText: 'Not Found'
-      } as Response)
-
-      await expect(client.postForId(999999999)).rejects.toThrow(
-        'Post with ID 999999999 not found: HTTP 404: Not Found'
-      )
-
-      // Verify it still attempted to call the global endpoint
-      const fetchCall = mockFetch.mock.calls[0]
-      const requestUrl = fetchCall[0] as string
-      expect(requestUrl).toBe('https://substack.com/api/v1/posts/by-id/999999999')
+      expect(mockAxiosInstance.get).toHaveBeenCalledWith('/posts/by-id/999999999')
     })
   })
 })

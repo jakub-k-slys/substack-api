@@ -96,7 +96,7 @@ describe('Sample Data Integration', () => {
 ```bash
 # Setup credentials first
 cp .env.example .env
-# Edit .env and add your SUBSTACK_API_KEY
+# Edit .env and add your SUBSTACK_TOKEN
 
 npm run test:e2e           # Run once
 npm run test:e2e:watch     # Run in watch mode
@@ -104,8 +104,8 @@ npm run test:all           # Run all test types
 ```
 
 **Credential requirements**:
-- `SUBSTACK_API_KEY`: Required - Your Substack API key
-- `SUBSTACK_HOSTNAME`: Optional - Your Substack hostname
+- `SUBSTACK_TOKEN`: Required - Your Substack token
+- `SUBSTACK_PUBLICATION_URL`: Optional - Your Substack publication URL
 
 **Example E2E test**:
 ```typescript
@@ -227,7 +227,7 @@ npm test                    # All tests must pass
 
 ### E2E Test Issues
 - Verify `.env` file has valid credentials
-- Check API key permissions
+- Check token permissions
 - Review network connectivity
 - Some operations may not be available for all account types
 
@@ -242,7 +242,7 @@ npm test                    # All tests must pass
 
 - **Never commit** your `.env` file or API credentials
 - **Use repository secrets** for CI/CD credentials
-- **API keys should have minimal required permissions**
+- **Tokens should have minimal required permissions**
 - **All E2E tests must be read-only operations**
 
 Thank you for contributing to make this library better! 🚀

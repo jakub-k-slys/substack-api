@@ -1,17 +1,21 @@
-import { NoteBuilder, ParagraphBuilder, ListBuilder, ListItemBuilder } from '@/domain/note-builder'
-import type { HttpClient } from '@/internal/http-client'
-import type { PublishNoteResponse } from '@/internal'
+import {
+  NoteBuilder,
+  ParagraphBuilder,
+  ListBuilder,
+  ListItemBuilder
+} from '@substack-api/domain/note-builder'
+import type { HttpClient } from '@substack-api/internal/http-client'
+import type { PublishNoteResponse } from '@substack-api/internal'
 
 describe('NoteBuilder', () => {
-  let mockHttpClient: jest.Mocked<HttpClient>
+  let mockPublicationClient: jest.Mocked<HttpClient>
   let mockPublishResponse: PublishNoteResponse
 
   beforeEach(() => {
-    mockHttpClient = {
+    mockPublicationClient = {
       get: jest.fn(),
       post: jest.fn(),
-      request: jest.fn(),
-      getPerPage: jest.fn().mockReturnValue(25)
+      request: jest.fn()
     } as unknown as jest.Mocked<HttpClient>
 
     mockPublishResponse = {
@@ -46,19 +50,19 @@ describe('NoteBuilder', () => {
       user_primary_publication: undefined
     }
 
-    mockHttpClient.post.mockResolvedValue(mockPublishResponse)
+    mockPublicationClient.post.mockResolvedValue(mockPublishResponse)
   })
 
   describe('Constructor', () => {
     it('should create empty post builder without parameters', () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       expect(builder).toBeInstanceOf(NoteBuilder)
     })
   })
 
   describe('paragraph() method', () => {
     it('should return ParagraphBuilder instance', () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       const paragraphBuilder = builder.paragraph()
       expect(paragraphBuilder).toBeInstanceOf(ParagraphBuilder)
     })
@@ -66,7 +70,7 @@ describe('NoteBuilder', () => {
 
   describe('Basic paragraph creation', () => {
     it('should create note with simple text content', async () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       const result = await builder.paragraph().text('Hello world').build()
 
       expect(result).toEqual({
@@ -92,7 +96,7 @@ describe('NoteBuilder', () => {
     })
 
     it('should create note with mixed formatting', async () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       const result = await builder
         .paragraph()
         .text('This is ')
@@ -119,7 +123,7 @@ describe('NoteBuilder', () => {
     })
 
     it('should support links', async () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       const result = await builder
         .paragraph()
         .text('Visit ')
@@ -144,7 +148,7 @@ describe('NoteBuilder', () => {
 
   describe('Multiple paragraphs', () => {
     it('should create note with multiple paragraphs', async () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       const result = await builder
         .paragraph()
         .text('First paragraph')
@@ -166,7 +170,7 @@ describe('NoteBuilder', () => {
 
   describe('Lists', () => {
     it('should create bullet list', async () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       const result = await builder
         .paragraph()
         .text('My list:')
@@ -209,7 +213,7 @@ describe('NoteBuilder', () => {
     })
 
     it('should create numbered list', async () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       const result = await builder
         .paragraph()
         .text('Steps:')
@@ -247,7 +251,7 @@ describe('NoteBuilder', () => {
     })
 
     it('should support formatting in list items', async () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       const result = await builder
         .paragraph()
         .text('List:')
@@ -279,12 +283,12 @@ describe('NoteBuilder', () => {
 
   describe('Validation', () => {
     it('should throw error when building note with no paragraphs', () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       expect(() => builder.build()).toThrow('Note must contain at least one paragraph')
     })
 
     it('should throw error when paragraph has no content', () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
 
       // This should be impossible with our API design, but let's test the validation
       // We'll need to call addParagraph directly to simulate this edge case
@@ -298,7 +302,7 @@ describe('NoteBuilder', () => {
 
   describe('Builder types and scoping', () => {
     it('should return correct builder types', () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       const paragraphBuilder = builder.paragraph()
       const listBuilder = paragraphBuilder.bulletList()
       const listItemBuilder = listBuilder.item()
@@ -311,10 +315,10 @@ describe('NoteBuilder', () => {
 
   describe('Publishing', () => {
     it('should publish note directly from paragraph builder', async () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       const result = await builder.paragraph().text('Test content').publish()
 
-      expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },

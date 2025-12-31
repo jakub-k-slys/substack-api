@@ -13,8 +13,8 @@ This directory contains example applications that demonstrate how to use the Sub
 
 2. Edit `.env` and add your Substack API credentials:
    ```
-   SUBSTACK_API_KEY=your-api-key-here
-   SUBSTACK_HOSTNAME=your-publication.substack.com
+   SUBSTACK_TOKEN=your-token-here
+   SUBSTACK_PUBLICATION_URL=your-publication.substack.com
    ```
 
 3. Run the sample:
@@ -34,7 +34,7 @@ npm run sample
 
 The `index.ts` example showcases the following features:
 
-1. **🔐 Authentication** - Connecting with API key and publication hostname
+1. **🔐 Authentication** - Connecting with token and publication URL
 2. **📡 Connectivity Testing** - Verifying the API connection works
 3. **👤 Profile Management** - Fetching your own profile information
 4. **📰 Content Fetching** - Listing recent posts with titles and metadata
@@ -87,8 +87,8 @@ The `index.ts` example showcases the following features:
 
 If you encounter authentication errors:
 
-- Verify your API key is correct
-- Ensure your hostname matches your publication
-- Check that your API key has the necessary permissions
+- Verify your token is correct
+- Ensure your publication URL matches your publication
+- Check that your token has the necessary permissions
 
 For more information, see the main project documentation.

@@ -45,8 +45,8 @@ To verify the installation, you can create a simple test file:
 import { SubstackClient } from 'substack-api';
 
 const client = new SubstackClient({
-  apiKey: 'your-connect-sid-cookie-value',
-  hostname: 'example.substack.com'
+  token: 'your-connect-sid-cookie-value',
+  publicationUrl: 'example.substack.com'
 });
 
 async function test() {

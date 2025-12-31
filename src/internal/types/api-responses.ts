@@ -27,7 +27,7 @@ export type SubstackPublication = t.TypeOf<typeof SubstackPublicationCodec>
  * Raw API response shape for posts - minimal validation
  * Only validates fields actually used by PreviewPost domain class
  */
-export const SubstackPostCodec = t.intersection([
+export const SubstackPreviewPostCodec = t.intersection([
   t.type({
     id: t.number,
     title: t.string,
@@ -39,7 +39,7 @@ export const SubstackPostCodec = t.intersection([
   })
 ])
 
-export type SubstackPost = t.TypeOf<typeof SubstackPostCodec>
+export type SubstackPreviewPost = t.TypeOf<typeof SubstackPreviewPostCodec>
 
 /**
  * Raw API response shape for full posts from /posts/by-id/:id endpoint
@@ -50,7 +50,8 @@ export const SubstackFullPostCodec = t.intersection([
     id: t.number,
     title: t.string,
     slug: t.string,
-    post_date: t.string
+    post_date: t.string,
+    canonical_url: t.string
   }),
   t.partial({
     subtitle: t.string,
@@ -67,7 +68,7 @@ export const SubstackFullPostCodec = t.intersection([
 export type SubstackFullPost = t.TypeOf<typeof SubstackFullPostCodec>
 
 /**
- * Raw API response shape for comments from /api/v1/post/{id}/comments endpoint
+ * Raw API response shape for comments from /post/{id}/comments endpoint
  * Uses actual field names from the API response
  */
 export const SubstackCommentCodec = t.intersection([
@@ -83,7 +84,7 @@ export const SubstackCommentCodec = t.intersection([
 export type SubstackComment = t.TypeOf<typeof SubstackCommentCodec>
 
 /**
- * Response structure from /api/v1/reader/comment/{id} endpoint - keeping wrapper structure
+ * Response structure from /reader/comment/{id} endpoint - keeping wrapper structure
  */
 export const SubstackCommentResponseCodec = t.type({
   item: t.type({
@@ -103,45 +104,9 @@ export const SubstackCommentResponseCodec = t.type({
 })
 
 export type SubstackCommentResponse = t.TypeOf<typeof SubstackCommentResponseCodec>
-
-/**
- * Subscription publication type - raw API response
- */
-export interface SubstackSubscriptionPublication {
-  id: number
-  name: string
-  subdomain: string
-  custom_domain?: string | null
-  is_on_substack: boolean
-  author_id: number
-  author_handle: string
-  created_at: string
-  logo_url?: string
-  cover_photo_url?: string
-  twitter_screen_name?: string | null
-  community_enabled: boolean
-  copyright?: string
-  founding_subscription_benefits?: string[]
-  paid_subscription_benefits?: string[]
-  free_subscription_benefits?: string[]
-  stripe_user_id?: string
-  stripe_country?: string
-  payments_state?: string
-  language?: string
-  email_from_name?: string
-  homepage_type?: string
-  theme_background_pop_color?: string
-  theme_web_bg_color?: string
-  theme_cover_bg_color?: string | null
-}
-
-export interface SubstackSubscriptionsResponse {
-  publications: SubstackSubscriptionPublication[]
-}
-
 /**
  * Minimal codec for Profile API responses - only validates fields we actually use
- * This is for /api/v1/user/{slug}/public_profile endpoint
+ * This is for /user/{slug}/public_profile endpoint
  */
 export const SubstackFullProfileCodec = t.intersection([
   t.type({
@@ -190,7 +155,7 @@ const SubstackNoteCommentCodec = t.intersection([
 
 /**
  * Minimal codec for Note API responses - only validates fields we actually use
- * This is for /api/v1/reader/feed/profile/{id} and similar note endpoints
+ * This is for /reader/feed/profile/{id} and similar note endpoints
  */
 export const SubstackNoteCodec = t.intersection([
   t.type({

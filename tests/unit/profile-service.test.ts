@@ -1,24 +1,21 @@
-import { ProfileService } from '@/internal/services/profile-service'
-import { HttpClient } from '@/internal/http-client'
-import type { SubstackFullProfile } from '@/internal'
+import { ProfileService } from '@substack-api/internal/services/profile-service'
+import { HttpClient } from '@substack-api/internal/http-client'
+import type { SubstackFullProfile } from '@substack-api/internal'
 
 // Mock the http client
-jest.mock('@/internal/http-client')
+jest.mock('@substack-api/internal/http-client')
 
 describe('ProfileService', () => {
   let profileService: ProfileService
-  let mockHttpClient: jest.Mocked<HttpClient>
+  let mockPublicationClient: jest.Mocked<HttpClient>
 
   beforeEach(() => {
     jest.clearAllMocks()
 
-    mockHttpClient = new HttpClient('https://test.com', {
-      apiKey: 'test',
-      hostname: 'test.com'
-    }) as jest.Mocked<HttpClient>
-    mockHttpClient.get = jest.fn()
+    mockPublicationClient = new HttpClient('https://test.com', 'test') as jest.Mocked<HttpClient>
+    mockPublicationClient.get = jest.fn()
 
-    profileService = new ProfileService(mockHttpClient)
+    profileService = new ProfileService(mockPublicationClient)
   })
 
   describe('getOwnProfile', () => {
@@ -34,21 +31,23 @@ describe('ProfileService', () => {
         bio: 'Test bio'
       }
 
-      mockHttpClient.get.mockResolvedValueOnce(mockHandles).mockResolvedValueOnce(mockProfile)
+      mockPublicationClient.get
+        .mockResolvedValueOnce(mockHandles)
+        .mockResolvedValueOnce(mockProfile)
 
       const result = await profileService.getOwnProfile()
 
       expect(result).toEqual(mockProfile)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/handle/options')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/testuser/public_profile')
+      expect(mockPublicationClient.get).toHaveBeenCalledWith('/handle/options')
+      expect(mockPublicationClient.get).toHaveBeenCalledWith('/user/testuser/public_profile')
     })
 
     it('should throw error when handle options request fails', async () => {
       const error = new Error('Handle Options API Error')
-      mockHttpClient.get.mockRejectedValueOnce(error)
+      mockPublicationClient.get.mockRejectedValueOnce(error)
 
       await expect(profileService.getOwnProfile()).rejects.toThrow('Handle Options API Error')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/handle/options')
+      expect(mockPublicationClient.get).toHaveBeenCalledWith('/handle/options')
     })
 
     it('should throw error when profile request fails', async () => {
@@ -57,11 +56,11 @@ describe('ProfileService', () => {
       }
       const error = new Error('Profile API Error')
 
-      mockHttpClient.get.mockResolvedValueOnce(mockHandles).mockRejectedValueOnce(error)
+      mockPublicationClient.get.mockResolvedValueOnce(mockHandles).mockRejectedValueOnce(error)
 
       await expect(profileService.getOwnProfile()).rejects.toThrow('Profile API Error')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/handle/options')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/testuser/public_profile')
+      expect(mockPublicationClient.get).toHaveBeenCalledWith('/handle/options')
+      expect(mockPublicationClient.get).toHaveBeenCalledWith('/user/testuser/public_profile')
     })
   })
 
@@ -85,21 +84,23 @@ describe('ProfileService', () => {
         ]
       }
 
-      mockHttpClient.get.mockResolvedValueOnce(mockFeedResponse).mockResolvedValueOnce(mockProfile)
+      mockPublicationClient.get
+        .mockResolvedValueOnce(mockFeedResponse)
+        .mockResolvedValueOnce(mockProfile)
 
       const result = await profileService.getProfileById(456)
 
       expect(result).toEqual(mockProfile)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/feed/profile/456')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/otheruser/public_profile')
+      expect(mockPublicationClient.get).toHaveBeenCalledWith('/reader/feed/profile/456')
+      expect(mockPublicationClient.get).toHaveBeenCalledWith('/user/otheruser/public_profile')
     })
 
     it('should throw error when HTTP request fails', async () => {
       const error = new Error('API Error')
-      mockHttpClient.get.mockRejectedValueOnce(error)
+      mockPublicationClient.get.mockRejectedValueOnce(error)
 
       await expect(profileService.getProfileById(456)).rejects.toThrow('API Error')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/feed/profile/456')
+      expect(mockPublicationClient.get).toHaveBeenCalledWith('/reader/feed/profile/456')
     })
   })
 
@@ -113,20 +114,20 @@ describe('ProfileService', () => {
         bio: 'Slug bio'
       }
 
-      mockHttpClient.get.mockResolvedValueOnce(mockProfile)
+      mockPublicationClient.get.mockResolvedValueOnce(mockProfile)
 
       const result = await profileService.getProfileBySlug('sluguser')
 
       expect(result).toEqual(mockProfile)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/sluguser/public_profile')
+      expect(mockPublicationClient.get).toHaveBeenCalledWith('/user/sluguser/public_profile')
     })
 
     it('should throw error when HTTP request fails', async () => {
       const error = new Error('API Error')
-      mockHttpClient.get.mockRejectedValueOnce(error)
+      mockPublicationClient.get.mockRejectedValueOnce(error)
 
       await expect(profileService.getProfileBySlug('sluguser')).rejects.toThrow('API Error')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/user/sluguser/public_profile')
+      expect(mockPublicationClient.get).toHaveBeenCalledWith('/user/sluguser/public_profile')
     })
   })
 })

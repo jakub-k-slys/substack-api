@@ -3,12 +3,12 @@
  */
 
 import {
-  SubstackPostCodec,
+  SubstackPreviewPostCodec,
   SubstackFullPostCodec,
   SubstackCommentCodec,
   SubstackCommentResponseCodec
-} from '@/internal/types'
-import { decodeOrThrow, decodeEither } from '@/internal/validation'
+} from '@substack-api/internal/types'
+import { decodeOrThrow, decodeEither } from '@substack-api/internal/validation'
 import { isLeft, isRight } from 'fp-ts/Either'
 
 describe('io-ts validation codecs', () => {
@@ -22,10 +22,10 @@ describe('io-ts validation codecs', () => {
         truncated_body_text: 'This is a test...'
       }
 
-      const result = decodeEither(SubstackPostCodec, validPost)
+      const result = decodeEither(SubstackPreviewPostCodec, validPost)
       expect(isRight(result)).toBe(true)
 
-      const decoded = decodeOrThrow(SubstackPostCodec, validPost, 'test post')
+      const decoded = decodeOrThrow(SubstackPreviewPostCodec, validPost, 'test post')
       expect(decoded.id).toBe(123)
       expect(decoded.title).toBe('Test Post')
       expect(decoded.subtitle).toBe('A test post')
@@ -38,11 +38,11 @@ describe('io-ts validation codecs', () => {
         post_date: '2023-01-01T00:00:00Z'
       }
 
-      const result = decodeEither(SubstackPostCodec, invalidPost)
+      const result = decodeEither(SubstackPreviewPostCodec, invalidPost)
       expect(isLeft(result)).toBe(true)
 
       expect(() => {
-        decodeOrThrow(SubstackPostCodec, invalidPost, 'test post')
+        decodeOrThrow(SubstackPreviewPostCodec, invalidPost, 'test post')
       }).toThrow('Invalid test post')
     })
 
@@ -53,10 +53,10 @@ describe('io-ts validation codecs', () => {
         post_date: '2023-01-01T00:00:00Z'
       }
 
-      const result = decodeEither(SubstackPostCodec, minimalPost)
+      const result = decodeEither(SubstackPreviewPostCodec, minimalPost)
       expect(isRight(result)).toBe(true)
 
-      const decoded = decodeOrThrow(SubstackPostCodec, minimalPost, 'minimal post')
+      const decoded = decodeOrThrow(SubstackPreviewPostCodec, minimalPost, 'minimal post')
       expect(decoded.id).toBe(456)
       expect(decoded.subtitle).toBeUndefined()
       expect(decoded.truncated_body_text).toBeUndefined()
