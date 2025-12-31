@@ -1,24 +1,21 @@
-import { NoteService } from '@/internal/services/note-service'
-import { HttpClient } from '@/internal/http-client'
-import type { SubstackCommentResponse } from '@/internal'
+import { NoteService } from '@substack-api/internal/services/note-service'
+import { HttpClient } from '@substack-api/internal/http-client'
+import type { SubstackCommentResponse } from '@substack-api/internal'
 
 // Mock the http client
-jest.mock('@/internal/http-client')
+jest.mock('@substack-api/internal/http-client')
 
 describe('NoteService', () => {
   let noteService: NoteService
-  let mockHttpClient: jest.Mocked<HttpClient>
+  let mockPublicationClient: jest.Mocked<HttpClient>
 
   beforeEach(() => {
     jest.clearAllMocks()
 
-    mockHttpClient = new HttpClient('https://test.com', {
-      apiKey: 'test',
-      hostname: 'test.com'
-    }) as jest.Mocked<HttpClient>
-    mockHttpClient.get = jest.fn()
+    mockPublicationClient = new HttpClient('https://test.com', 'test') as jest.Mocked<HttpClient>
+    mockPublicationClient.get = jest.fn()
 
-    noteService = new NoteService(mockHttpClient)
+    noteService = new NoteService(mockPublicationClient)
   })
 
   describe('getNoteById', () => {
@@ -36,7 +33,7 @@ describe('NoteService', () => {
         }
       }
 
-      mockHttpClient.get.mockResolvedValueOnce(mockCommentResponse)
+      mockPublicationClient.get.mockResolvedValueOnce(mockCommentResponse)
 
       const result = await noteService.getNoteById(123)
 
@@ -62,15 +59,15 @@ describe('NoteService', () => {
         parentComments: []
       })
 
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/comment/123')
+      expect(mockPublicationClient.get).toHaveBeenCalledWith('/reader/comment/123')
     })
 
     it('should throw error when HTTP request fails', async () => {
       const error = new Error('API Error')
-      mockHttpClient.get.mockRejectedValueOnce(error)
+      mockPublicationClient.get.mockRejectedValueOnce(error)
 
       await expect(noteService.getNoteById(123)).rejects.toThrow('API Error')
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/comment/123')
+      expect(mockPublicationClient.get).toHaveBeenCalledWith('/reader/comment/123')
     })
   })
 
@@ -93,7 +90,7 @@ describe('NoteService', () => {
         nextCursor: 'next-cursor-123'
       }
 
-      mockHttpClient.get.mockResolvedValueOnce(mockResponse)
+      mockPublicationClient.get.mockResolvedValueOnce(mockResponse)
 
       const result = await noteService.getNotesForLoggedUser()
 
@@ -101,7 +98,7 @@ describe('NoteService', () => {
         notes: mockResponse.items,
         nextCursor: 'next-cursor-123'
       })
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/notes')
+      expect(mockPublicationClient.get).toHaveBeenCalledWith('/notes')
     })
 
     it('should return paginated notes with cursor', async () => {
@@ -110,7 +107,7 @@ describe('NoteService', () => {
         next_cursor: undefined
       }
 
-      mockHttpClient.get.mockResolvedValueOnce(mockResponse)
+      mockPublicationClient.get.mockResolvedValueOnce(mockResponse)
 
       const result = await noteService.getNotesForLoggedUser({ cursor: 'test-cursor' })
 
@@ -118,7 +115,7 @@ describe('NoteService', () => {
         notes: [],
         nextCursor: undefined
       })
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/notes?cursor=test-cursor')
+      expect(mockPublicationClient.get).toHaveBeenCalledWith('/notes?cursor=test-cursor')
     })
 
     it('should handle missing items in response', async () => {
@@ -126,7 +123,7 @@ describe('NoteService', () => {
         nextCursor: 'next-cursor'
       }
 
-      mockHttpClient.get.mockResolvedValueOnce(mockResponse)
+      mockPublicationClient.get.mockResolvedValueOnce(mockResponse)
 
       const result = await noteService.getNotesForLoggedUser()
 
@@ -156,7 +153,7 @@ describe('NoteService', () => {
         nextCursor: 'next-cursor-456'
       }
 
-      mockHttpClient.get.mockResolvedValueOnce(mockResponse)
+      mockPublicationClient.get.mockResolvedValueOnce(mockResponse)
 
       const result = await noteService.getNotesForProfile(123)
 
@@ -164,7 +161,7 @@ describe('NoteService', () => {
         notes: mockResponse.items,
         nextCursor: 'next-cursor-456'
       })
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/reader/feed/profile/123?types=note')
+      expect(mockPublicationClient.get).toHaveBeenCalledWith('/reader/feed/profile/123?types=note')
     })
 
     it('should return paginated notes for profile with cursor', async () => {
@@ -173,7 +170,7 @@ describe('NoteService', () => {
         next_cursor: undefined
       }
 
-      mockHttpClient.get.mockResolvedValueOnce(mockResponse)
+      mockPublicationClient.get.mockResolvedValueOnce(mockResponse)
 
       const result = await noteService.getNotesForProfile(456, { cursor: 'profile-cursor' })
 
@@ -181,8 +178,8 @@ describe('NoteService', () => {
         notes: [],
         nextCursor: undefined
       })
-      expect(mockHttpClient.get).toHaveBeenCalledWith(
-        '/api/v1/reader/feed/profile/456?types=note&cursor=profile-cursor'
+      expect(mockPublicationClient.get).toHaveBeenCalledWith(
+        '/reader/feed/profile/456?types=note&cursor=profile-cursor'
       )
     })
 
@@ -192,13 +189,13 @@ describe('NoteService', () => {
         next_cursor: undefined
       }
 
-      mockHttpClient.get.mockResolvedValueOnce(mockResponse)
+      mockPublicationClient.get.mockResolvedValueOnce(mockResponse)
 
       const cursorWithSpecialChars = 'cursor+with special=chars&more'
       await noteService.getNotesForProfile(789, { cursor: cursorWithSpecialChars })
 
-      expect(mockHttpClient.get).toHaveBeenCalledWith(
-        `/api/v1/reader/feed/profile/789?types=note&cursor=${encodeURIComponent(cursorWithSpecialChars)}`
+      expect(mockPublicationClient.get).toHaveBeenCalledWith(
+        `/reader/feed/profile/789?types=note&cursor=${encodeURIComponent(cursorWithSpecialChars)}`
       )
     })
   })

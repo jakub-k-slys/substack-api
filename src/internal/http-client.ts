@@ -1,66 +1,49 @@
 /**
  * HTTP client utility for Substack API requests
  */
-import type { SubstackConfig } from '@/types'
+import axios, { AxiosInstance } from 'axios'
+import rateLimit from 'axios-rate-limit'
 
 export class HttpClient {
-  private readonly baseUrl: string
-  private readonly cookie: string
-  private readonly perPage: number
+  private readonly httpClient: AxiosInstance
 
-  constructor(baseUrl: string, config: SubstackConfig) {
-    if (!config.apiKey) {
-      throw new Error('apiKey is required in SubstackConfig')
+  constructor(baseUrl: string, token: string, maxRequestsPerSecond: number = 25) {
+    if (!token) {
+      throw new Error('API token is required')
     }
-    this.baseUrl = baseUrl
-    this.cookie = `substack.sid=${config.apiKey}`
-    this.perPage = config.perPage || 25
-  }
-
-  /**
-   * Get the configured items per page for pagination
-   */
-  getPerPage(): number {
-    return this.perPage
-  }
-
-  private async makeRequest<T>(url: string, options: RequestInit = {}): Promise<T> {
-    const response = await fetch(url, {
+    const instance = axios.create({
+      baseURL: baseUrl,
       headers: {
-        Cookie: this.cookie,
-        'Content-Type': 'application/json',
-        ...options.headers
-      },
-      ...options
+        Cookie: `substack.sid=${token}`
+      }
     })
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-    }
-
-    return response.json()
-  }
-
-  async request<T>(path: string, options: RequestInit = {}): Promise<T> {
-    const url = `${this.baseUrl}${path}`
-    return this.makeRequest<T>(url, options)
+    this.httpClient = rateLimit(instance, {
+      maxRequests: maxRequestsPerSecond,
+      perMilliseconds: 1000
+    })
   }
 
   async get<T>(path: string): Promise<T> {
-    return this.request<T>(path)
+    const response = await this.httpClient.get(path)
+    if (response.status != 200) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
+    return response.data
   }
 
   async post<T>(path: string, data?: unknown): Promise<T> {
-    return this.request<T>(path, {
-      method: 'POST',
-      body: data ? JSON.stringify(data) : undefined
-    })
+    const response = await this.httpClient.post(path, data)
+    if (response.status != 200) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
+    return response.data
   }
 
   async put<T>(path: string, data?: unknown): Promise<T> {
-    return this.request<T>(path, {
-      method: 'PUT',
-      body: data ? JSON.stringify(data) : undefined
-    })
+    const response = await this.httpClient.put(path, data)
+    if (response.status != 200) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
+    return response.data
   }
 }

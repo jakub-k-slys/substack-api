@@ -1,14 +1,14 @@
-import type { SubstackNote, PaginatedSubstackNotes } from '@/internal/types'
-import { SubstackCommentResponseCodec } from '@/internal/types'
-import { decodeOrThrow } from '@/internal/validation'
-import type { HttpClient } from '@/internal/http-client'
+import type { SubstackNote, PaginatedSubstackNotes } from '@substack-api/internal/types'
+import { SubstackCommentResponseCodec } from '@substack-api/internal/types'
+import { decodeOrThrow } from '@substack-api/internal/validation'
+import type { HttpClient } from '@substack-api/internal/http-client'
 
 /**
  * Service responsible for note-related HTTP operations
  * Returns internal types that can be transformed into domain models
  */
 export class NoteService {
-  constructor(private readonly httpClient: HttpClient) {}
+  constructor(private readonly publicationClient: HttpClient) {}
 
   /**
    * Get a note by ID from the API
@@ -18,7 +18,7 @@ export class NoteService {
    */
   async getNoteById(id: number): Promise<SubstackNote> {
     // Notes are fetched using the comment endpoint
-    const rawResponse = await this.httpClient.get<unknown>(`/api/v1/reader/comment/${id}`)
+    const rawResponse = await this.publicationClient.get<unknown>(`/reader/comment/${id}`)
 
     // Validate the response structure with io-ts
     const response = decodeOrThrow(
@@ -60,11 +60,9 @@ export class NoteService {
    * @throws {Error} When notes cannot be retrieved
    */
   async getNotesForLoggedUser(options?: { cursor?: string }): Promise<PaginatedSubstackNotes> {
-    const url = options?.cursor
-      ? `/api/v1/notes?cursor=${encodeURIComponent(options.cursor)}`
-      : '/api/v1/notes'
+    const url = options?.cursor ? `/notes?cursor=${encodeURIComponent(options.cursor)}` : '/notes'
 
-    const response = await this.httpClient.get<{
+    const response = await this.publicationClient.get<{
       items?: SubstackNote[]
       nextCursor?: string
     }>(url)
@@ -87,10 +85,10 @@ export class NoteService {
     options?: { cursor?: string }
   ): Promise<PaginatedSubstackNotes> {
     const url = options?.cursor
-      ? `/api/v1/reader/feed/profile/${profileId}?types=note&cursor=${encodeURIComponent(options.cursor)}`
-      : `/api/v1/reader/feed/profile/${profileId}?types=note`
+      ? `/reader/feed/profile/${profileId}?types=note&cursor=${encodeURIComponent(options.cursor)}`
+      : `/reader/feed/profile/${profileId}?types=note`
 
-    const response = await this.httpClient.get<{
+    const response = await this.publicationClient.get<{
       items?: SubstackNote[]
       nextCursor?: string
     }>(url)

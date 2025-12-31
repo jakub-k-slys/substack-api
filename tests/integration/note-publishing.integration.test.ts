@@ -1,4 +1,4 @@
-import { SubstackClient } from '@/substack-client'
+import { SubstackClient } from '@substack-api/substack-client'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 
@@ -10,14 +10,11 @@ describe('note publishing tests', () => {
     global.INTEGRATION_SERVER.capturedRequests.length = 0
 
     // Create client configured to use our local test server
-    const url = new URL(global.INTEGRATION_SERVER.url)
-    const hostname = `${url.hostname}:${url.port}`
-
     client = new SubstackClient({
-      hostname: hostname,
-      apiKey: 'test-key',
-      protocol: 'http', // Use HTTP for local test server
-      substackBaseUrl: global.INTEGRATION_SERVER.url // Configure global client to use mock server too
+      publicationUrl: global.INTEGRATION_SERVER.url,
+      token: 'test-key',
+      substackUrl: global.INTEGRATION_SERVER.url, // Configure global client to use mock server too
+      urlPrefix: '' // Integration server doesn't use API prefix
     })
   })
 
@@ -40,7 +37,7 @@ describe('note publishing tests', () => {
     const capturedRequest = global.INTEGRATION_SERVER.capturedRequests[0]
 
     expect(capturedRequest.method).toBe('POST')
-    expect(capturedRequest.url).toBe('/api/v1/comment/feed')
+    expect(capturedRequest.url).toBe('/comment/feed')
 
     const expectedRequestPath = join(process.cwd(), 'samples', 'api', 'v1', 'comment', 'feed')
     const expectedRequestData = JSON.parse(readFileSync(expectedRequestPath, 'utf8'))

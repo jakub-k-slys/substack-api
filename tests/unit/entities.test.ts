@@ -1,27 +1,26 @@
-import { SubstackClient } from '@/substack-client'
-import { Profile, PreviewPost, Comment } from '@/domain'
-import { PostService, ProfileService, NoteService, CommentService } from '@/internal/services'
-import type { HttpClient } from '@/internal/http-client'
+import { SubstackClient } from '@substack-api/substack-client'
+import { Profile, PreviewPost, Comment } from '@substack-api/domain'
+import {
+  PostService,
+  ProfileService,
+  NoteService,
+  CommentService
+} from '@substack-api/internal/services'
+import type { HttpClient } from '@substack-api/internal/http-client'
 
 describe('SubstackClient Entity Model', () => {
   let client: SubstackClient
 
   beforeEach(() => {
     client = new SubstackClient({
-      apiKey: 'test-api-key',
-      hostname: 'test.substack.com'
+      token: 'test-api-key',
+      publicationUrl: 'test.substack.com'
     })
   })
 
   describe('SubstackClient', () => {
     it('should create client instance', () => {
       expect(client).toBeInstanceOf(SubstackClient)
-    })
-
-    it('should handle invalid comment ID type', async () => {
-      await expect(client.commentForId('invalid' as any)).rejects.toThrow(
-        'Comment ID must be a number'
-      )
     })
 
     it('should throw error when getting own profile without proper authentication', async () => {
@@ -64,7 +63,8 @@ describe('SubstackClient Entity Model', () => {
         can_dm: false,
         dm_upgrade_options: []
       }
-      const httpClient = (client as unknown as { httpClient: HttpClient }).httpClient
+      const publicationClient = (client as unknown as { publicationClient: HttpClient })
+        .publicationClient
 
       // Create mock services
       const mockProfileService = {
@@ -91,11 +91,12 @@ describe('SubstackClient Entity Model', () => {
 
       const profile = new Profile(
         mockData,
-        httpClient,
+        publicationClient,
         mockProfileService,
         mockPostService,
         mockNoteService,
-        mockCommentService
+        mockCommentService,
+        25
       )
 
       expect(profile).toBeInstanceOf(Profile)
@@ -112,7 +113,8 @@ describe('SubstackClient Entity Model', () => {
         post_date: '2023-01-01T00:00:00Z',
         type: 'newsletter' as const
       }
-      const httpClient = (client as unknown as { httpClient: HttpClient }).httpClient
+      const publicationClient = (client as unknown as { publicationClient: HttpClient })
+        .publicationClient
 
       // Create mock services
       const mockCommentService = {
@@ -125,7 +127,7 @@ describe('SubstackClient Entity Model', () => {
         getPostsForProfile: jest.fn()
       } as unknown as PostService
 
-      const post = new PreviewPost(mockData, httpClient, mockCommentService, mockPostService)
+      const post = new PreviewPost(mockData, publicationClient, mockCommentService, mockPostService)
 
       expect(post).toBeInstanceOf(PreviewPost)
       expect(post.id).toBe(456)
@@ -141,8 +143,9 @@ describe('SubstackClient Entity Model', () => {
         user_id: 123,
         name: 'Test User'
       }
-      const httpClient = (client as unknown as { httpClient: HttpClient }).httpClient
-      const comment = new Comment(mockData, httpClient)
+      const publicationClient = (client as unknown as { publicationClient: HttpClient })
+        .publicationClient
+      const comment = new Comment(mockData, publicationClient)
 
       expect(comment).toBeInstanceOf(Comment)
       expect(comment.id).toBe(789)

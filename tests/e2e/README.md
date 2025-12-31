@@ -26,7 +26,7 @@ E2E tests are designed to:
 
 ### Prerequisites
 
-1. **Substack API credentials**: You need a valid Substack API key
+1. **Substack API credentials**: You need a valid Substack token
 2. **Environment setup**: Create a `.env` file in the project root
 
 ### Quick Start
@@ -36,8 +36,8 @@ E2E tests are designed to:
 cp .env.example .env
 
 # Edit .env and add your credentials
-SUBSTACK_API_KEY=your-api-key-here
-SUBSTACK_HOSTNAME=yoursite.substack.com  # optional
+SUBSTACK_TOKEN=your-token-here
+SUBSTACK_PUBLICATION_URL=yoursite.substack.com  # optional
 
 # Run E2E tests
 npm run test:e2e
@@ -71,11 +71,11 @@ When no API credentials are provided, **E2E tests will fail immediately** with a
 **Error message example:**
 
 ```
-❌ Missing required Substack credentials. Set SUBSTACK_API_KEY and SUBSTACK_HOSTNAME.
+❌ Missing required Substack credentials. Set SUBSTACK_TOKEN and SUBSTACK_PUBLICATION_URL.
 
 Required environment variables:
-- SUBSTACK_API_KEY: Your Substack API key (required)
-- SUBSTACK_HOSTNAME: Your Substack hostname (optional)
+- SUBSTACK_TOKEN: Your Substack token (required)
+- SUBSTACK_PUBLICATION_URL: Your Substack publication URL (optional)
 ```
 
 ### With Credentials
@@ -143,4 +143,4 @@ When creating new E2E tests:
 - **Never commit** your `.env` file or API credentials to version control
 - The `.env` file is already included in `.gitignore`
 - Use repository secrets for CI/CD credentials
-- API keys should have minimal required permissions
+- Tokens should have minimal required permissions

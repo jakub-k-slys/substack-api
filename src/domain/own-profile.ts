@@ -1,15 +1,15 @@
-import { Profile } from '@/domain/profile'
-import { Note } from '@/domain/note'
-import { NoteBuilder, NoteWithLinkBuilder } from '@/domain/note-builder'
-import type { SubstackFullProfile } from '@/internal'
-import type { HttpClient } from '@/internal/http-client'
+import { Profile } from '@substack-api/domain/profile'
+import { Note } from '@substack-api/domain/note'
+import { NoteBuilder, NoteWithLinkBuilder } from '@substack-api/domain/note-builder'
+import type { SubstackFullProfile } from '@substack-api/internal'
+import type { HttpClient } from '@substack-api/internal/http-client'
 import type {
   ProfileService,
   PostService,
   NoteService,
   FollowingService,
   CommentService
-} from '@/internal/services'
+} from '@substack-api/internal/services'
 
 /**
  * OwnProfile extends Profile with write capabilities for the authenticated user
@@ -17,29 +17,39 @@ import type {
 export class OwnProfile extends Profile {
   constructor(
     rawData: SubstackFullProfile,
-    client: HttpClient,
+    publicationClient: HttpClient,
     profileService: ProfileService,
     postService: PostService,
     noteService: NoteService,
     commentService: CommentService,
     private readonly followingService: FollowingService,
+    perPage: number,
     resolvedSlug?: string
   ) {
-    super(rawData, client, profileService, postService, noteService, commentService, resolvedSlug)
+    super(
+      rawData,
+      publicationClient,
+      profileService,
+      postService,
+      noteService,
+      commentService,
+      perPage,
+      resolvedSlug
+    )
   }
 
   /**
    * Create a new note using the builder pattern
    */
   newNote(): NoteBuilder {
-    return new NoteBuilder(this.client)
+    return new NoteBuilder(this.publicationClient)
   }
 
   /**
    * Create a new note with a link attachment using the builder pattern
    */
   newNoteWithLink(link: string): NoteWithLinkBuilder {
-    return new NoteWithLinkBuilder(this.client, link)
+    return new NoteWithLinkBuilder(this.publicationClient, link)
   }
 
   /**
@@ -56,11 +66,12 @@ export class OwnProfile extends Profile {
         const profileResponse = await this.profileService.getProfileBySlug(user.handle)
         yield new Profile(
           profileResponse,
-          this.client,
+          this.publicationClient,
           this.profileService,
           this.postService,
           this.noteService,
           this.commentService,
+          this.perPage,
           user.handle
         )
         count++
@@ -92,7 +103,7 @@ export class OwnProfile extends Profile {
           if (options.limit && totalYielded >= options.limit) {
             return // Stop if we've reached the requested limit
           }
-          yield new Note(noteData, this.client)
+          yield new Note(noteData, this.publicationClient)
           totalYielded++
         }
 

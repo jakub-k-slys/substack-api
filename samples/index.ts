@@ -8,7 +8,7 @@
  * social features like following users.
  */
 
-import { SubstackClient } from '@'
+import { SubstackClient } from '@substack-api'
 import { config } from 'dotenv'
 import { createInterface } from 'readline'
 
@@ -18,18 +18,19 @@ config()
 /**
  * Get API credentials from environment or user input
  */
-async function getCredentials(): Promise<{ apiKey: string; hostname: string }> {
-  const envApiKey = process.env.SUBSTACK_API_KEY || process.env.E2E_API_KEY
+async function getCredentials(): Promise<{ token: string; publicationUrl: string }> {
+  const envToken = process.env.SUBSTACK_API_KEY || process.env.E2E_API_KEY
   const envHostname = process.env.SUBSTACK_HOSTNAME || process.env.E2E_HOSTNAME || 'substack.com'
+  const envPublicationUrl = envHostname.startsWith('http') ? envHostname : `https://${envHostname}`
 
-  if (envApiKey) {
-    console.log('✅ Using API key from environment variables')
-    return { apiKey: envApiKey, hostname: envHostname }
+  if (envToken) {
+    console.log('✅ Using API token from environment variables')
+    return { token: envToken, publicationUrl: envPublicationUrl }
   }
 
   console.log('🔑 API credentials not found in environment variables')
   console.log('Please provide your Substack API credentials:')
-  
+
   const rl = createInterface({
     input: process.stdin,
     output: process.stdout
@@ -42,11 +43,12 @@ async function getCredentials(): Promise<{ apiKey: string; hostname: string }> {
   }
 
   try {
-    const apiKey = await question('Enter your Substack API key: ')
-    const hostname = await question('Enter your Substack hostname (or press Enter for substack.com): ') || 'substack.com'
-    
+    const token = await question('Enter your Substack API token: ')
+    const hostname = await question('Enter your publication URL (e.g., https://yourpub.substack.com): ')
+    const publicationUrl = hostname.startsWith('http') ? hostname : `https://${hostname}`
+
     rl.close()
-    return { apiKey: apiKey.trim(), hostname: hostname.trim() }
+    return { token: token.trim(), publicationUrl: publicationUrl.trim() }
   } catch (error) {
     rl.close()
     throw error
@@ -61,19 +63,19 @@ async function runExample(): Promise<void> {
 
   try {
     // 1. Get credentials and create client
-    const { apiKey, hostname } = await getCredentials()
-    
-    if (!apiKey) {
-      console.log('❌ API key is required to run this example')
+    const { token, publicationUrl } = await getCredentials()
+
+    if (!token) {
+      console.log('❌ API token is required to run this example')
       process.exit(1)
     }
 
     const client = new SubstackClient({
-      hostname,
-      apiKey
+      publicationUrl,
+      token
     })
 
-    console.log(`🌐 Connected to: ${hostname}`)
+    console.log(`🌐 Connected to: ${publicationUrl}`)
 
     // 2. Test connectivity
     console.log('\n📡 Testing API connectivity...')
@@ -113,6 +115,7 @@ async function runExample(): Promise<void> {
         }
         console.log(`      Published: ${post.publishedAt ? post.publishedAt.toLocaleDateString() : 'Unknown'}`)
         console.log(`      Author: ${post.author.name} (@${post.author.handle})`)
+        console.log(`      Post ID: ${post.id}`)
         console.log('')
       }
   
@@ -208,7 +211,7 @@ async function runExample(): Promise<void> {
     // 8. Fetching a full post by ID
     console.log('\n📄 Fetching a specific full post by ID...')
     try {
-      const postId = 167180194 // Real post ID from sample data
+      const postId = 176729823 // Real post ID from sample data
       const fullPost = await client.postForId(postId)
       
       console.log(`📋 Full Post Information:`)
@@ -217,6 +220,7 @@ async function runExample(): Promise<void> {
       console.log(`   Slug: ${fullPost.slug}`)
       console.log(`   Published: ${fullPost.publishedAt.toLocaleDateString()}`)
       console.log(`   Created: ${fullPost.createdAt.toLocaleDateString()}`)
+      console.log(`   URL: ${fullPost.url}`)
       
       if (fullPost.htmlBody) {
         const htmlPreview = fullPost.htmlBody.length > 200 ? 
@@ -371,9 +375,9 @@ async function runExample(): Promise<void> {
     
     if ((error as Error).message.includes('401') || (error as Error).message.includes('Unauthorized')) {
       console.error('\n💡 This might be an authentication issue. Please check:')
-      console.error('   • Your API key is correct')
-      console.error('   • Your hostname is correct')
-      console.error('   • Your API key has the necessary permissions')
+      console.error('   • Your API token is correct')
+      console.error('   • Your publication URL is correct')
+      console.error('   • Your API token has the necessary permissions')
     }
     
     process.exit(1)

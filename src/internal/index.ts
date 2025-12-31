@@ -2,6 +2,5 @@
  * Internal module exports - not exported from the public API
  */
 
-export * from '@/internal/types'
-export * from '@/internal/services'
-export * from '@/internal/cache'
+export * from '@substack-api/internal/types'
+export * from '@substack-api/internal/services'

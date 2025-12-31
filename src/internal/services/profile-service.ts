@@ -1,16 +1,16 @@
-import type { HttpClient } from '@/internal/http-client'
-import type { SubstackFullProfile, SubstackUserProfile } from '@/internal/types'
-import type { PotentialHandles } from '@/internal/types/potential-handles'
+import type { HttpClient } from '@substack-api/internal/http-client'
+import type { SubstackFullProfile, SubstackUserProfile } from '@substack-api/internal/types'
+import type { PotentialHandles } from '@substack-api/internal/types/potential-handles'
 
 /**
  * Service responsible for profile-related HTTP operations
  * Returns internal types that can be transformed into domain models
  */
 export class ProfileService {
-  constructor(private readonly httpClient: HttpClient) {}
+  constructor(private readonly substackClient: HttpClient) {}
 
   async getOwnSlug(): Promise<string> {
-    const data = await this.httpClient.get<PotentialHandles>('/api/v1/handle/options')
+    const data = await this.substackClient.get<PotentialHandles>('/handle/options')
     const existingHandle = data.potentialHandles.filter((handle) => handle.type == 'existing')[0]
     return existingHandle.handle
   }
@@ -21,7 +21,7 @@ export class ProfileService {
    */
   async getOwnProfile(): Promise<SubstackFullProfile> {
     const ownSlug = await this.getOwnSlug()
-    return await this.httpClient.get<SubstackFullProfile>(`/api/v1/user/${ownSlug}/public_profile`)
+    return await this.substackClient.get<SubstackFullProfile>(`/user/${ownSlug}/public_profile`)
   }
 
   /**
@@ -31,8 +31,8 @@ export class ProfileService {
    * @throws {Error} When profile is not found or API request fails
    */
   async getProfileById(id: number): Promise<SubstackFullProfile> {
-    const profileFeed = await this.httpClient.get<SubstackUserProfile>(
-      `/api/v1/reader/feed/profile/${id}`
+    const profileFeed = await this.substackClient.get<SubstackUserProfile>(
+      `/reader/feed/profile/${id}`
     )
 
     for (const item of profileFeed.items) {
@@ -55,6 +55,6 @@ export class ProfileService {
    * @throws {Error} When profile is not found or API request fails
    */
   async getProfileBySlug(slug: string): Promise<SubstackFullProfile> {
-    return await this.httpClient.get<SubstackFullProfile>(`/api/v1/user/${slug}/public_profile`)
+    return await this.substackClient.get<SubstackFullProfile>(`/user/${slug}/public_profile`)
   }
 }

@@ -62,7 +62,7 @@ export default [
       'no-restricted-imports': ['error', {
         'patterns': [{
           'group': ['./*', '../*', '../../*', '../../../*'],
-          'message': 'Relative imports are forbidden. Use @/ path alias instead (e.g., @/domain, @/internal/services).'
+          'message': 'Relative imports are forbidden. Use @substack-api/ path alias instead (e.g., @substack-api/domain, @substack-api/internal/services).'
         }]
       }],
       'prettier/prettier': ['error', {
@@ -119,7 +119,7 @@ export default [
       'no-restricted-imports': ['error', {
         'patterns': [{
           'group': ['./*', '../*', '../../*', '../../../*'],
-          'message': 'Relative imports are forbidden. Use @/ path alias instead (e.g., @/domain, @/internal/services).'
+          'message': 'Relative imports are forbidden. Use @substack-api/ path alias instead (e.g., @substack-api/domain, @substack-api/internal/services).'
         }]
       }],
       'prettier/prettier': ['error', {
@@ -176,7 +176,7 @@ export default [
       'no-restricted-imports': ['error', {
         'patterns': [{
           'group': ['./*', '../*', '../../*', '../../../*'],
-          'message': 'Relative imports are forbidden. Use @/ path alias instead (e.g., @/domain, @/internal/services).'
+          'message': 'Relative imports are forbidden. Use @substack-api/ path alias instead (e.g., @substack-api/domain, @substack-api/internal/services).'
         }]
       }],
       'prettier/prettier': ['error', {
