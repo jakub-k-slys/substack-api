@@ -1,13 +1,11 @@
 import * as t from 'io-ts'
 
 /**
- * Codec for CreateAttachmentResponse - validates the response from POST /comment/attachment
+ * Minimal codec for CreateAttachmentResponse - only validates the id field which is actually used
+ * Used field: id (to add to attachmentIds array)
  */
 export const CreateAttachmentResponseCodec = t.type({
-  id: t.string,
-  type: t.string,
-  publication: t.unknown,
-  post: t.unknown
+  id: t.string
 })
 
 export type CreateAttachmentResponse = t.TypeOf<typeof CreateAttachmentResponseCodec>
