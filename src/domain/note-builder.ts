@@ -1,10 +1,12 @@
 import {
   PublishNoteRequest,
   PublishNoteResponse,
+  PublishNoteResponseCodec,
   CreateAttachmentRequest,
-  CreateAttachmentResponse
+  CreateAttachmentResponseCodec
 } from '@substack-api/internal'
 import { HttpClient } from '@substack-api/internal/http-client'
+import { decodeOrThrow } from '@substack-api/internal/validation'
 
 interface TextSegment {
   text: string
@@ -437,7 +439,11 @@ export class NoteBuilder {
    * Publish the note
    */
   async publish(): Promise<PublishNoteResponse> {
-    return this.publicationClient.post<PublishNoteResponse>('/comment/feed', this.toNoteRequest())
+    const rawResponse = await this.publicationClient.post<unknown>(
+      '/comment/feed',
+      this.toNoteRequest()
+    )
+    return decodeOrThrow(PublishNoteResponseCodec, rawResponse, 'Publish note response')
   }
 }
 
@@ -481,9 +487,14 @@ export class NoteWithLinkBuilder extends NoteBuilder {
       type: 'link'
     }
 
-    const attachmentResponse = await this.publicationClient.post<CreateAttachmentResponse>(
+    const rawAttachmentResponse = await this.publicationClient.post<unknown>(
       '/comment/attachment',
       attachmentRequest
+    )
+    const attachmentResponse = decodeOrThrow(
+      CreateAttachmentResponseCodec,
+      rawAttachmentResponse,
+      'Create attachment response'
     )
 
     // Update the state with the attachment ID
@@ -496,7 +507,8 @@ export class NoteWithLinkBuilder extends NoteBuilder {
     const request = this.toNoteRequestWithState(updatedState)
 
     // Publish the note with attachment
-    return this.publicationClient.post<PublishNoteResponse>('/comment/feed', request)
+    const rawPublishResponse = await this.publicationClient.post<unknown>('/comment/feed', request)
+    return decodeOrThrow(PublishNoteResponseCodec, rawPublishResponse, 'Publish note response')
   }
 
   /**

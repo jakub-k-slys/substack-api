@@ -77,11 +77,53 @@ describe('ProfileService', () => {
       const mockFeedResponse = {
         items: [
           {
+            entity_key: 'test-key',
+            type: 'note',
             context: {
-              users: [{ id: 456, handle: 'otheruser' }]
+              type: 'reshare',
+              timestamp: '2023-01-01T00:00:00Z',
+              users: [
+                {
+                  id: 456,
+                  name: 'Other User',
+                  handle: 'otheruser',
+                  photo_url: 'https://example.com/other.jpg',
+                  profile_set_up_at: '2022-01-01T00:00:00Z',
+                  reader_installed_at: '2022-01-01T00:00:00Z'
+                }
+              ],
+              isFresh: true,
+              source: 'feed',
+              page_rank: 1
+            },
+            parentComments: [],
+            canReply: true,
+            isMuted: false,
+            trackingParameters: {
+              item_primary_entity_key: 'test-key',
+              item_entity_key: 'test-key',
+              item_type: 'note',
+              item_content_user_id: 456,
+              item_context_type: 'reshare',
+              item_context_type_bucket: 'feed',
+              item_context_timestamp: '2023-01-01T00:00:00Z',
+              item_context_user_id: 456,
+              item_context_user_ids: [456],
+              item_can_reply: true,
+              item_is_fresh: true,
+              item_last_impression_at: null,
+              item_page: null,
+              item_page_rank: 1,
+              impression_id: 'test-impression',
+              followed_user_count: 0,
+              subscribed_publication_count: 0,
+              is_following: false,
+              is_explicitly_subscribed: false
             }
           }
-        ]
+        ],
+        originalCursorTimestamp: '2023-01-01T00:00:00Z',
+        nextCursor: 'next-cursor'
       }
 
       mockPublicationClient.get

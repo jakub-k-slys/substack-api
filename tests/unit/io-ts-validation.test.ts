@@ -70,6 +70,7 @@ describe('io-ts validation codecs', () => {
         title: 'Test Full Post',
         slug: 'test-full-post',
         post_date: '2023-01-01T00:00:00Z',
+        canonical_url: 'https://example.com/test-full-post',
         body_html: '<p>This is the full HTML body content</p>',
         subtitle: 'A test full post',
         cover_image: 'https://example.com/image.jpg',
@@ -98,7 +99,8 @@ describe('io-ts validation codecs', () => {
         id: 456,
         title: 'Minimal Full Post',
         slug: 'minimal-full-post',
-        post_date: '2023-01-01T00:00:00Z'
+        post_date: '2023-01-01T00:00:00Z',
+        canonical_url: 'https://example.com/minimal-full-post'
       }
 
       const result = decodeEither(SubstackFullPostCodec, minimalFullPost)

@@ -1,11 +1,8 @@
-type HandleType = 'existing' | 'subdomain' | 'suggestion'
+import * as t from 'io-ts'
+import { PotentialHandleCodec } from '@substack-api/internal/types/potential-handle'
 
-export interface PotentialHandle {
-  id: string
-  handle: string
-  type: HandleType
-}
+export const PotentialHandlesCodec = t.type({
+  potentialHandles: t.array(PotentialHandleCodec)
+})
 
-export interface PotentialHandles {
-  potentialHandles: PotentialHandle[]
-}
+export type PotentialHandles = t.TypeOf<typeof PotentialHandlesCodec>
