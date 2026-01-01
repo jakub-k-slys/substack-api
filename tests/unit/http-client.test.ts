@@ -33,7 +33,8 @@ describe('HttpClient', () => {
       expect(mockedAxios.create).toHaveBeenCalledWith({
         baseURL: 'https://test.substack.com',
         headers: {
-          Cookie: 'substack.sid=test-api-key'
+          Cookie: 'substack.sid=test-api-key',
+          'Content-Type': 'application/json'
         }
       })
       expect(client).toBeDefined()

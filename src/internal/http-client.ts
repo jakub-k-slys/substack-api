@@ -14,7 +14,8 @@ export class HttpClient {
     const instance = axios.create({
       baseURL: baseUrl,
       headers: {
-        Cookie: `substack.sid=${token}`
+        Cookie: `substack.sid=${token}`,
+        'Content-Type': 'application/json'
       }
     })
     this.httpClient = rateLimit(instance, {

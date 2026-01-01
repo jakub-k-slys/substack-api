@@ -253,7 +253,7 @@ async function runExample(): Promise<void> {
     }
 
     // 9. Creating notes (COMMENTED OUT - uncomment to test note creation)
-    /*
+
     console.log('\n📝 Note Creation Examples (commented out to prevent accidental publishing)')
 
     // Example: Create a simple note
@@ -364,7 +364,7 @@ async function runExample(): Promise<void> {
 
     console.log('   💡 To test note creation, uncomment the examples above')
     console.log('   ⚠️  Warning: Uncommenting will publish real notes to your Substack!')
-    */
+
     console.log('\n✨ Example completed successfully!')
     console.log('💡 This example demonstrates basic Substack API usage.')
     console.log('   For more advanced features, check out the full documentation.')

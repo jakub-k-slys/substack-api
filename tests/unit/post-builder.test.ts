@@ -19,35 +19,10 @@ describe('NoteBuilder', () => {
     } as unknown as jest.Mocked<HttpClient>
 
     mockPublishResponse = {
-      user_id: 123,
-      body: 'Test note content',
-      body_json: {
-        type: 'doc',
-        attrs: { schemaVersion: 'v1' },
-        content: []
-      },
-      post_id: null,
-      publication_id: null,
-      media_clip_id: null,
-      ancestor_path: '',
-      type: 'feed',
-      status: 'published',
-      reply_minimum_role: 'everyone',
       id: 789,
-      deleted: false,
       date: '2023-01-01T00:00:00Z',
-      name: 'Test User',
-      photo_url: 'https://example.com/photo.jpg',
-      reactions: {},
-      children: [],
-      user_bestseller_tier: null,
-      isFirstFeedCommentByUser: false,
-      reaction_count: 0,
-      restacks: 0,
-      restacked: false,
-      children_count: 0,
-      attachments: [],
-      user_primary_publication: undefined
+      body: 'Test note content',
+      attachments: []
     }
 
     mockPublicationClient.post.mockResolvedValue(mockPublishResponse)
