@@ -228,7 +228,7 @@ describe('PreviewPost Entity', () => {
 describe('FullPost Entity', () => {
   let mockHttpClient: jest.Mocked<HttpClient>
   let mockCommentService: jest.Mocked<CommentService>
-  let mockPostService: jest.Mocked<PostService>
+  let _mockPostService: jest.Mocked<PostService>
   let fullPost: FullPost
 
   beforeEach(() => {
@@ -243,7 +243,7 @@ describe('FullPost Entity', () => {
       getCommentById: jest.fn()
     } as unknown as jest.Mocked<CommentService>
 
-    mockPostService = {
+    _mockPostService = {
       getPostById: jest.fn(),
       getPostsForProfile: jest.fn()
     } as unknown as jest.Mocked<PostService>

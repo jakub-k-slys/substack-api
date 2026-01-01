@@ -1,6 +1,11 @@
 import type { HttpClient } from '@substack-api/internal/http-client'
-import type { SubstackFullProfile, SubstackUserProfile } from '@substack-api/internal/types'
-import type { PotentialHandles } from '@substack-api/internal/types/potential-handles'
+import {
+  SubstackFullProfileCodec,
+  SubstackUserProfileCodec,
+  PotentialHandlesCodec
+} from '@substack-api/internal/types'
+import type { SubstackFullProfile } from '@substack-api/internal/types'
+import { decodeOrThrow } from '@substack-api/internal/validation'
 
 /**
  * Service responsible for profile-related HTTP operations
@@ -10,7 +15,8 @@ export class ProfileService {
   constructor(private readonly substackClient: HttpClient) {}
 
   async getOwnSlug(): Promise<string> {
-    const data = await this.substackClient.get<PotentialHandles>('/handle/options')
+    const rawResponse = await this.substackClient.get<unknown>('/handle/options')
+    const data = decodeOrThrow(PotentialHandlesCodec, rawResponse, 'Potential handles response')
     const existingHandle = data.potentialHandles.filter((handle) => handle.type == 'existing')[0]
     return existingHandle.handle
   }
@@ -21,7 +27,8 @@ export class ProfileService {
    */
   async getOwnProfile(): Promise<SubstackFullProfile> {
     const ownSlug = await this.getOwnSlug()
-    return await this.substackClient.get<SubstackFullProfile>(`/user/${ownSlug}/public_profile`)
+    const rawResponse = await this.substackClient.get<unknown>(`/user/${ownSlug}/public_profile`)
+    return decodeOrThrow(SubstackFullProfileCodec, rawResponse, 'Full profile response')
   }
 
   /**
@@ -31,8 +38,11 @@ export class ProfileService {
    * @throws {Error} When profile is not found or API request fails
    */
   async getProfileById(id: number): Promise<SubstackFullProfile> {
-    const profileFeed = await this.substackClient.get<SubstackUserProfile>(
-      `/reader/feed/profile/${id}`
+    const rawProfileFeed = await this.substackClient.get<unknown>(`/reader/feed/profile/${id}`)
+    const profileFeed = decodeOrThrow(
+      SubstackUserProfileCodec,
+      rawProfileFeed,
+      'User profile feed response'
     )
 
     for (const item of profileFeed.items) {
@@ -55,6 +65,7 @@ export class ProfileService {
    * @throws {Error} When profile is not found or API request fails
    */
   async getProfileBySlug(slug: string): Promise<SubstackFullProfile> {
-    return await this.substackClient.get<SubstackFullProfile>(`/user/${slug}/public_profile`)
+    const rawResponse = await this.substackClient.get<unknown>(`/user/${slug}/public_profile`)
+    return decodeOrThrow(SubstackFullProfileCodec, rawResponse, 'Full profile response')
   }
 }

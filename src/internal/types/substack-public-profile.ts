@@ -1,21 +1,8 @@
-/**
- * Internal profile API response types
- */
-
-import type {
-  SubstackPublication,
-  SubstackPreviewPost,
-  SubstackComment
-} from '@substack-api/internal/types/api-responses'
-import type {
-  SubstackUser,
-  SubstackPublicationBase,
-  SubstackUserLink,
-  SubstackPublicationUser,
-  SubstackProfileSubscription,
-  SubstackTrackingParameters,
-  SubstackProfileItemContext
-} from '@substack-api/internal/types/common'
+import type { SubstackUser } from '@substack-api/internal/types/substack-user'
+import type { SubstackPublicationBase } from '@substack-api/internal/types/substack-publication-base'
+import type { SubstackUserLink } from '@substack-api/internal/types/substack-user-link'
+import type { SubstackPublicationUser } from '@substack-api/internal/types/substack-publication-user'
+import type { SubstackProfileSubscription } from '@substack-api/internal/types/substack-profile-subscription'
 
 export interface SubstackPublicProfile extends SubstackUser {
   tos_accepted_at?: string | null
@@ -48,21 +35,4 @@ export interface SubstackPublicProfile extends SubstackUser {
   followsViewer: boolean
   can_dm: boolean
   dm_upgrade_options: string[]
-}
-
-export interface SubstackUserProfile {
-  items: Array<{
-    entity_key: string
-    type: string
-    context: SubstackProfileItemContext
-    publication?: SubstackPublication | null
-    post?: SubstackPreviewPost | null
-    comment?: SubstackComment | null
-    parentComments: SubstackComment[]
-    canReply: boolean
-    isMuted: boolean
-    trackingParameters: SubstackTrackingParameters
-  }>
-  originalCursorTimestamp: string
-  nextCursor: string
 }

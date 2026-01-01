@@ -32,6 +32,7 @@ describe('PostService', () => {
         title: 'Test Post',
         slug: 'test-post',
         post_date: '2023-01-01T00:00:00Z',
+        canonical_url: 'https://example.com/test-post',
         body_html: '<p>Test post body content</p>'
       }
 
@@ -57,6 +58,7 @@ describe('PostService', () => {
         title: 'Another Test Post',
         slug: 'another-test-post',
         post_date: '2023-02-01T00:00:00Z',
+        canonical_url: 'https://example.com/another-test-post',
         body_html: '<p>Another test post body content</p>'
       }
 
