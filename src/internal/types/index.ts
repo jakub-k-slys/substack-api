@@ -5,7 +5,6 @@
 
 // API Response types with io-ts codecs
 export type { SubstackPublication } from '@substack-api/internal/types/substack-publication'
-export { SubstackPublicationCodec } from '@substack-api/internal/types/substack-publication'
 
 export type { SubstackPreviewPost } from '@substack-api/internal/types/substack-preview-post'
 export { SubstackPreviewPostCodec } from '@substack-api/internal/types/substack-preview-post'
@@ -30,10 +29,8 @@ export type { SubstackUser } from '@substack-api/internal/types/substack-user'
 export { SubstackUserCodec } from '@substack-api/internal/types/substack-user'
 
 export type { SubstackPublicationBase } from '@substack-api/internal/types/substack-publication-base'
-export { SubstackPublicationBaseCodec } from '@substack-api/internal/types/substack-publication-base'
 
 export type { SubstackTrackingParameters } from '@substack-api/internal/types/substack-tracking-parameters'
-export { SubstackTrackingParametersCodec } from '@substack-api/internal/types/substack-tracking-parameters'
 
 export type { SubstackProfileItemContext } from '@substack-api/internal/types/substack-profile-item-context'
 export { SubstackProfileItemContextCodec } from '@substack-api/internal/types/substack-profile-item-context'

@@ -1,21 +1,18 @@
 import * as t from 'io-ts'
 
 /**
- * Base user information that appears across different API responses
+ * Minimal user information codec - only validates fields actually used in the codebase
+ * Used fields: id, name, handle, photo_url, bio (optional)
  */
 export const SubstackUserCodec = t.intersection([
   t.type({
     id: t.number,
     name: t.string,
     handle: t.string,
-    photo_url: t.string,
-    profile_set_up_at: t.string,
-    reader_installed_at: t.string
+    photo_url: t.string
   }),
   t.partial({
-    previous_name: t.string,
-    bio: t.string,
-    bestseller_tier: t.union([t.number, t.null])
+    bio: t.string
   })
 ])
 
