@@ -68,7 +68,7 @@ export class SubstackClient {
     this.commentService = new CommentService(this.publicationClient)
     this.followingService = new FollowingService(this.publicationClient, this.substackClient)
     this.connectivityService = new ConnectivityService(this.substackClient)
-    this.newNoteService = new NewNoteService(this.publicationClient)
+    this.newNoteService = new NewNoteService(this.substackClient)
   }
 
   /**
