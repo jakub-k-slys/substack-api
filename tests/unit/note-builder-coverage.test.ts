@@ -297,7 +297,12 @@ describe('NoteBuilder - Coverage Tests', () => {
 
     beforeEach(() => {
       mockClient.post
-        .mockResolvedValueOnce({ id: 'attachment-123', type: 'link', publication: null, post: null }) // Attachment response
+        .mockResolvedValueOnce({
+          id: 'attachment-123',
+          type: 'link',
+          publication: null,
+          post: null
+        }) // Attachment response
         .mockResolvedValueOnce(createMockNoteResponse()) // Note response
       noteWithLinkBuilder = new NoteWithLinkBuilder(mockClient, 'https://example.com/test')
     })

@@ -14,7 +14,10 @@ export class ConnectivityService {
    */
   async isConnected(): Promise<boolean> {
     try {
-      await this.substackClient.get('/feed/following')
+      await this.substackClient.put('/user-setting', {
+        type: 'last_home_tab',
+        value_text: 'inbox'
+      })
       return true
     } catch {
       return false
