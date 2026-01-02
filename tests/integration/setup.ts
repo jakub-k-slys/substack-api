@@ -142,6 +142,37 @@ const createMockServer = (): Promise<{
         return
       }
 
+      // Handle PUT requests to /user-setting (connectivity check)
+      if (req.method === 'PUT' && req.url === '/user-setting') {
+        let body = ''
+        req.on('data', (chunk) => {
+          body += chunk.toString()
+        })
+        req.on('end', () => {
+          try {
+            // Parse and capture the request for verification
+            const requestData = JSON.parse(body)
+
+            // Capture the request for test verification
+            capturedRequests.push({
+              method: req.method!,
+              url: req.url!,
+              headers: req.headers as Record<string, string>,
+              body: requestData
+            })
+
+            // Return success response
+            res.writeHead(200)
+            res.end(JSON.stringify({ success: true }))
+          } catch (error) {
+            console.error('Error processing user-setting request:', error)
+            res.writeHead(400)
+            res.end(JSON.stringify({ error: 'Invalid JSON' }))
+          }
+        })
+        return
+      }
+
       // Map URLs to sample files for GET requests
       const samplePath = mapUrlToSampleFile(req.url || '')
 

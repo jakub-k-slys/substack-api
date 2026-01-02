@@ -8,7 +8,8 @@ import type {
   PostService,
   NoteService,
   FollowingService,
-  CommentService
+  CommentService,
+  NewNoteService
 } from '@substack-api/internal/services'
 
 /**
@@ -23,6 +24,7 @@ export class OwnProfile extends Profile {
     noteService: NoteService,
     commentService: CommentService,
     private readonly followingService: FollowingService,
+    private readonly newNoteService: NewNoteService,
     perPage: number,
     resolvedSlug?: string
   ) {
@@ -42,14 +44,14 @@ export class OwnProfile extends Profile {
    * Create a new note using the builder pattern
    */
   newNote(): NoteBuilder {
-    return new NoteBuilder(this.publicationClient)
+    return this.newNoteService.newNote()
   }
 
   /**
    * Create a new note with a link attachment using the builder pattern
    */
   newNoteWithLink(link: string): NoteWithLinkBuilder {
-    return new NoteWithLinkBuilder(this.publicationClient, link)
+    return this.newNoteService.newNoteWithLink(link)
   }
 
   /**

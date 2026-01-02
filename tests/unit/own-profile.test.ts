@@ -1,13 +1,14 @@
 import { OwnProfile } from '@substack-api/domain/own-profile'
 import { Note } from '@substack-api/domain/note'
 import { Profile } from '@substack-api/domain/profile'
-import { NoteBuilder } from '@substack-api/domain/note-builder'
+import { NoteBuilder, NoteWithLinkBuilder } from '@substack-api/domain/note-builder'
 import {
   ProfileService,
   PostService,
   NoteService,
   CommentService,
-  FollowingService
+  FollowingService,
+  NewNoteService
 } from '@substack-api/internal/services'
 import type { SubstackFullProfile } from '@substack-api/internal'
 import type { HttpClient } from '@substack-api/internal/http-client'
@@ -19,6 +20,7 @@ describe('OwnProfile Entity', () => {
   let mockCommentService: jest.Mocked<CommentService>
   let mockNoteService: jest.Mocked<NoteService>
   let mockFollowingService: jest.Mocked<FollowingService>
+  let mockNewNoteService: jest.Mocked<NewNoteService>
   let ownProfile: OwnProfile
 
   beforeEach(() => {
@@ -64,6 +66,13 @@ describe('OwnProfile Entity', () => {
       getFollowing: jest.fn()
     } as unknown as jest.Mocked<FollowingService>
 
+    mockNewNoteService = {
+      newNote: jest.fn().mockImplementation(() => new NoteBuilder(mockClient)),
+      newNoteWithLink: jest
+        .fn()
+        .mockImplementation((link: string) => new NoteWithLinkBuilder(mockClient, link))
+    } as unknown as jest.Mocked<NewNoteService>
+
     ownProfile = new OwnProfile(
       mockProfileData,
       mockClient,
@@ -72,6 +81,7 @@ describe('OwnProfile Entity', () => {
       mockNoteService,
       mockCommentService,
       mockFollowingService,
+      mockNewNoteService,
       25
     )
   })
@@ -286,6 +296,7 @@ describe('OwnProfile Entity', () => {
       mockNoteService,
       mockCommentService,
       localFollowingService,
+      mockNewNoteService,
       25,
       'resolved-own-slug'
     )

@@ -20,7 +20,7 @@ describe('SubstackClient Integration Tests', () => {
       test('should test API connectivity', async () => {
         const result = await client.testConnectivity()
         expect(typeof result).toBe('boolean')
-        // Returns true since /feed/following endpoint returns valid data in mock server
+        // Returns true since /user-setting endpoint returns success in mock server
         expect(result).toBe(true)
       })
     })

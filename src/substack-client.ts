@@ -6,7 +6,8 @@ import {
   FollowingService,
   NoteService,
   PostService,
-  ProfileService
+  ProfileService,
+  NewNoteService
 } from '@substack-api/internal/services'
 import type { SubstackConfig } from '@substack-api/types'
 
@@ -22,6 +23,7 @@ export class SubstackClient {
   private readonly commentService: CommentService
   private readonly followingService: FollowingService
   private readonly connectivityService: ConnectivityService
+  private readonly newNoteService: NewNoteService
   private readonly perPage: number
 
   /**
@@ -66,6 +68,7 @@ export class SubstackClient {
     this.commentService = new CommentService(this.publicationClient)
     this.followingService = new FollowingService(this.publicationClient, this.substackClient)
     this.connectivityService = new ConnectivityService(this.substackClient)
+    this.newNoteService = new NewNoteService(this.publicationClient)
   }
 
   /**
@@ -91,6 +94,7 @@ export class SubstackClient {
         this.noteService,
         this.commentService,
         this.followingService,
+        this.newNoteService,
         this.perPage,
         profile.handle
       )
