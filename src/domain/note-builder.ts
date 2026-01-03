@@ -1,9 +1,9 @@
 import {
+  CreateAttachmentRequest,
+  CreateAttachmentResponseCodec,
   PublishNoteRequest,
   PublishNoteResponse,
-  PublishNoteResponseCodec,
-  CreateAttachmentRequest,
-  CreateAttachmentResponseCodec
+  PublishNoteResponseCodec
 } from '@substack-api/internal'
 import { HttpClient } from '@substack-api/internal/http-client'
 import { decodeOrThrow } from '@substack-api/internal/validation'
@@ -309,7 +309,7 @@ export class NoteBuilder {
   protected readonly state: NoteBuilderState
 
   constructor(
-    protected readonly publicationClient: HttpClient,
+    protected readonly substackClient: HttpClient,
     state: NoteBuilderState = { paragraphs: [] }
   ) {
     this.state = state
@@ -319,7 +319,7 @@ export class NoteBuilder {
    * Add a paragraph to the note (used by ParagraphBuilder)
    */
   addParagraph(paragraph: { segments: TextSegment[]; lists: List[] }): NoteBuilder {
-    return new NoteBuilder(this.publicationClient, {
+    return new NoteBuilder(this.substackClient, {
       paragraphs: [...this.state.paragraphs, paragraph],
       attachmentIds: this.state.attachmentIds
     })
@@ -439,8 +439,8 @@ export class NoteBuilder {
    * Publish the note
    */
   async publish(): Promise<PublishNoteResponse> {
-    const rawResponse = await this.publicationClient.post<unknown>(
-      '/comment/feed',
+    const rawResponse = await this.substackClient.post<unknown>(
+      '/comment/feed/',
       this.toNoteRequest()
     )
     return decodeOrThrow(PublishNoteResponseCodec, rawResponse, 'Publish note response')
@@ -452,29 +452,20 @@ export class NoteBuilder {
  */
 export class NoteWithLinkBuilder extends NoteBuilder {
   constructor(
-    publicationClient: HttpClient,
+    substackClient: HttpClient,
     private readonly linkUrl: string
   ) {
-    super(publicationClient)
+    super(substackClient)
   }
 
   /**
    * Add a paragraph to the note (used by ParagraphBuilder) - returns NoteWithLinkBuilder to preserve attachment logic
    */
   addParagraph(paragraph: { segments: TextSegment[]; lists: List[] }): NoteWithLinkBuilder {
-    return new NoteWithLinkBuilder(this.publicationClient, this.linkUrl).copyState({
+    return new NoteWithLinkBuilder(this.substackClient, this.linkUrl).copyState({
       paragraphs: [...this.state.paragraphs, paragraph],
       attachmentIds: this.state.attachmentIds
     })
-  }
-
-  /**
-   * Copy state to new instance - helper method
-   */
-  private copyState(state: NoteBuilderState): NoteWithLinkBuilder {
-    const newBuilder = new NoteWithLinkBuilder(this.publicationClient, this.linkUrl)
-    ;(newBuilder as any).state = state
-    return newBuilder
   }
 
   /**
@@ -487,8 +478,8 @@ export class NoteWithLinkBuilder extends NoteBuilder {
       type: 'link'
     }
 
-    const rawAttachmentResponse = await this.publicationClient.post<unknown>(
-      '/comment/attachment',
+    const rawAttachmentResponse = await this.substackClient.post<unknown>(
+      '/comment/attachment/',
       attachmentRequest
     )
     const attachmentResponse = decodeOrThrow(
@@ -507,8 +498,17 @@ export class NoteWithLinkBuilder extends NoteBuilder {
     const request = this.toNoteRequestWithState(updatedState)
 
     // Publish the note with attachment
-    const rawPublishResponse = await this.publicationClient.post<unknown>('/comment/feed', request)
+    const rawPublishResponse = await this.substackClient.post<unknown>('/comment/feed/', request)
     return decodeOrThrow(PublishNoteResponseCodec, rawPublishResponse, 'Publish note response')
+  }
+
+  /**
+   * Copy state to new instance - helper method
+   */
+  private copyState(state: NoteBuilderState): NoteWithLinkBuilder {
+    const newBuilder = new NoteWithLinkBuilder(this.substackClient, this.linkUrl)
+    ;(newBuilder as any).state = state
+    return newBuilder
   }
 
   /**

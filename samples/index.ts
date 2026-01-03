@@ -80,19 +80,19 @@ async function runExample(): Promise<void> {
     // 2. Test connectivity
     console.log('\n📡 Testing API connectivity...')
     const isConnected = await client.testConnectivity()
-    
+
     if (!isConnected) {
       console.log('❌ Failed to connect to Substack API')
       console.log('Please check your API key and network connection')
       process.exit(1)
     }
-    
+
     console.log('✅ API connectivity verified')
 
     // 3. Get own profile
     console.log('\n👤 Fetching your profile...')
     const profile = await client.ownProfile()
-    
+
     console.log(`📋 Profile Information:`)
     console.log(`   Name: ${profile.name}`)
     console.log(`   Handle: @${profile.slug}`)
@@ -103,22 +103,22 @@ async function runExample(): Promise<void> {
 
     // 4. List recent posts
     console.log('\n📰 Fetching your 3 most recent posts...')
-  
+
     try {
       for await (const post of profile.posts({ limit: 3 })) {
         console.log(`   "${post.title}"`)
         if (post.body) {
-          const bodyPreview = post.body.length > 100 ? 
-            post.body.substring(0, 97) + '...' : 
-            post.body
+          const bodyPreview =
+            post.body.length > 100 ? post.body.substring(0, 97) + '...' : post.body
           console.log(`      Description: ${bodyPreview}`)
         }
-        console.log(`      Published: ${post.publishedAt ? post.publishedAt.toLocaleDateString() : 'Unknown'}`)
+        console.log(
+          `      Published: ${post.publishedAt ? post.publishedAt.toLocaleDateString() : 'Unknown'}`
+        )
         console.log(`      Author: ${post.author.name} (@${post.author.handle})`)
         console.log(`      Post ID: ${post.id}`)
         console.log('')
       }
-  
     } catch (error) {
       console.log(`   ⚠️  Could not fetch posts: ${(error as Error).message}`)
     }
@@ -127,16 +127,15 @@ async function runExample(): Promise<void> {
     console.log('\n📝 Fetching your 3 most recent notes...')
     try {
       for await (const note of profile.notes({ limit: 3 })) {
-        const preview = note.body.length > 100 ? 
-          note.body.substring(0, 97) + '...' : 
-          note.body
-        
+        const preview = note.body.length > 100 ? note.body.substring(0, 97) + '...' : note.body
+
         console.log(`     "${preview}"`)
-        console.log(`      Date: ${note.publishedAt ? note.publishedAt.toLocaleDateString() : 'Unknown'}`)
+        console.log(
+          `      Date: ${note.publishedAt ? note.publishedAt.toLocaleDateString() : 'Unknown'}`
+        )
         console.log(`      Author: ${note.author.name} (@${note.author.handle})`)
         console.log('')
       }
-    
     } catch (error) {
       console.log(`   ⚠️  Could not fetch notes: ${(error as Error).message}`)
     }
@@ -147,15 +146,12 @@ async function runExample(): Promise<void> {
       for await (const user of profile.following({ limit: 3 })) {
         console.log(`   ${user.name} (@${user.slug})`)
         if (user.bio) {
-          const bioPrev = user.bio.length > 80 ?
-            user.bio.substring(0, 77) + '...' :
-            user.bio
+          const bioPrev = user.bio.length > 80 ? user.bio.substring(0, 77) + '...' : user.bio
           console.log(`      Bio: ${bioPrev}`)
         }
         console.log(`      URL: ${user.url}`)
         console.log('')
       }
-
     } catch (error) {
       console.log(`   ⚠️  Could not fetch following: ${(error as Error).message}`)
     }
@@ -175,16 +171,15 @@ async function runExample(): Promise<void> {
     console.log('\n📝 Fetching your 3 most recent notes...')
     try {
       for await (const note of foreignProfile.notes({ limit: 3 })) {
-        const preview = note.body.length > 100 ? 
-          note.body.substring(0, 97) + '...' : 
-          note.body
-        
+        const preview = note.body.length > 100 ? note.body.substring(0, 97) + '...' : note.body
+
         console.log(`"${preview}"`)
-        console.log(`      Date: ${note.publishedAt ? note.publishedAt.toLocaleDateString() : 'Unknown'}`)
+        console.log(
+          `      Date: ${note.publishedAt ? note.publishedAt.toLocaleDateString() : 'Unknown'}`
+        )
         console.log(`      Author: ${note.author.name} (@${note.author.handle})`)
         console.log('')
       }
-      
     } catch (error) {
       console.log(`   ⚠️  Could not fetch notes: ${(error as Error).message}`)
     }
@@ -194,16 +189,16 @@ async function runExample(): Promise<void> {
       for await (const post of foreignProfile.posts({ limit: 3 })) {
         console.log(`   "${post.title}"`)
         if (post.body) {
-          const bodyPreview = post.body.length > 100 ? 
-            post.body.substring(0, 97) + '...' : 
-            post.body
+          const bodyPreview =
+            post.body.length > 100 ? post.body.substring(0, 97) + '...' : post.body
           console.log(`      Description: ${bodyPreview}`)
         }
-        console.log(`      Published: ${post.publishedAt ? post.publishedAt.toLocaleDateString() : 'Unknown'}`)
+        console.log(
+          `      Published: ${post.publishedAt ? post.publishedAt.toLocaleDateString() : 'Unknown'}`
+        )
         console.log(`      Author: ${post.author.name} (@${post.author.handle})`)
         console.log('')
       }
-  
     } catch (error) {
       console.log(`   ⚠️  Could not fetch posts: ${(error as Error).message}`)
     }
@@ -213,7 +208,7 @@ async function runExample(): Promise<void> {
     try {
       const postId = 176729823 // Real post ID from sample data
       const fullPost = await client.postForId(postId)
-      
+
       console.log(`📋 Full Post Information:`)
       console.log(`   Title: "${fullPost.title}"`)
       console.log(`   Subtitle: "${fullPost.subtitle}"`)
@@ -221,41 +216,41 @@ async function runExample(): Promise<void> {
       console.log(`   Published: ${fullPost.publishedAt.toLocaleDateString()}`)
       console.log(`   Created: ${fullPost.createdAt.toLocaleDateString()}`)
       console.log(`   URL: ${fullPost.url}`)
-      
+
       if (fullPost.htmlBody) {
-        const htmlPreview = fullPost.htmlBody.length > 200 ? 
-          fullPost.htmlBody.substring(0, 197) + '...' : 
-          fullPost.htmlBody
+        const htmlPreview =
+          fullPost.htmlBody.length > 200
+            ? fullPost.htmlBody.substring(0, 197) + '...'
+            : fullPost.htmlBody
         console.log(`   HTML Content: ${htmlPreview}`)
       }
-      
+
       if (fullPost.postTags && fullPost.postTags.length > 0) {
         console.log(`   Tags: [${fullPost.postTags.join(', ')}]`)
       }
-      
+
       if (fullPost.reactions && Object.keys(fullPost.reactions).length > 0) {
         const reactionsStr = Object.entries(fullPost.reactions)
           .map(([emoji, count]) => `${emoji}: ${count}`)
           .join(', ')
         console.log(`   Reactions: {${reactionsStr}}`)
       }
-      
+
       if (fullPost.restacks !== undefined) {
         console.log(`   Restacks: ${fullPost.restacks}`)
       }
-      
+
       if (fullPost.coverImage) {
         console.log(`   Cover Image: ${fullPost.coverImage}`)
       }
-      
     } catch (error) {
       console.log(`   ⚠️  Could not fetch full post: ${(error as Error).message}`)
     }
 
     // 9. Creating notes (COMMENTED OUT - uncomment to test note creation)
-
-    console.log('\n📝 Note Creation Examples (commented out to prevent accidental publishing)')
 /*
+    console.log('\n📝 Note Creation Examples (commented out to prevent accidental publishing)')
+
     // Example: Create a simple note
     console.log('\n📝 Creating a simple note...')
     try {
@@ -278,89 +273,87 @@ async function runExample(): Promise<void> {
       console.log(`✅ Note published successfully!`)
       console.log(`   Note ID: ${noteResponse.id}`)
       console.log(`   Published at: ${noteResponse.date}`)
-      
     } catch (error) {
       console.log(`   ❌ Failed to create note: ${(error as Error).message}`)
     }
+        // Example: Create a note with link attachment
+        console.log('\n🔗 Creating a note with link attachment...')
+        try {
+          const noteWithLinkResponse = await profile
+            .newNoteWithLink('https://iam.slys.dev/p/friends-bring-friends')
+            .paragraph()
+            .text('Check out the ')
+            .bold('Substack API documentation')
+            .text(' - it has everything you need to get started!')
+            .paragraph()
+            .text('Key features covered:')
+            .bulletList()
+            .item()
+            .text('Authentication and setup')
+            .item()
+            .text('Profile and content management')
+            .item()
+            .text('Social features like following users')
+            .item()
+            .text('Advanced formatting options')
+            .finish()
+            .paragraph()
+            .text('The link is automatically attached to this note. 📎')
+            .publish()
 
-    // Example: Create a note with link attachment
-    console.log('\n🔗 Creating a note with link attachment...')
-    try {
-      const noteWithLinkResponse = await profile
-        .newNoteWithLink('https://iam.slys.dev/p/friends-bring-friends')
-        .paragraph()
-        .text('Check out the ')
-        .bold('Substack API documentation')
-        .text(' - it has everything you need to get started!')
-        .paragraph()
-        .text('Key features covered:')
-        .bulletList()
-        .item()
-        .text('Authentication and setup')
-        .item()
-        .text('Profile and content management')
-        .item()
-        .text('Social features like following users')
-        .item()
-        .text('Advanced formatting options')
-        .finish()
-        .paragraph()
-        .text('The link is automatically attached to this note. 📎')
-        .publish()
+          console.log(`✅ Note with link attachment published successfully!`)
+          console.log(`   Note ID: ${noteWithLinkResponse.id}`)
+          console.log(`   Published at: ${noteWithLinkResponse.date}`)
+          console.log(`   Attachments: ${noteWithLinkResponse.attachments?.length || 0}`)
 
-      console.log(`✅ Note with link attachment published successfully!`)
-      console.log(`   Note ID: ${noteWithLinkResponse.id}`)
-      console.log(`   Published at: ${noteWithLinkResponse.date}`)
-      console.log(`   Attachments: ${noteWithLinkResponse.attachments?.length || 0}`)
-      
-    } catch (error) {
-      console.log(`   ❌ Failed to create note with link: ${(error as Error).message}`)
-    }
+        } catch (error) {
+          console.log(`   ❌ Failed to create note with link: ${(error as Error).message}`)
+        }
 
-    // Example: Create a complex formatted note
-    console.log('\n✨ Creating a complex formatted note...')
-    try {
-      const complexNoteResponse = await profile
-        .newNote()
-        .paragraph()
-        .text('🎯 ')
-        .bold('Weekly Development Update')
-        .paragraph()
-        .text('This week I focused on:')
-        .numberedList()
-        .item()
-        .bold('API Integration')
-        .text(' - Connected to ')
-        .link('Substack API', 'https://substack.com/api')
-        .item()
-        .italic('Code Quality')
-        .text(' - Added comprehensive ')
-        .code('unit tests')
-        .item()
-        .underline('Documentation')
-        .text(' - Updated README and examples')
-        .finish()
-        .paragraph()
-        .text('Next week\'s priorities:')
-        .bulletList()
-        .item()
-        .text('Performance optimization')
-        .item()
-        .text('Error handling improvements')
-        .item()
-        .text('Integration testing')
-        .finish()
-        .paragraph()
-        .text('Feel free to reach out with any questions! 💬')
-        .publish()
+        // Example: Create a complex formatted note
+        console.log('\n✨ Creating a complex formatted note...')
+        try {
+          const complexNoteResponse = await profile
+            .newNote()
+            .paragraph()
+            .text('🎯 ')
+            .bold('Weekly Development Update')
+            .paragraph()
+            .text('This week I focused on:')
+            .numberedList()
+            .item()
+            .bold('API Integration')
+            .text(' - Connected to ')
+            .link('Substack API', 'https://substack.com/api')
+            .item()
+            .italic('Code Quality')
+            .text(' - Added comprehensive ')
+            .code('unit tests')
+            .item()
+            .underline('Documentation')
+            .text(' - Updated README and examples')
+            .finish()
+            .paragraph()
+            .text('Next week\'s priorities:')
+            .bulletList()
+            .item()
+            .text('Performance optimization')
+            .item()
+            .text('Error handling improvements')
+            .item()
+            .text('Integration testing')
+            .finish()
+            .paragraph()
+            .text('Feel free to reach out with any questions! 💬')
+            .publish()
 
-      console.log(`✅ Complex formatted note published successfully!`)
-      console.log(`   Note ID: ${complexNoteResponse.id}`)
-      console.log(`   Content length: ${complexNoteResponse.body?.length || 0} characters`)
-      
-    } catch (error) {
-      console.log(`   ❌ Failed to create complex note: ${(error as Error).message}`)
-    }
+          console.log(`✅ Complex formatted note published successfully!`)
+          console.log(`   Note ID: ${complexNoteResponse.id}`)
+          console.log(`   Content length: ${complexNoteResponse.body?.length || 0} characters`)
+
+        } catch (error) {
+          console.log(`   ❌ Failed to create complex note: ${(error as Error).message}`)
+        }
 */
     console.log('   💡 To test note creation, uncomment the examples above')
     console.log('   ⚠️  Warning: Uncommenting will publish real notes to your Substack!')
@@ -368,7 +361,6 @@ async function runExample(): Promise<void> {
     console.log('\n✨ Example completed successfully!')
     console.log('💡 This example demonstrates basic Substack API usage.')
     console.log('   For more advanced features, check out the full documentation.')
-
   } catch (error) {
     console.error('\n❌ Error running example:')
     console.error((error as Error).message)

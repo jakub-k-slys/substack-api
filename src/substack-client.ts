@@ -4,10 +4,10 @@ import {
   CommentService,
   ConnectivityService,
   FollowingService,
+  NewNoteService,
   NoteService,
   PostService,
-  ProfileService,
-  NewNoteService
+  ProfileService
 } from '@substack-api/internal/services'
 import type { SubstackConfig } from '@substack-api/types'
 
@@ -43,7 +43,7 @@ export class SubstackClient {
     const normalizedSubstackUrl = SubstackClient.normalizeUrl(config.substackUrl || 'substack.com')
 
     // Determine URL prefix
-    const urlPrefix = config.urlPrefix !== undefined ? config.urlPrefix : 'api/v1/'
+    const urlPrefix = config.urlPrefix !== undefined ? config.urlPrefix : 'api/v1'
 
     // Store configuration
     this.perPage = config.perPage || 25
