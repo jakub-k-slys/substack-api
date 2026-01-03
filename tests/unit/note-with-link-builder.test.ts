@@ -74,7 +74,7 @@ describe('NoteWithLinkBuilder', () => {
       expect(mockClient.post).toHaveBeenCalledTimes(2)
 
       // Verify first call was attachment creation
-      expect(mockClient.post).toHaveBeenNthCalledWith(1, '/comment/attachment', {
+      expect(mockClient.post).toHaveBeenNthCalledWith(1, '/comment/attachment/', {
         url: 'https://example.com/test',
         type: 'link'
       })
@@ -82,7 +82,7 @@ describe('NoteWithLinkBuilder', () => {
       // Verify second call was note publish with attachment ID
       expect(mockClient.post).toHaveBeenNthCalledWith(
         2,
-        '/comment/feed',
+        '/comment/feed/',
         expect.objectContaining({
           attachmentIds: ['19b5d6f9-46db-47d6-b381-17cb5f443c00'],
           bodyJson: {
@@ -172,7 +172,7 @@ describe('NoteWithLinkBuilder', () => {
       expect(mockClient.post).toHaveBeenCalledTimes(2)
 
       // Verify first call was attachment creation
-      expect(mockClient.post).toHaveBeenNthCalledWith(1, '/comment/attachment', {
+      expect(mockClient.post).toHaveBeenNthCalledWith(1, '/comment/attachment/', {
         url: 'https://example.com/test',
         type: 'link'
       })
@@ -180,7 +180,7 @@ describe('NoteWithLinkBuilder', () => {
       // Verify the complex structure was preserved in the note publish
       expect(mockClient.post).toHaveBeenNthCalledWith(
         2,
-        '/comment/feed',
+        '/comment/feed/',
         expect.objectContaining({
           attachmentIds: ['attachment-id-123'],
           bodyJson: {
@@ -228,7 +228,7 @@ describe('NoteWithLinkBuilder', () => {
 
       // Verify only the attachment call was made
       expect(mockClient.post).toHaveBeenCalledTimes(1)
-      expect(mockClient.post).toHaveBeenNthCalledWith(1, '/comment/attachment', {
+      expect(mockClient.post).toHaveBeenNthCalledWith(1, '/comment/attachment/', {
         url: 'https://example.com/test',
         type: 'link'
       })

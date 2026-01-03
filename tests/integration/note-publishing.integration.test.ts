@@ -37,7 +37,7 @@ describe('note publishing tests', () => {
     const capturedRequest = global.INTEGRATION_SERVER.capturedRequests[0]
 
     expect(capturedRequest.method).toBe('POST')
-    expect(capturedRequest.url).toBe('/comment/feed')
+    expect(capturedRequest.url).toBe('/comment/feed/')
 
     const expectedRequestPath = join(process.cwd(), 'samples', 'api', 'v1', 'comment', 'feed')
     const expectedRequestData = JSON.parse(readFileSync(expectedRequestPath, 'utf8'))

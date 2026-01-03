@@ -34,7 +34,11 @@ describe('HttpClient', () => {
         baseURL: 'https://test.substack.com',
         headers: {
           Cookie: 'substack.sid=test-api-key',
-          'Content-Type': 'application/json'
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'User-Agent':
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Safari/605.1.15',
+          'Accept-Encoding': 'gzip, deflate, br'
         }
       })
       expect(client).toBeDefined()

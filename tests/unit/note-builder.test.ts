@@ -35,7 +35,7 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
       const builder = new NoteBuilder(mockPublicationClient)
       const result = await builder.paragraph().text('my test text').publish()
 
-      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
@@ -69,7 +69,7 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
         .text('my test text2')
         .publish()
 
-      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
@@ -114,7 +114,7 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
         .text('my test text2')
         .publish()
 
-      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
@@ -170,7 +170,7 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
         .text('regular again')
         .publish()
 
-      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
@@ -231,7 +231,7 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
         .text(' in the text')
         .publish()
 
-      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
@@ -275,7 +275,7 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
         .code('code text')
         .publish()
 
-      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
@@ -330,7 +330,7 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
         .text('Second paragraph')
         .publish()
 
-      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
@@ -366,7 +366,7 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
       const builder = new NoteBuilder(mockPublicationClient)
       const result = await builder.paragraph().text('Only paragraph').publish()
 
-      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },

@@ -293,7 +293,7 @@ describe('NoteBuilder', () => {
       const builder = new NoteBuilder(mockPublicationClient)
       const result = await builder.paragraph().text('Test content').publish()
 
-      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },

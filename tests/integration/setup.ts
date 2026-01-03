@@ -48,8 +48,8 @@ const createMockServer = (): Promise<{
         return
       }
 
-      // Handle POST requests to /comment/attachment (attachment creation)
-      if (req.method === 'POST' && req.url === '/comment/attachment') {
+      // Handle POST requests to /comment/attachment/ (attachment creation)
+      if (req.method === 'POST' && req.url === '/comment/attachment/') {
         let body = ''
         req.on('data', (chunk) => {
           body += chunk.toString()
@@ -95,8 +95,8 @@ const createMockServer = (): Promise<{
         return
       }
 
-      // Handle POST requests to /comment/feed (note publishing)
-      if (req.method === 'POST' && req.url === '/comment/feed') {
+      // Handle POST requests to /comment/feed/ (note publishing)
+      if (req.method === 'POST' && req.url === '/comment/feed/') {
         let body = ''
         req.on('data', (chunk) => {
           body += chunk.toString()

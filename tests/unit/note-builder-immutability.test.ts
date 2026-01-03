@@ -54,7 +54,7 @@ describe('NoteBuilder Immutability', () => {
       const resultB = await branchB.publish()
 
       // Verify the first call (Branch A)
-      expect(mockPublicationClient.post).toHaveBeenNthCalledWith(1, '/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenNthCalledWith(1, '/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
@@ -81,7 +81,7 @@ describe('NoteBuilder Immutability', () => {
       })
 
       // Verify the second call (Branch B)
-      expect(mockPublicationClient.post).toHaveBeenNthCalledWith(2, '/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenNthCalledWith(2, '/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
@@ -182,7 +182,7 @@ describe('NoteBuilder Immutability', () => {
         .text(' text')
         .publish()
 
-      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
