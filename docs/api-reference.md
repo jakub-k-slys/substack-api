@@ -16,16 +16,16 @@ Creates a new SubstackClient instance with cookie-based authentication.
 
 **Parameters:**
 - `config`: Configuration object (required)
-  - `apiKey`: Your substack.sid cookie value (required)
-  - `hostname` (optional): Publication hostname (default: 'substack.com')
+  - `token`: Your substack.sid cookie value (required)
+  - `publicationUrl` (optional): Publication URL (default: 'substack.com')
 
 **Example:**
 ```typescript
 import { SubstackClient } from 'substack-api';
 
 const client = new SubstackClient({
-  apiKey: 'your-connect-sid-cookie-value',
-  hostname: 'example.substack.com'
+  token: 'your-connect-sid-cookie-value',
+  publicationUrl: 'example.substack.com'
 });
 ```
 
@@ -535,8 +535,8 @@ try {
 
 ```typescript
 interface SubstackConfig {
-  apiKey: string;        // substack.sid cookie value
-  hostname?: string;     // publication hostname (optional)
+  token: string;             // substack.sid cookie value
+  publicationUrl?: string;   // publication URL (optional)
 }
 ```
 
@@ -564,7 +564,7 @@ interface IteratorOptions {
 
 ```typescript
 const client = new SubstackClient({
-  apiKey: process.env.SUBSTACK_API_KEY!
+  token: process.env.SUBSTACK_TOKEN!
 });
 
 const isConnected = await client.testConnectivity();

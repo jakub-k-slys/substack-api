@@ -1,8 +1,8 @@
-import { NoteWithLinkBuilder } from '@/domain/note-builder'
-import { HttpClient } from '@/internal/http-client'
+import { NoteWithLinkBuilder } from '@substack-api/domain/note-builder'
+import { HttpClient } from '@substack-api/internal/http-client'
 
 // Mock HttpClient
-jest.mock('@/internal/http-client')
+jest.mock('@substack-api/internal/http-client')
 const MockHttpClient = HttpClient as jest.MockedClass<typeof HttpClient>
 
 describe('NoteWithLinkBuilder', () => {
@@ -10,10 +10,10 @@ describe('NoteWithLinkBuilder', () => {
   let builder: NoteWithLinkBuilder
 
   beforeEach(() => {
-    mockClient = new MockHttpClient('https://example.com', {
-      hostname: 'example.com',
-      apiKey: 'test-api-key'
-    }) as jest.Mocked<HttpClient>
+    mockClient = new MockHttpClient(
+      'https://example.com',
+      'test-api-key'
+    ) as jest.Mocked<HttpClient>
     builder = new NoteWithLinkBuilder(mockClient, 'https://example.com/test')
   })
 
@@ -74,7 +74,7 @@ describe('NoteWithLinkBuilder', () => {
       expect(mockClient.post).toHaveBeenCalledTimes(2)
 
       // Verify first call was attachment creation
-      expect(mockClient.post).toHaveBeenNthCalledWith(1, '/api/v1/comment/attachment', {
+      expect(mockClient.post).toHaveBeenNthCalledWith(1, '/comment/attachment/', {
         url: 'https://example.com/test',
         type: 'link'
       })
@@ -82,7 +82,7 @@ describe('NoteWithLinkBuilder', () => {
       // Verify second call was note publish with attachment ID
       expect(mockClient.post).toHaveBeenNthCalledWith(
         2,
-        '/api/v1/comment/feed',
+        '/comment/feed/',
         expect.objectContaining({
           attachmentIds: ['19b5d6f9-46db-47d6-b381-17cb5f443c00'],
           bodyJson: {
@@ -172,7 +172,7 @@ describe('NoteWithLinkBuilder', () => {
       expect(mockClient.post).toHaveBeenCalledTimes(2)
 
       // Verify first call was attachment creation
-      expect(mockClient.post).toHaveBeenNthCalledWith(1, '/api/v1/comment/attachment', {
+      expect(mockClient.post).toHaveBeenNthCalledWith(1, '/comment/attachment/', {
         url: 'https://example.com/test',
         type: 'link'
       })
@@ -180,7 +180,7 @@ describe('NoteWithLinkBuilder', () => {
       // Verify the complex structure was preserved in the note publish
       expect(mockClient.post).toHaveBeenNthCalledWith(
         2,
-        '/api/v1/comment/feed',
+        '/comment/feed/',
         expect.objectContaining({
           attachmentIds: ['attachment-id-123'],
           bodyJson: {
@@ -228,7 +228,7 @@ describe('NoteWithLinkBuilder', () => {
 
       // Verify only the attachment call was made
       expect(mockClient.post).toHaveBeenCalledTimes(1)
-      expect(mockClient.post).toHaveBeenNthCalledWith(1, '/api/v1/comment/attachment', {
+      expect(mockClient.post).toHaveBeenNthCalledWith(1, '/comment/attachment/', {
         url: 'https://example.com/test',
         type: 'link'
       })

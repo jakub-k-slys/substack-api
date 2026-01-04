@@ -1,8 +1,13 @@
-import type { SubstackPublicProfile, SubstackFullProfile } from '@/internal'
-import type { HttpClient } from '@/internal/http-client'
-import type { ProfileService, CommentService, PostService, NoteService } from '@/internal/services'
-import { PreviewPost } from '@/domain/post'
-import { Note } from '@/domain/note'
+import type { SubstackPublicProfile, SubstackFullProfile } from '@substack-api/internal'
+import type { HttpClient } from '@substack-api/internal/http-client'
+import type {
+  ProfileService,
+  CommentService,
+  PostService,
+  NoteService
+} from '@substack-api/internal/services'
+import { PreviewPost } from '@substack-api/domain/post'
+import { Note } from '@substack-api/domain/note'
 
 /**
  * Base Profile class representing a Substack user profile (read-only)
@@ -18,11 +23,12 @@ export class Profile {
 
   constructor(
     protected readonly rawData: SubstackPublicProfile | SubstackFullProfile,
-    protected readonly client: HttpClient,
+    protected readonly publicationClient: HttpClient,
     protected readonly profileService: ProfileService,
     protected readonly postService: PostService,
     protected readonly noteService: NoteService,
     protected readonly commentService: CommentService,
+    protected readonly perPage: number,
     resolvedSlug?: string
   ) {
     this.id = rawData.id
@@ -40,14 +46,12 @@ export class Profile {
    */
   async *posts(options: { limit?: number } = {}): AsyncIterable<PreviewPost> {
     try {
-      // Get the perPage configuration from the client
-      const perPageConfig = this.client.getPerPage()
       let offset = 0
       let totalYielded = 0
 
       while (true) {
         const postsData = await this.postService.getPostsForProfile(this.id, {
-          limit: perPageConfig,
+          limit: this.perPage,
           offset
         })
 
@@ -59,16 +63,21 @@ export class Profile {
           if (options.limit && totalYielded >= options.limit) {
             return // Stop if we've reached the requested limit
           }
-          yield new PreviewPost(postData, this.client, this.commentService, this.postService)
+          yield new PreviewPost(
+            postData,
+            this.publicationClient,
+            this.commentService,
+            this.postService
+          )
           totalYielded++
         }
 
         // If we got fewer posts than requested, we've reached the end
-        if (postsData.length < perPageConfig) {
+        if (postsData.length < this.perPage) {
           break
         }
 
-        offset += perPageConfig
+        offset += this.perPage
       }
     } catch (error) {
       console.log(error)
@@ -99,7 +108,7 @@ export class Profile {
           if (options.limit && totalYielded >= options.limit) {
             return // Stop if we've reached the requested limit
           }
-          yield new Note(item, this.client)
+          yield new Note(item, this.publicationClient)
           totalYielded++
         }
 

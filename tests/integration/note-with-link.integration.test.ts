@@ -1,4 +1,4 @@
-import { SubstackClient } from '@/substack-client'
+import { SubstackClient } from '@substack-api/substack-client'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 
@@ -10,14 +10,11 @@ describe('note with link attachment integration tests', () => {
     global.INTEGRATION_SERVER.capturedRequests.length = 0
 
     // Create client configured to use our local test server
-    const url = new URL(global.INTEGRATION_SERVER.url)
-    const hostname = `${url.hostname}:${url.port}`
-
     client = new SubstackClient({
-      hostname: hostname,
-      apiKey: 'test-key',
-      protocol: 'http', // Use HTTP for local test server
-      substackBaseUrl: global.INTEGRATION_SERVER.url // Configure global client to use mock server too
+      publicationUrl: global.INTEGRATION_SERVER.url,
+      token: 'test-key',
+      substackUrl: global.INTEGRATION_SERVER.url, // Configure global client to use mock server too
+      urlPrefix: '' // Integration server doesn't use API prefix
     })
   })
 
@@ -39,7 +36,7 @@ describe('note with link attachment integration tests', () => {
     // Verify first request was attachment creation
     const attachmentRequest = global.INTEGRATION_SERVER.capturedRequests[0]
     expect(attachmentRequest.method).toBe('POST')
-    expect(attachmentRequest.url).toBe('/api/v1/comment/attachment')
+    expect(attachmentRequest.url).toBe('/comment/attachment/')
 
     const expectedAttachmentRequestPath = join(
       process.cwd(),
@@ -55,7 +52,7 @@ describe('note with link attachment integration tests', () => {
     // Verify second request was note publishing with attachment
     const noteRequest = global.INTEGRATION_SERVER.capturedRequests[1]
     expect(noteRequest.method).toBe('POST')
-    expect(noteRequest.url).toBe('/api/v1/comment/feed')
+    expect(noteRequest.url).toBe('/comment/feed/')
 
     const capturedNoteBody = noteRequest.body as any
 

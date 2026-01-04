@@ -62,7 +62,7 @@ const post: Post = await profile.posts({ limit: 1 }).next().value;
 Cookie-based authentication using your Substack session:
 ```typescript
 const client = new SubstackClient({
-  apiKey: 'your-connect-sid-cookie-value' // Extracted from browser
+  token: 'your-connect-sid-cookie-value' // Extracted from browser
 });
 ```
 
@@ -110,7 +110,7 @@ The library is built around several key concepts:
 ### SubstackClient
 The main entry point that handles authentication and provides access to entities:
 ```typescript
-const client = new SubstackClient({ apiKey: 'cookie-value' });
+const client = new SubstackClient({ token: 'cookie-value' });
 ```
 
 ### Entity Classes
@@ -204,7 +204,7 @@ for await (const post of myProfile.posts()) {
 import { SubstackClient } from 'substack-api';
 
 const client = new SubstackClient({
-  apiKey: process.env.SUBSTACK_API_KEY!
+  token: process.env.SUBSTACK_TOKEN!
 });
 
 // Test connection

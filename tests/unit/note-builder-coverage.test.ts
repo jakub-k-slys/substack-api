@@ -1,19 +1,44 @@
-import { NoteBuilder, NoteWithLinkBuilder } from '@/domain/note-builder'
-import { HttpClient } from '@/internal/http-client'
+import { NoteBuilder, NoteWithLinkBuilder } from '@substack-api/domain/note-builder'
+import { HttpClient } from '@substack-api/internal/http-client'
 
 // Mock HttpClient
-jest.mock('@/internal/http-client')
+jest.mock('@substack-api/internal/http-client')
 const MockHttpClient = HttpClient as jest.MockedClass<typeof HttpClient>
+
+// Helper to create valid PublishNoteResponse mock
+const createMockNoteResponse = (overrides = {}) => ({
+  user_id: 123,
+  body: 'test',
+  body_json: {},
+  ancestor_path: '',
+  type: 'feed' as const,
+  status: 'published' as const,
+  reply_minimum_role: 'everyone' as const,
+  id: 456,
+  deleted: false,
+  date: '2023-01-01T00:00:00Z',
+  name: 'Test User',
+  photo_url: 'https://example.com/photo.jpg',
+  reactions: {},
+  children: [],
+  isFirstFeedCommentByUser: false,
+  reaction_count: 0,
+  restacks: 0,
+  restacked: false,
+  children_count: 0,
+  attachments: [],
+  ...overrides
+})
 
 describe('NoteBuilder - Coverage Tests', () => {
   let mockClient: jest.Mocked<HttpClient>
   let builder: NoteBuilder
 
   beforeEach(() => {
-    mockClient = new MockHttpClient('https://example.com', {
-      hostname: 'example.com',
-      apiKey: 'test-api-key'
-    }) as jest.Mocked<HttpClient>
+    mockClient = new MockHttpClient(
+      'https://example.com',
+      'test-api-key'
+    ) as jest.Mocked<HttpClient>
     builder = new NoteBuilder(mockClient)
   })
 
@@ -272,8 +297,13 @@ describe('NoteBuilder - Coverage Tests', () => {
 
     beforeEach(() => {
       mockClient.post
-        .mockResolvedValueOnce({ id: 'attachment-123' }) // Attachment response
-        .mockResolvedValueOnce({ id: 'note-456', body: 'test' }) // Note response
+        .mockResolvedValueOnce({
+          id: 'attachment-123',
+          type: 'link',
+          publication: null,
+          post: null
+        }) // Attachment response
+        .mockResolvedValueOnce(createMockNoteResponse()) // Note response
       noteWithLinkBuilder = new NoteWithLinkBuilder(mockClient, 'https://example.com/test')
     })
 

@@ -3,7 +3,7 @@
   "compilerOptions": {
     "types": ["jest", "node"],
     "paths": {
-      "@/*": ["src/*"],
+      "@substack-api/*": ["src/*"],
       "@test/*": ["tests/*"]
     }
   },

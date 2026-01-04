@@ -7,22 +7,29 @@ dotenv.config()
 declare global {
   var E2E_CONFIG: {
     hasCredentials: boolean
-    apiKey?: string
-    hostname?: string
+    token?: string
+    publicationUrl?: string
   }
 
-  function getTestCredentials(): { apiKey: string; hostname?: string } | null
+  function getTestCredentials(): { token: string; publicationUrl?: string } | null
 }
 
 // Check for credentials but don't fail early - let individual tests handle missing credentials
-const apiKey = process.env.SUBSTACK_API_KEY || process.env.E2E_API_KEY
+const token = process.env.SUBSTACK_API_KEY || process.env.E2E_API_KEY
 const hostname = process.env.SUBSTACK_HOSTNAME || process.env.E2E_HOSTNAME
 
-if (apiKey) {
+// Convert hostname to full URL if it doesn't start with http
+const publicationUrl = hostname
+  ? hostname.startsWith('http')
+    ? hostname
+    : `https://${hostname}`
+  : undefined
+
+if (token) {
   global.E2E_CONFIG = {
     hasCredentials: true,
-    apiKey,
-    hostname
+    token,
+    publicationUrl
   }
 } else {
   global.E2E_CONFIG = {
@@ -31,11 +38,11 @@ if (apiKey) {
 }
 
 // Helper function to get credentials for tests
-global.getTestCredentials = (): { apiKey: string; hostname?: string } | null => {
-  if (global.E2E_CONFIG.hasCredentials && global.E2E_CONFIG.apiKey) {
+global.getTestCredentials = (): { token: string; publicationUrl?: string } | null => {
+  if (global.E2E_CONFIG.hasCredentials && global.E2E_CONFIG.token) {
     return {
-      apiKey: global.E2E_CONFIG.apiKey,
-      hostname: global.E2E_CONFIG.hostname
+      token: global.E2E_CONFIG.token,
+      publicationUrl: global.E2E_CONFIG.publicationUrl
     }
   }
   return null

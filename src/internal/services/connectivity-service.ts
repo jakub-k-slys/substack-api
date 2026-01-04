@@ -1,11 +1,11 @@
-import type { HttpClient } from '@/internal/http-client'
+import type { HttpClient } from '@substack-api/internal/http-client'
 
 /**
  * Service responsible for checking API connectivity and session validity
  * Provides a clean boolean indicator of whether the API is accessible
  */
 export class ConnectivityService {
-  constructor(private readonly httpClient: HttpClient) {}
+  constructor(private readonly substackClient: HttpClient) {}
 
   /**
    * Check if the API is connected and accessible
@@ -14,7 +14,10 @@ export class ConnectivityService {
    */
   async isConnected(): Promise<boolean> {
     try {
-      await this.httpClient.get('/api/v1/feed/following')
+      await this.substackClient.put('/user-setting', {
+        type: 'last_home_tab',
+        value_text: 'inbox'
+      })
       return true
     } catch {
       return false

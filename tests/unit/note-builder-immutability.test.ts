@@ -1,57 +1,31 @@
-import { NoteBuilder, ParagraphBuilder } from '@/domain/note-builder'
-import type { HttpClient } from '@/internal/http-client'
-import type { PublishNoteResponse } from '@/internal'
+import { NoteBuilder, ParagraphBuilder } from '@substack-api/domain/note-builder'
+import type { HttpClient } from '@substack-api/internal/http-client'
+import type { PublishNoteResponse } from '@substack-api/internal'
 
 describe('NoteBuilder Immutability', () => {
-  let mockHttpClient: jest.Mocked<HttpClient>
+  let mockPublicationClient: jest.Mocked<HttpClient>
   let mockPublishResponse: PublishNoteResponse
 
   beforeEach(() => {
-    mockHttpClient = {
+    mockPublicationClient = {
       get: jest.fn(),
       post: jest.fn(),
-      request: jest.fn(),
-      getPerPage: jest.fn().mockReturnValue(25)
+      request: jest.fn()
     } as unknown as jest.Mocked<HttpClient>
 
     mockPublishResponse = {
-      user_id: 123,
-      body: 'Test note content',
-      body_json: {
-        type: 'doc',
-        attrs: { schemaVersion: 'v1' },
-        content: []
-      },
-      post_id: null,
-      publication_id: null,
-      media_clip_id: null,
-      ancestor_path: '',
-      type: 'feed',
-      status: 'published',
-      reply_minimum_role: 'everyone',
       id: 789,
-      deleted: false,
       date: '2023-01-01T00:00:00Z',
-      name: 'Test User',
-      photo_url: 'https://example.com/photo.jpg',
-      reactions: {},
-      children: [],
-      user_bestseller_tier: null,
-      isFirstFeedCommentByUser: false,
-      reaction_count: 0,
-      restacks: 0,
-      restacked: false,
-      children_count: 0,
-      attachments: [],
-      user_primary_publication: undefined
+      body: 'Test note content',
+      attachments: []
     }
 
-    mockHttpClient.post.mockResolvedValue(mockPublishResponse)
+    mockPublicationClient.post.mockResolvedValue(mockPublishResponse)
   })
 
   describe('Builder Immutability', () => {
     it('should return new instances instead of mutating existing ones', () => {
-      const builder1 = new NoteBuilder(mockHttpClient)
+      const builder1 = new NoteBuilder(mockPublicationClient)
       const builder2 = builder1.paragraph()
       const builder3 = builder2.text('Hello')
       const builder4 = builder3.bold(' World')
@@ -69,7 +43,7 @@ describe('NoteBuilder Immutability', () => {
     })
 
     it('should allow branching without affecting original builders', async () => {
-      const base = new NoteBuilder(mockHttpClient).paragraph().text('Shared text ')
+      const base = new NoteBuilder(mockPublicationClient).paragraph().text('Shared text ')
 
       // Create two branches from the same base
       const branchA = base.bold('Branch A')
@@ -80,7 +54,7 @@ describe('NoteBuilder Immutability', () => {
       const resultB = await branchB.publish()
 
       // Verify the first call (Branch A)
-      expect(mockHttpClient.post).toHaveBeenNthCalledWith(1, '/api/v1/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenNthCalledWith(1, '/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
@@ -107,7 +81,7 @@ describe('NoteBuilder Immutability', () => {
       })
 
       // Verify the second call (Branch B)
-      expect(mockHttpClient.post).toHaveBeenNthCalledWith(2, '/api/v1/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenNthCalledWith(2, '/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
@@ -135,11 +109,11 @@ describe('NoteBuilder Immutability', () => {
 
       expect(resultA).toBe(mockPublishResponse)
       expect(resultB).toBe(mockPublishResponse)
-      expect(mockHttpClient.post).toHaveBeenCalledTimes(2)
+      expect(mockPublicationClient.post).toHaveBeenCalledTimes(2)
     })
 
     it('should allow complex branching with multiple paragraph builders', async () => {
-      const noteBuilder = new NoteBuilder(mockHttpClient)
+      const noteBuilder = new NoteBuilder(mockPublicationClient)
 
       // Create a paragraph with some initial content
       const baseParagraph = noteBuilder.paragraph().text('Start: ')
@@ -168,7 +142,7 @@ describe('NoteBuilder Immutability', () => {
     })
 
     it('should maintain immutability with list builders', async () => {
-      const base = new NoteBuilder(mockHttpClient)
+      const base = new NoteBuilder(mockPublicationClient)
         .paragraph()
         .text('Before list')
         .bulletList()
@@ -199,7 +173,7 @@ describe('NoteBuilder Immutability', () => {
 
     it('should support method chaining on immutable builders', async () => {
       // Traditional chaining should still work
-      const result = await new NoteBuilder(mockHttpClient)
+      const result = await new NoteBuilder(mockPublicationClient)
         .paragraph()
         .text('Hello ')
         .bold('bold ')
@@ -208,7 +182,7 @@ describe('NoteBuilder Immutability', () => {
         .text(' text')
         .publish()
 
-      expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
@@ -236,7 +210,7 @@ describe('NoteBuilder Immutability', () => {
 
   describe('Regression Tests', () => {
     it('should not modify original builder when creating new paragraphs', async () => {
-      const originalBuilder = new NoteBuilder(mockHttpClient)
+      const originalBuilder = new NoteBuilder(mockPublicationClient)
       const withFirstParagraph = originalBuilder.paragraph().text('First paragraph')
       const withSecondParagraph = withFirstParagraph.paragraph().text('Second paragraph')
 
@@ -253,7 +227,7 @@ describe('NoteBuilder Immutability', () => {
     })
 
     it('should maintain state isolation between list builders', () => {
-      const noteBuilder = new NoteBuilder(mockHttpClient)
+      const noteBuilder = new NoteBuilder(mockPublicationClient)
       const paragraph = noteBuilder.paragraph().text('Before list')
 
       const list1 = paragraph.bulletList().item().text('Item 1')

@@ -1,154 +1,170 @@
-import { HttpClient } from '@/internal/http-client'
+import { HttpClient } from '@substack-api/internal/http-client'
+import axios from 'axios'
+import type { AxiosInstance } from 'axios'
 
-// Mock fetch globally
-global.fetch = jest.fn()
+jest.mock('axios')
+jest.mock('axios-rate-limit', () => (instance: AxiosInstance) => instance)
+
+const mockedAxios = axios as jest.Mocked<typeof axios>
 
 describe('HttpClient', () => {
-  let client: HttpClient
-  const mockFetch = fetch as jest.MockedFunction<typeof fetch>
+  let mockAxiosInstance: jest.Mocked<AxiosInstance>
 
   beforeEach(() => {
     jest.clearAllMocks()
-    client = new HttpClient('https://test.substack.com', {
-      apiKey: 'test-api-key',
-      hostname: 'test.substack.com'
-    })
+
+    mockAxiosInstance = {
+      get: jest.fn(),
+      post: jest.fn(),
+      put: jest.fn()
+    } as unknown as jest.Mocked<AxiosInstance>
+
+    mockedAxios.create.mockReturnValue(mockAxiosInstance)
   })
 
   describe('constructor', () => {
-    it('should throw error when apiKey is missing', () => {
-      expect(
-        () => new HttpClient('https://test.com', { apiKey: '', hostname: 'test.com' })
-      ).toThrow('apiKey is required in SubstackConfig')
+    it('should throw error when token is missing', () => {
+      expect(() => new HttpClient('https://test.com', '')).toThrow('API token is required')
     })
 
-    it('should use provided base URL', () => {
-      const clientWithCustomBaseUrl = new HttpClient('https://custom.example.com', {
-        apiKey: 'test-key',
-        hostname: 'default.substack.com'
-      })
-      expect(clientWithCustomBaseUrl).toBeDefined()
-    })
+    it('should create axios instance with correct base URL and headers', () => {
+      const client = new HttpClient('https://test.substack.com', 'test-api-key')
 
-    it('should set up correct base URL and cookie', () => {
-      const clientInstance = client as unknown as { baseUrl: string; cookie: string }
-      expect(clientInstance.baseUrl).toBe('https://test.substack.com')
-      expect(clientInstance.cookie).toBe('substack.sid=test-api-key')
-    })
-  })
-
-  describe('request', () => {
-    it('should make successful request', async () => {
-      const mockResponse = { data: 'test' }
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: jest.fn().mockResolvedValue(mockResponse)
-      } as unknown as Response)
-
-      const result = await client.request('/test')
-
-      expect(mockFetch).toHaveBeenCalledWith('https://test.substack.com/test', {
+      expect(mockedAxios.create).toHaveBeenCalledWith({
+        baseURL: 'https://test.substack.com',
         headers: {
           Cookie: 'substack.sid=test-api-key',
-          'Content-Type': 'application/json'
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'User-Agent':
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Safari/605.1.15',
+          'Accept-Encoding': 'gzip, deflate, br'
         }
       })
-      expect(result).toEqual(mockResponse)
-    })
-
-    it('should handle HTTP error responses', async () => {
-      mockFetch.mockResolvedValue({
-        ok: false,
-        status: 404,
-        statusText: 'Not Found'
-      } as unknown as Response)
-
-      await expect(client.request('/test')).rejects.toThrow('HTTP 404: Not Found')
-    })
-
-    it('should include custom headers', async () => {
-      const mockResponse = { data: 'test' }
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: jest.fn().mockResolvedValue(mockResponse)
-      } as unknown as Response)
-
-      await client.request('/test', {
-        headers: {
-          'Custom-Header': 'custom-value'
-        }
-      })
-
-      // Verify that fetch was called with the custom header
-      expect(mockFetch).toHaveBeenCalledTimes(1)
-      const [url, options] = mockFetch.mock.calls[0]
-      expect(url).toBe('https://test.substack.com/test')
-      expect(options?.headers).toHaveProperty('Custom-Header', 'custom-value')
+      expect(client).toBeDefined()
     })
   })
 
   describe('get', () => {
-    it('should make GET request', async () => {
+    it('should make successful GET request', async () => {
       const mockResponse = { data: 'test' }
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: jest.fn().mockResolvedValue(mockResponse)
-      } as unknown as Response)
+      mockAxiosInstance.get.mockResolvedValue({
+        status: 200,
+        data: mockResponse
+      })
+
+      const client = new HttpClient('https://test.substack.com', 'test-api-key')
 
       const result = await client.get('/test')
 
-      expect(mockFetch).toHaveBeenCalledWith('https://test.substack.com/test', {
-        headers: {
-          Cookie: 'substack.sid=test-api-key',
-          'Content-Type': 'application/json'
-        }
-      })
+      expect(mockAxiosInstance.get).toHaveBeenCalledWith('/test')
       expect(result).toEqual(mockResponse)
+    })
+
+    it('should throw error on non-200 response', async () => {
+      mockAxiosInstance.get.mockResolvedValue({
+        status: 404,
+        statusText: 'Not Found',
+        data: {}
+      })
+
+      const client = new HttpClient('https://test.substack.com', 'test-api-key')
+
+      await expect(client.get('/test')).rejects.toThrow('HTTP 404: Not Found')
     })
   })
 
   describe('post', () => {
-    it('should make POST request with data', async () => {
+    it('should make successful POST request with data', async () => {
       const mockResponse = { success: true }
       const postData = { title: 'Test Post' }
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: jest.fn().mockResolvedValue(mockResponse)
-      } as unknown as Response)
+      mockAxiosInstance.post.mockResolvedValue({
+        status: 200,
+        data: mockResponse
+      })
+
+      const client = new HttpClient('https://test.substack.com', 'test-api-key')
 
       const result = await client.post('/test', postData)
 
-      expect(mockFetch).toHaveBeenCalledWith('https://test.substack.com/test', {
-        method: 'POST',
-        body: JSON.stringify(postData),
-        headers: {
-          Cookie: 'substack.sid=test-api-key',
-          'Content-Type': 'application/json'
-        }
-      })
+      expect(mockAxiosInstance.post).toHaveBeenCalledWith('/test', postData)
       expect(result).toEqual(mockResponse)
     })
 
     it('should make POST request without data', async () => {
       const mockResponse = { success: true }
 
-      mockFetch.mockResolvedValue({
-        ok: true,
-        json: jest.fn().mockResolvedValue(mockResponse)
-      } as unknown as Response)
+      mockAxiosInstance.post.mockResolvedValue({
+        status: 200,
+        data: mockResponse
+      })
+
+      const client = new HttpClient('https://test.substack.com', 'test-api-key')
 
       const result = await client.post('/test')
 
-      expect(mockFetch).toHaveBeenCalledWith('https://test.substack.com/test', {
-        method: 'POST',
-        body: undefined,
-        headers: {
-          Cookie: 'substack.sid=test-api-key',
-          'Content-Type': 'application/json'
-        }
-      })
+      expect(mockAxiosInstance.post).toHaveBeenCalledWith('/test', undefined)
       expect(result).toEqual(mockResponse)
+    })
+
+    it('should throw error on non-200 response', async () => {
+      mockAxiosInstance.post.mockResolvedValue({
+        status: 500,
+        statusText: 'Internal Server Error',
+        data: {}
+      })
+
+      const client = new HttpClient('https://test.substack.com', 'test-api-key')
+
+      await expect(client.post('/test', {})).rejects.toThrow('HTTP 500: Internal Server Error')
+    })
+  })
+
+  describe('put', () => {
+    it('should make successful PUT request with data', async () => {
+      const mockResponse = { success: true }
+      const putData = { title: 'Updated Post' }
+
+      mockAxiosInstance.put.mockResolvedValue({
+        status: 200,
+        data: mockResponse
+      })
+
+      const client = new HttpClient('https://test.substack.com', 'test-api-key')
+
+      const result = await client.put('/test', putData)
+
+      expect(mockAxiosInstance.put).toHaveBeenCalledWith('/test', putData)
+      expect(result).toEqual(mockResponse)
+    })
+
+    it('should make PUT request without data', async () => {
+      const mockResponse = { success: true }
+
+      mockAxiosInstance.put.mockResolvedValue({
+        status: 200,
+        data: mockResponse
+      })
+
+      const client = new HttpClient('https://test.substack.com', 'test-api-key')
+
+      const result = await client.put('/test')
+
+      expect(mockAxiosInstance.put).toHaveBeenCalledWith('/test', undefined)
+      expect(result).toEqual(mockResponse)
+    })
+
+    it('should throw error on non-200 response', async () => {
+      mockAxiosInstance.put.mockResolvedValue({
+        status: 403,
+        statusText: 'Forbidden',
+        data: {}
+      })
+
+      const client = new HttpClient('https://test.substack.com', 'test-api-key')
+
+      await expect(client.put('/test', {})).rejects.toThrow('HTTP 403: Forbidden')
     })
   })
 })

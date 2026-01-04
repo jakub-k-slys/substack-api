@@ -1,67 +1,41 @@
-import { NoteBuilder, ParagraphBuilder } from '@/domain/note-builder'
-import type { HttpClient } from '@/internal/http-client'
-import type { PublishNoteResponse } from '@/internal'
+import { NoteBuilder, ParagraphBuilder } from '@substack-api/domain/note-builder'
+import type { HttpClient } from '@substack-api/internal/http-client'
+import type { PublishNoteResponse } from '@substack-api/internal'
 
 describe('NoteBuilder (Legacy Test Suite)', () => {
-  let mockHttpClient: jest.Mocked<HttpClient>
+  let mockPublicationClient: jest.Mocked<HttpClient>
   let mockPublishResponse: PublishNoteResponse
 
   beforeEach(() => {
-    mockHttpClient = {
+    mockPublicationClient = {
       get: jest.fn(),
       post: jest.fn(),
-      request: jest.fn(),
-      getPerPage: jest.fn().mockReturnValue(25)
+      request: jest.fn()
     } as unknown as jest.Mocked<HttpClient>
 
     mockPublishResponse = {
-      user_id: 123,
-      body: 'Test note content',
-      body_json: {
-        type: 'doc',
-        attrs: { schemaVersion: 'v1' },
-        content: []
-      },
-      post_id: null,
-      publication_id: null,
-      media_clip_id: null,
-      ancestor_path: '',
-      type: 'feed',
-      status: 'published',
-      reply_minimum_role: 'everyone',
       id: 789,
-      deleted: false,
       date: '2023-01-01T00:00:00Z',
-      name: 'Test User',
-      photo_url: 'https://example.com/photo.jpg',
-      reactions: {},
-      children: [],
-      user_bestseller_tier: null,
-      isFirstFeedCommentByUser: false,
-      reaction_count: 0,
-      restacks: 0,
-      restacked: false,
-      children_count: 0,
-      attachments: [],
-      user_primary_publication: undefined
+      body: 'Test note content',
+      attachments: []
     }
 
-    mockHttpClient.post.mockResolvedValue(mockPublishResponse)
+    mockPublicationClient.post.mockResolvedValue(mockPublishResponse)
   })
 
   describe('Constructor', () => {
     it('should create empty post builder', () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       expect(builder).toBeInstanceOf(NoteBuilder)
     })
   })
 
   describe('Simple use case', () => {
     it('should create note with simple text and publish', async () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       const result = await builder.paragraph().text('my test text').publish()
 
-      expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
@@ -87,7 +61,7 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
 
   describe('Two paragraphs', () => {
     it('should create note with two simple paragraphs', async () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       const result = await builder
         .paragraph()
         .text('my test text1')
@@ -95,7 +69,7 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
         .text('my test text2')
         .publish()
 
-      expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
@@ -130,7 +104,7 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
 
   describe('Rich formatting within a paragraph', () => {
     it('should create note with rich formatting', async () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       const result = await builder
         .paragraph()
         .text('adasd')
@@ -140,7 +114,7 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
         .text('my test text2')
         .publish()
 
-      expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
@@ -184,7 +158,7 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
 
   describe('Multiple paragraphs with different formatting', () => {
     it('should create note with multiple rich paragraphs', async () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       const result = await builder
         .paragraph()
         .text('adasd')
@@ -196,7 +170,7 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
         .text('regular again')
         .publish()
 
-      expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
@@ -249,7 +223,7 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
 
   describe('Code formatting', () => {
     it('should support code formatting in paragraphs', async () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       const result = await builder
         .paragraph()
         .text('Here is some ')
@@ -257,7 +231,7 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
         .text(' in the text')
         .publish()
 
-      expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
@@ -292,7 +266,7 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
 
   describe('Mixed formatting types', () => {
     it('should support all formatting types in one paragraph', async () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       const result = await builder
         .paragraph()
         .text('Plain text, ')
@@ -301,7 +275,7 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
         .code('code text')
         .publish()
 
-      expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
@@ -342,13 +316,13 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
 
   describe('ParagraphBuilder', () => {
     it('should return ParagraphBuilder instance for rich formatting', () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       const paragraphBuilder = builder.paragraph()
       expect(paragraphBuilder).toBeInstanceOf(ParagraphBuilder)
     })
 
     it('should allow chaining from paragraph builder to new node', async () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       const result = await builder
         .paragraph()
         .text('First paragraph')
@@ -356,7 +330,7 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
         .text('Second paragraph')
         .publish()
 
-      expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
@@ -389,10 +363,10 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
     })
 
     it('should publish directly from paragraph builder', async () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       const result = await builder.paragraph().text('Only paragraph').publish()
 
-      expect(mockHttpClient.post).toHaveBeenCalledWith('/api/v1/comment/feed', {
+      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed/', {
         bodyJson: {
           type: 'doc',
           attrs: { schemaVersion: 'v1' },
@@ -418,7 +392,7 @@ describe('NoteBuilder (Legacy Test Suite)', () => {
 
   describe('Empty content handling', () => {
     it('should throw error when trying to publish empty note', () => {
-      const builder = new NoteBuilder(mockHttpClient)
+      const builder = new NoteBuilder(mockPublicationClient)
       expect(() => builder.build()).toThrow('Note must contain at least one paragraph')
     })
   })

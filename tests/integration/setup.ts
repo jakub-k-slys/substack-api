@@ -48,8 +48,8 @@ const createMockServer = (): Promise<{
         return
       }
 
-      // Handle POST requests to /api/v1/comment/attachment (attachment creation)
-      if (req.method === 'POST' && req.url === '/api/v1/comment/attachment') {
+      // Handle POST requests to /comment/attachment/ (attachment creation)
+      if (req.method === 'POST' && req.url === '/comment/attachment/') {
         let body = ''
         req.on('data', (chunk) => {
           body += chunk.toString()
@@ -95,8 +95,8 @@ const createMockServer = (): Promise<{
         return
       }
 
-      // Handle POST requests to /api/v1/comment/feed (note publishing)
-      if (req.method === 'POST' && req.url === '/api/v1/comment/feed') {
+      // Handle POST requests to /comment/feed/ (note publishing)
+      if (req.method === 'POST' && req.url === '/comment/feed/') {
         let body = ''
         req.on('data', (chunk) => {
           body += chunk.toString()
@@ -135,6 +135,37 @@ const createMockServer = (): Promise<{
             res.end(sampleData)
           } catch (error) {
             console.error('Error processing note publish request:', error)
+            res.writeHead(400)
+            res.end(JSON.stringify({ error: 'Invalid JSON' }))
+          }
+        })
+        return
+      }
+
+      // Handle PUT requests to /user-setting (connectivity check)
+      if (req.method === 'PUT' && req.url === '/user-setting') {
+        let body = ''
+        req.on('data', (chunk) => {
+          body += chunk.toString()
+        })
+        req.on('end', () => {
+          try {
+            // Parse and capture the request for verification
+            const requestData = JSON.parse(body)
+
+            // Capture the request for test verification
+            capturedRequests.push({
+              method: req.method!,
+              url: req.url!,
+              headers: req.headers as Record<string, string>,
+              body: requestData
+            })
+
+            // Return success response
+            res.writeHead(200)
+            res.end(JSON.stringify({ success: true }))
+          } catch (error) {
+            console.error('Error processing user-setting request:', error)
             res.writeHead(400)
             res.end(JSON.stringify({ error: 'Invalid JSON' }))
           }
@@ -186,21 +217,21 @@ function mapUrlToSampleFile(url: string): string | null {
 
   // Map common API endpoints to sample files
   const mappings: Record<string, string | null> = {
-    'api/v1/handle/options': 'handle/options',
-    'api/v1/subscription': 'subscription',
-    'api/v1/subscriptions': 'subscriptions',
-    'api/v1/user/profile/self': 'user/282291554/profile', // New endpoint for own profile
-    'api/v1/user/282291554/profile': 'user/282291554/profile',
-    'api/v1/user/254824415/profile': 'user/282291554/profile', // Map the subscription user_id to existing profile
-    'api/v1/user/jennyouyang/public_profile': 'user/282291554/profile', // Map jennyouyang handle to profile
-    'api/v1/user/jakubslys/public_profile': 'user/jakubslys/public_profile',
-    'api/v1/users/282291554': 'user/282291554/profile',
-    'api/v1/users/254824415': 'user/282291554/profile', // Map the subscription user_id to existing profile
-    'api/v1/reader/feed/profile/282291554': 'reader/feed/profile/282291554',
-    'api/v1/profile/posts': 'profile/posts?profile_user_id=27968736&limit=50',
-    'api/v1/feed/following': 'feed/following',
-    'api/v1/reader/comment/131648795': 'reader/comment/131648795',
-    'api/v1/posts/by-id/167180194': 'posts/by-id/167180194'
+    'handle/options': 'handle/options',
+    subscription: 'subscription',
+    subscriptions: 'subscriptions',
+    'user/profile/self': 'user/282291554/profile', // New endpoint for own profile
+    'user/282291554/profile': 'user/282291554/profile',
+    'user/254824415/profile': 'user/282291554/profile', // Map the subscription user_id to existing profile
+    'user/jennyouyang/public_profile': 'user/282291554/profile', // Map jennyouyang handle to profile
+    'user/jakubslys/public_profile': 'user/jakubslys/public_profile',
+    'users/282291554': 'user/282291554/profile',
+    'users/254824415': 'user/282291554/profile', // Map the subscription user_id to existing profile
+    'reader/feed/profile/282291554': 'reader/feed/profile/282291554',
+    'profile/posts': 'profile/posts?profile_user_id=27968736&limit=50',
+    'feed/following': 'feed/following',
+    'reader/comment/131648795': 'reader/comment/131648795',
+    'posts/by-id/167180194': 'posts/by-id/167180194'
   }
 
   const sampleFile = mappings[cleanUrl]
@@ -224,7 +255,7 @@ function mapUrlToSampleFile(url: string): string | null {
 
 // Helper function to create a test HTTP client that uses our mock server
 export async function createTestHttpClient() {
-  const response = await fetch(`${global.INTEGRATION_SERVER.url}/api/v1/subscription`)
+  const response = await fetch(`${global.INTEGRATION_SERVER.url}/subscription`)
   return response.json()
 }
 

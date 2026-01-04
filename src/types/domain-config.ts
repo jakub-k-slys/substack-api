@@ -3,13 +3,12 @@
  */
 
 export interface SubstackConfig {
-  hostname: string
-  apiVersion?: string
-  apiKey: string
-  perPage?: number // Default items per page for pagination (default: 25)
-  cacheTTL?: number // Cache TTL in seconds (default: 300)
-  protocol?: 'http' | 'https' // Protocol to use (default: 'https')
-  substackBaseUrl?: string // Base URL for global Substack endpoints (default: 'https://substack.com')
+  publicationUrl: string // Publication base URL (mandatory, e.g., 'https://yourpub.substack.com')
+  token: string // API authentication token (mandatory)
+  substackUrl?: string // Base URL for global Substack endpoints (optional, defaults to 'https://substack.com')
+  urlPrefix?: string // URL prefix for API endpoints (optional, defaults to 'api/v1/')
+  perPage?: number // Default items per page for pagination (optional, defaults to 25)
+  maxRequestsPerSecond?: number // Maximum API requests per second (optional, defaults to 25)
 }
 
 export interface PaginationParams {

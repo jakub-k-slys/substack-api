@@ -8,8 +8,8 @@ This example demonstrates how to use the new `newNoteWithLink` feature to create
 import { SubstackClient } from 'substack-api';
 
 const client = new SubstackClient({
-  apiKey: 'your-api-key',
-  hostname: 'your-publication.substack.com'
+  token: 'your-token',
+  publicationUrl: 'your-publication.substack.com'
 });
 
 const ownProfile = await client.ownProfile();

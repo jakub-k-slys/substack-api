@@ -1,16 +1,17 @@
-import { OwnProfile } from '@/domain/own-profile'
-import { Note } from '@/domain/note'
-import { Profile } from '@/domain/profile'
-import { NoteBuilder } from '@/domain/note-builder'
+import { OwnProfile } from '@substack-api/domain/own-profile'
+import { Note } from '@substack-api/domain/note'
+import { Profile } from '@substack-api/domain/profile'
+import { NoteBuilder, NoteWithLinkBuilder } from '@substack-api/domain/note-builder'
 import {
   ProfileService,
   PostService,
   NoteService,
   CommentService,
-  FollowingService
-} from '@/internal/services'
-import type { SubstackFullProfile } from '@/internal'
-import type { HttpClient } from '@/internal/http-client'
+  FollowingService,
+  NewNoteService
+} from '@substack-api/internal/services'
+import type { SubstackFullProfile } from '@substack-api/internal'
+import type { HttpClient } from '@substack-api/internal/http-client'
 
 describe('OwnProfile Entity', () => {
   let mockProfileData: SubstackFullProfile
@@ -19,6 +20,7 @@ describe('OwnProfile Entity', () => {
   let mockCommentService: jest.Mocked<CommentService>
   let mockNoteService: jest.Mocked<NoteService>
   let mockFollowingService: jest.Mocked<FollowingService>
+  let mockNewNoteService: jest.Mocked<NewNoteService>
   let ownProfile: OwnProfile
 
   beforeEach(() => {
@@ -34,8 +36,7 @@ describe('OwnProfile Entity', () => {
     const mockClient = {
       get: jest.fn(),
       post: jest.fn(),
-      request: jest.fn(),
-      getPerPage: jest.fn().mockReturnValue(25)
+      request: jest.fn()
     } as unknown as jest.Mocked<HttpClient>
 
     mockProfileService = {
@@ -65,6 +66,13 @@ describe('OwnProfile Entity', () => {
       getFollowing: jest.fn()
     } as unknown as jest.Mocked<FollowingService>
 
+    mockNewNoteService = {
+      newNote: jest.fn().mockImplementation(() => new NoteBuilder(mockClient)),
+      newNoteWithLink: jest
+        .fn()
+        .mockImplementation((link: string) => new NoteWithLinkBuilder(mockClient, link))
+    } as unknown as jest.Mocked<NewNoteService>
+
     ownProfile = new OwnProfile(
       mockProfileData,
       mockClient,
@@ -72,7 +80,9 @@ describe('OwnProfile Entity', () => {
       mockPostService,
       mockNoteService,
       mockCommentService,
-      mockFollowingService
+      mockFollowingService,
+      mockNewNoteService,
+      25
     )
   })
 
@@ -94,13 +104,13 @@ describe('OwnProfile Entity', () => {
   })
 
   it('should iterate through following users using correct endpoint chain', async () => {
-    // Mock the response from /api/v1/feed/following (returns array of FollowingUser objects)
+    // Mock the response from /feed/following (returns array of FollowingUser objects)
     const mockFollowingIds = [
       { id: 1, handle: 'user1' },
       { id: 2, handle: 'user2' }
     ]
 
-    // Mock the responses from /api/v1/user/{id}/profile
+    // Mock the responses from /user/{id}/profile
     const mockProfile1 = {
       id: 1,
       handle: 'user1',
@@ -279,14 +289,15 @@ describe('OwnProfile Entity', () => {
       {
         get: jest.fn(),
         post: jest.fn(),
-        request: jest.fn(),
-        getPerPage: jest.fn().mockReturnValue(25)
+        request: jest.fn()
       } as unknown as jest.Mocked<HttpClient>,
       localProfileService,
       mockPostService,
       mockNoteService,
       mockCommentService,
       localFollowingService,
+      mockNewNoteService,
+      25,
       'resolved-own-slug'
     )
 
@@ -629,7 +640,7 @@ describe('OwnProfile Entity', () => {
 
     it('should handle empty notes response', async () => {
       const mockResponse = { notes: [] }
-      const mockClient = ownProfile['client'] as jest.Mocked<HttpClient>
+      const mockClient = ownProfile['publicationClient'] as jest.Mocked<HttpClient>
       mockClient.get.mockResolvedValue(mockResponse)
 
       const notes = []
@@ -642,7 +653,7 @@ describe('OwnProfile Entity', () => {
 
     it('should handle missing notes property', async () => {
       const mockResponse = {}
-      const mockClient = ownProfile['client'] as jest.Mocked<HttpClient>
+      const mockClient = ownProfile['publicationClient'] as jest.Mocked<HttpClient>
       mockClient.get.mockResolvedValue(mockResponse)
 
       const notes = []
@@ -654,7 +665,7 @@ describe('OwnProfile Entity', () => {
     })
 
     it('should handle API error gracefully for notes', async () => {
-      const mockClient = ownProfile['client'] as jest.Mocked<HttpClient>
+      const mockClient = ownProfile['publicationClient'] as jest.Mocked<HttpClient>
       mockClient.get.mockRejectedValue(new Error('API error'))
 
       const notes = []

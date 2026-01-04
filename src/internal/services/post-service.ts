@@ -1,17 +1,14 @@
-import type { SubstackPost, SubstackFullPost } from '@/internal/types'
-import { SubstackPostCodec, SubstackFullPostCodec } from '@/internal/types'
-import { decodeOrThrow } from '@/internal/validation'
-import type { HttpClient } from '@/internal/http-client'
+import type { SubstackFullPost, SubstackPreviewPost } from '@substack-api/internal/types'
+import { SubstackFullPostCodec, SubstackPreviewPostCodec } from '@substack-api/internal/types'
+import { decodeOrThrow } from '@substack-api/internal/validation'
+import type { HttpClient } from '@substack-api/internal/http-client'
 
 /**
  * Service responsible for post-related HTTP operations
  * Returns internal types that can be transformed into domain models
  */
 export class PostService {
-  constructor(
-    private readonly globalHttpClient: HttpClient,
-    private readonly httpClient: HttpClient
-  ) {}
+  constructor(private readonly substackClient: HttpClient) {}
 
   /**
    * Get a post by ID from the API
@@ -25,9 +22,7 @@ export class PostService {
    */
   async getPostById(id: number): Promise<SubstackFullPost> {
     // Post lookup by ID must use the global substack.com endpoint, not publication-specific hostnames
-    const rawResponse = await this.globalHttpClient.get<{ post: unknown }>(
-      `/api/v1/posts/by-id/${id}`
-    )
+    const rawResponse = await this.substackClient.get<{ post: unknown }>(`/posts/by-id/${id}`)
 
     // Extract the post data from the wrapper object
     if (!rawResponse.post) {
@@ -59,22 +54,22 @@ export class PostService {
    * Get posts for a profile
    * @param profileId - The profile user ID
    * @param options - Pagination options
-   * @returns Promise<SubstackPost[]> - Raw post data from API (validated)
+   * @returns Promise<SubstackPreviewPost[]> - Raw post data from API (validated)
    * @throws {Error} When posts cannot be retrieved or validation fails
    */
   async getPostsForProfile(
     profileId: number,
     _options: { limit: number; offset: number }
-  ): Promise<SubstackPost[]> {
-    const response = await this.globalHttpClient.get<{ posts: unknown[] }>(
-      `/api/v1/profile/posts?profile_user_id=${profileId}`
+  ): Promise<Array<SubstackPreviewPost>> {
+    const response = await this.substackClient.get<{ posts: unknown[] }>(
+      `/profile/posts?profile_user_id=${profileId}`
     )
 
     const posts = response.posts || []
 
     // Validate each post with io-ts
     return posts.map((post, index) =>
-      decodeOrThrow(SubstackPostCodec, post, `Post ${index} in profile response`)
+      decodeOrThrow(SubstackPreviewPostCodec, post, `Post ${index} in profile response`)
     )
   }
 }

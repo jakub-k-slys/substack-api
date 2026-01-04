@@ -1,5 +1,5 @@
-import type { SubstackComment } from '@/internal'
-import type { HttpClient } from '@/internal/http-client'
+import type { SubstackComment } from '@substack-api/internal'
+import type { HttpClient } from '@substack-api/internal/http-client'
 
 /**
  * Comment entity representing a comment on a post or note
@@ -12,7 +12,7 @@ export class Comment {
 
   constructor(
     private readonly rawData: SubstackComment,
-    private readonly client: HttpClient
+    private readonly publicationClient: HttpClient
   ) {
     this.id = rawData.id
     this.body = rawData.body

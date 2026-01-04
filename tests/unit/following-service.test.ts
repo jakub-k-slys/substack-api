@@ -1,30 +1,27 @@
-import { FollowingService } from '@/internal/services/following-service'
-import { HttpClient } from '@/internal/http-client'
+import { FollowingService } from '@substack-api/internal/services/following-service'
+import { HttpClient } from '@substack-api/internal/http-client'
 
 // Mock the http client
-jest.mock('@/internal/http-client')
+jest.mock('@substack-api/internal/http-client')
 
 describe('FollowingService', () => {
   let followingService: FollowingService
-  let mockHttpClient: jest.Mocked<HttpClient>
+  let mockPublicationClient: jest.Mocked<HttpClient>
   let mockSubstackClient: jest.Mocked<HttpClient>
 
   beforeEach(() => {
     jest.clearAllMocks()
 
-    mockHttpClient = new HttpClient('https://test.substack.com', {
-      apiKey: 'test',
-      hostname: 'test.com'
-    }) as jest.Mocked<HttpClient>
-    mockHttpClient.get = jest.fn()
+    mockPublicationClient = new HttpClient(
+      'https://test.substack.com',
+      'test'
+    ) as jest.Mocked<HttpClient>
+    mockPublicationClient.get = jest.fn()
 
-    mockSubstackClient = new HttpClient('https://substack.com', {
-      apiKey: 'test',
-      hostname: 'test.com'
-    }) as jest.Mocked<HttpClient>
+    mockSubstackClient = new HttpClient('https://substack.com', 'test') as jest.Mocked<HttpClient>
     mockSubstackClient.put = jest.fn()
 
-    followingService = new FollowingService(mockHttpClient, mockSubstackClient)
+    followingService = new FollowingService(mockPublicationClient, mockSubstackClient)
   })
 
   describe('getFollowing', () => {
@@ -49,16 +46,16 @@ describe('FollowingService', () => {
       }
 
       mockSubstackClient.put.mockResolvedValue({ user_id: mockUserId })
-      mockHttpClient.get.mockResolvedValue(mockSubscriberLists)
+      mockPublicationClient.get.mockResolvedValue(mockSubscriberLists)
 
       const result = await followingService.getFollowing()
 
-      expect(mockSubstackClient.put).toHaveBeenCalledWith('/api/v1/user-setting', {
+      expect(mockSubstackClient.put).toHaveBeenCalledWith('/user-setting', {
         type: 'last_home_tab',
         value_text: 'inbox'
       })
-      expect(mockHttpClient.get).toHaveBeenCalledWith(
-        `/api/v1/user/${mockUserId}/subscriber-lists?lists=following`
+      expect(mockPublicationClient.get).toHaveBeenCalledWith(
+        `/user/${mockUserId}/subscriber-lists?lists=following`
       )
       expect(result).toEqual([
         { id: 123, handle: 'user123' },
@@ -84,7 +81,7 @@ describe('FollowingService', () => {
       }
 
       mockSubstackClient.put.mockResolvedValue({ user_id: mockUserId })
-      mockHttpClient.get.mockResolvedValue(mockSubscriberLists)
+      mockPublicationClient.get.mockResolvedValue(mockSubscriberLists)
 
       const result = await followingService.getFollowing()
 
@@ -96,7 +93,7 @@ describe('FollowingService', () => {
       const error = new Error('Network error')
 
       mockSubstackClient.put.mockResolvedValue({ user_id: mockUserId })
-      mockHttpClient.get.mockRejectedValue(error)
+      mockPublicationClient.get.mockRejectedValue(error)
 
       await expect(followingService.getFollowing()).rejects.toThrow('Network error')
     })

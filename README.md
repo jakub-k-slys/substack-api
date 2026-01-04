@@ -16,10 +16,10 @@ pnpm add substack-api
 ```typescript
 import { SubstackClient } from 'substack-api';
 
-// Initialize client with your API key
+// Initialize client with your token
 const client = new SubstackClient({
-  apiKey: 'your-connect-sid-cookie-value',
-  hostname: 'example.substack.com'
+  token: 'your-connect-sid-cookie-value',
+  publicationUrl: 'example.substack.com'
 });
 
 // Get your profile and iterate through posts

@@ -1,17 +1,17 @@
-import { PreviewPost, FullPost } from '@/domain/post'
-import { Comment } from '@/domain/comment'
-import { CommentService } from '@/internal/services/comment-service'
-import { PostService } from '@/internal/services/post-service'
-import type { HttpClient } from '@/internal/http-client'
+import { FullPost, PreviewPost } from '@substack-api/domain/post'
+import { Comment } from '@substack-api/domain/comment'
+import { CommentService } from '@substack-api/internal/services/comment-service'
+import { PostService } from '@substack-api/internal/services/post-service'
+import type { HttpClient } from '@substack-api/internal/http-client'
 
 describe('PreviewPost Entity', () => {
-  let mockHttpClient: jest.Mocked<HttpClient>
+  let mockPublicationClient: jest.Mocked<HttpClient>
   let mockCommentService: jest.Mocked<CommentService>
   let mockPostService: jest.Mocked<PostService>
   let post: PreviewPost
 
   beforeEach(() => {
-    mockHttpClient = {
+    mockPublicationClient = {
       get: jest.fn(),
       post: jest.fn(),
       request: jest.fn()
@@ -64,7 +64,7 @@ describe('PreviewPost Entity', () => {
       theme: { background_pop: 'blue' }
     }
 
-    post = new PreviewPost(mockPostData, mockHttpClient, mockCommentService, mockPostService)
+    post = new PreviewPost(mockPostData, mockPublicationClient, mockCommentService, mockPostService)
   })
 
   describe('comments()', () => {
@@ -228,7 +228,7 @@ describe('PreviewPost Entity', () => {
 describe('FullPost Entity', () => {
   let mockHttpClient: jest.Mocked<HttpClient>
   let mockCommentService: jest.Mocked<CommentService>
-  let mockPostService: jest.Mocked<PostService>
+  let _mockPostService: jest.Mocked<PostService>
   let fullPost: FullPost
 
   beforeEach(() => {
@@ -243,7 +243,7 @@ describe('FullPost Entity', () => {
       getCommentById: jest.fn()
     } as unknown as jest.Mocked<CommentService>
 
-    mockPostService = {
+    _mockPostService = {
       getPostById: jest.fn(),
       getPostsForProfile: jest.fn()
     } as unknown as jest.Mocked<PostService>
@@ -262,7 +262,7 @@ describe('FullPost Entity', () => {
       htmlBody: '<p>Full HTML content with <strong>formatting</strong></p>' // For backward compatibility
     }
 
-    fullPost = new FullPost(mockFullPostData, mockHttpClient, mockCommentService, mockPostService)
+    fullPost = new FullPost(mockFullPostData, mockHttpClient, mockCommentService)
   })
 
   describe('properties', () => {
@@ -293,19 +293,15 @@ describe('FullPost Entity', () => {
       const postWithoutHtmlBody = new FullPost(
         mockDataWithoutHtmlBody,
         mockHttpClient,
-        mockCommentService,
-        mockPostService
+        mockCommentService
       )
 
       expect(postWithoutHtmlBody.htmlBody).toBe('<p>Body from body_html field</p>')
     })
   })
 
-  describe('inheritance', () => {
-    it('should inherit all methods from PreviewPost', async () => {
-      // Test that fullPost method is available
-      expect(typeof fullPost.fullPost).toBe('function')
-
+  describe('Post interface implementation', () => {
+    it('should implement all methods from Post interface', async () => {
       // Test that like method is available
       expect(typeof fullPost.like).toBe('function')
 

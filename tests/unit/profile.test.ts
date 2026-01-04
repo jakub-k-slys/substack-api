@@ -1,10 +1,15 @@
-import { Profile } from '@/domain/profile'
-import { PreviewPost, Note } from '@/domain'
-import { ProfileService, PostService, NoteService, CommentService } from '@/internal/services'
-import type { HttpClient } from '@/internal/http-client'
+import { Profile } from '@substack-api/domain/profile'
+import { PreviewPost, Note } from '@substack-api/domain'
+import {
+  ProfileService,
+  PostService,
+  NoteService,
+  CommentService
+} from '@substack-api/internal/services'
+import type { HttpClient } from '@substack-api/internal/http-client'
 
 describe('Profile Entity', () => {
-  let mockHttpClient: jest.Mocked<HttpClient>
+  let mockPublicationClient: jest.Mocked<HttpClient>
   let mockProfileService: jest.Mocked<ProfileService>
   let mockPostService: jest.Mocked<PostService>
   let mockNoteService: jest.Mocked<NoteService>
@@ -12,11 +17,10 @@ describe('Profile Entity', () => {
   let profile: Profile
 
   beforeEach(() => {
-    mockHttpClient = {
+    mockPublicationClient = {
       get: jest.fn(),
       post: jest.fn(),
-      request: jest.fn(),
-      getPerPage: jest.fn().mockReturnValue(25)
+      request: jest.fn()
     } as unknown as jest.Mocked<HttpClient>
 
     mockProfileService = {
@@ -79,11 +83,12 @@ describe('Profile Entity', () => {
 
     profile = new Profile(
       mockProfileData,
-      mockHttpClient,
+      mockPublicationClient,
       mockProfileService,
       mockPostService,
       mockNoteService,
-      mockCommentService
+      mockCommentService,
+      25
     )
   })
 
@@ -156,7 +161,7 @@ describe('Profile Entity', () => {
 
     it('should handle empty posts response', async () => {
       const mockResponse = { posts: [] }
-      mockHttpClient.get.mockResolvedValue(mockResponse)
+      mockPublicationClient.get.mockResolvedValue(mockResponse)
 
       const posts = []
       for await (const post of profile.posts()) {
@@ -168,7 +173,7 @@ describe('Profile Entity', () => {
 
     it('should handle missing posts property', async () => {
       const mockResponse = {}
-      mockHttpClient.get.mockResolvedValue(mockResponse)
+      mockPublicationClient.get.mockResolvedValue(mockResponse)
 
       const posts = []
       for await (const post of profile.posts()) {
@@ -179,7 +184,7 @@ describe('Profile Entity', () => {
     })
 
     it('should handle API error gracefully', async () => {
-      mockHttpClient.get.mockRejectedValue(new Error('API error'))
+      mockPublicationClient.get.mockRejectedValue(new Error('API error'))
 
       const posts = []
       for await (const post of profile.posts()) {
@@ -189,38 +194,20 @@ describe('Profile Entity', () => {
       expect(posts).toHaveLength(0)
     })
 
-    it('should use perPage configuration from client', async () => {
-      // Mock a different perPage value
-      mockHttpClient.getPerPage.mockReturnValue(10)
-
-      const mockPosts = [
-        {
-          id: 1,
-          title: 'Post 1',
-          slug: 'post-1',
-          post_date: '2023-01-01T00:00:00Z',
-          canonical_url: 'https://example.com/post1',
-          type: 'newsletter' as const
-        }
-      ]
-      mockPostService.getPostsForProfile.mockResolvedValue(mockPosts)
-
-      const posts = []
-      for await (const post of profile.posts()) {
-        posts.push(post)
-      }
-
-      expect(posts).toHaveLength(1)
-      expect(mockPostService.getPostsForProfile).toHaveBeenCalledWith(123, {
-        limit: 10,
-        offset: 0
-      })
-    })
-
     it('should implement pagination with offset for multiple pages', async () => {
       // Reset the mock to avoid interference from other tests
       mockPostService.getPostsForProfile.mockReset()
-      mockHttpClient.getPerPage.mockReturnValue(2) // Set perPage to 2 for this test
+
+      // Create a new profile with perPage set to 2 for this test
+      const profileWithCustomPerPage = new Profile(
+        profile['rawData'],
+        mockPublicationClient,
+        mockProfileService,
+        mockPostService,
+        mockNoteService,
+        mockCommentService,
+        2
+      )
 
       // Mock first page response (full page)
       const firstPagePosts = [
@@ -281,7 +268,7 @@ describe('Profile Entity', () => {
         .mockResolvedValueOnce(thirdPagePosts) // offset=4, returns 1 post (partial page - end)
 
       const posts = []
-      for await (const post of profile.posts()) {
+      for await (const post of profileWithCustomPerPage.posts()) {
         posts.push(post)
       }
 
@@ -678,7 +665,7 @@ describe('Profile Entity', () => {
 
     it('should handle empty notes response', async () => {
       const mockResponse = { items: [] }
-      mockHttpClient.get.mockResolvedValue(mockResponse)
+      mockPublicationClient.get.mockResolvedValue(mockResponse)
 
       const notes = []
       for await (const note of profile.notes()) {
@@ -690,7 +677,7 @@ describe('Profile Entity', () => {
 
     it('should handle missing items property', async () => {
       const mockResponse = {}
-      mockHttpClient.get.mockResolvedValue(mockResponse)
+      mockPublicationClient.get.mockResolvedValue(mockResponse)
 
       const notes = []
       for await (const note of profile.notes()) {
@@ -701,7 +688,7 @@ describe('Profile Entity', () => {
     })
 
     it('should handle API error gracefully', async () => {
-      mockHttpClient.get.mockRejectedValue(new Error('API error'))
+      mockPublicationClient.get.mockRejectedValue(new Error('API error'))
 
       const notes = []
       for await (const note of profile.notes()) {
@@ -711,94 +698,9 @@ describe('Profile Entity', () => {
       expect(notes).toHaveLength(0)
     })
 
-    it('should use perPage configuration from client', async () => {
-      // Mock a different perPage value
-      mockHttpClient.getPerPage.mockReturnValue(10)
-
-      const mockResponse = [
-        {
-          entity_key: 'c-129',
-          type: 'comment',
-          context: {
-            type: 'note',
-            timestamp: '2023-01-01T00:00:00Z',
-            users: [
-              {
-                id: 123,
-                name: 'Test User',
-                handle: 'testuser',
-                photo_url: 'https://example.com/photo.jpg',
-                profile_set_up_at: '2023-01-01T00:00:00Z',
-                reader_installed_at: '2023-01-01T00:00:00Z'
-              }
-            ],
-            isFresh: false,
-            page_rank: 1
-          },
-          comment: {
-            name: 'Test User',
-            handle: 'testuser',
-            photo_url: 'https://example.com/photo.jpg',
-            id: 129,
-            body: 'PerPage test note',
-            type: 'feed',
-            user_id: 123,
-            date: '2023-01-01T00:00:00Z',
-            ancestor_path: '',
-            reply_minimum_role: 'everyone',
-            reaction_count: 0,
-            reactions: {},
-            restacks: 0,
-            restacked: false,
-            children_count: 0,
-            attachments: []
-          },
-          parentComments: [],
-          canReply: true,
-          isMuted: false,
-          trackingParameters: {
-            item_primary_entity_key: 'c-129',
-            item_entity_key: 'c-129',
-            item_type: 'comment',
-            item_content_user_id: 123,
-            item_context_type: 'note',
-            item_context_type_bucket: '',
-            item_context_timestamp: '2023-01-01T00:00:00Z',
-            item_context_user_id: 123,
-            item_context_user_ids: [123],
-            item_can_reply: true,
-            item_is_fresh: false,
-            item_last_impression_at: null,
-            item_page: null,
-            item_page_rank: 1,
-            impression_id: 'test-impression',
-            followed_user_count: 0,
-            subscribed_publication_count: 0,
-            is_following: false,
-            is_explicitly_subscribed: false
-          }
-        }
-      ]
-      mockNoteService.getNotesForProfile.mockResolvedValue({
-        notes: mockResponse,
-        nextCursor: undefined
-      })
-
-      const notes = []
-      for await (const note of profile.notes()) {
-        notes.push(note)
-      }
-
-      expect(notes).toHaveLength(1)
-      expect(mockNoteService.getNotesForProfile).toHaveBeenCalledWith(123, {
-        cursor: undefined
-      })
-    })
-
     it('should implement pagination with cursor for multiple pages', async () => {
       // Reset the mock to avoid interference from other tests
       mockNoteService.getNotesForProfile.mockReset()
-      mockHttpClient.getPerPage.mockReturnValue(2) // Set perPage to 2 for this test
 
       // Mock first page response (full page)
       const firstPageResponse = [

@@ -12,7 +12,7 @@ export default {
   roots: ['<rootDir>/tests/e2e'],
   testMatch: ['**/*.e2e.test.ts'],
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
+    '^@substack-api/(.*)$': '<rootDir>/src/$1',
     '^@test/(.*)$': '<rootDir>/tests/$1'
   },
   setupFilesAfterEnv: ['<rootDir>/tests/e2e/setup.ts'],

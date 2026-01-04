@@ -1,31 +1,28 @@
-import { PostService } from '@/internal/services/post-service'
-import { HttpClient } from '@/internal/http-client'
-import type { SubstackFullPost, SubstackPost } from '@/internal'
+import { PostService } from '@substack-api/internal/services/post-service'
+import { HttpClient } from '@substack-api/internal/http-client'
+import type { SubstackFullPost, SubstackPreviewPost } from '@substack-api/internal'
 
 // Mock the http client
-jest.mock('@/internal/http-client')
+jest.mock('@substack-api/internal/http-client')
 
 describe('PostService', () => {
   let postService: PostService
-  let mockGlobalHttpClient: jest.Mocked<HttpClient>
-  let mockHttpClient: jest.Mocked<HttpClient>
+  let mockSubstackClient: jest.Mocked<HttpClient>
+  let mockPublicationClient: jest.Mocked<HttpClient>
 
   beforeEach(() => {
     jest.clearAllMocks()
 
-    mockGlobalHttpClient = new HttpClient('https://substack.com', {
-      apiKey: 'test',
-      hostname: 'test.com'
-    }) as jest.Mocked<HttpClient>
-    mockGlobalHttpClient.get = jest.fn()
+    mockSubstackClient = new HttpClient('https://substack.com', 'test') as jest.Mocked<HttpClient>
+    mockSubstackClient.get = jest.fn()
 
-    mockHttpClient = new HttpClient('https://test.substack.com', {
-      apiKey: 'test',
-      hostname: 'test.com'
-    }) as jest.Mocked<HttpClient>
-    mockHttpClient.get = jest.fn()
+    mockPublicationClient = new HttpClient(
+      'https://test.substack.com',
+      'test'
+    ) as jest.Mocked<HttpClient>
+    mockPublicationClient.get = jest.fn()
 
-    postService = new PostService(mockGlobalHttpClient, mockHttpClient)
+    postService = new PostService(mockSubstackClient)
   })
 
   describe('getPostById', () => {
@@ -35,23 +32,24 @@ describe('PostService', () => {
         title: 'Test Post',
         slug: 'test-post',
         post_date: '2023-01-01T00:00:00Z',
+        canonical_url: 'https://example.com/test-post',
         body_html: '<p>Test post body content</p>'
       }
 
-      mockGlobalHttpClient.get.mockResolvedValueOnce({ post: mockPost })
+      mockSubstackClient.get.mockResolvedValueOnce({ post: mockPost })
 
       const result = await postService.getPostById(123)
 
       expect(result).toEqual(mockPost)
-      expect(mockGlobalHttpClient.get).toHaveBeenCalledWith('/api/v1/posts/by-id/123')
+      expect(mockSubstackClient.get).toHaveBeenCalledWith('/posts/by-id/123')
     })
 
     it('should throw error when global HTTP client fails', async () => {
       const errorMessage = 'HTTP 404: Not found'
-      mockGlobalHttpClient.get.mockRejectedValueOnce(new Error(errorMessage))
+      mockSubstackClient.get.mockRejectedValueOnce(new Error(errorMessage))
 
       await expect(postService.getPostById(999)).rejects.toThrow(errorMessage)
-      expect(mockGlobalHttpClient.get).toHaveBeenCalledWith('/api/v1/posts/by-id/999')
+      expect(mockSubstackClient.get).toHaveBeenCalledWith('/posts/by-id/999')
     })
 
     it('should use global HTTP client instead of publication-specific client', async () => {
@@ -60,25 +58,26 @@ describe('PostService', () => {
         title: 'Another Test Post',
         slug: 'another-test-post',
         post_date: '2023-02-01T00:00:00Z',
+        canonical_url: 'https://example.com/another-test-post',
         body_html: '<p>Another test post body content</p>'
       }
 
-      mockGlobalHttpClient.get.mockResolvedValueOnce({ post: mockPost })
+      mockSubstackClient.get.mockResolvedValueOnce({ post: mockPost })
 
       await postService.getPostById(456)
 
       // Verify that only the global HTTP client is used
-      expect(mockGlobalHttpClient.get).toHaveBeenCalledWith('/api/v1/posts/by-id/456')
+      expect(mockSubstackClient.get).toHaveBeenCalledWith('/posts/by-id/456')
     })
 
     it('should throw error when response is missing post data', async () => {
       // Mock response without post data
-      mockGlobalHttpClient.get.mockResolvedValueOnce({})
+      mockSubstackClient.get.mockResolvedValueOnce({})
 
       await expect(postService.getPostById(123)).rejects.toThrow(
         'Invalid response format: missing post data'
       )
-      expect(mockGlobalHttpClient.get).toHaveBeenCalledWith('/api/v1/posts/by-id/123')
+      expect(mockSubstackClient.get).toHaveBeenCalledWith('/posts/by-id/123')
     })
 
     it('should transform postTags from objects to strings', async () => {
@@ -93,7 +92,7 @@ describe('PostService', () => {
         postTags: [{ name: 'tech', id: 1 }, { name: 'newsletter', id: 2 }, 'simple-string-tag']
       }
 
-      mockGlobalHttpClient.get.mockResolvedValueOnce({ post: mockPost })
+      mockSubstackClient.get.mockResolvedValueOnce({ post: mockPost })
 
       const result = await postService.getPostById(123)
 
@@ -103,7 +102,7 @@ describe('PostService', () => {
 
   describe('getPostsForProfile', () => {
     it('should return posts for a profile', async () => {
-      const mockPosts: SubstackPost[] = [
+      const mockPosts: SubstackPreviewPost[] = [
         {
           id: 1,
           title: 'Post 1',
@@ -116,41 +115,35 @@ describe('PostService', () => {
         }
       ]
 
-      mockGlobalHttpClient.get.mockResolvedValueOnce({ posts: mockPosts })
+      mockSubstackClient.get.mockResolvedValueOnce({ posts: mockPosts })
 
       const result = await postService.getPostsForProfile(123, { limit: 10, offset: 0 })
 
       expect(result).toEqual(mockPosts)
-      expect(mockGlobalHttpClient.get).toHaveBeenCalledWith(
-        '/api/v1/profile/posts?profile_user_id=123'
-      )
+      expect(mockSubstackClient.get).toHaveBeenCalledWith('/profile/posts?profile_user_id=123')
     })
 
     it('should handle empty posts array', async () => {
-      mockGlobalHttpClient.get.mockResolvedValueOnce({ posts: [] })
+      mockSubstackClient.get.mockResolvedValueOnce({ posts: [] })
 
       const result = await postService.getPostsForProfile(456, { limit: 5, offset: 10 })
 
       expect(result).toEqual([])
-      expect(mockGlobalHttpClient.get).toHaveBeenCalledWith(
-        '/api/v1/profile/posts?profile_user_id=456'
-      )
+      expect(mockSubstackClient.get).toHaveBeenCalledWith('/profile/posts?profile_user_id=456')
     })
 
     it('should handle missing posts property in response', async () => {
-      mockGlobalHttpClient.get.mockResolvedValueOnce({})
+      mockSubstackClient.get.mockResolvedValueOnce({})
 
       const result = await postService.getPostsForProfile(789, { limit: 20, offset: 5 })
 
       expect(result).toEqual([])
-      expect(mockGlobalHttpClient.get).toHaveBeenCalledWith(
-        '/api/v1/profile/posts?profile_user_id=789'
-      )
+      expect(mockSubstackClient.get).toHaveBeenCalledWith('/profile/posts?profile_user_id=789')
     })
 
     it('should throw error when HTTP client fails', async () => {
       const errorMessage = 'HTTP 500: Internal server error'
-      mockGlobalHttpClient.get.mockRejectedValueOnce(new Error(errorMessage))
+      mockSubstackClient.get.mockRejectedValueOnce(new Error(errorMessage))
 
       await expect(postService.getPostsForProfile(123, { limit: 10, offset: 0 })).rejects.toThrow(
         errorMessage
@@ -158,7 +151,7 @@ describe('PostService', () => {
     })
 
     it('should validate each post in the response', async () => {
-      const validPost: SubstackPost = {
+      const validPost: SubstackPreviewPost = {
         id: 1,
         title: 'Valid Post',
         post_date: '2023-01-01T00:00:00Z'
@@ -170,7 +163,7 @@ describe('PostService', () => {
         // Missing required fields
       }
 
-      mockGlobalHttpClient.get.mockResolvedValueOnce({ posts: [validPost, invalidPost] })
+      mockSubstackClient.get.mockResolvedValueOnce({ posts: [validPost, invalidPost] })
 
       await expect(postService.getPostsForProfile(123, { limit: 10, offset: 0 })).rejects.toThrow(
         /Post 1 in profile response/

@@ -1,89 +1,101 @@
-import { ConnectivityService } from '@/internal/services/connectivity-service'
-import { HttpClient } from '@/internal/http-client'
+import { ConnectivityService } from '@substack-api/internal/services/connectivity-service'
+import { HttpClient } from '@substack-api/internal/http-client'
 
 // Mock the HttpClient
-jest.mock('@/internal/http-client')
+jest.mock('@substack-api/internal/http-client')
 
 describe('ConnectivityService', () => {
   let connectivityService: ConnectivityService
-  let mockHttpClient: jest.Mocked<HttpClient>
+  let mockSubstackClient: jest.Mocked<HttpClient>
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockHttpClient = new HttpClient('https://test.com', {
-      apiKey: 'test',
-      hostname: 'test.com'
-    }) as jest.Mocked<HttpClient>
-    mockHttpClient.get = jest.fn()
+    mockSubstackClient = new HttpClient('https://test.com', 'test') as jest.Mocked<HttpClient>
+    mockSubstackClient.put = jest.fn()
 
-    connectivityService = new ConnectivityService(mockHttpClient)
+    connectivityService = new ConnectivityService(mockSubstackClient)
   })
 
   describe('isConnected', () => {
     it('should return true when API is accessible', async () => {
       // Arrange
-      mockHttpClient.get.mockResolvedValue({})
+      mockSubstackClient.put.mockResolvedValue({})
 
       // Act
       const result = await connectivityService.isConnected()
 
       // Assert
       expect(result).toBe(true)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/feed/following')
-      expect(mockHttpClient.get).toHaveBeenCalledTimes(1)
+      expect(mockSubstackClient.put).toHaveBeenCalledWith('/user-setting', {
+        type: 'last_home_tab',
+        value_text: 'inbox'
+      })
+      expect(mockSubstackClient.put).toHaveBeenCalledTimes(1)
     })
 
     it('should return false when API request fails with network error', async () => {
       // Arrange
-      mockHttpClient.get.mockRejectedValue(new Error('Network error'))
+      mockSubstackClient.put.mockRejectedValue(new Error('Network error'))
 
       // Act
       const result = await connectivityService.isConnected()
 
       // Assert
       expect(result).toBe(false)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/feed/following')
-      expect(mockHttpClient.get).toHaveBeenCalledTimes(1)
+      expect(mockSubstackClient.put).toHaveBeenCalledWith('/user-setting', {
+        type: 'last_home_tab',
+        value_text: 'inbox'
+      })
+      expect(mockSubstackClient.put).toHaveBeenCalledTimes(1)
     })
 
     it('should return false when API request fails with HTTP error', async () => {
       // Arrange
-      mockHttpClient.get.mockRejectedValue(new Error('HTTP 401: Unauthorized'))
+      mockSubstackClient.put.mockRejectedValue(new Error('HTTP 401: Unauthorized'))
 
       // Act
       const result = await connectivityService.isConnected()
 
       // Assert
       expect(result).toBe(false)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/feed/following')
-      expect(mockHttpClient.get).toHaveBeenCalledTimes(1)
+      expect(mockSubstackClient.put).toHaveBeenCalledWith('/user-setting', {
+        type: 'last_home_tab',
+        value_text: 'inbox'
+      })
+      expect(mockSubstackClient.put).toHaveBeenCalledTimes(1)
     })
 
     it('should return false when API request fails with timeout', async () => {
       // Arrange
-      mockHttpClient.get.mockRejectedValue(new Error('Request timeout'))
+      mockSubstackClient.put.mockRejectedValue(new Error('Request timeout'))
 
       // Act
       const result = await connectivityService.isConnected()
 
       // Assert
       expect(result).toBe(false)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/feed/following')
-      expect(mockHttpClient.get).toHaveBeenCalledTimes(1)
+      expect(mockSubstackClient.put).toHaveBeenCalledWith('/user-setting', {
+        type: 'last_home_tab',
+        value_text: 'inbox'
+      })
+      expect(mockSubstackClient.put).toHaveBeenCalledTimes(1)
     })
 
     it('should handle successful API response with data', async () => {
       // Arrange
-      const mockResponse = [123, 456, 789]
-      mockHttpClient.get.mockResolvedValue(mockResponse)
+      const mockResponse = { success: true }
+      mockSubstackClient.put.mockResolvedValue(mockResponse)
 
       // Act
       const result = await connectivityService.isConnected()
 
       // Assert
       expect(result).toBe(true)
-      expect(mockHttpClient.get).toHaveBeenCalledWith('/api/v1/feed/following')
-      expect(mockHttpClient.get).toHaveBeenCalledTimes(1)
+      expect(mockSubstackClient.put).toHaveBeenCalledWith('/user-setting', {
+        type: 'last_home_tab',
+        value_text: 'inbox'
+      })
+      expect(mockSubstackClient.put).toHaveBeenCalledTimes(1)
     })
   })
 })
