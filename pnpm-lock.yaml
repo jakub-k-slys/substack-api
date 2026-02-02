@@ -10,10 +10,10 @@ importers:
     dependencies:
       axios:
         specifier: ^1.13.2
-        version: 1.13.3
+        version: 1.13.4
       axios-rate-limit:
         specifier: ^1.4.0
-        version: 1.4.0(axios@1.13.3)
+        version: 1.4.0(axios@1.13.4)
       fp-ts:
         specifier: ^2.16.10
         version: 2.16.11
@@ -875,8 +875,8 @@ packages:
     peerDependencies:
       axios: '*'
 
-  axios@1.13.3:
-    resolution: {integrity: sha512-ERT8kdX7DZjtUm7IitEyV7InTHAF42iJuMArIiDIV5YtPanJkgw4hw5Dyg9fh0mihdWNn1GKaeIWErfe56UQ1g==}
+  axios@1.13.4:
+    resolution: {integrity: sha512-1wVkUaAO6WyaYtCkcYCOx12ZgpGf9Zif+qXa4n+oYzK558YryKqiL6UWwd5DqiH3VRW0GYhTZQ/vlgJrCoNQlg==}
 
   babel-jest@30.2.0:
     resolution: {integrity: sha512-0YiBEOxWqKkSQWL9nNGGEgndoeL0ZpWrbLMNL5u/Kaxrli3Eaxlt3ZtIDktEvXt4L/R9r3ODr2zKwGM/2BjxVw==}
@@ -2984,11 +2984,11 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  axios-rate-limit@1.4.0(axios@1.13.3):
+  axios-rate-limit@1.4.0(axios@1.13.4):
     dependencies:
-      axios: 1.13.3
+      axios: 1.13.4
 
-  axios@1.13.3:
+  axios@1.13.4:
     dependencies:
       follow-redirects: 1.15.11
       form-data: 4.0.5
