@@ -13,7 +13,7 @@ importers:
         version: 1.13.5
       axios-rate-limit:
         specifier: ^1.4.0
-        version: 1.4.0(axios@1.13.5)
+        version: 1.6.0(axios@1.13.5)
       fp-ts:
         specifier: ^2.16.10
         version: 2.16.11
@@ -870,8 +870,8 @@ packages:
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
-  axios-rate-limit@1.4.0:
-    resolution: {integrity: sha512-uM5PbmSUdSle1I+59Av/wpLuNRobfatIR+FyylSoHcVHT20ohjflNnLMEHZQr7N2QVG/Wlt8jekIPhWwoKtpXQ==}
+  axios-rate-limit@1.6.0:
+    resolution: {integrity: sha512-U33XhAQ0JV4GMpmdAOd2nZNs3P8YuBcVup3DT1pIZKM9uYbJl2oNXqq17ZFIr4EExmu1jAudG4cXXU30K/ITqw==}
     peerDependencies:
       axios: '*'
 
@@ -2985,7 +2985,7 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  axios-rate-limit@1.4.0(axios@1.13.5):
+  axios-rate-limit@1.6.0(axios@1.13.5):
     dependencies:
       axios: 1.13.5
 
