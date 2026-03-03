@@ -5,74 +5,41 @@ import {
   ListItemBuilder
 } from '@substack-api/domain/note-builder'
 import type { HttpClient } from '@substack-api/internal/http-client'
-import type { PublishNoteResponse } from '@substack-api/internal'
 
-describe('NoteBuilder', () => {
-  let mockPublicationClient: jest.Mocked<HttpClient>
-  let mockPublishResponse: PublishNoteResponse
+describe('NoteBuilder (post-builder)', () => {
+  let mockClient: jest.Mocked<HttpClient>
 
   beforeEach(() => {
-    mockPublicationClient = {
+    mockClient = {
       get: jest.fn(),
-      post: jest.fn(),
-      request: jest.fn()
+      post: jest.fn()
     } as unknown as jest.Mocked<HttpClient>
 
-    mockPublishResponse = {
-      id: 789,
-      date: '2023-01-01T00:00:00Z',
-      body: 'Test note content',
-      attachments: []
-    }
-
-    mockPublicationClient.post.mockResolvedValue(mockPublishResponse)
+    mockClient.post.mockResolvedValue({ id: 789 })
   })
 
   describe('Constructor', () => {
-    it('should create empty post builder without parameters', () => {
-      const builder = new NoteBuilder(mockPublicationClient)
+    it('should create empty NoteBuilder', () => {
+      const builder = new NoteBuilder(mockClient)
       expect(builder).toBeInstanceOf(NoteBuilder)
     })
   })
 
   describe('paragraph() method', () => {
     it('should return ParagraphBuilder instance', () => {
-      const builder = new NoteBuilder(mockPublicationClient)
-      const paragraphBuilder = builder.paragraph()
-      expect(paragraphBuilder).toBeInstanceOf(ParagraphBuilder)
+      const builder = new NoteBuilder(mockClient)
+      expect(builder.paragraph()).toBeInstanceOf(ParagraphBuilder)
     })
   })
 
   describe('Basic paragraph creation', () => {
-    it('should create note with simple text content', async () => {
-      const builder = new NoteBuilder(mockPublicationClient)
-      const result = await builder.paragraph().text('Hello world').build()
-
-      expect(result).toEqual({
-        bodyJson: {
-          type: 'doc',
-          attrs: { schemaVersion: 'v1' },
-          content: [
-            {
-              type: 'paragraph',
-              content: [
-                {
-                  type: 'text',
-                  text: 'Hello world'
-                }
-              ]
-            }
-          ]
-        },
-        tabId: 'for-you',
-        surface: 'feed',
-        replyMinimumRole: 'everyone'
-      })
+    it('should build simple text as Markdown string', () => {
+      const result = new NoteBuilder(mockClient).paragraph().text('Hello world').build()
+      expect(result).toBe('Hello world')
     })
 
-    it('should create note with mixed formatting', async () => {
-      const builder = new NoteBuilder(mockPublicationClient)
-      const result = await builder
+    it('should build mixed formatting as Markdown', () => {
+      const result = new NoteBuilder(mockClient)
         .paragraph()
         .text('This is ')
         .bold('bold')
@@ -83,72 +50,38 @@ describe('NoteBuilder', () => {
         .text(' text.')
         .build()
 
-      expect(result.bodyJson.content[0]).toEqual({
-        type: 'paragraph',
-        content: [
-          { type: 'text', text: 'This is ' },
-          { type: 'text', text: 'bold', marks: [{ type: 'bold' }] },
-          { type: 'text', text: ' and ' },
-          { type: 'text', text: 'italic', marks: [{ type: 'italic' }] },
-          { type: 'text', text: ' and ' },
-          { type: 'text', text: 'underlined', marks: [{ type: 'underline' }] },
-          { type: 'text', text: ' text.' }
-        ]
-      })
+      expect(result).toBe('This is **bold** and _italic_ and underlined text.')
     })
 
-    it('should support links', async () => {
-      const builder = new NoteBuilder(mockPublicationClient)
-      const result = await builder
+    it('should format links as [text](url)', () => {
+      const result = new NoteBuilder(mockClient)
         .paragraph()
         .text('Visit ')
         .link('Google', 'https://google.com')
         .text(' for search.')
         .build()
 
-      expect(result.bodyJson.content[0]).toEqual({
-        type: 'paragraph',
-        content: [
-          { type: 'text', text: 'Visit ' },
-          {
-            type: 'text',
-            text: 'Google',
-            marks: [{ type: 'link', attrs: { href: 'https://google.com' } }]
-          },
-          { type: 'text', text: ' for search.' }
-        ]
-      })
+      expect(result).toBe('Visit [Google](https://google.com) for search.')
     })
   })
 
   describe('Multiple paragraphs', () => {
-    it('should create note with multiple paragraphs', async () => {
-      const builder = new NoteBuilder(mockPublicationClient)
-      const result = await builder
+    it('should join paragraphs with \\n\\n', () => {
+      const result = new NoteBuilder(mockClient)
         .paragraph()
         .text('First paragraph')
         .paragraph()
         .text('Second paragraph')
         .build()
 
-      expect(result.bodyJson.content).toHaveLength(2)
-      expect(result.bodyJson.content[0]).toEqual({
-        type: 'paragraph',
-        content: [{ type: 'text', text: 'First paragraph' }]
-      })
-      expect(result.bodyJson.content[1]).toEqual({
-        type: 'paragraph',
-        content: [{ type: 'text', text: 'Second paragraph' }]
-      })
+      expect(result).toBe('First paragraph\n\nSecond paragraph')
     })
   })
 
   describe('Lists', () => {
-    it('should create bullet list', async () => {
-      const builder = new NoteBuilder(mockPublicationClient)
-      const result = await builder
+    it('should prefix bullet list items with "- "', () => {
+      const result = new NoteBuilder(mockClient)
         .paragraph()
-        .text('My list:')
         .bulletList()
         .item()
         .text('First item')
@@ -157,41 +90,13 @@ describe('NoteBuilder', () => {
         .finish()
         .build()
 
-      expect(result.bodyJson.content).toHaveLength(2)
-      expect(result.bodyJson.content[0]).toEqual({
-        type: 'paragraph',
-        content: [{ type: 'text', text: 'My list:' }]
-      })
-      expect(result.bodyJson.content[1]).toEqual({
-        type: 'bulletList',
-        content: [
-          {
-            type: 'listItem',
-            content: [
-              {
-                type: 'paragraph',
-                content: [{ type: 'text', text: 'First item' }]
-              }
-            ]
-          },
-          {
-            type: 'listItem',
-            content: [
-              {
-                type: 'paragraph',
-                content: [{ type: 'text', text: 'Second item' }]
-              }
-            ]
-          }
-        ]
-      })
+      expect(result).toContain('- First item')
+      expect(result).toContain('- Second item')
     })
 
-    it('should create numbered list', async () => {
-      const builder = new NoteBuilder(mockPublicationClient)
-      const result = await builder
+    it('should prefix numbered list items with "1. ", "2. "', () => {
+      const result = new NoteBuilder(mockClient)
         .paragraph()
-        .text('Steps:')
         .numberedList()
         .item()
         .text('Step one')
@@ -200,36 +105,13 @@ describe('NoteBuilder', () => {
         .finish()
         .build()
 
-      expect(result.bodyJson.content[1]).toEqual({
-        type: 'orderedList',
-        content: [
-          {
-            type: 'listItem',
-            content: [
-              {
-                type: 'paragraph',
-                content: [{ type: 'text', text: 'Step one' }]
-              }
-            ]
-          },
-          {
-            type: 'listItem',
-            content: [
-              {
-                type: 'paragraph',
-                content: [{ type: 'text', text: 'Step two' }]
-              }
-            ]
-          }
-        ]
-      })
+      expect(result).toContain('1. Step one')
+      expect(result).toContain('2. Step two')
     })
 
-    it('should support formatting in list items', async () => {
-      const builder = new NoteBuilder(mockPublicationClient)
-      const result = await builder
+    it('should support formatting in list items', () => {
+      const result = new NoteBuilder(mockClient)
         .paragraph()
-        .text('List:')
         .bulletList()
         .item()
         .bold('Bold')
@@ -240,35 +122,23 @@ describe('NoteBuilder', () => {
         .finish()
         .build()
 
-      const listContent = result.bodyJson.content[1] as any
-      expect(listContent.content[0].content[0].content).toEqual([
-        { type: 'text', text: 'Bold', marks: [{ type: 'bold' }] },
-        { type: 'text', text: ' and ' },
-        { type: 'text', text: 'italic', marks: [{ type: 'italic' }] }
-      ])
-      expect(listContent.content[1].content[0].content).toEqual([
-        {
-          type: 'text',
-          text: 'Link',
-          marks: [{ type: 'link', attrs: { href: 'https://example.com' } }]
-        }
-      ])
+      expect(result).toContain('- **Bold** and _italic_')
+      expect(result).toContain('- [Link](https://example.com)')
     })
   })
 
   describe('Validation', () => {
-    it('should throw error when building note with no paragraphs', () => {
-      const builder = new NoteBuilder(mockPublicationClient)
-      expect(() => builder.build()).toThrow('Note must contain at least one paragraph')
+    it('should throw when building empty note', () => {
+      expect(() => new NoteBuilder(mockClient).build()).toThrow(
+        'Note must contain at least one paragraph'
+      )
     })
 
-    it('should throw error when paragraph has no content', () => {
-      const builder = new NoteBuilder(mockPublicationClient)
-
-      // This should be impossible with our API design, but let's test the validation
-      // We'll need to call addParagraph directly to simulate this edge case
-      const builderWithEmptyParagraph = (builder as any).addParagraph({ segments: [], lists: [] })
-
+    it('should throw when paragraph has no content', () => {
+      const builderWithEmptyParagraph = (new NoteBuilder(mockClient) as any).addParagraph({
+        segments: [],
+        lists: []
+      })
       expect(() => builderWithEmptyParagraph.build()).toThrow(
         'Each paragraph must contain at least one content block'
       )
@@ -277,7 +147,7 @@ describe('NoteBuilder', () => {
 
   describe('Builder types and scoping', () => {
     it('should return correct builder types', () => {
-      const builder = new NoteBuilder(mockPublicationClient)
+      const builder = new NoteBuilder(mockClient)
       const paragraphBuilder = builder.paragraph()
       const listBuilder = paragraphBuilder.bulletList()
       const listItemBuilder = listBuilder.item()
@@ -289,26 +159,17 @@ describe('NoteBuilder', () => {
   })
 
   describe('Publishing', () => {
-    it('should publish note directly from paragraph builder', async () => {
-      const builder = new NoteBuilder(mockPublicationClient)
-      const result = await builder.paragraph().text('Test content').publish()
+    it('should POST to /notes with { content: markdownString }', async () => {
+      await new NoteBuilder(mockClient).paragraph().text('Test content').publish()
 
-      expect(mockPublicationClient.post).toHaveBeenCalledWith('/comment/feed/', {
-        bodyJson: {
-          type: 'doc',
-          attrs: { schemaVersion: 'v1' },
-          content: [
-            {
-              type: 'paragraph',
-              content: [{ type: 'text', text: 'Test content' }]
-            }
-          ]
-        },
-        tabId: 'for-you',
-        surface: 'feed',
-        replyMinimumRole: 'everyone'
+      expect(mockClient.post).toHaveBeenCalledWith('/notes', {
+        content: 'Test content'
       })
-      expect(result).toBe(mockPublishResponse)
+    })
+
+    it('should return GatewayCreateNoteResponse from publish()', async () => {
+      const result = await new NoteBuilder(mockClient).paragraph().text('Test').publish()
+      expect(result).toEqual({ id: 789 })
     })
   })
 })

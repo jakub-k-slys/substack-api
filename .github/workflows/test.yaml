@@ -150,7 +150,7 @@ jobs:
               run: |
                 pnpm test:e2e
               env:
-                SUBSTACK_API_KEY: ${{ secrets.SUBSTACK_API_KEY }}
+                SUBSTACK_TOKEN: ${{ secrets.SUBSTACK_TOKEN }}
                 SUBSTACK_HOSTNAME: ${{ secrets.SUBSTACK_HOSTNAME }}
             - name: Upload E2E test results
               if: always()

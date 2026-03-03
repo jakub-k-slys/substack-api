@@ -7,10 +7,7 @@ describe('SubstackClient Entity Model E2E', () => {
 
   beforeAll(() => {
     const { token, publicationUrl } = validateE2ECredentials()
-    client = new SubstackClient({
-      token: token,
-      publicationUrl: publicationUrl
-    })
+    client = new SubstackClient({ token, publicationUrl })
   })
 
   test('should test connectivity', async () => {

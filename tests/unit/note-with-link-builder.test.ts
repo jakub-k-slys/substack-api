@@ -1,7 +1,6 @@
 import { NoteWithLinkBuilder } from '@substack-api/domain/note-builder'
 import { HttpClient } from '@substack-api/internal/http-client'
 
-// Mock HttpClient
 jest.mock('@substack-api/internal/http-client')
 const MockHttpClient = HttpClient as jest.MockedClass<typeof HttpClient>
 
@@ -10,10 +9,11 @@ describe('NoteWithLinkBuilder', () => {
   let builder: NoteWithLinkBuilder
 
   beforeEach(() => {
-    mockClient = new MockHttpClient(
-      'https://example.com',
-      'test-api-key'
-    ) as jest.Mocked<HttpClient>
+    mockClient = new MockHttpClient('https://example.com', {
+      token: 'dummy-token',
+      publicationUrl: 'https://pub.com'
+    }) as jest.Mocked<HttpClient>
+    mockClient.post = jest.fn().mockResolvedValue({ id: 67890 })
     builder = new NoteWithLinkBuilder(mockClient, 'https://example.com/test')
   })
 
@@ -22,216 +22,60 @@ describe('NoteWithLinkBuilder', () => {
   })
 
   describe('publish', () => {
-    it('should create attachment and publish note with attachment ID', async () => {
-      // Mock attachment creation response
-      const mockAttachmentResponse = {
-        id: '19b5d6f9-46db-47d6-b381-17cb5f443c00',
-        type: 'post',
-        publication: {},
-        post: {}
-      }
-
-      // Mock note publish response
-      const mockPublishResponse = {
-        user_id: 12345,
-        body: 'Test note',
-        body_json: {
-          type: 'doc',
-          attrs: { schemaVersion: 'v1' },
-          content: []
-        },
-        post_id: null,
-        publication_id: null,
-        media_clip_id: null,
-        ancestor_path: '',
-        type: 'feed',
-        status: 'published',
-        reply_minimum_role: 'everyone',
-        id: 67890,
-        deleted: false,
-        date: '2025-08-06T12:00:00Z',
-        name: 'Test User',
-        photo_url: 'https://example.com/photo.jpg',
-        reactions: {},
-        children: [],
-        user_bestseller_tier: null,
-        isFirstFeedCommentByUser: false,
-        reaction_count: 0,
-        restacks: 0,
-        restacked: false,
-        children_count: 0,
-        attachments: []
-      }
-
-      mockClient.post
-        .mockResolvedValueOnce(mockAttachmentResponse) // First call for attachment
-        .mockResolvedValueOnce(mockPublishResponse) // Second call for note publish
-
-      // Build and publish a simple note
+    it('should POST to /notes with { content, attachment } in a single call', async () => {
       const result = await builder.paragraph().text('Check out this link!').publish()
 
-      // Verify two calls were made in the correct order
-      expect(mockClient.post).toHaveBeenCalledTimes(2)
-
-      // Verify first call was attachment creation
-      expect(mockClient.post).toHaveBeenNthCalledWith(1, '/comment/attachment/', {
-        url: 'https://example.com/test',
-        type: 'link'
+      expect(mockClient.post).toHaveBeenCalledTimes(1)
+      expect(mockClient.post).toHaveBeenCalledWith('/notes', {
+        content: 'Check out this link!',
+        attachment: 'https://example.com/test'
       })
-
-      // Verify second call was note publish with attachment ID
-      expect(mockClient.post).toHaveBeenNthCalledWith(
-        2,
-        '/comment/feed/',
-        expect.objectContaining({
-          attachmentIds: ['19b5d6f9-46db-47d6-b381-17cb5f443c00'],
-          bodyJson: {
-            type: 'doc',
-            attrs: { schemaVersion: 'v1' },
-            content: [
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: 'Check out this link!'
-                  }
-                ]
-              }
-            ]
-          },
-          tabId: 'for-you',
-          surface: 'feed',
-          replyMinimumRole: 'everyone'
-        })
-      )
-
-      expect(result).toEqual(mockPublishResponse)
+      expect(result).toEqual({ id: 67890 })
     })
 
-    it('should handle complex note content with attachments', async () => {
-      // Mock attachment creation response
-      const mockAttachmentResponse = {
-        id: 'attachment-id-123',
-        type: 'post',
-        publication: {},
-        post: {}
-      }
-
-      // Mock note publish response
-      const mockPublishResponse = {
-        user_id: 12345,
-        body: 'Complex note',
-        body_json: {
-          type: 'doc',
-          attrs: { schemaVersion: 'v1' },
-          content: []
-        },
-        post_id: null,
-        publication_id: null,
-        media_clip_id: null,
-        ancestor_path: '',
-        type: 'feed',
-        status: 'published',
-        reply_minimum_role: 'everyone',
-        id: 67890,
-        deleted: false,
-        date: '2025-08-06T12:00:00Z',
-        name: 'Test User',
-        photo_url: 'https://example.com/photo.jpg',
-        reactions: {},
-        children: [],
-        user_bestseller_tier: null,
-        isFirstFeedCommentByUser: false,
-        reaction_count: 0,
-        restacks: 0,
-        restacked: false,
-        children_count: 0,
-        attachments: []
-      }
-
-      mockClient.post
-        .mockResolvedValueOnce(mockAttachmentResponse)
-        .mockResolvedValueOnce(mockPublishResponse)
-
-      // Build a complex note with multiple formatting options
-      const result = await builder
+    it('should include the attachment URL for complex notes', async () => {
+      await builder
         .paragraph()
         .text('This is ')
-        .bold('bold text')
+        .bold('bold')
         .text(' and ')
-        .italic('italic text')
-        .text('.')
+        .italic('italic')
         .paragraph()
-        .text('Here is a ')
-        .link('link', 'https://example.com')
-        .text(' in the note.')
+        .text('Second paragraph with ')
+        .link('a link', 'https://example.com')
         .publish()
 
-      // Verify two calls were made in the correct order
-      expect(mockClient.post).toHaveBeenCalledTimes(2)
-
-      // Verify first call was attachment creation
-      expect(mockClient.post).toHaveBeenNthCalledWith(1, '/comment/attachment/', {
-        url: 'https://example.com/test',
-        type: 'link'
+      expect(mockClient.post).toHaveBeenCalledTimes(1)
+      expect(mockClient.post).toHaveBeenCalledWith('/notes', {
+        content:
+          'This is **bold** and _italic_\n\nSecond paragraph with [a link](https://example.com)',
+        attachment: 'https://example.com/test'
       })
-
-      // Verify the complex structure was preserved in the note publish
-      expect(mockClient.post).toHaveBeenNthCalledWith(
-        2,
-        '/comment/feed/',
-        expect.objectContaining({
-          attachmentIds: ['attachment-id-123'],
-          bodyJson: {
-            type: 'doc',
-            attrs: { schemaVersion: 'v1' },
-            content: [
-              {
-                type: 'paragraph',
-                content: [
-                  { type: 'text', text: 'This is ' },
-                  { type: 'text', text: 'bold text', marks: [{ type: 'bold' }] },
-                  { type: 'text', text: ' and ' },
-                  { type: 'text', text: 'italic text', marks: [{ type: 'italic' }] },
-                  { type: 'text', text: '.' }
-                ]
-              },
-              {
-                type: 'paragraph',
-                content: [
-                  { type: 'text', text: 'Here is a ' },
-                  {
-                    type: 'text',
-                    text: 'link',
-                    marks: [{ type: 'link', attrs: { href: 'https://example.com' } }]
-                  },
-                  { type: 'text', text: ' in the note.' }
-                ]
-              }
-            ]
-          }
-        })
-      )
-
-      expect(result).toEqual(mockPublishResponse)
     })
 
-    it('should handle attachment creation failure', async () => {
-      // Mock attachment creation to fail
-      mockClient.post.mockRejectedValueOnce(new Error('Attachment creation failed'))
+    it('should use the correct link URL passed to constructor', async () => {
+      const specificUrl = 'https://specific-article.com/path/to/post'
+      const specificBuilder = new NoteWithLinkBuilder(mockClient, specificUrl)
+      await specificBuilder.paragraph().text('My note').publish()
 
-      // Attempt to publish should throw the error
-      await expect(builder.paragraph().text('Test').publish()).rejects.toThrow(
-        'Attachment creation failed'
-      )
-
-      // Verify only the attachment call was made
-      expect(mockClient.post).toHaveBeenCalledTimes(1)
-      expect(mockClient.post).toHaveBeenNthCalledWith(1, '/comment/attachment/', {
-        url: 'https://example.com/test',
-        type: 'link'
+      expect(mockClient.post).toHaveBeenCalledWith('/notes', {
+        content: 'My note',
+        attachment: specificUrl
       })
+    })
+
+    it('should throw when note has no content', async () => {
+      await expect(
+        new NoteWithLinkBuilder(mockClient, 'https://example.com').publish()
+      ).rejects.toThrow()
+      expect(mockClient.post).not.toHaveBeenCalled()
+    })
+
+    it('should propagate errors from the HTTP client', async () => {
+      mockClient.post.mockRejectedValueOnce(new Error('Network error'))
+
+      await expect(builder.paragraph().text('Test').publish()).rejects.toThrow('Network error')
+      expect(mockClient.post).toHaveBeenCalledTimes(1)
     })
   })
 })

@@ -1,24 +1,19 @@
 import { SubstackClient } from '@substack-api/substack-client'
-import { readFileSync } from 'fs'
-import { join } from 'path'
 
 describe('note publishing tests', () => {
   let client: SubstackClient
 
   beforeEach(() => {
-    // Clear captured requests before each test
     global.INTEGRATION_SERVER.capturedRequests.length = 0
 
-    // Create client configured to use our local test server
     client = new SubstackClient({
-      publicationUrl: global.INTEGRATION_SERVER.url,
-      token: 'test-key',
-      substackUrl: global.INTEGRATION_SERVER.url, // Configure global client to use mock server too
-      urlPrefix: '' // Integration server doesn't use API prefix
+      gatewayUrl: global.INTEGRATION_SERVER.url,
+      publicationUrl: 'https://test.substack.com',
+      token: 'dummy-token'
     })
   })
 
-  test('should build and publish note with correct request structure and response', async () => {
+  test('should publish note as markdown to POST /api/v1/notes', async () => {
     const profile = await client.ownProfile()
     await profile
       .newNote()
@@ -34,17 +29,23 @@ describe('note publishing tests', () => {
       .publish()
 
     expect(global.INTEGRATION_SERVER.capturedRequests).toHaveLength(1)
-    const capturedRequest = global.INTEGRATION_SERVER.capturedRequests[0]
+    const req = global.INTEGRATION_SERVER.capturedRequests[0]
 
-    expect(capturedRequest.method).toBe('POST')
-    expect(capturedRequest.url).toBe('/comment/feed/')
+    expect(req.method).toBe('POST')
+    expect(req.url).toBe('/api/v1/notes')
 
-    const expectedRequestPath = join(process.cwd(), 'samples', 'api', 'v1', 'comment', 'feed')
-    const expectedRequestData = JSON.parse(readFileSync(expectedRequestPath, 'utf8'))
+    const body = req.body as { content: string }
+    expect(typeof body.content).toBe('string')
+    expect(body.content).toContain('**test**')
+    expect(body.content).toContain('_test1_')
+    expect(body.content).toContain('`another test`')
+    expect(body.content).toContain('just a test')
+    expect(body).not.toHaveProperty('attachment')
+  })
 
-    const capturedRequestBody = capturedRequest.body as Record<string, unknown>
-    console.log('Captured request body:', capturedRequestBody)
-    console.log('Expected request body:', expectedRequestData)
-    expect(capturedRequestBody).toEqual(expectedRequestData)
+  test('should return note ID from gateway response', async () => {
+    const profile = await client.ownProfile()
+    const result = await profile.newNote().paragraph().text('Hello').publish()
+    expect(result.id).toBe(12345)
   })
 })

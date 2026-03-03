@@ -5,7 +5,10 @@ declare global {
     publicationUrl?: string
   }
 
-  function getTestCredentials(): { token: string; publicationUrl?: string } | null
+  function getTestCredentials(): {
+    token: string
+    publicationUrl?: string
+  } | null
 }
 
 export {}

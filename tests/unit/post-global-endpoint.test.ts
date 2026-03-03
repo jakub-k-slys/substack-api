@@ -8,9 +8,15 @@ jest.mock('axios-rate-limit', () => (instance: AxiosInstance) => instance)
 
 const mockedAxios = axios as jest.Mocked<typeof axios>
 
-describe('SubstackClient - Global Post Endpoint', () => {
+describe('SubstackClient - Post Endpoint via Gateway', () => {
   let client: SubstackClient
   let mockAxiosInstance: jest.Mocked<AxiosInstance>
+
+  const gatewayConfig = {
+    gatewayUrl: 'http://localhost:5001',
+    publicationUrl: 'https://test.substack.com',
+    token: 'dummy-token'
+  }
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -23,79 +29,40 @@ describe('SubstackClient - Global Post Endpoint', () => {
 
     mockedAxios.create.mockReturnValue(mockAxiosInstance)
 
-    // Configure client with a publication-specific hostname
-    client = new SubstackClient({
-      token: 'test-api-key',
-      publicationUrl: 'https://someuser.substack.com' // Publication-specific hostname
-    })
+    client = new SubstackClient(gatewayConfig)
   })
 
   describe('postForId', () => {
-    it('should fetch post by ID successfully', async () => {
+    it('should fetch post by ID from GET /posts/{id} with no wrapper', async () => {
       const mockPost = {
         id: 123,
         title: 'Test Post',
         slug: 'test-post',
-        post_date: '2023-01-01T00:00:00Z',
-        canonical_url: 'https://example.com/post',
-        type: 'newsletter' as const,
-        body_html: '<p>Test post body content</p>'
+        url: 'https://example.com/post',
+        published_at: '2023-01-01T00:00:00Z',
+        html_body: '<p>Test post body</p>'
       }
 
-      // Mock successful response from substackClient (global endpoint)
       mockAxiosInstance.get.mockResolvedValueOnce({
         status: 200,
-        data: { post: mockPost }
+        data: mockPost
       })
 
       const post = await client.postForId(123)
 
       expect(post).toBeInstanceOf(FullPost)
       expect(post.title).toBe('Test Post')
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith('/posts/by-id/123')
+      // HTTP client passes { params: undefined } as second arg to axios
+      expect(mockAxiosInstance.get).toHaveBeenCalledWith('/posts/123', { params: undefined })
     })
 
-    it('should work with different publication hostnames', async () => {
-      // Test with another publication-specific hostname
-      const anotherClient = new SubstackClient({
-        token: 'test-api-key',
-        publicationUrl: 'https://anotherpub.substack.com'
-      })
-
-      const mockPost = {
-        id: 456,
-        title: 'Another Test Post',
-        slug: 'another-test-post',
-        post_date: '2023-01-01T00:00:00Z',
-        canonical_url: 'https://example.com/post',
-        type: 'newsletter' as const,
-        body_html: '<p>Another test post body content</p>'
-      }
-
-      mockAxiosInstance.get.mockResolvedValueOnce({
-        status: 200,
-        data: { post: mockPost }
-      })
-
-      const post = await anotherClient.postForId(456)
-
-      expect(post).toBeInstanceOf(FullPost)
-      expect(post.title).toBe('Another Test Post')
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith('/posts/by-id/456')
-    })
-
-    it('should handle errors from endpoint properly', async () => {
+    it('should handle 404 errors and wrap in friendly message', async () => {
       mockAxiosInstance.get.mockRejectedValueOnce({
-        response: {
-          status: 404,
-          statusText: 'Not Found'
-        },
+        response: { status: 404, statusText: 'Not Found' },
         message: 'Request failed with status code 404'
       })
 
-      await expect(client.postForId(999999999)).rejects.toThrow('Post with ID 999999999 not found')
-
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith('/posts/by-id/999999999')
+      await expect(client.postForId(999)).rejects.toThrow('Post with ID 999 not found')
     })
   })
 })

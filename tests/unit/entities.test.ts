@@ -1,20 +1,15 @@
 import { SubstackClient } from '@substack-api/substack-client'
 import { Profile, PreviewPost, Comment } from '@substack-api/domain'
-import {
-  PostService,
-  ProfileService,
-  NoteService,
-  CommentService
-} from '@substack-api/internal/services'
-import type { HttpClient } from '@substack-api/internal/http-client'
+import { PostService, NoteService, CommentService } from '@substack-api/internal/services'
 
 describe('SubstackClient Entity Model', () => {
   let client: SubstackClient
 
   beforeEach(() => {
     client = new SubstackClient({
-      token: 'test-api-key',
-      publicationUrl: 'test.substack.com'
+      gatewayUrl: 'http://localhost:5001',
+      publicationUrl: 'https://test.substack.com',
+      token: 'dummy-token'
     })
   })
 
@@ -24,54 +19,20 @@ describe('SubstackClient Entity Model', () => {
     })
 
     it('should throw error when getting own profile without proper authentication', async () => {
-      await expect(client.ownProfile()).rejects.toThrow('Failed to get own profile:')
+      await expect(client.ownProfile()).rejects.toThrow()
     })
   })
 
   describe('Entity Creation', () => {
-    it('should create Profile entity', () => {
+    it('should create Profile entity from GatewayProfile', () => {
       const mockData = {
         id: 123,
         handle: 'testuser',
         name: 'Test User',
-        photo_url: 'https://example.com/photo.jpg',
-        profile_set_up_at: new Date().toISOString(),
-        reader_installed_at: new Date().toISOString(),
-        profile_disabled: false,
-        publicationUsers: [],
-        userLinks: [],
-        subscriptions: [],
-        subscriptionsTruncated: false,
-        hasGuestPost: false,
-        max_pub_tier: 0,
-        hasActivity: false,
-        hasLikes: false,
-        lists: [],
-        rough_num_free_subscribers_int: 0,
-        rough_num_free_subscribers: '0',
-        bestseller_badge_disabled: false,
-        subscriberCountString: '0',
-        subscriberCount: '0',
-        subscriberCountNumber: 0,
-        hasHiddenPublicationUsers: false,
-        visibleSubscriptionsCount: 0,
-        primaryPublicationIsPledged: false,
-        primaryPublicationSubscriptionState: 'not_subscribed',
-        isSubscribed: false,
-        isFollowing: false,
-        followsViewer: false,
-        can_dm: false,
-        dm_upgrade_options: []
+        url: 'https://substack.com/@testuser',
+        avatar_url: 'https://example.com/photo.jpg',
+        bio: 'Test bio'
       }
-      const publicationClient = (client as unknown as { publicationClient: HttpClient })
-        .publicationClient
-
-      // Create mock services
-      const mockProfileService = {
-        getOwnProfile: jest.fn(),
-        getProfileById: jest.fn(),
-        getProfileBySlug: jest.fn()
-      } as unknown as ProfileService
 
       const mockPostService = {
         getPostById: jest.fn(),
@@ -85,14 +46,11 @@ describe('SubstackClient Entity Model', () => {
       } as unknown as NoteService
 
       const mockCommentService = {
-        getCommentsForPost: jest.fn(),
-        getCommentById: jest.fn()
+        getCommentsForPost: jest.fn()
       } as unknown as CommentService
 
       const profile = new Profile(
         mockData,
-        publicationClient,
-        mockProfileService,
         mockPostService,
         mockNoteService,
         mockCommentService,
@@ -105,21 +63,15 @@ describe('SubstackClient Entity Model', () => {
       expect(profile.slug).toBe('testuser')
     })
 
-    it('should create PreviewPost entity', () => {
+    it('should create PreviewPost entity from GatewayPost', () => {
       const mockData = {
         id: 456,
         title: 'Test Post',
-        slug: 'test-slug',
-        post_date: '2023-01-01T00:00:00Z',
-        type: 'newsletter' as const
+        published_at: '2023-01-01T00:00:00Z'
       }
-      const publicationClient = (client as unknown as { publicationClient: HttpClient })
-        .publicationClient
 
-      // Create mock services
       const mockCommentService = {
-        getCommentsForPost: jest.fn(),
-        getCommentById: jest.fn()
+        getCommentsForPost: jest.fn()
       } as unknown as CommentService
 
       const mockPostService = {
@@ -127,25 +79,21 @@ describe('SubstackClient Entity Model', () => {
         getPostsForProfile: jest.fn()
       } as unknown as PostService
 
-      const post = new PreviewPost(mockData, publicationClient, mockCommentService, mockPostService)
+      const post = new PreviewPost(mockData, mockCommentService, mockPostService)
 
       expect(post).toBeInstanceOf(PreviewPost)
       expect(post.id).toBe(456)
       expect(post.title).toBe('Test Post')
     })
 
-    it('should create Comment entity', () => {
+    it('should create Comment entity from GatewayComment', () => {
       const mockData = {
         id: 789,
         body: 'Test comment',
-        date: '2023-01-01T00:00:00Z',
-        post_id: 456,
-        user_id: 123,
-        name: 'Test User'
+        is_admin: false
       }
-      const publicationClient = (client as unknown as { publicationClient: HttpClient })
-        .publicationClient
-      const comment = new Comment(mockData, publicationClient)
+
+      const comment = new Comment(mockData)
 
       expect(comment).toBeInstanceOf(Comment)
       expect(comment.id).toBe(789)

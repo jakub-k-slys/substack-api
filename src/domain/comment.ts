@@ -1,22 +1,13 @@
-import type { SubstackComment } from '@substack-api/internal'
-import type { HttpClient } from '@substack-api/internal/http-client'
+import type { GatewayComment } from '@substack-api/internal/types'
 
-/**
- * Comment entity representing a comment on a post or note
- */
 export class Comment {
   public readonly id: number
   public readonly body: string
   public readonly isAdmin?: boolean
-  public readonly likesCount?: number
 
-  constructor(
-    private readonly rawData: SubstackComment,
-    private readonly publicationClient: HttpClient
-  ) {
+  constructor(private readonly rawData: GatewayComment) {
     this.id = rawData.id
     this.body = rawData.body
-    this.isAdmin = rawData.author_is_admin
-    this.likesCount = undefined // TODO: Extract from rawData when available
+    this.isAdmin = rawData.is_admin
   }
 }
