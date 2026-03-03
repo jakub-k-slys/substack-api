@@ -2,31 +2,26 @@
 
 ## Requirements
 
-- Node.js 16 or higher  
-- npm or yarn package manager
-- A Substack account with publication access
+- Node.js 18 or higher
+- A Substack account with both `substack.sid` and `connect.sid` session cookies
 
-## NPM Installation
-
-You can install the package using npm:
+## Install
 
 ```bash
 npm install substack-api
 ```
 
-## Yarn Installation
-
-If you prefer using yarn:
-
 ```bash
 yarn add substack-api
 ```
 
+```bash
+pnpm add substack-api
+```
+
 ## TypeScript Configuration
 
-The library is written in TypeScript and includes type definitions out of the box. No additional setup is required for TypeScript projects.
-
-For optimal TypeScript integration, ensure your `tsconfig.json` includes:
+The library ships with TypeScript definitions. For optimal integration, ensure your `tsconfig.json` includes:
 
 ```json
 {
@@ -37,59 +32,38 @@ For optimal TypeScript integration, ensure your `tsconfig.json` includes:
 }
 ```
 
-## Verification
-
-To verify the installation, you can create a simple test file:
+## Verify Installation
 
 ```typescript
 import { SubstackClient } from 'substack-api';
 
+const token = btoa(JSON.stringify({
+  substack_sid: process.env.SUBSTACK_SID!,
+  connect_sid: process.env.CONNECT_SID!
+}));
+
 const client = new SubstackClient({
-  token: 'your-connect-sid-cookie-value',
-  publicationUrl: 'example.substack.com'
+  publicationUrl: 'yourname.substack.com',
+  token
 });
 
-async function test() {
-  try {
-    const isConnected = await client.testConnectivity();
-    console.log('Connection status:', isConnected ? 'Connected' : 'Failed');
-  } catch (error) {
-    console.error('Error:', error.message);
-  }
-}
-
-test();
+const isConnected = await client.testConnectivity();
+console.log('Connected:', isConnected);
 ```
 
 ## Development Installation
 
-If you want to contribute to the library or run it from source:
+To contribute or run from source:
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/jakub-k-slys/substack-api.git
-   cd substack-api
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Build the project:
-   ```bash
-   npm run build
-   ```
-
-4. Run tests:
-   ```bash
-   npm test
-   ```
+```bash
+git clone https://github.com/jakub-k-slys/substack-api.git
+cd substack-api
+pnpm install
+pnpm build
+pnpm test
+```
 
 ## Next Steps
 
-Once installed, you can:
-
-- Follow the [Quickstart](quickstart.md) guide to begin using the library
-- Check out the [Examples](examples.md) for common use cases
-- Read the [API Reference](api-reference.md) for detailed API documentation
+- [Quickstart](quickstart.md) — authenticate and make your first API call
+- [API Reference](api-reference.md) — complete method documentation

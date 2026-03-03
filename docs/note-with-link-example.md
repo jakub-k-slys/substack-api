@@ -1,112 +1,76 @@
-# Note with Link Attachment Example
+# Note with Link Attachment
 
-This example demonstrates how to use the new `newNoteWithLink` feature to create and publish notes with link attachments.
+Use `newNoteWithLink()` to publish a note with a URL attached. The link is sent as an attachment field alongside the Markdown content.
 
 ## Basic Usage
 
 ```typescript
 import { SubstackClient } from 'substack-api';
 
+const token = btoa(JSON.stringify({
+  substack_sid: process.env.SUBSTACK_SID!,
+  connect_sid: process.env.CONNECT_SID!
+}));
+
 const client = new SubstackClient({
-  token: 'your-token',
-  publicationUrl: 'your-publication.substack.com'
+  publicationUrl: 'yourname.substack.com',
+  token
 });
 
-const ownProfile = await client.ownProfile();
+const me = await client.ownProfile();
 
-// Create a note with a link attachment
-const response = await ownProfile
-  .newNoteWithLink('https://iam.slys.dev/p/understanding-locking-contention')
+const response = await me
+  .newNoteWithLink('https://example.com/interesting-article')
   .paragraph()
-  .text('Check out this interesting article about ')
-  .bold('locking contention')
-  .text(' in computing systems!')
-  .paragraph()
-  .text('It covers important concepts that every developer should know.')
+  .text('Check out this article about ')
+  .bold('distributed systems')
+  .text(' — highly recommend.')
   .publish();
 
-console.log('Note published with ID:', response.id);
+console.log('Published note ID:', response.id);
 ```
 
 ## How it Works
 
-1. **Attachment Creation**: When you call `publish()` on a `NoteWithLinkBuilder`, it first creates an attachment by making a POST request to `/api/v1/comment/attachment` with the link URL.
+When you call `publish()` on a `NoteWithLinkBuilder`, the client sends a single POST to `/notes` on the gateway with:
 
-2. **Note Publishing**: After the attachment is created successfully, it publishes the note with the attachment ID included in the `attachmentIds` array.
-
-## API Calls Made
-
-The above example makes two API calls:
-
-1. **Create Attachment**:
-   ```
-   POST /api/v1/comment/attachment
-   {
-     "url": "https://iam.slys.dev/p/understanding-locking-contention",
-     "type": "link"
-   }
-   ```
-   
-   Response:
-   ```json
-   {
-     "id": "19b5d6f9-46db-47d6-b381-17cb5f443c00",
-     "type": "post",
-     "publication": { ... },
-     "post": { ... }
-   }
-   ```
-
-2. **Publish Note**:
-   ```
-   POST /api/v1/comment/feed
-   {
-     "bodyJson": {
-       "type": "doc",
-       "attrs": { "schemaVersion": "v1" },
-       "content": [...]
-     },
-     "attachmentIds": ["19b5d6f9-46db-47d6-b381-17cb5f443c00"],
-     "tabId": "for-you",
-     "surface": "feed",
-     "replyMinimumRole": "everyone"
-   }
-   ```
-
-## Error Handling
-
-If the attachment creation fails, the note will not be published:
-
-```typescript
-try {
-  const response = await ownProfile
-    .newNoteWithLink('https://invalid-url')
-    .paragraph()
-    .text('This will fail')
-    .publish();
-} catch (error) {
-  console.error('Failed to create attachment or publish note:', error.message);
+```json
+{
+  "content": "Check out this article about **distributed systems** — highly recommend.",
+  "attachment": "https://example.com/interesting-article"
 }
 ```
 
+The gateway handles the attachment resolution and note publishing.
+
 ## Comparison with Regular Notes
 
-For comparison, here's how you would create a regular note without a link attachment:
-
 ```typescript
-// Regular note (no attachment)
-const regularNote = await ownProfile
-  .newNote()
+// Regular note — no attachment
+await me.newNote()
   .paragraph()
-  .text('This is a regular note without attachments')
+  .text('Just a thought.')
   .publish();
 
-// Note with link attachment  
-const noteWithLink = await ownProfile
-  .newNoteWithLink('https://example.com')
+// Note with link attachment
+await me.newNoteWithLink('https://example.com/article')
   .paragraph()
-  .text('This note will have a link attachment')
+  .text('Worth reading.')
   .publish();
 ```
 
-The `NoteWithLinkBuilder` supports all the same formatting options as the regular `NoteBuilder` (bold, italic, links, lists, etc.), but automatically handles the attachment creation process.
+`NoteWithLinkBuilder` supports all the same formatting as `NoteBuilder`: bold, italic, links, lists, multiple paragraphs, etc.
+
+## Error Handling
+
+```typescript
+try {
+  await me
+    .newNoteWithLink('https://example.com/article')
+    .paragraph()
+    .text('New post is live!')
+    .publish();
+} catch (error) {
+  console.error('Failed to publish:', error.message);
+}
+```
