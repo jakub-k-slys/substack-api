@@ -254,27 +254,29 @@ async function runExample(): Promise<void> {
     /*
     console.log('\n📝 Note Creation Examples (commented out to prevent accidental publishing)')
 
-    // Example: Create a simple note
+    // Example: Create a simple note using Markdown
     console.log('\n📝 Creating a simple note...')
     try {
-      const noteResponse = await profile
-        .newNote()
-        .paragraph()
-        .text('This is a test note created via the ')
-        .bold('Substack API')
-        .text('! 🚀')
-        .paragraph()
-        .text('It supports various formatting options like ')
-        .italic('italic text')
-        .text(', ')
-        .code('code snippets')
-        .text(', and ')
-        .link('external links', 'https://substack.com')
-        .text('.')
-        .publish()
+      const noteResponse = await profile.publishNote(
+        'This is a test note created via the **Substack API**!\n\n' +
+          'It supports _italic text_, `code snippets`, and [external links](https://substack.com).'
+      )
 
       console.log(`✅ Note published successfully!`)
       console.log(`   Note ID: ${noteResponse.id}`)
+    } catch (error) {
+      console.log(`   ❌ Failed to create note: ${(error as Error).message}`)
+    }
+
+    // Example: Create a note with a link attachment
+    console.log('\n📝 Creating a note with link attachment...')
+    try {
+      const noteWithLink = await profile.publishNote('Check out this article!', {
+        attachment: 'https://substack.com'
+      })
+
+      console.log(`✅ Note with link published successfully!`)
+      console.log(`   Note ID: ${noteWithLink.id}`)
     } catch (error) {
       console.log(`   ❌ Failed to create note: ${(error as Error).message}`)
     }
