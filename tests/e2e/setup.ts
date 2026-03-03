@@ -18,10 +18,8 @@ declare global {
 }
 
 // Check for credentials but don't fail early - let individual tests handle missing credentials
-const substackSid =
-  process.env.SUBSTACK_SID || process.env.SUBSTACK_API_KEY || process.env.E2E_API_KEY
-const connectSid = process.env.CONNECT_SID
-const hostname = process.env.SUBSTACK_HOSTNAME || process.env.E2E_HOSTNAME
+const token = process.env.SUBSTACK_TOKEN
+const hostname = process.env.SUBSTACK_HOSTNAME
 
 // Convert hostname to full URL if it doesn't start with http
 const publicationUrl = hostname
@@ -30,10 +28,10 @@ const publicationUrl = hostname
     : `https://${hostname}`
   : undefined
 
-if (substackSid && connectSid) {
+if (token) {
   global.E2E_CONFIG = {
     hasCredentials: true,
-    token: btoa(JSON.stringify({ substack_sid: substackSid, connect_sid: connectSid })),
+    token,
     publicationUrl
   }
 } else {
