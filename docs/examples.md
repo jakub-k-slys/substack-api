@@ -1,20 +1,16 @@
 # Examples
 
-Practical examples using the SubstackClient entity-based API.
-
 ## Setup
 
 ```typescript
 import { SubstackClient } from 'substack-api';
 
-const token = btoa(JSON.stringify({
-  substack_sid: process.env.SUBSTACK_SID!,
-  connect_sid: process.env.CONNECT_SID!
-}));
-
 const client = new SubstackClient({
-  publicationUrl: process.env.SUBSTACK_PUBLICATION_URL!,
-  token
+  publicationUrl: process.env.SUBSTACK_HOSTNAME!,
+  token: btoa(JSON.stringify({
+    substack_sid: process.env.SUBSTACK_SID!,
+    connect_sid: process.env.CONNECT_SID!
+  }))
 });
 
 const isConnected = await client.testConnectivity();
@@ -23,13 +19,13 @@ if (!isConnected) throw new Error('Authentication failed');
 
 ---
 
-## Profile Browsing
+## Profiles
 
 ### Get your own profile
 
 ```typescript
 const me = await client.ownProfile();
-console.log(`${me.name} (@${me.handle})`);
+console.log(`${me.name} (@${me.slug})`);
 console.log(`Bio: ${me.bio ?? 'Not set'}`);
 ```
 
@@ -37,8 +33,7 @@ console.log(`Bio: ${me.bio ?? 'Not set'}`);
 
 ```typescript
 const profile = await client.profileForSlug('platformer');
-console.log(`${profile.name}`);
-console.log(`${profile.url}`);
+console.log(`${profile.name} — ${profile.url}`);
 ```
 
 ### Browse someone's posts
@@ -64,7 +59,7 @@ for await (const note of profile.notes({ limit: 15 })) {
 
 ---
 
-## Reading Posts
+## Posts
 
 ### Fetch a post by ID
 
@@ -98,7 +93,7 @@ for await (const preview of profile.posts({ limit: 3 })) {
 
 ---
 
-## Reading Notes
+## Notes
 
 ### Fetch a note by ID
 
@@ -122,54 +117,28 @@ for await (const note of me.notes({ limit: 10 })) {
 
 ## Publishing Notes
 
-### Simple note
+### Plain note
 
 ```typescript
 const me = await client.ownProfile();
 
-await me.newNote()
-  .paragraph()
-  .text('Just shipped something new!')
-  .publish();
-```
-
-### Formatted note
-
-```typescript
-await me.newNote()
-  .paragraph()
-  .bold('Quick update: ')
-  .text('we just released v3.')
-  .paragraph()
-  .text('Key changes:')
-  .bulletList()
-  .item().text('Gateway-based HTTP layer').finish()
-  .item().text('Simplified authentication').finish()
-  .item().text('Cleaner entity model').finish()
-  .finish()
-  .publish();
+await me.publishNote('Just shipped something new!');
 ```
 
 ### Note with link attachment
 
 ```typescript
-await me.newNoteWithLink('https://example.com/my-post')
-  .paragraph()
-  .text('New post is live — ')
-  .italic('highly recommend.')
-  .publish();
+await me.publishNote('New post is live — check it out.', {
+  attachment: 'https://example.com/my-post'
+});
 ```
 
-### Build markdown without publishing
+### Rich markdown note
 
 ```typescript
-const markdown = me.newNote()
-  .paragraph()
-  .text('Hello ')
-  .bold('world')
-  .build();
-
-console.log(markdown); // Hello **world**
+await me.publishNote(
+  '**Quick update:** we just released v3.\n\nKey changes:\n- Gateway-based HTTP layer\n- Simplified authentication\n- Cleaner entity model'
+);
 ```
 
 ---
@@ -182,7 +151,7 @@ console.log(markdown); // Hello **world**
 const me = await client.ownProfile();
 
 for await (const user of me.following({ limit: 20 })) {
-  console.log(`${user.name} (@${user.handle})`);
+  console.log(`${user.name} (@${user.slug})`);
 }
 ```
 
@@ -213,24 +182,9 @@ for await (const note of profile.notes({ limit: 50 })) {
 }
 
 notes.sort((a, b) => b.likesCount - a.likesCount);
-
-console.log('Top notes:');
 notes.slice(0, 5).forEach((note, i) => {
   console.log(`${i + 1}. [${note.likesCount} likes] ${note.body.substring(0, 60)}`);
 });
-```
-
-### Post comments summary
-
-```typescript
-const post = await client.postForId(167180194);
-
-const comments = [];
-for await (const comment of post.comments()) {
-  comments.push(comment);
-}
-
-console.log(`${post.title} — ${comments.length} comments`);
 ```
 
 ### Recent activity across your network
@@ -252,6 +206,19 @@ for await (const user of me.following({ limit: 10 })) {
 }
 ```
 
+### Collect all comments on a post
+
+```typescript
+const post = await client.postForId(167180194);
+
+const comments = [];
+for await (const comment of post.comments()) {
+  comments.push(comment);
+}
+
+console.log(`${post.title} — ${comments.length} comments`);
+```
+
 ---
 
 ## Error Handling
@@ -262,23 +229,8 @@ for await (const user of me.following({ limit: 10 })) {
 try {
   const profile = await client.profileForSlug('no-such-person');
 } catch (error) {
-  if (error.message.includes('404')) {
-    console.error('Profile not found');
-  } else {
-    console.error(error.message);
-  }
-}
-```
-
-### Handle errors during iteration
-
-```typescript
-try {
-  for await (const post of profile.posts({ limit: 100 })) {
-    console.log(post.title);
-  }
-} catch (error) {
-  console.error('Pagination error:', error.message);
+  console.error(error.message);
+  // "Profile with slug 'no-such-person' not found: ..."
 }
 ```
 
