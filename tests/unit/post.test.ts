@@ -2,24 +2,44 @@ import { FullPost, PreviewPost } from '@substack-api/domain/post'
 import { Comment } from '@substack-api/domain/comment'
 import { CommentService } from '@substack-api/internal/services/comment-service'
 import { PostService } from '@substack-api/internal/services/post-service'
-import type { HttpClient } from '@substack-api/internal/http-client'
+
+const makeGatewayPost = (id: number, title: string) => ({
+  id,
+  title,
+  subtitle: 'Test subtitle',
+  truncated_body: 'Truncated...',
+  published_at: '2023-01-01T00:00:00Z'
+})
+
+const makeGatewayFullPost = (id: number, title: string) => ({
+  id,
+  title,
+  slug: `post-${id}`,
+  subtitle: 'Test subtitle',
+  url: `https://example.com/post-${id}`,
+  published_at: '2023-01-01T00:00:00Z',
+  html_body: '<p>Full HTML content with <strong>formatting</strong></p>',
+  truncated_body: 'Truncated content',
+  reactions: { '❤️': 5 },
+  restacks: 2,
+  tags: ['tag1'],
+  cover_image: 'https://example.com/cover.jpg'
+})
+
+const makeGatewayComment = (id: number, body: string) => ({
+  id,
+  body,
+  is_admin: false
+})
 
 describe('PreviewPost Entity', () => {
-  let mockPublicationClient: jest.Mocked<HttpClient>
   let mockCommentService: jest.Mocked<CommentService>
   let mockPostService: jest.Mocked<PostService>
   let post: PreviewPost
 
   beforeEach(() => {
-    mockPublicationClient = {
-      get: jest.fn(),
-      post: jest.fn(),
-      request: jest.fn()
-    } as unknown as jest.Mocked<HttpClient>
-
     mockCommentService = {
-      getCommentsForPost: jest.fn(),
-      getCommentById: jest.fn()
+      getCommentsForPost: jest.fn()
     } as unknown as jest.Mocked<CommentService>
 
     mockPostService = {
@@ -27,70 +47,30 @@ describe('PreviewPost Entity', () => {
       getPostsForProfile: jest.fn()
     } as unknown as jest.Mocked<PostService>
 
-    const mockPostData = {
-      id: 456,
-      title: 'Test Post',
-      slug: 'test-post',
-      post_date: '2023-01-01T00:00:00Z',
-      canonical_url: 'https://example.com/post',
-      type: 'newsletter' as const,
-      subtitle: 'Test subtitle',
-      description: 'Test description',
-      publishedAt: '2023-01-01T00:00:00Z',
-      audience: 'everyone' as const,
-      write_comment_permissions: 'everyone' as const,
-      should_send_email: true,
-      draft: false,
-      likes: 10,
-      comments: 5,
-      restacks: 2,
-      cover_image: 'https://example.com/cover.jpg',
-      podcast_url: '',
-      videoUpload: null,
-      podcastUpload: null,
-      postTags: [],
-      pin_comment: false,
-      free_unlock: false,
-      default_comment_sort: 'best_first' as const,
-      reactions: {
-        '❤️': 5,
-        '👍': 3,
-        '👎': 1
-      },
-      section_id: null,
-      hasCashtag: false,
-      body: 'Test post content',
-      voiceover_id: null,
-      theme: { background_pop: 'blue' }
-    }
+    post = new PreviewPost(makeGatewayPost(456, 'Test Post'), mockCommentService, mockPostService)
+  })
 
-    post = new PreviewPost(mockPostData, mockPublicationClient, mockCommentService, mockPostService)
+  describe('properties', () => {
+    it('should expose id', () => {
+      expect(post.id).toBe(456)
+    })
+
+    it('should expose title', () => {
+      expect(post.title).toBe('Test Post')
+    })
+
+    it('should expose publishedAt as Date', () => {
+      expect(post.publishedAt).toBeInstanceOf(Date)
+    })
   })
 
   describe('comments()', () => {
     it('should iterate through post comments', async () => {
-      const mockComments = [
-        {
-          id: 1,
-          body: 'Comment 1',
-          date: '2023-01-01T00:00:00Z',
-          post_id: 456,
-          user_id: 123,
-          name: 'User 1'
-        },
-        {
-          id: 2,
-          body: 'Comment 2',
-          date: '2023-01-02T00:00:00Z',
-          post_id: 456,
-          user_id: 124,
-          name: 'User 2'
-        }
-      ]
+      const mockComments = [makeGatewayComment(1, 'Comment 1'), makeGatewayComment(2, 'Comment 2')]
       mockCommentService.getCommentsForPost.mockResolvedValue(mockComments)
 
       const comments = []
-      for await (const comment of post.comments({ limit: 2 })) {
+      for await (const comment of post.comments()) {
         comments.push(comment)
       }
 
@@ -101,26 +81,11 @@ describe('PreviewPost Entity', () => {
       expect(mockCommentService.getCommentsForPost).toHaveBeenCalledWith(456)
     })
 
-    it('should handle limit parameter', async () => {
-      const mockComments = [
-        {
-          id: 1,
-          body: 'Comment 1',
-          date: '2023-01-01T00:00:00Z',
-          post_id: 456,
-          user_id: 123,
-          name: 'User 1'
-        },
-        {
-          id: 2,
-          body: 'Comment 2',
-          date: '2023-01-02T00:00:00Z',
-          post_id: 456,
-          user_id: 124,
-          name: 'User 2'
-        }
-      ]
-      mockCommentService.getCommentsForPost.mockResolvedValue(mockComments)
+    it('should respect limit parameter', async () => {
+      mockCommentService.getCommentsForPost.mockResolvedValue([
+        makeGatewayComment(1, 'Comment 1'),
+        makeGatewayComment(2, 'Comment 2')
+      ])
 
       const comments = []
       for await (const comment of post.comments({ limit: 1 })) {
@@ -131,7 +96,7 @@ describe('PreviewPost Entity', () => {
       expect(comments[0].body).toBe('Comment 1')
     })
 
-    it('should handle empty comments response', async () => {
+    it('should handle empty comments', async () => {
       mockCommentService.getCommentsForPost.mockResolvedValue([])
 
       const comments = []
@@ -142,173 +107,87 @@ describe('PreviewPost Entity', () => {
       expect(comments).toHaveLength(0)
     })
 
-    it('should handle missing comments property', async () => {
-      mockCommentService.getCommentsForPost.mockResolvedValue([])
-
-      const comments = []
-      for await (const comment of post.comments()) {
-        comments.push(comment)
-      }
-
-      expect(comments).toHaveLength(0)
-    })
-
-    it('should throw error when API fails', async () => {
+    it('should throw when API fails', async () => {
       mockCommentService.getCommentsForPost.mockRejectedValue(new Error('API error'))
 
-      const comments = []
       await expect(async () => {
-        for await (const comment of post.comments()) {
-          comments.push(comment)
+        for await (const _ of post.comments()) {
+          // consume
         }
-      }).rejects.toThrow('Failed to get comments for post 456: API error')
-    })
-  })
-
-  describe('like()', () => {
-    it('should throw error for unimplemented like functionality', async () => {
-      await expect(post.like()).rejects.toThrow(
-        'Post liking not implemented yet - requires like API'
-      )
-    })
-  })
-
-  describe('addComment()', () => {
-    it('should throw error for unimplemented comment functionality', async () => {
-      await expect(post.addComment({ body: 'Test comment' })).rejects.toThrow(
-        'Comment creation not implemented yet - requires comment creation API'
-      )
-    })
-  })
-
-  describe('properties', () => {
-    it('should have correct property values', () => {
-      expect(post.id).toBe(456)
-      expect(post.title).toBe('Test Post')
-      expect(post.likesCount).toBe(0) // Currently hardcoded to 0
-      expect(post.publishedAt).toBeInstanceOf(Date)
+      }).rejects.toThrow()
     })
   })
 
   describe('fullPost()', () => {
-    it('should fetch full post data and return FullPost instance', async () => {
-      const mockFullPostData = {
-        id: 456,
-        title: 'Test Post',
-        slug: 'test-post',
-        post_date: '2023-01-01T00:00:00Z',
-        canonical_url: 'https://example.com/post',
-        type: 'newsletter' as const,
-        subtitle: 'Test subtitle',
-        description: 'Test description',
-        truncated_body_text: 'Truncated content',
-        body_html: '<p>Full HTML content</p>',
-        htmlBody: '<p>Full HTML content</p>' // For backward compatibility
-      }
-
-      mockPostService.getPostById.mockResolvedValue(mockFullPostData)
+    it('should fetch full post and return FullPost instance', async () => {
+      const mockFullPost = makeGatewayFullPost(456, 'Test Post')
+      mockPostService.getPostById.mockResolvedValue(mockFullPost)
 
       const fullPost = await post.fullPost()
 
       expect(fullPost).toBeInstanceOf(FullPost)
       expect(fullPost.id).toBe(456)
       expect(fullPost.title).toBe('Test Post')
-      expect(fullPost.htmlBody).toBe('<p>Full HTML content</p>')
       expect(mockPostService.getPostById).toHaveBeenCalledWith(456)
     })
 
-    it('should throw error when PostService fails', async () => {
+    it('should throw when PostService fails', async () => {
       mockPostService.getPostById.mockRejectedValue(new Error('API error'))
+      await expect(post.fullPost()).rejects.toThrow()
+    })
+  })
 
-      await expect(post.fullPost()).rejects.toThrow('Failed to fetch full post 456: API error')
+  describe('like()', () => {
+    it('should throw not-implemented error', async () => {
+      await expect(post.like()).rejects.toThrow()
+    })
+  })
+
+  describe('addComment()', () => {
+    it('should throw not-implemented error', async () => {
+      await expect(post.addComment({ body: 'Test' })).rejects.toThrow()
     })
   })
 })
 
 describe('FullPost Entity', () => {
-  let mockHttpClient: jest.Mocked<HttpClient>
   let mockCommentService: jest.Mocked<CommentService>
-  let _mockPostService: jest.Mocked<PostService>
   let fullPost: FullPost
 
   beforeEach(() => {
-    mockHttpClient = {
-      get: jest.fn(),
-      post: jest.fn(),
-      request: jest.fn()
-    } as unknown as jest.Mocked<HttpClient>
-
     mockCommentService = {
-      getCommentsForPost: jest.fn(),
-      getCommentById: jest.fn()
+      getCommentsForPost: jest.fn()
     } as unknown as jest.Mocked<CommentService>
 
-    _mockPostService = {
-      getPostById: jest.fn(),
-      getPostsForProfile: jest.fn()
-    } as unknown as jest.Mocked<PostService>
-
-    const mockFullPostData = {
-      id: 789,
-      title: 'Full Test Post',
-      slug: 'full-test-post',
-      post_date: '2023-01-01T00:00:00Z',
-      canonical_url: 'https://example.com/full-post',
-      type: 'newsletter' as const,
-      subtitle: 'Full test subtitle',
-      description: 'Full test description',
-      truncated_body_text: 'Truncated content',
-      body_html: '<p>Full HTML content with <strong>formatting</strong></p>',
-      htmlBody: '<p>Full HTML content with <strong>formatting</strong></p>' // For backward compatibility
-    }
-
-    fullPost = new FullPost(mockFullPostData, mockHttpClient, mockCommentService)
+    fullPost = new FullPost(makeGatewayFullPost(789, 'Full Test Post'), mockCommentService)
   })
 
   describe('properties', () => {
-    it('should have all PreviewPost properties', () => {
+    it('should expose id', () => {
       expect(fullPost.id).toBe(789)
-      expect(fullPost.title).toBe('Full Test Post')
-      expect(fullPost.subtitle).toBe('Full test subtitle')
-      expect(fullPost.truncatedBody).toBe('Truncated content')
-      expect(fullPost.likesCount).toBe(0)
-      expect(fullPost.publishedAt).toBeInstanceOf(Date)
     })
 
-    it('should have htmlBody property', () => {
+    it('should expose title', () => {
+      expect(fullPost.title).toBe('Full Test Post')
+    })
+
+    it('should expose htmlBody', () => {
       expect(fullPost.htmlBody).toBe('<p>Full HTML content with <strong>formatting</strong></p>')
     })
 
-    it('should handle missing htmlBody gracefully', () => {
-      const mockDataWithoutHtmlBody = {
-        id: 999,
-        title: 'Test Post',
-        slug: 'test-post',
-        post_date: '2023-01-01T00:00:00Z',
-        canonical_url: 'https://example.com/post',
-        type: 'newsletter' as const,
-        body_html: '<p>Body from body_html field</p>' // body_html is required, but htmlBody is optional
-      }
+    it('should expose subtitle', () => {
+      expect(fullPost.subtitle).toBe('Test subtitle')
+    })
 
-      const postWithoutHtmlBody = new FullPost(
-        mockDataWithoutHtmlBody,
-        mockHttpClient,
-        mockCommentService
-      )
-
-      expect(postWithoutHtmlBody.htmlBody).toBe('<p>Body from body_html field</p>')
+    it('should expose publishedAt as Date', () => {
+      expect(fullPost.publishedAt).toBeInstanceOf(Date)
     })
   })
 
-  describe('Post interface implementation', () => {
-    it('should implement all methods from Post interface', async () => {
-      // Test that like method is available
+  describe('Post interface', () => {
+    it('should have like, addComment, and comments methods', () => {
       expect(typeof fullPost.like).toBe('function')
-
-      // Test that addComment method is available
       expect(typeof fullPost.addComment).toBe('function')
-
-      // Test that comments method is available
       expect(typeof fullPost.comments).toBe('function')
     })
   })

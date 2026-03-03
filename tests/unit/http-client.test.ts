@@ -23,25 +23,34 @@ describe('HttpClient', () => {
   })
 
   describe('constructor', () => {
-    it('should throw error when token is missing', () => {
-      expect(() => new HttpClient('https://test.com', '')).toThrow('API token is required')
+    it('should create axios instance with Authorization Bearer and x-publication-url headers', () => {
+      const credentials = {
+        token: 'my-bearer-token',
+        publicationUrl: 'https://pub.example.com'
+      }
+      const client = new HttpClient('https://test.com', credentials)
+
+      expect(mockedAxios.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          baseURL: 'https://test.com',
+          headers: expect.objectContaining({
+            Authorization: expect.stringMatching(/^Bearer /),
+            'x-publication-url': 'https://pub.example.com'
+          })
+        })
+      )
+      expect(client).toBeDefined()
     })
 
-    it('should create axios instance with correct base URL and headers', () => {
-      const client = new HttpClient('https://test.substack.com', 'test-api-key')
+    it('should use provided token as bearer token', () => {
+      const credentials = {
+        token: 'my-custom-token',
+        publicationUrl: 'https://pub.example.com'
+      }
+      new HttpClient('https://test.com', credentials)
 
-      expect(mockedAxios.create).toHaveBeenCalledWith({
-        baseURL: 'https://test.substack.com',
-        headers: {
-          Cookie: 'substack.sid=test-api-key',
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          'User-Agent':
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Safari/605.1.15',
-          'Accept-Encoding': 'gzip, deflate, br'
-        }
-      })
-      expect(client).toBeDefined()
+      const createCall = mockedAxios.create.mock.calls[0][0] as any
+      expect(createCall.headers['Authorization']).toBe('Bearer my-custom-token')
     })
   })
 
@@ -53,12 +62,30 @@ describe('HttpClient', () => {
         data: mockResponse
       })
 
-      const client = new HttpClient('https://test.substack.com', 'test-api-key')
+      const client = new HttpClient('https://test.com', {
+        token: 'dummy-token',
+        publicationUrl: 'https://pub.com'
+      })
 
       const result = await client.get('/test')
 
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith('/test')
+      expect(mockAxiosInstance.get).toHaveBeenCalledWith('/test', { params: undefined })
       expect(result).toEqual(mockResponse)
+    })
+
+    it('should pass params when provided', async () => {
+      mockAxiosInstance.get.mockResolvedValue({ status: 200, data: {} })
+
+      const client = new HttpClient('https://test.com', {
+        token: 'dummy-token',
+        publicationUrl: 'https://pub.com'
+      })
+
+      await client.get('/test', { limit: 10, offset: 0 })
+
+      expect(mockAxiosInstance.get).toHaveBeenCalledWith('/test', {
+        params: { limit: 10, offset: 0 }
+      })
     })
 
     it('should throw error on non-200 response', async () => {
@@ -68,7 +95,10 @@ describe('HttpClient', () => {
         data: {}
       })
 
-      const client = new HttpClient('https://test.substack.com', 'test-api-key')
+      const client = new HttpClient('https://test.com', {
+        token: 'dummy-token',
+        publicationUrl: 'https://pub.com'
+      })
 
       await expect(client.get('/test')).rejects.toThrow('HTTP 404: Not Found')
     })
@@ -84,7 +114,10 @@ describe('HttpClient', () => {
         data: mockResponse
       })
 
-      const client = new HttpClient('https://test.substack.com', 'test-api-key')
+      const client = new HttpClient('https://test.com', {
+        token: 'dummy-token',
+        publicationUrl: 'https://pub.com'
+      })
 
       const result = await client.post('/test', postData)
 
@@ -100,7 +133,10 @@ describe('HttpClient', () => {
         data: mockResponse
       })
 
-      const client = new HttpClient('https://test.substack.com', 'test-api-key')
+      const client = new HttpClient('https://test.com', {
+        token: 'dummy-token',
+        publicationUrl: 'https://pub.com'
+      })
 
       const result = await client.post('/test')
 
@@ -115,7 +151,10 @@ describe('HttpClient', () => {
         data: {}
       })
 
-      const client = new HttpClient('https://test.substack.com', 'test-api-key')
+      const client = new HttpClient('https://test.com', {
+        token: 'dummy-token',
+        publicationUrl: 'https://pub.com'
+      })
 
       await expect(client.post('/test', {})).rejects.toThrow('HTTP 500: Internal Server Error')
     })
@@ -131,27 +170,14 @@ describe('HttpClient', () => {
         data: mockResponse
       })
 
-      const client = new HttpClient('https://test.substack.com', 'test-api-key')
+      const client = new HttpClient('https://test.com', {
+        token: 'dummy-token',
+        publicationUrl: 'https://pub.com'
+      })
 
       const result = await client.put('/test', putData)
 
       expect(mockAxiosInstance.put).toHaveBeenCalledWith('/test', putData)
-      expect(result).toEqual(mockResponse)
-    })
-
-    it('should make PUT request without data', async () => {
-      const mockResponse = { success: true }
-
-      mockAxiosInstance.put.mockResolvedValue({
-        status: 200,
-        data: mockResponse
-      })
-
-      const client = new HttpClient('https://test.substack.com', 'test-api-key')
-
-      const result = await client.put('/test')
-
-      expect(mockAxiosInstance.put).toHaveBeenCalledWith('/test', undefined)
       expect(result).toEqual(mockResponse)
     })
 
@@ -162,7 +188,10 @@ describe('HttpClient', () => {
         data: {}
       })
 
-      const client = new HttpClient('https://test.substack.com', 'test-api-key')
+      const client = new HttpClient('https://test.com', {
+        token: 'dummy-token',
+        publicationUrl: 'https://pub.com'
+      })
 
       await expect(client.put('/test', {})).rejects.toThrow('HTTP 403: Forbidden')
     })

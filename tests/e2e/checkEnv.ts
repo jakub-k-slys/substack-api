@@ -12,21 +12,22 @@ export interface RequiredEnvVars {
  * @throws Error with descriptive message if required variables are missing
  */
 export function validateE2ECredentials(): RequiredEnvVars {
-  const token = process.env.SUBSTACK_API_KEY
+  const substackSid = process.env.SUBSTACK_SID || process.env.SUBSTACK_API_KEY
+  const connectSid = process.env.CONNECT_SID
   const hostname = process.env.SUBSTACK_HOSTNAME
 
-  if (!token || !hostname) {
+  if (!substackSid || !connectSid || !hostname) {
     throw new Error(`
-❌ Missing required Substack credentials. Set SUBSTACK_API_KEY and SUBSTACK_HOSTNAME.
+❌ Missing required Substack credentials.
 
 Required environment variables:
-- SUBSTACK_API_KEY: Your Substack API key (required)
-- SUBSTACK_HOSTNAME: Your Substack hostname (optional)
+- SUBSTACK_SID: Your substack.sid session cookie value (required)
+- CONNECT_SID: Your connect.sid session cookie value (required)
+- SUBSTACK_HOSTNAME: Your Substack publication hostname, e.g. yoursite.substack.com (required)
 
 You can set these variables:
-1. In your environment: export SUBSTACK_API_KEY=your-key-here
+1. In your environment: export SUBSTACK_SID=your-sid-here
 2. In a .env file in the project root (copy from .env.example)
-3. Alternative names: E2E_API_KEY, E2E_HOSTNAME
 
 For more information, see tests/e2e/README.md
 `)
@@ -36,7 +37,7 @@ For more information, see tests/e2e/README.md
   const publicationUrl = hostname.startsWith('http') ? hostname : `https://${hostname}`
 
   return {
-    token,
+    token: btoa(JSON.stringify({ substack_sid: substackSid, connect_sid: connectSid })),
     publicationUrl
   }
 }

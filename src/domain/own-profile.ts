@@ -1,8 +1,7 @@
 import { Profile } from '@substack-api/domain/profile'
 import { Note } from '@substack-api/domain/note'
 import { NoteBuilder, NoteWithLinkBuilder } from '@substack-api/domain/note-builder'
-import type { SubstackFullProfile } from '@substack-api/internal'
-import type { HttpClient } from '@substack-api/internal/http-client'
+import type { GatewayProfile } from '@substack-api/internal/types'
 import type {
   ProfileService,
   PostService,
@@ -12,51 +11,28 @@ import type {
   NewNoteService
 } from '@substack-api/internal/services'
 
-/**
- * OwnProfile extends Profile with write capabilities for the authenticated user
- */
 export class OwnProfile extends Profile {
   constructor(
-    rawData: SubstackFullProfile,
-    publicationClient: HttpClient,
-    profileService: ProfileService,
+    rawData: GatewayProfile,
     postService: PostService,
     noteService: NoteService,
     commentService: CommentService,
+    private readonly profileService: ProfileService,
     private readonly followingService: FollowingService,
     private readonly newNoteService: NewNoteService,
-    perPage: number,
-    resolvedSlug?: string
+    perPage: number
   ) {
-    super(
-      rawData,
-      publicationClient,
-      profileService,
-      postService,
-      noteService,
-      commentService,
-      perPage,
-      resolvedSlug
-    )
+    super(rawData, postService, noteService, commentService, perPage)
   }
 
-  /**
-   * Create a new note using the builder pattern
-   */
   newNote(): NoteBuilder {
     return this.newNoteService.newNote()
   }
 
-  /**
-   * Create a new note with a link attachment using the builder pattern
-   */
   newNoteWithLink(link: string): NoteWithLinkBuilder {
     return this.newNoteService.newNoteWithLink(link)
   }
 
-  /**
-   * Get users that the authenticated user follows
-   */
   async *following(options: { limit?: number } = {}): AsyncIterable<Profile> {
     const followingUsers = await this.followingService.getFollowing()
 
@@ -65,16 +41,13 @@ export class OwnProfile extends Profile {
       if (options.limit && count >= options.limit) break
 
       try {
-        const profileResponse = await this.profileService.getProfileBySlug(user.handle)
+        const profileData = await this.profileService.getProfileBySlug(user.handle)
         yield new Profile(
-          profileResponse,
-          this.publicationClient,
-          this.profileService,
+          profileData,
           this.postService,
           this.noteService,
           this.commentService,
-          this.perPage,
-          user.handle
+          this.perPage
         )
         count++
       } catch {
@@ -83,33 +56,22 @@ export class OwnProfile extends Profile {
     }
   }
 
-  /**
-   * Get notes from the authenticated user's profile
-   */
   async *notes(options: { limit?: number } = {}): AsyncIterable<Note> {
     try {
       let cursor: string | undefined = undefined
       let totalYielded = 0
 
       while (true) {
-        // Use NoteService to fetch notes for the authenticated user with cursor-based pagination
-        const paginatedNotes = await this.noteService.getNotesForLoggedUser({
-          cursor
-        })
-
-        if (!paginatedNotes.notes) {
-          break // No more notes to fetch
-        }
+        const paginatedNotes = await this.noteService.getNotesForLoggedUser({ cursor })
 
         for (const noteData of paginatedNotes.notes) {
           if (options.limit && totalYielded >= options.limit) {
-            return // Stop if we've reached the requested limit
+            return
           }
-          yield new Note(noteData, this.publicationClient)
+          yield new Note(noteData)
           totalYielded++
         }
 
-        // If there's no next cursor, we've reached the end
         if (!paginatedNotes.nextCursor) {
           break
         }
@@ -117,7 +79,6 @@ export class OwnProfile extends Profile {
         cursor = paginatedNotes.nextCursor
       }
     } catch {
-      // If the endpoint doesn't exist or fails, return empty iterator
       yield* []
     }
   }

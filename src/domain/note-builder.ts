@@ -1,17 +1,12 @@
-import {
-  CreateAttachmentRequest,
-  CreateAttachmentResponseCodec,
-  PublishNoteRequest,
-  PublishNoteResponse,
-  PublishNoteResponseCodec
-} from '@substack-api/internal'
-import { HttpClient } from '@substack-api/internal/http-client'
+import type { HttpClient } from '@substack-api/internal/http-client'
+import { GatewayCreateNoteResponseC } from '@substack-api/internal/types'
+import type { GatewayCreateNoteResponse } from '@substack-api/internal/types'
 import { decodeOrThrow } from '@substack-api/internal/validation'
 
 interface TextSegment {
   text: string
   type: 'bold' | 'italic' | 'code' | 'underline' | 'link' | 'simple'
-  url?: string // For link segments
+  url?: string
 }
 
 interface ListItem {
@@ -42,12 +37,44 @@ interface ParagraphBuilderState {
 
 interface NoteBuilderState {
   paragraphs: Array<{ segments: TextSegment[]; lists: List[] }>
-  attachmentIds?: string[]
 }
 
-/**
- * Builder for constructing list items - similar to paragraph but no nested lists allowed
- */
+function segmentToMarkdown(segment: TextSegment): string {
+  const { text, type, url } = segment
+  switch (type) {
+    case 'bold':
+      return `**${text}**`
+    case 'italic':
+      return `_${text}_`
+    case 'code':
+      return `\`${text}\``
+    case 'link':
+      return `[${text}](${url})`
+    case 'underline':
+    case 'simple':
+    default:
+      return text
+  }
+}
+
+function paragraphToMarkdown(paragraph: { segments: TextSegment[]; lists: List[] }): string {
+  const parts: string[] = []
+
+  if (paragraph.segments.length > 0) {
+    parts.push(paragraph.segments.map(segmentToMarkdown).join(''))
+  }
+
+  for (const list of paragraph.lists) {
+    const lines = list.items.map((item, i) => {
+      const content = item.segments.map(segmentToMarkdown).join('')
+      return list.type === 'bullet' ? `- ${content}` : `${i + 1}. ${content}`
+    })
+    parts.push(lines.join('\n'))
+  }
+
+  return parts.join('\n')
+}
+
 export class ListItemBuilder {
   private readonly state: ListItemBuilderState
 
@@ -58,87 +85,55 @@ export class ListItemBuilder {
     this.state = state
   }
 
-  /**
-   * Add plain text to the current list item
-   */
   text(text: string): ListItemBuilder {
     return new ListItemBuilder(this.listBuilder, {
       segments: [...this.state.segments, { text, type: 'simple' }]
     })
   }
 
-  /**
-   * Add bold text to the current list item
-   */
   bold(text: string): ListItemBuilder {
     return new ListItemBuilder(this.listBuilder, {
       segments: [...this.state.segments, { text, type: 'bold' }]
     })
   }
 
-  /**
-   * Add italic text to the current list item
-   */
   italic(text: string): ListItemBuilder {
     return new ListItemBuilder(this.listBuilder, {
       segments: [...this.state.segments, { text, type: 'italic' }]
     })
   }
 
-  /**
-   * Add code text to the current list item
-   */
   code(text: string): ListItemBuilder {
     return new ListItemBuilder(this.listBuilder, {
       segments: [...this.state.segments, { text, type: 'code' }]
     })
   }
 
-  /**
-   * Add underlined text to the current list item
-   */
   underline(text: string): ListItemBuilder {
     return new ListItemBuilder(this.listBuilder, {
       segments: [...this.state.segments, { text, type: 'underline' }]
     })
   }
 
-  /**
-   * Add a link to the current list item
-   */
   link(text: string, url: string): ListItemBuilder {
     return new ListItemBuilder(this.listBuilder, {
       segments: [...this.state.segments, { text, type: 'link', url }]
     })
   }
 
-  /**
-   * Get the current segments (used by ListBuilder)
-   */
   getSegments(): TextSegment[] {
     return this.state.segments
   }
 
-  /**
-   * Return to the list builder to add another item
-   */
   item(): ListItemBuilder {
-    // Commit current item and create new one
     return this.listBuilder.addItem({ segments: this.state.segments }).item()
   }
 
-  /**
-   * Finish the list and return to paragraph
-   */
   finish(): ParagraphBuilder {
-    // Commit current item
     return this.listBuilder.addItem({ segments: this.state.segments }).finish()
   }
 }
 
-/**
- * Builder for constructing lists within a paragraph
- */
 export class ListBuilder {
   private readonly state: ListBuilderState
 
@@ -150,9 +145,6 @@ export class ListBuilder {
     this.state = state || { type, items: [] }
   }
 
-  /**
-   * Add an item to the current list
-   */
   addItem(item: ListItem): ListBuilder {
     return new ListBuilder(this.state.type, this.paragraphBuilder, {
       type: this.state.type,
@@ -160,25 +152,15 @@ export class ListBuilder {
     })
   }
 
-  /**
-   * Start a new list item
-   */
   item(): ListItemBuilder {
     return new ListItemBuilder(this)
   }
 
-  /**
-   * Finish the list and return to paragraph
-   */
   finish(): ParagraphBuilder {
-    // Add the completed list to the paragraph
     return this.paragraphBuilder.addList({ type: this.state.type, items: this.state.items })
   }
 }
 
-/**
- * Builder for constructing rich text within a paragraph
- */
 export class ParagraphBuilder {
   private readonly state: ParagraphBuilderState
 
@@ -189,9 +171,6 @@ export class ParagraphBuilder {
     this.state = state
   }
 
-  /**
-   * Add plain text to the current paragraph
-   */
   text(text: string): ParagraphBuilder {
     return new ParagraphBuilder(this.noteBuilder, {
       segments: [...this.state.segments, { text, type: 'simple' }],
@@ -199,9 +178,6 @@ export class ParagraphBuilder {
     })
   }
 
-  /**
-   * Add bold text to the current paragraph
-   */
   bold(text: string): ParagraphBuilder {
     return new ParagraphBuilder(this.noteBuilder, {
       segments: [...this.state.segments, { text, type: 'bold' }],
@@ -209,9 +185,6 @@ export class ParagraphBuilder {
     })
   }
 
-  /**
-   * Add italic text to the current paragraph
-   */
   italic(text: string): ParagraphBuilder {
     return new ParagraphBuilder(this.noteBuilder, {
       segments: [...this.state.segments, { text, type: 'italic' }],
@@ -219,9 +192,6 @@ export class ParagraphBuilder {
     })
   }
 
-  /**
-   * Add code text to the current paragraph
-   */
   code(text: string): ParagraphBuilder {
     return new ParagraphBuilder(this.noteBuilder, {
       segments: [...this.state.segments, { text, type: 'code' }],
@@ -229,9 +199,6 @@ export class ParagraphBuilder {
     })
   }
 
-  /**
-   * Add underlined text to the current paragraph
-   */
   underline(text: string): ParagraphBuilder {
     return new ParagraphBuilder(this.noteBuilder, {
       segments: [...this.state.segments, { text, type: 'underline' }],
@@ -239,9 +206,6 @@ export class ParagraphBuilder {
     })
   }
 
-  /**
-   * Add a link to the current paragraph
-   */
   link(text: string, url: string): ParagraphBuilder {
     return new ParagraphBuilder(this.noteBuilder, {
       segments: [...this.state.segments, { text, type: 'link', url }],
@@ -249,23 +213,14 @@ export class ParagraphBuilder {
     })
   }
 
-  /**
-   * Start a bullet list in the current paragraph
-   */
   bulletList(): ListBuilder {
     return new ListBuilder('bullet', this)
   }
 
-  /**
-   * Start a numbered list in the current paragraph
-   */
   numberedList(): ListBuilder {
     return new ListBuilder('numbered', this)
   }
 
-  /**
-   * Add a list to the current paragraph (used by ListBuilder)
-   */
   addList(list: List): ParagraphBuilder {
     return new ParagraphBuilder(this.noteBuilder, {
       segments: [...this.state.segments],
@@ -273,34 +228,19 @@ export class ParagraphBuilder {
     })
   }
 
-  /**
-   * Get the current paragraph content (used by NoteBuilder)
-   */
   getParagraphContent(): { segments: TextSegment[]; lists: List[] } {
     return { segments: this.state.segments, lists: this.state.lists }
   }
 
-  /**
-   * Start a new paragraph
-   */
   paragraph(): ParagraphBuilder {
-    // Commit the current paragraph
     return this.noteBuilder.addParagraph(this.getParagraphContent()).paragraph()
   }
 
-  /**
-   * Build and validate the note
-   */
-  build(): PublishNoteRequest {
-    // Commit the current paragraph before building
+  build(): string {
     return this.noteBuilder.addParagraph(this.getParagraphContent()).build()
   }
 
-  /**
-   * Publish the note directly
-   */
-  async publish(): Promise<PublishNoteResponse> {
-    // Commit the current paragraph before publishing
+  async publish(): Promise<GatewayCreateNoteResponse> {
     return this.noteBuilder.addParagraph(this.getParagraphContent()).publish()
   }
 }
@@ -309,271 +249,65 @@ export class NoteBuilder {
   protected readonly state: NoteBuilderState
 
   constructor(
-    protected readonly substackClient: HttpClient,
+    protected readonly client: HttpClient,
     state: NoteBuilderState = { paragraphs: [] }
   ) {
     this.state = state
   }
 
-  /**
-   * Add a paragraph to the note (used by ParagraphBuilder)
-   */
   addParagraph(paragraph: { segments: TextSegment[]; lists: List[] }): NoteBuilder {
-    return new NoteBuilder(this.substackClient, {
-      paragraphs: [...this.state.paragraphs, paragraph],
-      attachmentIds: this.state.attachmentIds
+    return new NoteBuilder(this.client, {
+      paragraphs: [...this.state.paragraphs, paragraph]
     })
   }
 
-  /**
-   * Start a paragraph
-   */
   paragraph(): ParagraphBuilder {
     return new ParagraphBuilder(this)
   }
 
-  /**
-   * Convert the builder's content to Substack's note format
-   */
-  private toNoteRequest(): PublishNoteRequest {
-    // Validation: must have at least one paragraph
+  protected toMarkdown(): string {
     if (this.state.paragraphs.length === 0) {
       throw new Error('Note must contain at least one paragraph')
     }
-
-    // Validation: each paragraph must have content
     for (const paragraph of this.state.paragraphs) {
       if (paragraph.segments.length === 0 && paragraph.lists.length === 0) {
         throw new Error('Each paragraph must contain at least one content block')
       }
     }
-
-    const content = this.state.paragraphs.flatMap((paragraph) => {
-      const elements = []
-
-      // Add paragraph content if it has segments
-      if (paragraph.segments.length > 0) {
-        elements.push({
-          type: 'paragraph' as const,
-          content: paragraph.segments.map((segment) => this.segmentToContent(segment))
-        })
-      }
-
-      // Add list content
-      for (const list of paragraph.lists) {
-        elements.push({
-          type: list.type === 'bullet' ? ('bulletList' as const) : ('orderedList' as const),
-          content: list.items.map((item) => ({
-            type: 'listItem' as const,
-            content: [
-              {
-                type: 'paragraph' as const,
-                content: item.segments.map((segment) => this.segmentToContent(segment))
-              }
-            ]
-          }))
-        })
-      }
-
-      return elements
-    })
-
-    const request: PublishNoteRequest = {
-      bodyJson: {
-        type: 'doc',
-        attrs: {
-          schemaVersion: 'v1'
-        },
-        content
-      },
-      tabId: 'for-you',
-      surface: 'feed',
-      replyMinimumRole: 'everyone'
-    }
-
-    if (this.state.attachmentIds && this.state.attachmentIds.length > 0) {
-      request.attachmentIds = this.state.attachmentIds
-    }
-
-    return request
+    return this.state.paragraphs.map(paragraphToMarkdown).join('\n\n')
   }
 
-  /**
-   * Convert a text segment to Substack content format
-   */
-  protected segmentToContent(segment: TextSegment) {
-    const base = {
-      type: 'text' as const,
-      text: segment.text
-    }
-
-    if (segment.type === 'simple') {
-      return base
-    }
-
-    if (segment.type === 'link') {
-      if (!segment.url) {
-        throw new Error('Link segments must have a URL')
-      }
-      return {
-        ...base,
-        marks: [{ type: 'link' as const, attrs: { href: segment.url } }]
-      }
-    }
-
-    // For other formatting types
-    return {
-      ...base,
-      marks: [{ type: segment.type as 'bold' | 'italic' | 'code' | 'underline' }]
-    }
+  build(): string {
+    return this.toMarkdown()
   }
 
-  /**
-   * Build and validate the note
-   */
-  build(): PublishNoteRequest {
-    return this.toNoteRequest()
-  }
-
-  /**
-   * Publish the note
-   */
-  async publish(): Promise<PublishNoteResponse> {
-    const rawResponse = await this.substackClient.post<unknown>(
-      '/comment/feed/',
-      this.toNoteRequest()
-    )
-    return decodeOrThrow(PublishNoteResponseCodec, rawResponse, 'Publish note response')
+  async publish(): Promise<GatewayCreateNoteResponse> {
+    const raw = await this.client.post<unknown>('/notes', { content: this.toMarkdown() })
+    return decodeOrThrow(GatewayCreateNoteResponseC, raw, 'GatewayCreateNoteResponse')
   }
 }
 
-/**
- * Extended NoteBuilder that creates an attachment for a link and publishes the note with the attachment
- */
 export class NoteWithLinkBuilder extends NoteBuilder {
   constructor(
-    substackClient: HttpClient,
+    client: HttpClient,
     private readonly linkUrl: string
   ) {
-    super(substackClient)
+    super(client)
   }
 
-  /**
-   * Add a paragraph to the note (used by ParagraphBuilder) - returns NoteWithLinkBuilder to preserve attachment logic
-   */
   addParagraph(paragraph: { segments: TextSegment[]; lists: List[] }): NoteWithLinkBuilder {
-    return new NoteWithLinkBuilder(this.substackClient, this.linkUrl).copyState({
-      paragraphs: [...this.state.paragraphs, paragraph],
-      attachmentIds: this.state.attachmentIds
+    const next = new NoteWithLinkBuilder(this.client, this.linkUrl)
+    ;(next as any).state = {
+      paragraphs: [...this.state.paragraphs, paragraph]
+    }
+    return next
+  }
+
+  async publish(): Promise<GatewayCreateNoteResponse> {
+    const raw = await this.client.post<unknown>('/notes', {
+      content: this.toMarkdown(),
+      attachment: this.linkUrl
     })
-  }
-
-  /**
-   * Publish the note with the link attachment
-   */
-  async publish(): Promise<PublishNoteResponse> {
-    // First, create the attachment for the link
-    const attachmentRequest: CreateAttachmentRequest = {
-      url: this.linkUrl,
-      type: 'link'
-    }
-
-    const rawAttachmentResponse = await this.substackClient.post<unknown>(
-      '/comment/attachment/',
-      attachmentRequest
-    )
-    const attachmentResponse = decodeOrThrow(
-      CreateAttachmentResponseCodec,
-      rawAttachmentResponse,
-      'Create attachment response'
-    )
-
-    // Update the state with the attachment ID
-    const updatedState: NoteBuilderState = {
-      paragraphs: this.state.paragraphs,
-      attachmentIds: [attachmentResponse.id]
-    }
-
-    // Create the request with attachment
-    const request = this.toNoteRequestWithState(updatedState)
-
-    // Publish the note with attachment
-    const rawPublishResponse = await this.substackClient.post<unknown>('/comment/feed/', request)
-    return decodeOrThrow(PublishNoteResponseCodec, rawPublishResponse, 'Publish note response')
-  }
-
-  /**
-   * Copy state to new instance - helper method
-   */
-  private copyState(state: NoteBuilderState): NoteWithLinkBuilder {
-    const newBuilder = new NoteWithLinkBuilder(this.substackClient, this.linkUrl)
-    ;(newBuilder as any).state = state
-    return newBuilder
-  }
-
-  /**
-   * Convert the builder's content to Substack's note format with custom state
-   */
-  private toNoteRequestWithState(state: NoteBuilderState): PublishNoteRequest {
-    // Validation: must have at least one paragraph
-    if (state.paragraphs.length === 0) {
-      throw new Error('Note must contain at least one paragraph')
-    }
-
-    // Validation: each paragraph must have content
-    for (const paragraph of state.paragraphs) {
-      if (paragraph.segments.length === 0 && paragraph.lists.length === 0) {
-        throw new Error('Each paragraph must contain at least one content block')
-      }
-    }
-
-    const content = state.paragraphs.flatMap((paragraph) => {
-      const elements = []
-
-      // Add paragraph content if it has segments
-      if (paragraph.segments.length > 0) {
-        elements.push({
-          type: 'paragraph' as const,
-          content: paragraph.segments.map((segment) => this.segmentToContent(segment))
-        })
-      }
-
-      // Add list content
-      for (const list of paragraph.lists) {
-        elements.push({
-          type: list.type === 'bullet' ? ('bulletList' as const) : ('orderedList' as const),
-          content: list.items.map((item) => ({
-            type: 'listItem' as const,
-            content: [
-              {
-                type: 'paragraph' as const,
-                content: item.segments.map((segment) => this.segmentToContent(segment))
-              }
-            ]
-          }))
-        })
-      }
-
-      return elements
-    })
-
-    const request: PublishNoteRequest = {
-      bodyJson: {
-        type: 'doc',
-        attrs: {
-          schemaVersion: 'v1'
-        },
-        content
-      },
-      tabId: 'for-you',
-      surface: 'feed',
-      replyMinimumRole: 'everyone'
-    }
-
-    if (state.attachmentIds && state.attachmentIds.length > 0) {
-      request.attachmentIds = state.attachmentIds
-    }
-
-    return request
+    return decodeOrThrow(GatewayCreateNoteResponseC, raw, 'GatewayCreateNoteResponse')
   }
 }

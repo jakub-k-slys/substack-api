@@ -1,11 +1,9 @@
 /**
  * Test that validates public API exports work correctly
- * This ensures consumers can import builder classes from the main package
  */
 
 describe('Public API Exports', () => {
   it('should export NoteBuilder from main package', async () => {
-    // Test that NoteBuilder can be imported from the main package entry point
     const { NoteBuilder } = await import('@substack-api/index')
     expect(NoteBuilder).toBeDefined()
     expect(typeof NoteBuilder).toBe('function')
@@ -29,38 +27,35 @@ describe('Public API Exports', () => {
     expect(typeof ListItemBuilder).toBe('function')
   })
 
-  it('should allow creating NoteBuilder instance', async () => {
+  it('should allow creating NoteBuilder instance with a mock client', async () => {
     const { NoteBuilder } = await import('@substack-api/index')
 
-    // Mock HttpClient since NoteBuilder requires it
-    const mockPublicationClient = {
+    const mockClient = {
       get: jest.fn(),
-      post: jest.fn(),
-      request: jest.fn()
+      post: jest.fn()
     }
 
-    const builder = new NoteBuilder(mockPublicationClient as any)
+    const builder = new NoteBuilder(mockClient as any)
     expect(builder).toBeInstanceOf(NoteBuilder)
     expect(typeof builder.paragraph).toBe('function')
   })
 
-  it('should allow type imports for content types', async () => {
-    // This test validates that TypeScript types can be imported
-    // The import itself is sufficient to verify the types are exported
-    const module = await import('@substack-api/index')
+  it('should allow calling build() on NoteBuilder to get Markdown string', async () => {
+    const { NoteBuilder } = await import('@substack-api/index')
 
-    // We can't directly test types at runtime, but we can verify
-    // that the module exports exist and can be used in type annotations
-    expect(module).toBeDefined()
-
-    // Test that we can use the types in practice
-    const textSegment: any = {
-      text: 'Hello',
-      type: 'bold'
+    const mockClient = {
+      get: jest.fn(),
+      post: jest.fn()
     }
-    expect(textSegment).toMatchObject({
-      text: 'Hello',
-      type: 'bold'
-    })
+
+    const builder = new NoteBuilder(mockClient as any)
+    const result = builder.paragraph().text('Hello').build()
+    expect(typeof result).toBe('string')
+    expect(result).toBe('Hello')
+  })
+
+  it('should export module with correct shape', async () => {
+    const module = await import('@substack-api/index')
+    expect(module).toBeDefined()
   })
 })

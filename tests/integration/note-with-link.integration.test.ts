@@ -1,24 +1,19 @@
 import { SubstackClient } from '@substack-api/substack-client'
-import { readFileSync } from 'fs'
-import { join } from 'path'
 
 describe('note with link attachment integration tests', () => {
   let client: SubstackClient
 
   beforeEach(() => {
-    // Clear captured requests before each test
     global.INTEGRATION_SERVER.capturedRequests.length = 0
 
-    // Create client configured to use our local test server
     client = new SubstackClient({
-      publicationUrl: global.INTEGRATION_SERVER.url,
-      token: 'test-key',
-      substackUrl: global.INTEGRATION_SERVER.url, // Configure global client to use mock server too
-      urlPrefix: '' // Integration server doesn't use API prefix
+      gatewayUrl: global.INTEGRATION_SERVER.url,
+      publicationUrl: 'https://test.substack.com',
+      token: 'dummy-token'
     })
   })
 
-  test('should create attachment and publish note with correct request structure', async () => {
+  test('should publish note with link as single POST with attachment field', async () => {
     const profile = await client.ownProfile()
     const testUrl = 'https://iam.slys.dev/p/understanding-locking-contention'
 
@@ -30,116 +25,21 @@ describe('note with link attachment integration tests', () => {
       .text(' about system design!')
       .publish()
 
-    // Should have made 2 requests: attachment creation + note publishing
-    expect(global.INTEGRATION_SERVER.capturedRequests).toHaveLength(2)
+    // Single request — gateway handles markdown + attachment in one call
+    expect(global.INTEGRATION_SERVER.capturedRequests).toHaveLength(1)
+    const req = global.INTEGRATION_SERVER.capturedRequests[0]
 
-    // Verify first request was attachment creation
-    const attachmentRequest = global.INTEGRATION_SERVER.capturedRequests[0]
-    expect(attachmentRequest.method).toBe('POST')
-    expect(attachmentRequest.url).toBe('/comment/attachment/')
+    expect(req.method).toBe('POST')
+    expect(req.url).toBe('/api/v1/notes')
 
-    const expectedAttachmentRequestPath = join(
-      process.cwd(),
-      'samples',
-      'api',
-      'v1',
-      'comment',
-      'attachment'
-    )
-    const expectedAttachmentData = JSON.parse(readFileSync(expectedAttachmentRequestPath, 'utf8'))
-    expect(attachmentRequest.body).toEqual(expectedAttachmentData)
-
-    // Verify second request was note publishing with attachment
-    const noteRequest = global.INTEGRATION_SERVER.capturedRequests[1]
-    expect(noteRequest.method).toBe('POST')
-    expect(noteRequest.url).toBe('/comment/feed/')
-
-    const capturedNoteBody = noteRequest.body as any
-
-    // Verify the structure matches our expected format
-    expect(capturedNoteBody).toMatchObject({
-      bodyJson: {
-        type: 'doc',
-        attrs: { schemaVersion: 'v1' },
-        content: [
-          {
-            type: 'paragraph',
-            content: [
-              { type: 'text', text: 'Check out this ' },
-              { type: 'text', text: 'interesting article', marks: [{ type: 'bold' }] },
-              { type: 'text', text: ' about system design!' }
-            ]
-          }
-        ]
-      },
-      attachmentIds: ['19b5d6f9-46db-47d6-b381-17cb5f443c00'],
-      replyMinimumRole: 'everyone',
-      tabId: 'for-you',
-      surface: 'feed'
-    })
+    const body = req.body as { content: string; attachment: string }
+    expect(body.content).toContain('Check out this ')
+    expect(body.content).toContain('**interesting article**')
+    expect(body.content).toContain(' about system design!')
+    expect(body.attachment).toBe(testUrl)
   })
 
-  test('should build complex note with attachment and correct structure', async () => {
-    const profile = await client.ownProfile()
-    const testUrl = 'https://example.com/test-article'
-
-    await profile
-      .newNoteWithLink(testUrl)
-      .paragraph()
-      .text('This is a ')
-      .bold('complex note')
-      .text(' with multiple ')
-      .italic('formatting options')
-      .text('.')
-      .paragraph()
-      .text('It includes ')
-      .link('internal links', 'https://internal.example.com')
-      .text(' and ')
-      .code('code snippets')
-      .text('.')
-      .publish()
-
-    expect(global.INTEGRATION_SERVER.capturedRequests).toHaveLength(2)
-
-    const attachmentRequest = global.INTEGRATION_SERVER.capturedRequests[0]
-    expect(attachmentRequest.body).toEqual({
-      url: 'https://example.com/test-article',
-      type: 'link'
-    })
-
-    const noteRequest = global.INTEGRATION_SERVER.capturedRequests[1]
-    const noteBody = noteRequest.body as any
-
-    // Verify the complex structure was built correctly
-    expect(noteBody.bodyJson.content).toHaveLength(2) // Two paragraphs
-
-    // First paragraph
-    expect(noteBody.bodyJson.content[0].content).toEqual([
-      { type: 'text', text: 'This is a ' },
-      { type: 'text', text: 'complex note', marks: [{ type: 'bold' }] },
-      { type: 'text', text: ' with multiple ' },
-      { type: 'text', text: 'formatting options', marks: [{ type: 'italic' }] },
-      { type: 'text', text: '.' }
-    ])
-
-    // Second paragraph
-    expect(noteBody.bodyJson.content[1].content).toEqual([
-      { type: 'text', text: 'It includes ' },
-      {
-        type: 'text',
-        text: 'internal links',
-        marks: [{ type: 'link', attrs: { href: 'https://internal.example.com' } }]
-      },
-      { type: 'text', text: ' and ' },
-      { type: 'text', text: 'code snippets', marks: [{ type: 'code' }] },
-      { type: 'text', text: '.' }
-    ])
-
-    // Verify attachment ID is included
-    expect(noteBody.attachmentIds).toEqual(['19b5d6f9-46db-47d6-b381-17cb5f443c00'])
-  })
-
-  test('should handle different URL formats correctly', async () => {
+  test('should include attachment URL for different URL formats', async () => {
     const profile = await client.ownProfile()
     const urls = [
       'https://blog.example.com/post/123',
@@ -148,61 +48,45 @@ describe('note with link attachment integration tests', () => {
     ]
 
     for (const testUrl of urls) {
-      // Clear previous requests
       global.INTEGRATION_SERVER.capturedRequests.length = 0
 
-      await profile
-        .newNoteWithLink(testUrl)
-        .paragraph()
-        .text(`Testing with URL: ${testUrl}`)
-        .publish()
+      await profile.newNoteWithLink(testUrl).paragraph().text('Testing URL').publish()
 
-      expect(global.INTEGRATION_SERVER.capturedRequests).toHaveLength(2)
-
-      const attachmentRequest = global.INTEGRATION_SERVER.capturedRequests[0]
-      expect(attachmentRequest.body).toEqual({
-        url: testUrl,
-        type: 'link'
-      })
+      expect(global.INTEGRATION_SERVER.capturedRequests).toHaveLength(1)
+      const body = global.INTEGRATION_SERVER.capturedRequests[0].body as { attachment: string }
+      expect(body.attachment).toBe(testUrl)
     }
   })
 
-  test('should work with lists and complex formatting', async () => {
+  test('should send correct markdown for complex note with link', async () => {
     const profile = await client.ownProfile()
 
     await profile
-      .newNoteWithLink('https://example.com/list-article')
+      .newNoteWithLink('https://example.com/article')
       .paragraph()
-      .text('Here are some key points from the article:')
-      .bulletList()
-      .item()
-      .text('First ')
-      .bold('important')
-      .text(' point')
-      .item()
-      .text('Second point with ')
-      .link('a link', 'https://reference.com')
-      .item()
-      .code('Third point')
-      .text(' with code')
-      .finish()
+      .text('This is a ')
+      .bold('complex note')
+      .text(' with ')
+      .italic('formatting')
+      .text('.')
+      .paragraph()
+      .text('With ')
+      .code('code')
+      .text(' and ')
+      .link('a link', 'https://ref.example.com')
+      .text('.')
       .publish()
 
-    expect(global.INTEGRATION_SERVER.capturedRequests).toHaveLength(2)
+    expect(global.INTEGRATION_SERVER.capturedRequests).toHaveLength(1)
+    const body = global.INTEGRATION_SERVER.capturedRequests[0].body as {
+      content: string
+      attachment: string
+    }
 
-    const noteRequest = global.INTEGRATION_SERVER.capturedRequests[1]
-    const noteBody = noteRequest.body as any
-
-    // Should have paragraph + bullet list
-    expect(noteBody.bodyJson.content).toHaveLength(2)
-    expect(noteBody.bodyJson.content[0].type).toBe('paragraph')
-    expect(noteBody.bodyJson.content[1].type).toBe('bulletList')
-
-    // Verify bullet list structure
-    const bulletList = noteBody.bodyJson.content[1]
-    expect(bulletList.content).toHaveLength(3) // Three list items
-
-    // Verify attachment is included
-    expect(noteBody.attachmentIds).toEqual(['19b5d6f9-46db-47d6-b381-17cb5f443c00'])
+    expect(body.content).toContain('**complex note**')
+    expect(body.content).toContain('_formatting_')
+    expect(body.content).toContain('`code`')
+    expect(body.content).toContain('[a link](https://ref.example.com)')
+    expect(body.attachment).toBe('https://example.com/article')
   })
 })
