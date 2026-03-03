@@ -1,7 +1,6 @@
 import { OwnProfile } from '@substack-api/domain/own-profile'
 import { Note } from '@substack-api/domain/note'
 import { Profile } from '@substack-api/domain/profile'
-import { NoteBuilder, NoteWithLinkBuilder } from '@substack-api/domain/note-builder'
 import {
   ProfileService,
   PostService,
@@ -10,8 +9,6 @@ import {
   FollowingService,
   NewNoteService
 } from '@substack-api/internal/services'
-import type { HttpClient } from '@substack-api/internal/http-client'
-
 const makeGatewayProfile = (id: number, handle: string, name: string) => ({
   id,
   handle,
@@ -30,7 +27,6 @@ const makeGatewayNote = (id: number, body: string) => ({
 })
 
 describe('OwnProfile Entity', () => {
-  let mockClient: jest.Mocked<HttpClient>
   let mockProfileService: jest.Mocked<ProfileService>
   let mockPostService: jest.Mocked<PostService>
   let mockCommentService: jest.Mocked<CommentService>
@@ -40,11 +36,6 @@ describe('OwnProfile Entity', () => {
   let ownProfile: OwnProfile
 
   beforeEach(() => {
-    mockClient = {
-      get: jest.fn(),
-      post: jest.fn()
-    } as unknown as jest.Mocked<HttpClient>
-
     mockProfileService = {
       getOwnProfile: jest.fn(),
       getProfileBySlug: jest.fn()
@@ -70,10 +61,7 @@ describe('OwnProfile Entity', () => {
     } as unknown as jest.Mocked<FollowingService>
 
     mockNewNoteService = {
-      newNote: jest.fn().mockImplementation(() => new NoteBuilder(mockClient)),
-      newNoteWithLink: jest
-        .fn()
-        .mockImplementation((link: string) => new NoteWithLinkBuilder(mockClient, link))
+      publishNote: jest.fn().mockResolvedValue({ id: 42 })
     } as unknown as jest.Mocked<NewNoteService>
 
     ownProfile = new OwnProfile(
@@ -94,20 +82,26 @@ describe('OwnProfile Entity', () => {
     expect(ownProfile.slug).toBe('testuser')
   })
 
-  it('should have additional write methods', () => {
-    expect(typeof ownProfile.newNote).toBe('function')
+  it('should have publishNote, following, and notes methods', () => {
+    expect(typeof ownProfile.publishNote).toBe('function')
     expect(typeof ownProfile.following).toBe('function')
     expect(typeof ownProfile.notes).toBe('function')
   })
 
-  it('should return NoteBuilder from newNote()', () => {
-    const builder = ownProfile.newNote()
-    expect(builder).toBeInstanceOf(NoteBuilder)
-  })
+  describe('publishNote()', () => {
+    it('should delegate to newNoteService.publishNote with content', async () => {
+      const result = await ownProfile.publishNote('Hello **world**')
+      expect(mockNewNoteService.publishNote).toHaveBeenCalledWith('Hello **world**', undefined)
+      expect(result).toEqual({ id: 42 })
+    })
 
-  it('should return NoteWithLinkBuilder from newNoteWithLink()', () => {
-    const builder = ownProfile.newNoteWithLink('https://example.com')
-    expect(builder).toBeInstanceOf(NoteWithLinkBuilder)
+    it('should pass attachment when provided', async () => {
+      await ownProfile.publishNote('Check this out', { attachment: 'https://example.com' })
+      expect(mockNewNoteService.publishNote).toHaveBeenCalledWith(
+        'Check this out',
+        'https://example.com'
+      )
+    })
   })
 
   describe('following()', () => {

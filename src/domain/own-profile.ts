@@ -1,7 +1,7 @@
 import { Profile } from '@substack-api/domain/profile'
 import { Note } from '@substack-api/domain/note'
-import { NoteBuilder, NoteWithLinkBuilder } from '@substack-api/domain/note-builder'
 import type { GatewayProfile } from '@substack-api/internal/types'
+import type { GatewayCreateNoteResponse } from '@substack-api/internal/types'
 import type {
   ProfileService,
   PostService,
@@ -25,12 +25,11 @@ export class OwnProfile extends Profile {
     super(rawData, postService, noteService, commentService, perPage)
   }
 
-  newNote(): NoteBuilder {
-    return this.newNoteService.newNote()
-  }
-
-  newNoteWithLink(link: string): NoteWithLinkBuilder {
-    return this.newNoteService.newNoteWithLink(link)
+  async publishNote(
+    content: string,
+    options?: { attachment?: string }
+  ): Promise<GatewayCreateNoteResponse> {
+    return this.newNoteService.publishNote(content, options?.attachment)
   }
 
   async *following(options: { limit?: number } = {}): AsyncIterable<Profile> {
