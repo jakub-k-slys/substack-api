@@ -1,5 +1,6 @@
 import { FollowingService } from '@substack-api/internal/services/following-service'
 import { HttpClient } from '@substack-api/internal/http-client'
+import { createMockHttpClient } from '@test/unit/fixtures'
 
 jest.mock('@substack-api/internal/http-client')
 
@@ -9,16 +10,12 @@ describe('FollowingService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockClient = new HttpClient('https://test.com', {
-      token: 'dummy-token',
-      publicationUrl: 'https://pub.com'
-    }) as jest.Mocked<HttpClient>
-    mockClient.get = jest.fn()
+    mockClient = createMockHttpClient()
     followingService = new FollowingService(mockClient)
   })
 
   describe('getFollowing', () => {
-    it('should return following users from GET /me/following with { items } response shape', async () => {
+    it('should return following users from GET /me/following', async () => {
       const mockUsers = [
         { id: 123, handle: 'user123' },
         { id: 456, handle: 'user456' }
@@ -31,17 +28,13 @@ describe('FollowingService', () => {
       expect(result).toEqual(mockUsers)
     })
 
-    it('should return empty array when items is empty', async () => {
+    it('should return empty array when no one is followed', async () => {
       mockClient.get.mockResolvedValue({ items: [] })
-
-      const result = await followingService.getFollowing()
-
-      expect(result).toEqual([])
+      expect(await followingService.getFollowing()).toEqual([])
     })
 
-    it('should throw error when request fails', async () => {
+    it('should throw when request fails', async () => {
       mockClient.get.mockRejectedValue(new Error('Network error'))
-
       await expect(followingService.getFollowing()).rejects.toThrow('Network error')
     })
   })

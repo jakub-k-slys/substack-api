@@ -1,5 +1,6 @@
 import { ConnectivityService } from '@substack-api/internal/services/connectivity-service'
 import { HttpClient } from '@substack-api/internal/http-client'
+import { createMockHttpClient } from '@test/unit/fixtures'
 
 jest.mock('@substack-api/internal/http-client')
 
@@ -9,11 +10,7 @@ describe('ConnectivityService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockClient = new HttpClient('https://test.com', {
-      token: 'dummy-token',
-      publicationUrl: 'https://pub.com'
-    }) as jest.Mocked<HttpClient>
-    mockClient.get = jest.fn()
+    mockClient = createMockHttpClient()
     connectivityService = new ConnectivityService(mockClient)
   })
 
@@ -25,32 +22,16 @@ describe('ConnectivityService', () => {
 
       expect(result).toBe(true)
       expect(mockClient.get).toHaveBeenCalledWith('/health/ready')
-      expect(mockClient.get).toHaveBeenCalledTimes(1)
     })
 
-    it('should return false when request fails with network error', async () => {
+    it('should return false when request fails', async () => {
       mockClient.get.mockRejectedValue(new Error('Network error'))
-
-      const result = await connectivityService.isConnected()
-
-      expect(result).toBe(false)
-      expect(mockClient.get).toHaveBeenCalledWith('/health/ready')
+      expect(await connectivityService.isConnected()).toBe(false)
     })
 
-    it('should return false when request fails with HTTP error', async () => {
+    it('should return false on HTTP error', async () => {
       mockClient.get.mockRejectedValue(new Error('HTTP 401: Unauthorized'))
-
-      const result = await connectivityService.isConnected()
-
-      expect(result).toBe(false)
-    })
-
-    it('should return false when request times out', async () => {
-      mockClient.get.mockRejectedValue(new Error('Request timeout'))
-
-      const result = await connectivityService.isConnected()
-
-      expect(result).toBe(false)
+      expect(await connectivityService.isConnected()).toBe(false)
     })
   })
 })

@@ -100,74 +100,29 @@ describe('SubstackClient Entity Model E2E', () => {
     console.log(`✅ Retrieved ${comments.length} comments from post "${testPost!.title}"`)
   })
 
-  test('should handle error cases gracefully - invalid profile slug', async () => {
-    try {
-      // Test invalid profile slug
-      const profile = await client.profileForSlug('this-profile-should-not-exist-12345')
-      // If we reach here, check if it's actually a valid profile or a default
-      if (profile && profile.slug === 'this-profile-should-not-exist-12345') {
-        // The profile unexpectedly exists, which is fine
-        console.log('ℹ️ Profile exists or default profile returned')
-      } else {
-        console.log('ℹ️ Profile request completed (may be default profile)')
-      }
-    } catch (error) {
-      // Check if it's any kind of error by constructor name
-      const errorName = error?.constructor?.name
-      const isValidError =
-        errorName === 'Error' ||
-        errorName === 'TypeError' ||
-        errorName === 'FetchError' ||
-        error instanceof Error
-      expect(isValidError).toBe(true)
-      console.log('✅ Properly handles invalid profile lookup')
-    }
+  test('should throw for invalid profile slug', async () => {
+    await expect(client.profileForSlug('this-profile-should-not-exist-12345')).rejects.toThrow()
+    console.log('✅ Properly handles invalid profile lookup')
   })
-  test('should handle error cases gracefully - invalid post id', async () => {
-    try {
-      // Test invalid post ID
-      const _post = await client.postForId(999999999999)
-      // If we reach here, the post unexpectedly exists or there's a default
-      console.log('ℹ️ Post request completed (may be default or existing post)')
-    } catch (error) {
-      // Check if it's any kind of error by constructor name
-      const errorName = error?.constructor?.name
-      const isValidError =
-        errorName === 'Error' ||
-        errorName === 'TypeError' ||
-        errorName === 'FetchError' ||
-        error instanceof Error
-      expect(isValidError).toBe(true)
-      console.log('✅ Properly handles invalid post lookup')
-    }
+
+  test('should throw for invalid post id', async () => {
+    await expect(client.postForId(999999999999)).rejects.toThrow()
+    console.log('✅ Properly handles invalid post lookup')
   })
-  test('should handle error cases gracefully - invalid note id', async () => {
-    try {
-      // Test invalid note ID
-      const _note = await client.noteForId(999999999999)
-      // If we reach here, the note unexpectedly exists or there's a default
-      console.log('ℹ️ Note request completed (may be default or existing note)')
-    } catch (error) {
-      // Check if it's any kind of error by constructor name
-      const errorName = error?.constructor?.name
-      const isValidError =
-        errorName === 'Error' ||
-        errorName === 'TypeError' ||
-        errorName === 'FetchError' ||
-        error instanceof Error
-      expect(isValidError).toBe(true)
-      console.log('✅ Properly handles invalid note lookup')
-    }
+
+  test('should throw for invalid note id', async () => {
+    await expect(client.noteForId(999999999999)).rejects.toThrow()
+    console.log('✅ Properly handles invalid note lookup')
   })
 
   test('should fetch 99 notes using cursor-based pagination', async () => {
-    const foreignProfile = await client.profileForSlug('jakubslys')
+    const profile = await client.profileForSlug('jakubslys')
     const notes = []
     let count = 0
 
     try {
       // Test fetching exactly 99 notes with the limit parameter
-      for await (const note of foreignProfile.notes({ limit: 99 })) {
+      for await (const note of profile.notes({ limit: 99 })) {
         notes.push(note)
         count++
 
