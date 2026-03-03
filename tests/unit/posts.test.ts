@@ -111,9 +111,14 @@ describe('PreviewPost Entity', () => {
   })
 
   describe('like() and addComment()', () => {
-    it('should throw not-implemented error', async () => {
-      await expect(post.like()).rejects.toThrow()
-      await expect(post.addComment({ body: 'Test' })).rejects.toThrow()
+    it('should throw not-implemented error for like()', async () => {
+      await expect(post.like()).rejects.toThrow('Post liking not implemented yet')
+    })
+
+    it('should throw not-implemented error for addComment()', async () => {
+      await expect(post.addComment({ body: 'Test' })).rejects.toThrow(
+        'Comment creation not implemented yet'
+      )
     })
   })
 })

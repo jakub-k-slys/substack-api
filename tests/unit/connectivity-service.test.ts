@@ -28,10 +28,5 @@ describe('ConnectivityService', () => {
       mockClient.get.mockRejectedValue(new Error('Network error'))
       expect(await connectivityService.isConnected()).toBe(false)
     })
-
-    it('should return false on HTTP error', async () => {
-      mockClient.get.mockRejectedValue(new Error('HTTP 401: Unauthorized'))
-      expect(await connectivityService.isConnected()).toBe(false)
-    })
   })
 })

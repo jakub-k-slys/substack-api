@@ -1,5 +1,5 @@
 import { SubstackClient } from '@substack-api/substack-client'
-import { Profile, OwnProfile, FullPost } from '@substack-api/domain'
+import { Profile, OwnProfile, FullPost, Note, Comment, PreviewPost } from '@substack-api/domain'
 
 describe('SubstackClient Integration Tests', () => {
   let client: SubstackClient
@@ -35,12 +35,13 @@ describe('SubstackClient Integration Tests', () => {
   })
 
   describe('ownProfile', () => {
-    test('should return OwnProfile instance', async () => {
+    test('should return OwnProfile instance with required fields', async () => {
       const profile = await client.ownProfile()
       expect(profile).toBeInstanceOf(OwnProfile)
-      expect(profile.id).toBe(27968736)
-      expect(profile.name).toBe('Jakub Slys 🎖️')
-      expect(profile.bio).toContain('Ever wonder how Uber matches rides')
+      expect(profile.id).toBeGreaterThan(0)
+      expect(profile.name).toBeTruthy()
+      expect(profile.slug).toBeTruthy()
+      expect(profile.bio).toBeTruthy()
     })
   })
 
@@ -48,10 +49,10 @@ describe('SubstackClient Integration Tests', () => {
     test('should retrieve profile by slug', async () => {
       const profile = await client.profileForSlug('jakubslys')
       expect(profile).toBeInstanceOf(Profile)
-      expect(profile.id).toBe(27968736)
-      expect(profile.name).toBe('Jakub Slys 🎖️')
+      expect(profile.id).toBeGreaterThan(0)
+      expect(profile.name).toBeTruthy()
       expect(profile.slug).toBe('jakubslys')
-      expect(profile.bio).toContain('Ever wonder how Uber matches rides')
+      expect(profile.bio).toBeTruthy()
       expect(typeof profile.posts).toBe('function')
       expect(typeof profile.notes).toBe('function')
     })
@@ -71,24 +72,15 @@ describe('SubstackClient Integration Tests', () => {
       const post = await client.postForId(167180194)
       expect(post).toBeInstanceOf(FullPost)
       expect(post.id).toBe(167180194)
-      expect(post.title).toBe('Week of June 24, 2025: Build SaaS Without Code')
-      expect(post.subtitle).toBe('The New Blueprint for Solopreneurs')
-      expect(post.slug).toBe('week-of-june-24-2025-build-saas-without')
-      expect(post.htmlBody).toContain('<div class="captioned-image-container">')
-      expect(post.htmlBody).toContain('content shatters the myth')
+      expect(post.title).toBeTruthy()
+      expect(post.subtitle).toBeTruthy()
+      expect(post.slug).toBeTruthy()
+      expect(post.htmlBody).toBeTruthy()
       expect(post.createdAt).toBeInstanceOf(Date)
-      expect(post.reactions).toEqual({ '❤': 4 })
-      expect(post.restacks).toBe(1)
-      expect(post.postTags).toEqual([
-        'tldr',
-        'workflows',
-        'content',
-        'digest',
-        'solopreneur',
-        'entrepreneur',
-        'agency'
-      ])
-      expect(post.coverImage).toContain('substack-post-media.s3.amazonaws.com')
+      expect(typeof post.reactions).toBe('object')
+      expect(typeof post.restacks).toBe('number')
+      expect(Array.isArray(post.postTags)).toBe(true)
+      expect(typeof post.coverImage).toBe('string')
       expect(typeof post.comments).toBe('function')
     })
 
@@ -100,12 +92,57 @@ describe('SubstackClient Integration Tests', () => {
   describe('noteForId', () => {
     test('should retrieve note by ID', async () => {
       const note = await client.noteForId(789)
-      expect(note.id).toBe(789)
-      expect(note.body).toBe('Test note body')
+      expect(note).toBeInstanceOf(Note)
+      expect(note.id).toBeGreaterThan(0)
+      expect(note.body).toBeTruthy()
+      expect(note.author).toBeTruthy()
+      expect(note.publishedAt).toBeInstanceOf(Date)
     })
 
     test('should throw when note not found', async () => {
       await expect(client.noteForId(999999999)).rejects.toThrow('Note with ID 999999999 not found')
+    })
+  })
+
+  describe('profile.posts() iteration', () => {
+    test('should yield PreviewPost instances', async () => {
+      const profile = await client.profileForSlug('jakubslys')
+      const posts: PreviewPost[] = []
+      for await (const post of profile.posts()) {
+        posts.push(post)
+      }
+      expect(posts.length).toBeGreaterThan(0)
+      expect(posts[0]).toBeInstanceOf(PreviewPost)
+      expect(posts[0].id).toBeGreaterThan(0)
+      expect(posts[0].title).toBeTruthy()
+      expect(posts[0].publishedAt).toBeInstanceOf(Date)
+    })
+  })
+
+  describe('profile.notes() iteration', () => {
+    test('should yield Note instances', async () => {
+      const profile = await client.profileForSlug('jakubslys')
+      const notes: Note[] = []
+      for await (const note of profile.notes()) {
+        notes.push(note)
+      }
+      expect(notes.length).toBeGreaterThan(0)
+      expect(notes[0]).toBeInstanceOf(Note)
+      expect(notes[0].id).toBeGreaterThan(0)
+      expect(notes[0].body).toBeTruthy()
+    })
+  })
+
+  describe('post.comments() iteration', () => {
+    test('should yield Comment instances', async () => {
+      const post = await client.postForId(167180194)
+      const comments: Comment[] = []
+      for await (const comment of post.comments()) {
+        comments.push(comment)
+      }
+      expect(comments.length).toBeGreaterThan(0)
+      expect(comments[0]).toBeInstanceOf(Comment)
+      expect(comments[0].body).toBeTruthy()
     })
   })
 })

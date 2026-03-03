@@ -5,7 +5,8 @@ import {
   PostService,
   NoteService,
   ProfileService,
-  ConnectivityService
+  ConnectivityService,
+  NewNoteService
 } from '@substack-api/internal/services'
 import { makeGatewayNote } from '@test/unit/fixtures'
 
@@ -16,6 +17,7 @@ const MockPostService = PostService as jest.MockedClass<typeof PostService>
 const MockNoteService = NoteService as jest.MockedClass<typeof NoteService>
 const MockProfileService = ProfileService as jest.MockedClass<typeof ProfileService>
 const MockConnectivityService = ConnectivityService as jest.MockedClass<typeof ConnectivityService>
+const MockNewNoteService = NewNoteService as jest.MockedClass<typeof NewNoteService>
 
 describe('SubstackClient', () => {
   let client: SubstackClient
@@ -23,6 +25,7 @@ describe('SubstackClient', () => {
   let mockNoteService: jest.Mocked<NoteService>
   let mockProfileService: jest.Mocked<ProfileService>
   let mockConnectivityService: jest.Mocked<ConnectivityService>
+  let mockNewNoteService: jest.Mocked<NewNoteService>
 
   const gatewayConfig = {
     gatewayUrl: 'http://localhost:5001',
@@ -40,6 +43,7 @@ describe('SubstackClient', () => {
     mockProfileService = MockProfileService.mock.instances[0] as jest.Mocked<ProfileService>
     mockConnectivityService = MockConnectivityService.mock
       .instances[0] as jest.Mocked<ConnectivityService>
+    mockNewNoteService = MockNewNoteService.mock.instances[0] as jest.Mocked<NewNoteService>
   })
 
   describe('constructor', () => {
@@ -96,6 +100,24 @@ describe('SubstackClient', () => {
     it('should throw when authentication fails', async () => {
       mockProfileService.getOwnProfile.mockRejectedValue(new Error('Unauthorized'))
       await expect(client.ownProfile()).rejects.toThrow('Failed to get own profile: Unauthorized')
+    })
+
+    it('should return OwnProfile with working publishNote method', async () => {
+      const mockProfile = {
+        id: 123,
+        name: 'Test User',
+        handle: 'testuser',
+        url: 'https://substack.com/@testuser',
+        avatar_url: 'https://example.com/photo.jpg'
+      }
+      mockProfileService.getOwnProfile.mockResolvedValueOnce(mockProfile)
+      mockNewNoteService.publishNote = jest.fn().mockResolvedValue({ id: 42 })
+
+      const profile = await client.ownProfile()
+      const result = await profile.publishNote('Hello world')
+
+      expect(mockNewNoteService.publishNote).toHaveBeenCalledWith('Hello world', undefined)
+      expect(result).toEqual({ id: 42 })
     })
   })
 
