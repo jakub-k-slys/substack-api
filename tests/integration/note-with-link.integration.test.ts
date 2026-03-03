@@ -17,13 +17,10 @@ describe('note with link attachment integration tests', () => {
     const profile = await client.ownProfile()
     const testUrl = 'https://iam.slys.dev/p/understanding-locking-contention'
 
-    await profile
-      .newNoteWithLink(testUrl)
-      .paragraph()
-      .text('Check out this ')
-      .bold('interesting article')
-      .text(' about system design!')
-      .publish()
+    await profile.publishNote(
+      'Check out this **interesting article** about system design!',
+      { attachment: testUrl }
+    )
 
     // Single request — gateway handles markdown + attachment in one call
     expect(global.INTEGRATION_SERVER.capturedRequests).toHaveLength(1)
@@ -50,7 +47,7 @@ describe('note with link attachment integration tests', () => {
     for (const testUrl of urls) {
       global.INTEGRATION_SERVER.capturedRequests.length = 0
 
-      await profile.newNoteWithLink(testUrl).paragraph().text('Testing URL').publish()
+      await profile.publishNote('Testing URL', { attachment: testUrl })
 
       expect(global.INTEGRATION_SERVER.capturedRequests).toHaveLength(1)
       const body = global.INTEGRATION_SERVER.capturedRequests[0].body as { attachment: string }
@@ -61,21 +58,10 @@ describe('note with link attachment integration tests', () => {
   test('should send correct markdown for complex note with link', async () => {
     const profile = await client.ownProfile()
 
-    await profile
-      .newNoteWithLink('https://example.com/article')
-      .paragraph()
-      .text('This is a ')
-      .bold('complex note')
-      .text(' with ')
-      .italic('formatting')
-      .text('.')
-      .paragraph()
-      .text('With ')
-      .code('code')
-      .text(' and ')
-      .link('a link', 'https://ref.example.com')
-      .text('.')
-      .publish()
+    await profile.publishNote(
+      'This is a **complex note** with _formatting_.\n\nWith `code` and [a link](https://ref.example.com).',
+      { attachment: 'https://example.com/article' }
+    )
 
     expect(global.INTEGRATION_SERVER.capturedRequests).toHaveLength(1)
     const body = global.INTEGRATION_SERVER.capturedRequests[0].body as {

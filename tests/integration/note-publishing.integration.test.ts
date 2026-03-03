@@ -15,18 +15,7 @@ describe('note publishing tests', () => {
 
   test('should publish note as markdown to POST /api/v1/notes', async () => {
     const profile = await client.ownProfile()
-    await profile
-      .newNote()
-      .paragraph()
-      .bold('test')
-      .paragraph()
-      .italic('test1')
-      .paragraph()
-      .code('another test')
-      .text(' ')
-      .paragraph()
-      .text('just a test')
-      .publish()
+    await profile.publishNote('**test**\n\n_test1_\n\n`another test` \n\njust a test')
 
     expect(global.INTEGRATION_SERVER.capturedRequests).toHaveLength(1)
     const req = global.INTEGRATION_SERVER.capturedRequests[0]
@@ -45,7 +34,7 @@ describe('note publishing tests', () => {
 
   test('should return note ID from gateway response', async () => {
     const profile = await client.ownProfile()
-    const result = await profile.newNote().paragraph().text('Hello').publish()
+    const result = await profile.publishNote('Hello')
     expect(result.id).toBe(12345)
   })
 })
