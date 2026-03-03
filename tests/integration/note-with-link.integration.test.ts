@@ -17,10 +17,9 @@ describe('note with link attachment integration tests', () => {
     const profile = await client.ownProfile()
     const testUrl = 'https://iam.slys.dev/p/understanding-locking-contention'
 
-    await profile.publishNote(
-      'Check out this **interesting article** about system design!',
-      { attachment: testUrl }
-    )
+    await profile.publishNote('Check out this **interesting article** about system design!', {
+      attachment: testUrl
+    })
 
     // Single request — gateway handles markdown + attachment in one call
     expect(global.INTEGRATION_SERVER.capturedRequests).toHaveLength(1)
