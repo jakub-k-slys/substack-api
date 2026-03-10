@@ -76,6 +76,7 @@ export class FullPost implements Post {
   public readonly truncatedBody: string
   public readonly publishedAt: Date
   public readonly htmlBody: string
+  public readonly markdown: string
   public readonly slug: string
   public readonly createdAt: Date
   public readonly reactions?: Record<string, number>
@@ -96,6 +97,7 @@ export class FullPost implements Post {
     this.publishedAt = new Date(rawData.published_at)
     this.url = rawData.url
     this.htmlBody = rawData.html_body || ''
+    this.markdown = rawData.markdown || ''
     this.slug = rawData.slug
     this.createdAt = new Date(rawData.published_at)
     this.reactions = rawData.reactions ?? undefined

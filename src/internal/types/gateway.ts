@@ -85,6 +85,7 @@ export const GatewayFullPostC = t.intersection([
   t.partial({
     subtitle: t.union([t.string, t.null]),
     html_body: t.union([t.string, t.null]),
+    markdown: t.union([t.string, t.null]),
     truncated_body: t.union([t.string, t.null]),
     reactions: t.union([t.record(t.string, t.number), t.null]),
     restacks: t.union([t.number, t.null]),

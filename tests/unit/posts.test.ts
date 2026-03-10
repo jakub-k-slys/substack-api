@@ -137,10 +137,11 @@ describe('FullPost Entity', () => {
   })
 
   describe('properties', () => {
-    it('should expose id, title, htmlBody, subtitle, and publishedAt', () => {
+    it('should expose id, title, htmlBody, markdown, subtitle, and publishedAt', () => {
       expect(fullPost.id).toBe(789)
       expect(fullPost.title).toBe('Full Test Post')
       expect(fullPost.htmlBody).toBe('<p>Full HTML content with <strong>formatting</strong></p>')
+      expect(fullPost.markdown).toBe('# Test\n\nFull markdown content with **formatting**')
       expect(fullPost.subtitle).toBe('Test subtitle')
       expect(fullPost.publishedAt).toBeInstanceOf(Date)
     })
