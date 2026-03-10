@@ -36,6 +36,7 @@ export const makeGatewayFullPost = (id: number, title: string) => ({
   url: `https://example.com/post-${id}`,
   published_at: '2023-01-01T00:00:00Z',
   html_body: '<p>Full HTML content with <strong>formatting</strong></p>',
+  markdown: '# Test\n\nFull markdown content with **formatting**',
   truncated_body: 'Truncated content',
   reactions: { '❤️': 5 },
   restacks: 2,
