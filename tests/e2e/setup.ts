@@ -11,15 +11,12 @@ declare global {
     publicationUrl?: string
   }
 
-  function getTestCredentials(): {
-    token: string
-    publicationUrl?: string
-  } | null
+  function getTestCredentials(): { token: string; publicationUrl?: string } | null
 }
 
 // Check for credentials but don't fail early - let individual tests handle missing credentials
-const token = process.env.SUBSTACK_TOKEN
-const hostname = process.env.SUBSTACK_HOSTNAME
+const token = process.env.SUBSTACK_API_KEY || process.env.E2E_API_KEY
+const hostname = process.env.SUBSTACK_HOSTNAME || process.env.E2E_HOSTNAME
 
 // Convert hostname to full URL if it doesn't start with http
 const publicationUrl = hostname
@@ -41,10 +38,7 @@ if (token) {
 }
 
 // Helper function to get credentials for tests
-global.getTestCredentials = (): {
-  token: string
-  publicationUrl?: string
-} | null => {
+global.getTestCredentials = (): { token: string; publicationUrl?: string } | null => {
   if (global.E2E_CONFIG.hasCredentials && global.E2E_CONFIG.token) {
     return {
       token: global.E2E_CONFIG.token,

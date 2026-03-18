@@ -8,7 +8,6 @@ jest.mock('axios-rate-limit', () => (instance: AxiosInstance) => instance)
 const mockedAxios = axios as jest.Mocked<typeof axios>
 
 describe('HttpClient', () => {
-  let client: HttpClient
   let mockAxiosInstance: jest.Mocked<AxiosInstance>
 
   beforeEach(() => {
@@ -21,69 +20,56 @@ describe('HttpClient', () => {
     } as unknown as jest.Mocked<AxiosInstance>
 
     mockedAxios.create.mockReturnValue(mockAxiosInstance)
-
-    client = new HttpClient('https://test.com', {
-      token: 'dummy-token',
-      publicationUrl: 'https://pub.com'
-    })
   })
 
   describe('constructor', () => {
-    it('should create axios instance with Authorization Bearer and x-publication-url headers', () => {
-      jest.clearAllMocks()
-      mockedAxios.create.mockReturnValue(mockAxiosInstance)
-      new HttpClient('https://test.com', {
-        token: 'my-bearer-token',
-        publicationUrl: 'https://pub.example.com'
-      })
-
-      expect(mockedAxios.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          baseURL: 'https://test.com',
-          headers: expect.objectContaining({
-            Authorization: expect.stringMatching(/^Bearer /),
-            'x-publication-url': 'https://pub.example.com'
-          })
-        })
-      )
+    it('should throw error when token is missing', () => {
+      expect(() => new HttpClient('https://test.com', '')).toThrow('API token is required')
     })
 
-    it('should use provided token as bearer token', () => {
-      jest.clearAllMocks()
-      mockedAxios.create.mockReturnValue(mockAxiosInstance)
-      new HttpClient('https://test.com', {
-        token: 'my-custom-token',
-        publicationUrl: 'https://pub.example.com'
-      })
+    it('should create axios instance with correct base URL and headers', () => {
+      const client = new HttpClient('https://test.substack.com', 'test-api-key')
 
-      const createCall = mockedAxios.create.mock.calls[0][0] as { headers: Record<string, string> }
-      expect(createCall.headers['Authorization']).toBe('Bearer my-custom-token')
+      expect(mockedAxios.create).toHaveBeenCalledWith({
+        baseURL: 'https://test.substack.com',
+        headers: {
+          Cookie: 'substack.sid=test-api-key',
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'User-Agent':
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Safari/605.1.15',
+          'Accept-Encoding': 'gzip, deflate, br'
+        }
+      })
+      expect(client).toBeDefined()
     })
   })
 
   describe('get', () => {
     it('should make successful GET request', async () => {
       const mockResponse = { data: 'test' }
-      mockAxiosInstance.get.mockResolvedValue({ status: 200, data: mockResponse })
+      mockAxiosInstance.get.mockResolvedValue({
+        status: 200,
+        data: mockResponse
+      })
+
+      const client = new HttpClient('https://test.substack.com', 'test-api-key')
 
       const result = await client.get('/test')
 
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith('/test', { params: undefined })
+      expect(mockAxiosInstance.get).toHaveBeenCalledWith('/test')
       expect(result).toEqual(mockResponse)
     })
 
-    it('should pass params when provided', async () => {
-      mockAxiosInstance.get.mockResolvedValue({ status: 200, data: {} })
-
-      await client.get('/test', { limit: 10, offset: 0 })
-
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith('/test', {
-        params: { limit: 10, offset: 0 }
-      })
-    })
-
     it('should throw error on non-200 response', async () => {
-      mockAxiosInstance.get.mockResolvedValue({ status: 404, statusText: 'Not Found', data: {} })
+      mockAxiosInstance.get.mockResolvedValue({
+        status: 404,
+        statusText: 'Not Found',
+        data: {}
+      })
+
+      const client = new HttpClient('https://test.substack.com', 'test-api-key')
+
       await expect(client.get('/test')).rejects.toThrow('HTTP 404: Not Found')
     })
   })
@@ -91,20 +77,35 @@ describe('HttpClient', () => {
   describe('post', () => {
     it('should make successful POST request with data', async () => {
       const mockResponse = { success: true }
-      mockAxiosInstance.post.mockResolvedValue({ status: 200, data: mockResponse })
+      const postData = { title: 'Test Post' }
 
-      const result = await client.post('/test', { title: 'Test Post' })
+      mockAxiosInstance.post.mockResolvedValue({
+        status: 200,
+        data: mockResponse
+      })
 
-      expect(mockAxiosInstance.post).toHaveBeenCalledWith('/test', { title: 'Test Post' })
+      const client = new HttpClient('https://test.substack.com', 'test-api-key')
+
+      const result = await client.post('/test', postData)
+
+      expect(mockAxiosInstance.post).toHaveBeenCalledWith('/test', postData)
       expect(result).toEqual(mockResponse)
     })
 
     it('should make POST request without data', async () => {
-      mockAxiosInstance.post.mockResolvedValue({ status: 200, data: { success: true } })
+      const mockResponse = { success: true }
 
-      await client.post('/test')
+      mockAxiosInstance.post.mockResolvedValue({
+        status: 200,
+        data: mockResponse
+      })
+
+      const client = new HttpClient('https://test.substack.com', 'test-api-key')
+
+      const result = await client.post('/test')
 
       expect(mockAxiosInstance.post).toHaveBeenCalledWith('/test', undefined)
+      expect(result).toEqual(mockResponse)
     })
 
     it('should throw error on non-200 response', async () => {
@@ -113,6 +114,9 @@ describe('HttpClient', () => {
         statusText: 'Internal Server Error',
         data: {}
       })
+
+      const client = new HttpClient('https://test.substack.com', 'test-api-key')
+
       await expect(client.post('/test', {})).rejects.toThrow('HTTP 500: Internal Server Error')
     })
   })
@@ -120,16 +124,46 @@ describe('HttpClient', () => {
   describe('put', () => {
     it('should make successful PUT request with data', async () => {
       const mockResponse = { success: true }
-      mockAxiosInstance.put.mockResolvedValue({ status: 200, data: mockResponse })
+      const putData = { title: 'Updated Post' }
 
-      const result = await client.put('/test', { title: 'Updated Post' })
+      mockAxiosInstance.put.mockResolvedValue({
+        status: 200,
+        data: mockResponse
+      })
 
-      expect(mockAxiosInstance.put).toHaveBeenCalledWith('/test', { title: 'Updated Post' })
+      const client = new HttpClient('https://test.substack.com', 'test-api-key')
+
+      const result = await client.put('/test', putData)
+
+      expect(mockAxiosInstance.put).toHaveBeenCalledWith('/test', putData)
+      expect(result).toEqual(mockResponse)
+    })
+
+    it('should make PUT request without data', async () => {
+      const mockResponse = { success: true }
+
+      mockAxiosInstance.put.mockResolvedValue({
+        status: 200,
+        data: mockResponse
+      })
+
+      const client = new HttpClient('https://test.substack.com', 'test-api-key')
+
+      const result = await client.put('/test')
+
+      expect(mockAxiosInstance.put).toHaveBeenCalledWith('/test', undefined)
       expect(result).toEqual(mockResponse)
     })
 
     it('should throw error on non-200 response', async () => {
-      mockAxiosInstance.put.mockResolvedValue({ status: 403, statusText: 'Forbidden', data: {} })
+      mockAxiosInstance.put.mockResolvedValue({
+        status: 403,
+        statusText: 'Forbidden',
+        data: {}
+      })
+
+      const client = new HttpClient('https://test.substack.com', 'test-api-key')
+
       await expect(client.put('/test', {})).rejects.toThrow('HTTP 403: Forbidden')
     })
   })

@@ -34,21 +34,19 @@ This is a TypeScript client library for the Substack API using a service-oriente
 - **SubstackClient** (`src/substack-client.ts`) - Main client class that orchestrates services
 - **Services** (`src/internal/services/`) - Business logic organized by domain (posts, notes, profiles, comments, etc.)
 - **Domain Models** (`src/domain/`) - Entity classes with methods (Profile, Post, Note, Comment)
-- **HTTP Layer** (`src/internal/http-client.ts`) - Single `HttpClient` sending `Authorization: Bearer <token>` + `x-publication-url` to the gateway
-- **Gateway** (`https://substack-gateway.vercel.app`) - Python FastAPI proxy; all requests are routed through it
-
-### Authentication
-`SubstackConfig.token` = `btoa(JSON.stringify({ substack_sid: '...', connect_sid: '...' }))`. Both cookies are required by the gateway.
+- **HTTP Layer** (`src/internal/http-client.ts`) - Abstraction over HTTP requests with error handling
+- **Caching** (`src/internal/cache/`) - In-memory caching with decorator pattern
 
 ### Key Patterns
 - **Entity-based API**: Domain objects have methods (e.g., `post.comments()`, `profile.posts()`)
 - **Iterator Pattern**: Pagination handled via async iterators (`for await (const post of profile.posts())`)
 - **Builder Pattern**: `NoteBuilder` for constructing formatted notes
 - **Service Layer**: Separation of HTTP concerns from business logic
-- **io-ts**: Runtime type validation for all gateway responses via `decodeOrThrow`
+- **Functional Programming**: Uses fp-ts and io-ts for validation and error handling
 
 ### Dependencies
-- **io-ts** / **fp-ts**: Runtime type validation
+- **fp-ts**: Functional programming utilities
+- **io-ts**: Runtime type validation
 - **Jest**: Testing framework with separate configs for unit/integration/e2e tests
 
 ### Testing Strategy

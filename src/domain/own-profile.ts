@@ -1,7 +1,8 @@
 import { Profile } from '@substack-api/domain/profile'
 import { Note } from '@substack-api/domain/note'
-import type { GatewayProfile } from '@substack-api/internal/types'
-import type { GatewayCreateNoteResponse } from '@substack-api/internal/types'
+import { NoteBuilder, NoteWithLinkBuilder } from '@substack-api/domain/note-builder'
+import type { SubstackFullProfile } from '@substack-api/internal'
+import type { HttpClient } from '@substack-api/internal/http-client'
 import type {
   ProfileService,
   PostService,
@@ -11,27 +12,51 @@ import type {
   NewNoteService
 } from '@substack-api/internal/services'
 
+/**
+ * OwnProfile extends Profile with write capabilities for the authenticated user
+ */
 export class OwnProfile extends Profile {
   constructor(
-    rawData: GatewayProfile,
+    rawData: SubstackFullProfile,
+    publicationClient: HttpClient,
+    profileService: ProfileService,
     postService: PostService,
     noteService: NoteService,
     commentService: CommentService,
-    private readonly profileService: ProfileService,
     private readonly followingService: FollowingService,
     private readonly newNoteService: NewNoteService,
-    perPage: number
+    perPage: number,
+    resolvedSlug?: string
   ) {
-    super(rawData, postService, noteService, commentService, perPage)
+    super(
+      rawData,
+      publicationClient,
+      profileService,
+      postService,
+      noteService,
+      commentService,
+      perPage,
+      resolvedSlug
+    )
   }
 
-  async publishNote(
-    content: string,
-    options?: { attachment?: string }
-  ): Promise<GatewayCreateNoteResponse> {
-    return this.newNoteService.publishNote(content, options?.attachment)
+  /**
+   * Create a new note using the builder pattern
+   */
+  newNote(): NoteBuilder {
+    return this.newNoteService.newNote()
   }
 
+  /**
+   * Create a new note with a link attachment using the builder pattern
+   */
+  newNoteWithLink(link: string): NoteWithLinkBuilder {
+    return this.newNoteService.newNoteWithLink(link)
+  }
+
+  /**
+   * Get users that the authenticated user follows
+   */
   async *following(options: { limit?: number } = {}): AsyncIterable<Profile> {
     const followingUsers = await this.followingService.getFollowing()
 
@@ -40,13 +65,16 @@ export class OwnProfile extends Profile {
       if (options.limit && count >= options.limit) break
 
       try {
-        const profileData = await this.profileService.getProfileBySlug(user.handle)
+        const profileResponse = await this.profileService.getProfileBySlug(user.handle)
         yield new Profile(
-          profileData,
+          profileResponse,
+          this.publicationClient,
+          this.profileService,
           this.postService,
           this.noteService,
           this.commentService,
-          this.perPage
+          this.perPage,
+          user.handle
         )
         count++
       } catch {
@@ -55,22 +83,33 @@ export class OwnProfile extends Profile {
     }
   }
 
+  /**
+   * Get notes from the authenticated user's profile
+   */
   async *notes(options: { limit?: number } = {}): AsyncIterable<Note> {
     try {
       let cursor: string | undefined = undefined
       let totalYielded = 0
 
       while (true) {
-        const paginatedNotes = await this.noteService.getNotesForLoggedUser({ cursor })
+        // Use NoteService to fetch notes for the authenticated user with cursor-based pagination
+        const paginatedNotes = await this.noteService.getNotesForLoggedUser({
+          cursor
+        })
+
+        if (!paginatedNotes.notes) {
+          break // No more notes to fetch
+        }
 
         for (const noteData of paginatedNotes.notes) {
           if (options.limit && totalYielded >= options.limit) {
-            return
+            return // Stop if we've reached the requested limit
           }
-          yield new Note(noteData)
+          yield new Note(noteData, this.publicationClient)
           totalYielded++
         }
 
+        // If there's no next cursor, we've reached the end
         if (!paginatedNotes.nextCursor) {
           break
         }
@@ -78,6 +117,7 @@ export class OwnProfile extends Profile {
         cursor = paginatedNotes.nextCursor
       }
     } catch {
+      // If the endpoint doesn't exist or fails, return empty iterator
       yield* []
     }
   }
