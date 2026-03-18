@@ -1,0 +1,4175 @@
+{
+  "items": [
+    {
+      "entity_key": "c-131661687",
+      "type": "comment",
+      "context": {
+        "type": "note",
+        "timestamp": "2025-07-03T10:36:54.004Z",
+        "users": [
+          {
+            "id": 343074721,
+            "name": "Angel Rodriguez Santiago",
+            "handle": "angelsant",
+            "previous_name": null,
+            "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+            "bio": "hey there! been working on data + analytics for the past 7 years. excited to share what I know!",
+            "profile_set_up_at": "2025-05-10T15:02:41.569Z",
+            "reader_installed_at": "2025-05-10T18:09:56.677Z",
+            "bestseller_tier": null,
+            "primary_publication": {
+              "id": 4980083,
+              "subdomain": "angelsant",
+              "custom_domain_optional": false,
+              "name": "Workflow Forge",
+              "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+              "author_id": 343074721,
+              "user_id": 343074721,
+              "handles_enabled": false,
+              "explicit": false,
+              "is_personal_mode": false,
+              "payments_state": "disabled",
+              "pledges_enabled": true
+            }
+          }
+        ],
+        "fallbackReason": "//TODO: create fallback reasons",
+        "fallbackUrl": null,
+        "isFresh": false,
+        "source": "db-note",
+        "retrievalModelVersion": 0,
+        "page": null,
+        "page_rank": 0
+      },
+      "publication": null,
+      "post": null,
+      "comment": {
+        "name": "Angel Rodriguez Santiago",
+        "handle": "angelsant",
+        "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+        "id": 131661687,
+        "body": "Use AI to Think Harder, Not Less\n\nUse it to:\n\nStress-test ideas \n\nCrush weak logic \n\nEdit ruthlessly \n\nSharpen arguments \n\nYou must always do the thinking part.",
+        "body_json": {
+          "attrs": {
+            "schemaVersion": "v1"
+          },
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "Use AI to Think Harder, Not Less",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ],
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Use it to:"
+                }
+              ]
+            },
+            {
+              "type": "bulletList",
+              "content": [
+                {
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "text": "Stress-test ideas ",
+                          "type": "text"
+                        }
+                      ]
+                    }
+                  ],
+                  "type": "listItem"
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Crush weak logic "
+                        }
+                      ],
+                      "type": "paragraph"
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "text": "Edit ruthlessly ",
+                          "type": "text"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "text": "Sharpen arguments ",
+                          "type": "text"
+                        }
+                      ]
+                    }
+                  ],
+                  "type": "listItem"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "italic"
+                    }
+                  ],
+                  "text": "You must always do the thinking part."
+                }
+              ]
+            }
+          ],
+          "type": "doc"
+        },
+        "publication_id": null,
+        "post_id": null,
+        "user_id": 343074721,
+        "type": "feed",
+        "date": "2025-07-03T10:36:54.004Z",
+        "edited_at": null,
+        "ancestor_path": "",
+        "reply_minimum_role": "everyone",
+        "media_clip_id": null,
+        "reaction_count": 7,
+        "reactions": {
+          "❤": 7
+        },
+        "restacks": 0,
+        "restacked": false,
+        "children_count": 0,
+        "attachments": [],
+        "user_bestseller_tier": null,
+        "user_primary_publication": {
+          "id": 4980083,
+          "subdomain": "angelsant",
+          "custom_domain_optional": false,
+          "name": "Workflow Forge",
+          "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+          "author_id": 343074721,
+          "user_id": 343074721,
+          "handles_enabled": false,
+          "explicit": false,
+          "is_personal_mode": false,
+          "payments_state": "disabled",
+          "pledges_enabled": true
+        }
+      },
+      "parentComments": [],
+      "canReply": true,
+      "isMuted": false,
+      "trackingParameters": {
+        "item_primary_entity_key": "c-131661687",
+        "item_entity_key": "c-131661687",
+        "item_type": "comment",
+        "item_comment_id": 131661687,
+        "item_content_user_id": 343074721,
+        "item_context_type": "note",
+        "item_context_type_bucket": "",
+        "item_context_timestamp": "2025-07-03T10:36:54.004Z",
+        "item_context_user_id": 343074721,
+        "item_context_user_ids": [
+          343074721
+        ],
+        "item_can_reply": true,
+        "item_is_fresh": false,
+        "item_last_impression_at": null,
+        "item_source": "db-note",
+        "retrieval_model_version": 0,
+        "item_page": null,
+        "item_page_rank": 0,
+        "impression_id": "00993b83-3468-4e0d-9453-cb4be4fe5211",
+        "followed_user_count": 0,
+        "subscribed_publication_count": 0,
+        "is_following": false,
+        "is_explicitly_subscribed": false
+      }
+    },
+    {
+      "entity_key": "c-131657235",
+      "type": "comment",
+      "context": {
+        "type": "note",
+        "timestamp": "2025-07-03T10:05:35.633Z",
+        "users": [
+          {
+            "id": 343074721,
+            "name": "Angel Rodriguez Santiago",
+            "handle": "angelsant",
+            "previous_name": null,
+            "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+            "bio": "hey there! been working on data + analytics for the past 7 years. excited to share what I know!",
+            "profile_set_up_at": "2025-05-10T15:02:41.569Z",
+            "reader_installed_at": "2025-05-10T18:09:56.677Z",
+            "bestseller_tier": null,
+            "primary_publication": {
+              "id": 4980083,
+              "subdomain": "angelsant",
+              "custom_domain_optional": false,
+              "name": "Workflow Forge",
+              "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+              "author_id": 343074721,
+              "user_id": 343074721,
+              "handles_enabled": false,
+              "explicit": false,
+              "is_personal_mode": false,
+              "payments_state": "disabled",
+              "pledges_enabled": true
+            }
+          }
+        ],
+        "fallbackReason": "//TODO: create fallback reasons",
+        "fallbackUrl": null,
+        "isFresh": false,
+        "source": "db-note",
+        "retrievalModelVersion": 0,
+        "page": null,
+        "page_rank": 1
+      },
+      "publication": null,
+      "post": null,
+      "comment": {
+        "name": "Angel Rodriguez Santiago",
+        "handle": "angelsant",
+        "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+        "id": 131657235,
+        "body": "🚀 Firecrawl Just Open-Sourced an AI Search Engine That Rivals Perplexity\n\nFirecrawl built a 100% open-source Perplexity clone and released it for free.\n\nWhat it does:\n\n🌐 Real-time web search via Firecrawl API\n\n🤖 AI responses streamed with GPT-4o-mini\n\n🔗 Cited sources included by default\n\n📈 Live stock data + TradingView charts\n\n🧠 Smart follow-up questions, auto-generated\n\nIt’s fast. Free. And yours to build on.\n\n📄 Check it out: https://github.com/mendableai/fireplexity\n\n—\n\nI cover AI tools and solopreneur workflows:\n\nhttps://angelsant.substack.com",
+        "body_json": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ],
+                  "text": "🚀 Firecrawl Just Open-Sourced an AI Search Engine That Rivals Perplexity"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Firecrawl built a "
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ],
+                  "text": "100% open-source Perplexity clone"
+                },
+                {
+                  "type": "text",
+                  "text": " and released it for free."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "What it does:"
+                }
+              ]
+            },
+            {
+              "type": "bulletList",
+              "content": [
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "🌐 Real-time web search via Firecrawl API"
+                        }
+                      ],
+                      "type": "paragraph"
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "🤖 AI responses streamed with GPT-4o-mini"
+                        }
+                      ],
+                      "type": "paragraph"
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "🔗 Cited sources included by default"
+                        }
+                      ],
+                      "type": "paragraph"
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "📈 Live stock data + TradingView charts"
+                        }
+                      ],
+                      "type": "paragraph"
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "🧠 Smart follow-up questions, auto-generated"
+                        }
+                      ],
+                      "type": "paragraph"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "It’s fast. Free. And yours to build on."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "📄 Check it out: "
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "attrs": {
+                        "class": "note-link",
+                        "href": "https://github.com/mendableai/fireplexity",
+                        "target": "_blank",
+                        "rel": "nofollow ugc noopener"
+                      },
+                      "type": "link"
+                    }
+                  ],
+                  "text": "https://github.com/mendableai/fireplexity"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "—"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "I cover AI tools and solopreneur workflows:"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "attrs": {
+                        "href": "https://angelsant.substack.com/",
+                        "target": "_blank",
+                        "rel": "nofollow ugc noopener",
+                        "class": "note-link"
+                      },
+                      "type": "link"
+                    }
+                  ],
+                  "text": "https://angelsant.substack.com/"
+                }
+              ]
+            }
+          ],
+          "attrs": {
+            "schemaVersion": "v1"
+          }
+        },
+        "publication_id": null,
+        "post_id": null,
+        "user_id": 343074721,
+        "type": "feed",
+        "date": "2025-07-03T10:05:35.633Z",
+        "edited_at": null,
+        "ancestor_path": "",
+        "reply_minimum_role": "everyone",
+        "media_clip_id": null,
+        "reaction_count": 6,
+        "reactions": {
+          "❤": 6
+        },
+        "restacks": 0,
+        "restacked": false,
+        "children_count": 1,
+        "attachments": [],
+        "user_bestseller_tier": null,
+        "user_primary_publication": {
+          "id": 4980083,
+          "subdomain": "angelsant",
+          "custom_domain_optional": false,
+          "name": "Workflow Forge",
+          "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+          "author_id": 343074721,
+          "user_id": 343074721,
+          "handles_enabled": false,
+          "explicit": false,
+          "is_personal_mode": false,
+          "payments_state": "disabled",
+          "pledges_enabled": true
+        }
+      },
+      "parentComments": [],
+      "canReply": true,
+      "isMuted": false,
+      "trackingParameters": {
+        "item_primary_entity_key": "c-131657235",
+        "item_entity_key": "c-131657235",
+        "item_type": "comment",
+        "item_comment_id": 131657235,
+        "item_content_user_id": 343074721,
+        "item_context_type": "note",
+        "item_context_type_bucket": "",
+        "item_context_timestamp": "2025-07-03T10:05:35.633Z",
+        "item_context_user_id": 343074721,
+        "item_context_user_ids": [
+          343074721
+        ],
+        "item_can_reply": true,
+        "item_is_fresh": false,
+        "item_last_impression_at": null,
+        "item_source": "db-note",
+        "retrieval_model_version": 0,
+        "item_page": null,
+        "item_page_rank": 1,
+        "impression_id": "ec6b3bbe-7151-4bc7-9ee3-1f1c89b88e69",
+        "followed_user_count": 0,
+        "subscribed_publication_count": 0,
+        "is_following": false,
+        "is_explicitly_subscribed": false
+      }
+    },
+    {
+      "entity_key": "c-131656212",
+      "type": "comment",
+      "context": {
+        "type": "note",
+        "timestamp": "2025-07-03T09:57:03.686Z",
+        "users": [
+          {
+            "id": 343074721,
+            "name": "Angel Rodriguez Santiago",
+            "handle": "angelsant",
+            "previous_name": null,
+            "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+            "bio": "hey there! been working on data + analytics for the past 7 years. excited to share what I know!",
+            "profile_set_up_at": "2025-05-10T15:02:41.569Z",
+            "reader_installed_at": "2025-05-10T18:09:56.677Z",
+            "bestseller_tier": null,
+            "primary_publication": {
+              "id": 4980083,
+              "subdomain": "angelsant",
+              "custom_domain_optional": false,
+              "name": "Workflow Forge",
+              "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+              "author_id": 343074721,
+              "user_id": 343074721,
+              "handles_enabled": false,
+              "explicit": false,
+              "is_personal_mode": false,
+              "payments_state": "disabled",
+              "pledges_enabled": true
+            }
+          }
+        ],
+        "fallbackReason": "//TODO: create fallback reasons",
+        "fallbackUrl": null,
+        "isFresh": false,
+        "source": "db-note",
+        "retrievalModelVersion": 0,
+        "page": null,
+        "page_rank": 2
+      },
+      "publication": null,
+      "post": null,
+      "comment": {
+        "name": "Angel Rodriguez Santiago",
+        "handle": "angelsant",
+        "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+        "id": 131656212,
+        "body": "🤖 Claude Isn’t Your Therapist — But It Can Help\n\nAnthropic found that only 2.9% of Claude chats are about emotional support or companionship. \n\nAnd even then, users report feeling slightly happier after.\n\nMost chats are still about work or creativity.\n\nBit it seems like AI might be a decent listener.\n\n—\n\nI write about AI, automation, and solopreneur tools:\n\nhttps://angelsant.substack.com",
+        "body_json": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "🤖 Claude Isn’t Your Therapist — But It Can Help",
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "Anthropic found that only 2.9% of Claude chats are about emotional support or companionship. ",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "And even then, users report feeling ",
+                  "type": "text"
+                },
+                {
+                  "text": "slightly happier ",
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "italic"
+                    }
+                  ]
+                },
+                {
+                  "text": "after.",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "Most chats are still about work or creativity.",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "Bit it seems like AI might be a decent listener.",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "—",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "I write about AI, automation, and solopreneur tools:",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "https://angelsant.substack.com/",
+                  "type": "text",
+                  "marks": [
+                    {
+                      "attrs": {
+                        "target": "_blank",
+                        "class": "note-link",
+                        "href": "https://angelsant.substack.com/",
+                        "rel": "nofollow ugc noopener"
+                      },
+                      "type": "link"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "attrs": {
+            "schemaVersion": "v1"
+          }
+        },
+        "publication_id": null,
+        "post_id": null,
+        "user_id": 343074721,
+        "type": "feed",
+        "date": "2025-07-03T09:57:03.686Z",
+        "edited_at": null,
+        "ancestor_path": "",
+        "reply_minimum_role": "everyone",
+        "media_clip_id": null,
+        "reaction_count": 1,
+        "reactions": {
+          "❤": 1
+        },
+        "restacks": 0,
+        "restacked": false,
+        "children_count": 0,
+        "attachments": [
+          {
+            "id": "a8c2648f-3635-486e-94c3-db3c45a07cd8",
+            "type": "image",
+            "imageUrl": "https://substack-post-media.s3.amazonaws.com/public/images/19ecd58b-a741-47f9-9d2f-9a103e1f2869_1147x798.jpeg",
+            "imageWidth": 1147,
+            "imageHeight": 798,
+            "explicit": false
+          }
+        ],
+        "user_bestseller_tier": null,
+        "user_primary_publication": {
+          "id": 4980083,
+          "subdomain": "angelsant",
+          "custom_domain_optional": false,
+          "name": "Workflow Forge",
+          "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+          "author_id": 343074721,
+          "user_id": 343074721,
+          "handles_enabled": false,
+          "explicit": false,
+          "is_personal_mode": false,
+          "payments_state": "disabled",
+          "pledges_enabled": true
+        }
+      },
+      "parentComments": [],
+      "canReply": true,
+      "isMuted": false,
+      "trackingParameters": {
+        "item_primary_entity_key": "c-131656212",
+        "item_entity_key": "c-131656212",
+        "item_type": "comment",
+        "item_comment_id": 131656212,
+        "item_content_user_id": 343074721,
+        "item_context_type": "note",
+        "item_context_type_bucket": "",
+        "item_context_timestamp": "2025-07-03T09:57:03.686Z",
+        "item_context_user_id": 343074721,
+        "item_context_user_ids": [
+          343074721
+        ],
+        "item_can_reply": true,
+        "item_is_fresh": false,
+        "item_last_impression_at": null,
+        "item_source": "db-note",
+        "retrieval_model_version": 0,
+        "item_page": null,
+        "item_page_rank": 2,
+        "impression_id": "947d2788-0e56-447c-a9ac-95021eb3d507",
+        "followed_user_count": 0,
+        "subscribed_publication_count": 0,
+        "is_following": false,
+        "is_explicitly_subscribed": false
+      }
+    },
+    {
+      "entity_key": "c-131348168",
+      "type": "comment",
+      "context": {
+        "type": "note",
+        "timestamp": "2025-07-02T12:10:48.269Z",
+        "users": [
+          {
+            "id": 343074721,
+            "name": "Angel Rodriguez Santiago",
+            "handle": "angelsant",
+            "previous_name": null,
+            "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+            "bio": "hey there! been working on data + analytics for the past 7 years. excited to share what I know!",
+            "profile_set_up_at": "2025-05-10T15:02:41.569Z",
+            "reader_installed_at": "2025-05-10T18:09:56.677Z",
+            "bestseller_tier": null,
+            "primary_publication": {
+              "id": 4980083,
+              "subdomain": "angelsant",
+              "custom_domain_optional": false,
+              "name": "Workflow Forge",
+              "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+              "author_id": 343074721,
+              "user_id": 343074721,
+              "handles_enabled": false,
+              "explicit": false,
+              "is_personal_mode": false,
+              "payments_state": "disabled",
+              "pledges_enabled": true
+            }
+          }
+        ],
+        "fallbackReason": "//TODO: create fallback reasons",
+        "fallbackUrl": null,
+        "isFresh": false,
+        "source": "db-note",
+        "retrievalModelVersion": 0,
+        "page": null,
+        "page_rank": 3
+      },
+      "publication": null,
+      "post": null,
+      "comment": {
+        "name": "Angel Rodriguez Santiago",
+        "handle": "angelsant",
+        "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+        "id": 131348168,
+        "body": "🧪 LLM Evaluations Just Got Easier with n8n\n\nn8n just added native support for evaluating LLMs inside your workflows—no extra tools needed.\n\n✅ Run tests with real or sample data\n\n📊 Measure accuracy, latency, and token usage\n\n🤖 Compare model outputs side-by-side\n\n📥 Log results to Sheets or trigger Slack alerts\n\nPerfect for debugging prompts, tracking regressions, or comparing models—all without leaving your automation stack.\n\n📄 Docs: https://docs.n8n.io/advanced-ai/evaluations/overview/\n\n🔍 I write about AI tools, agents, and solopreneur workflows.\n\nRead more here → https://angelsant.substack.com",
+        "body_json": {
+          "attrs": {
+            "schemaVersion": "v1"
+          },
+          "content": [
+            {
+              "content": [
+                {
+                  "text": "🧪 ",
+                  "type": "text"
+                },
+                {
+                  "text": "LLM Evaluations Just Got Easier with n8n",
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ]
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "text": "n8n just added native support for evaluating LLMs inside your workflows—no extra tools needed.",
+                  "type": "text"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "text": "✅ Run tests with real or sample data",
+                  "type": "text"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "📊 Measure accuracy, latency, and token usage"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "text": "🤖 Compare model outputs side-by-side",
+                  "type": "text"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "📥 Log results to Sheets or trigger Slack alerts"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Perfect for debugging prompts, tracking regressions, or comparing models—all without leaving your automation stack."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "📄 Docs: "
+                },
+                {
+                  "type": "text",
+                  "text": "https://docs.n8n.io/advanced-ai/evaluations/overview/",
+                  "marks": [
+                    {
+                      "attrs": {
+                        "class": "note-link",
+                        "target": "_blank",
+                        "href": "https://docs.n8n.io/advanced-ai/evaluations/overview/",
+                        "rel": "nofollow ugc noopener"
+                      },
+                      "type": "link"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "🔍 I write about AI tools, agents, and solopreneur workflows.",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Read more here → "
+                },
+                {
+                  "type": "text",
+                  "text": "https://angelsant.substack.com",
+                  "marks": [
+                    {
+                      "attrs": {
+                        "rel": "nofollow ugc noopener",
+                        "href": "https://angelsant.substack.com",
+                        "target": "_blank",
+                        "class": "note-link"
+                      },
+                      "type": "link"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "type": "doc"
+        },
+        "publication_id": null,
+        "post_id": null,
+        "user_id": 343074721,
+        "type": "feed",
+        "date": "2025-07-02T12:10:48.269Z",
+        "edited_at": null,
+        "ancestor_path": "",
+        "reply_minimum_role": "everyone",
+        "media_clip_id": null,
+        "reaction_count": 5,
+        "reactions": {
+          "❤": 5
+        },
+        "restacks": 0,
+        "restacked": false,
+        "children_count": 1,
+        "attachments": [],
+        "user_bestseller_tier": null,
+        "user_primary_publication": {
+          "id": 4980083,
+          "subdomain": "angelsant",
+          "custom_domain_optional": false,
+          "name": "Workflow Forge",
+          "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+          "author_id": 343074721,
+          "user_id": 343074721,
+          "handles_enabled": false,
+          "explicit": false,
+          "is_personal_mode": false,
+          "payments_state": "disabled",
+          "pledges_enabled": true
+        }
+      },
+      "parentComments": [],
+      "canReply": true,
+      "isMuted": false,
+      "trackingParameters": {
+        "item_primary_entity_key": "c-131348168",
+        "item_entity_key": "c-131348168",
+        "item_type": "comment",
+        "item_comment_id": 131348168,
+        "item_content_user_id": 343074721,
+        "item_context_type": "note",
+        "item_context_type_bucket": "",
+        "item_context_timestamp": "2025-07-02T12:10:48.269Z",
+        "item_context_user_id": 343074721,
+        "item_context_user_ids": [
+          343074721
+        ],
+        "item_can_reply": true,
+        "item_is_fresh": false,
+        "item_last_impression_at": null,
+        "item_source": "db-note",
+        "retrieval_model_version": 0,
+        "item_page": null,
+        "item_page_rank": 3,
+        "impression_id": "9a594003-6547-4729-8ff3-67d021d2360b",
+        "followed_user_count": 0,
+        "subscribed_publication_count": 0,
+        "is_following": false,
+        "is_explicitly_subscribed": false
+      }
+    },
+    {
+      "entity_key": "c-131345259",
+      "type": "comment",
+      "context": {
+        "type": "note",
+        "timestamp": "2025-07-02T11:59:21.147Z",
+        "users": [
+          {
+            "id": 343074721,
+            "name": "Angel Rodriguez Santiago",
+            "handle": "angelsant",
+            "previous_name": null,
+            "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+            "bio": "hey there! been working on data + analytics for the past 7 years. excited to share what I know!",
+            "profile_set_up_at": "2025-05-10T15:02:41.569Z",
+            "reader_installed_at": "2025-05-10T18:09:56.677Z",
+            "bestseller_tier": null,
+            "primary_publication": {
+              "id": 4980083,
+              "subdomain": "angelsant",
+              "custom_domain_optional": false,
+              "name": "Workflow Forge",
+              "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+              "author_id": 343074721,
+              "user_id": 343074721,
+              "handles_enabled": false,
+              "explicit": false,
+              "is_personal_mode": false,
+              "payments_state": "disabled",
+              "pledges_enabled": true
+            }
+          }
+        ],
+        "fallbackReason": "//TODO: create fallback reasons",
+        "fallbackUrl": null,
+        "isFresh": false,
+        "source": "db-note",
+        "retrievalModelVersion": 0,
+        "page": null,
+        "page_rank": 4
+      },
+      "publication": null,
+      "post": null,
+      "comment": {
+        "name": "Angel Rodriguez Santiago",
+        "handle": "angelsant",
+        "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+        "id": 131345259,
+        "body": "🧠 SLMs Are the Future of AI Agents\n\nNVIDIA Research just released a paper that might flip how you think about building AI agents:\n\nForget giant LLMs—Small Language Models (SLMs) could be the better path forward.\n\nThey’re faster, cheaper, and often just as good for repetitive, tool-like tasks.\n\nHere’s what makes SLMs powerful for agentic AI:\n\n✅ High accuracy on focused workflows\n\n⚡️ Faster responses, lower memory usage\n\n💸 Massive cost savings over time\n\n🔁 Easily integrated into hybrid LLM-SLM setups\n\nKey takeaways from the paper:\n\nSLMs are evolving quickly—even at the same parameter size\n\nReplacing LLMs in your pipeline is easier than you think\n\nIf you’re building agents, here’s what to do:\n\n→ Audit where your LLM is working too hard\n\n→ Fine-tune SLMs on those subtasks\n\n→ Replace, monitor, and optimize\n\n📄 NVIDIA’s paper breaks it down: https://arxiv.org/pdf/2506.02153\n\nThe future of agents isn’t bigger—it’s smarter.",
+        "body_json": {
+          "attrs": {
+            "schemaVersion": "v1"
+          },
+          "content": [
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "🧠 "
+                },
+                {
+                  "type": "text",
+                  "text": "SLMs Are the Future of AI Agents",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ]
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "NVIDIA Research just released a paper that might flip how you think about building AI agents:"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Forget giant LLMs—"
+                },
+                {
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ],
+                  "type": "text",
+                  "text": "Small Language Models"
+                },
+                {
+                  "type": "text",
+                  "text": " (SLMs) could be the better path forward."
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "text": "They’re ",
+                  "type": "text"
+                },
+                {
+                  "text": "faster",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ],
+                  "type": "text"
+                },
+                {
+                  "text": ", ",
+                  "type": "text"
+                },
+                {
+                  "text": "cheaper",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ],
+                  "type": "text"
+                },
+                {
+                  "text": ", and often ",
+                  "type": "text"
+                },
+                {
+                  "text": "just as good",
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ]
+                },
+                {
+                  "text": " for repetitive, tool-like tasks.",
+                  "type": "text"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "text": "Here’s what makes SLMs powerful for agentic AI:",
+                  "type": "text"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "text": "✅ High accuracy on focused workflows",
+                  "type": "text"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "text": "⚡️ Faster responses, lower memory usage",
+                  "type": "text"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "💸 Massive cost savings over time"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "🔁 Easily integrated into hybrid LLM-SLM setups",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "Key takeaways from the paper:",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "orderedList",
+              "attrs": {
+                "start": 1
+              },
+              "content": [
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "SLMs are evolving quickly—even at the same parameter size"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "listItem",
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        {
+                          "type": "text",
+                          "text": "Replacing LLMs in your pipeline is easier than you think"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "If you’re building agents, here’s what to do:"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "→ Audit where your LLM is working too hard"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "→ Fine-tune SLMs on those subtasks",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "content": [
+                {
+                  "text": "→ Replace, monitor, and optimize",
+                  "type": "text"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "📄 NVIDIA’s paper breaks it down: "
+                },
+                {
+                  "type": "text",
+                  "text": "https://arxiv.org/pdf/2506.02153",
+                  "marks": [
+                    {
+                      "attrs": {
+                        "class": "note-link",
+                        "href": "https://arxiv.org/pdf/2506.02153",
+                        "target": "_blank",
+                        "rel": "nofollow ugc noopener"
+                      },
+                      "type": "link"
+                    }
+                  ]
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "text": "The future of agents isn’t bigger—",
+                  "type": "text"
+                },
+                {
+                  "text": "it’s smarter",
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ]
+                },
+                {
+                  "text": ".",
+                  "type": "text"
+                }
+              ],
+              "type": "paragraph"
+            }
+          ],
+          "type": "doc"
+        },
+        "publication_id": null,
+        "post_id": null,
+        "user_id": 343074721,
+        "type": "feed",
+        "date": "2025-07-02T11:59:21.147Z",
+        "edited_at": null,
+        "ancestor_path": "",
+        "reply_minimum_role": "everyone",
+        "media_clip_id": null,
+        "reaction_count": 3,
+        "reactions": {
+          "❤": 3
+        },
+        "restacks": 0,
+        "restacked": false,
+        "children_count": 0,
+        "attachments": [
+          {
+            "id": "3ecd8ff1-111f-41fd-8003-24dd6c2dcbdf",
+            "type": "image",
+            "imageUrl": "https://substack-post-media.s3.amazonaws.com/public/images/24bc66cf-dc42-4859-9afb-c57b3c86bff1_1055x1123.jpeg",
+            "imageWidth": 1055,
+            "imageHeight": 1123,
+            "explicit": false
+          }
+        ],
+        "user_bestseller_tier": null,
+        "user_primary_publication": {
+          "id": 4980083,
+          "subdomain": "angelsant",
+          "custom_domain_optional": false,
+          "name": "Workflow Forge",
+          "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+          "author_id": 343074721,
+          "user_id": 343074721,
+          "handles_enabled": false,
+          "explicit": false,
+          "is_personal_mode": false,
+          "payments_state": "disabled",
+          "pledges_enabled": true
+        }
+      },
+      "parentComments": [],
+      "canReply": true,
+      "isMuted": false,
+      "trackingParameters": {
+        "item_primary_entity_key": "c-131345259",
+        "item_entity_key": "c-131345259",
+        "item_type": "comment",
+        "item_comment_id": 131345259,
+        "item_content_user_id": 343074721,
+        "item_context_type": "note",
+        "item_context_type_bucket": "",
+        "item_context_timestamp": "2025-07-02T11:59:21.147Z",
+        "item_context_user_id": 343074721,
+        "item_context_user_ids": [
+          343074721
+        ],
+        "item_can_reply": true,
+        "item_is_fresh": false,
+        "item_last_impression_at": null,
+        "item_source": "db-note",
+        "retrieval_model_version": 0,
+        "item_page": null,
+        "item_page_rank": 4,
+        "impression_id": "a61ab819-e0f6-4ba4-89ce-994e1e9069ac",
+        "followed_user_count": 0,
+        "subscribed_publication_count": 0,
+        "is_following": false,
+        "is_explicitly_subscribed": false
+      }
+    },
+    {
+      "entity_key": "c-131340190",
+      "type": "comment",
+      "context": {
+        "type": "note",
+        "timestamp": "2025-07-02T11:37:44.142Z",
+        "users": [
+          {
+            "id": 343074721,
+            "name": "Angel Rodriguez Santiago",
+            "handle": "angelsant",
+            "previous_name": null,
+            "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+            "bio": "hey there! been working on data + analytics for the past 7 years. excited to share what I know!",
+            "profile_set_up_at": "2025-05-10T15:02:41.569Z",
+            "reader_installed_at": "2025-05-10T18:09:56.677Z",
+            "bestseller_tier": null,
+            "primary_publication": {
+              "id": 4980083,
+              "subdomain": "angelsant",
+              "custom_domain_optional": false,
+              "name": "Workflow Forge",
+              "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+              "author_id": 343074721,
+              "user_id": 343074721,
+              "handles_enabled": false,
+              "explicit": false,
+              "is_personal_mode": false,
+              "payments_state": "disabled",
+              "pledges_enabled": true
+            }
+          }
+        ],
+        "fallbackReason": "//TODO: create fallback reasons",
+        "fallbackUrl": null,
+        "isFresh": false,
+        "source": "db-note",
+        "retrievalModelVersion": 0,
+        "page": null,
+        "page_rank": 5
+      },
+      "publication": null,
+      "post": null,
+      "comment": {
+        "name": "Angel Rodriguez Santiago",
+        "handle": "angelsant",
+        "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+        "id": 131340190,
+        "body": "🖼️ A Photoshop Killer—And It’s Free\n\nChinese researchers just dropped a bombshell: OmniGen2, an open-source AI image editor that rivals premium tools.\n\nIt edits with surgical precision:\n\n🟦 “Make her dress blue” → Nailed it.\n\n😊 “Add a smile” → Natural.\n\n🧥 “Put this jacket on him” → Seamless.\n\nNo background smudges. No weird artifacts. \n\nAnd the best part?\n\nIt’s 100% free and open-source.\n\n👉 Github Repo - https://github.com/VectorSpaceLab/OmniGen2\n\nHow will you use it?",
+        "body_json": {
+          "type": "doc",
+          "content": [
+            {
+              "content": [
+                {
+                  "text": "🖼️ ",
+                  "type": "text"
+                },
+                {
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ],
+                  "text": "A Photoshop Killer—And It’s Free",
+                  "type": "text"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Chinese researchers just dropped a bombshell: OmniGen2, an open-source AI image editor that rivals premium tools."
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "It edits with surgical precision:"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "🟦 “Make her dress blue” → Nailed it."
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "😊 “Add a smile” → Natural."
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "🧥 “Put this jacket on him” → Seamless."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "No background smudges. No weird artifacts. "
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "And the best part?"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ],
+                  "text": "It’s 100% free and open-source."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "👉 Github Repo - ",
+                  "type": "text"
+                },
+                {
+                  "text": "https://github.com/VectorSpaceLab/OmniGen2",
+                  "marks": [
+                    {
+                      "attrs": {
+                        "href": "https://github.com/VectorSpaceLab/OmniGen2",
+                        "class": "note-link",
+                        "target": "_blank",
+                        "rel": "nofollow ugc noopener"
+                      },
+                      "type": "link"
+                    }
+                  ],
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "How will you use it?",
+                  "marks": [
+                    {
+                      "type": "italic"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "attrs": {
+            "schemaVersion": "v1"
+          }
+        },
+        "publication_id": null,
+        "post_id": null,
+        "user_id": 343074721,
+        "type": "feed",
+        "date": "2025-07-02T11:37:44.142Z",
+        "edited_at": null,
+        "ancestor_path": "",
+        "reply_minimum_role": "everyone",
+        "media_clip_id": null,
+        "reaction_count": 4,
+        "reactions": {
+          "❤": 4
+        },
+        "restacks": 0,
+        "restacked": false,
+        "children_count": 0,
+        "attachments": [
+          {
+            "id": "165f03a0-3b42-496c-8f10-1d33e5d56058",
+            "type": "image",
+            "imageUrl": "https://substack-post-media.s3.amazonaws.com/public/images/d4e3e99d-5ef1-41f2-983d-0f42a330d33c_1284x2778.jpeg",
+            "imageWidth": 1284,
+            "imageHeight": 2778,
+            "explicit": false
+          }
+        ],
+        "user_bestseller_tier": null,
+        "user_primary_publication": {
+          "id": 4980083,
+          "subdomain": "angelsant",
+          "custom_domain_optional": false,
+          "name": "Workflow Forge",
+          "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+          "author_id": 343074721,
+          "user_id": 343074721,
+          "handles_enabled": false,
+          "explicit": false,
+          "is_personal_mode": false,
+          "payments_state": "disabled",
+          "pledges_enabled": true
+        }
+      },
+      "parentComments": [],
+      "canReply": true,
+      "isMuted": false,
+      "trackingParameters": {
+        "item_primary_entity_key": "c-131340190",
+        "item_entity_key": "c-131340190",
+        "item_type": "comment",
+        "item_comment_id": 131340190,
+        "item_content_user_id": 343074721,
+        "item_context_type": "note",
+        "item_context_type_bucket": "",
+        "item_context_timestamp": "2025-07-02T11:37:44.142Z",
+        "item_context_user_id": 343074721,
+        "item_context_user_ids": [
+          343074721
+        ],
+        "item_can_reply": true,
+        "item_is_fresh": false,
+        "item_last_impression_at": null,
+        "item_source": "db-note",
+        "retrieval_model_version": 0,
+        "item_page": null,
+        "item_page_rank": 5,
+        "impression_id": "b7130e78-9a2e-41b3-b198-a3f7e7263608",
+        "followed_user_count": 0,
+        "subscribed_publication_count": 0,
+        "is_following": false,
+        "is_explicitly_subscribed": false
+      }
+    },
+    {
+      "entity_key": "c-131157157",
+      "type": "comment",
+      "context": {
+        "type": "note",
+        "timestamp": "2025-07-01T19:56:00.328Z",
+        "users": [
+          {
+            "id": 343074721,
+            "name": "Angel Rodriguez Santiago",
+            "handle": "angelsant",
+            "previous_name": null,
+            "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+            "bio": "hey there! been working on data + analytics for the past 7 years. excited to share what I know!",
+            "profile_set_up_at": "2025-05-10T15:02:41.569Z",
+            "reader_installed_at": "2025-05-10T18:09:56.677Z",
+            "bestseller_tier": null,
+            "primary_publication": {
+              "id": 4980083,
+              "subdomain": "angelsant",
+              "custom_domain_optional": false,
+              "name": "Workflow Forge",
+              "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+              "author_id": 343074721,
+              "user_id": 343074721,
+              "handles_enabled": false,
+              "explicit": false,
+              "is_personal_mode": false,
+              "payments_state": "disabled",
+              "pledges_enabled": true
+            }
+          }
+        ],
+        "fallbackReason": "//TODO: create fallback reasons",
+        "fallbackUrl": null,
+        "isFresh": false,
+        "source": "db-note",
+        "retrievalModelVersion": 0,
+        "page": null,
+        "page_rank": 6
+      },
+      "publication": null,
+      "post": null,
+      "comment": {
+        "name": "Angel Rodriguez Santiago",
+        "handle": "angelsant",
+        "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+        "id": 131157157,
+        "body": "Any Substack writers focused on Automation & Solopreneurship?\n\nLet’s connect!\n\nIf you’re using Substack to explore:\n\n⚙️ Workflow automation for solo businesses\n\n🧱 Building tools without code (n8n, Make)\n\n💼 Smart systems for earning more while doing less\n\nDrop your link below 👇",
+        "body_json": {
+          "attrs": {
+            "schemaVersion": "v1"
+          },
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Any Substack writers focused on Automation & "
+                },
+                {
+                  "type": "text",
+                  "text": "Solopreneurship",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "text": "?"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "marks": [
+                    {
+                      "type": "italic"
+                    }
+                  ],
+                  "type": "text",
+                  "text": "Let’s connect!"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "If you’re using Substack to explore:"
+                }
+              ]
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "⚙️ Workflow automation for solo businesses"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "🧱 Building tools without code (n8n, Make)"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "💼 Smart systems for earning more while doing less"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Drop your link below 👇"
+                }
+              ]
+            }
+          ]
+        },
+        "publication_id": null,
+        "post_id": null,
+        "user_id": 343074721,
+        "type": "feed",
+        "date": "2025-07-01T19:56:00.328Z",
+        "edited_at": null,
+        "ancestor_path": "",
+        "reply_minimum_role": "everyone",
+        "media_clip_id": null,
+        "reaction_count": 13,
+        "reactions": {
+          "❤": 13
+        },
+        "restacks": 0,
+        "restacked": false,
+        "children_count": 3,
+        "attachments": [],
+        "user_bestseller_tier": null,
+        "user_primary_publication": {
+          "id": 4980083,
+          "subdomain": "angelsant",
+          "custom_domain_optional": false,
+          "name": "Workflow Forge",
+          "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+          "author_id": 343074721,
+          "user_id": 343074721,
+          "handles_enabled": false,
+          "explicit": false,
+          "is_personal_mode": false,
+          "payments_state": "disabled",
+          "pledges_enabled": true
+        }
+      },
+      "parentComments": [],
+      "canReply": true,
+      "isMuted": false,
+      "trackingParameters": {
+        "item_primary_entity_key": "c-131157157",
+        "item_entity_key": "c-131157157",
+        "item_type": "comment",
+        "item_comment_id": 131157157,
+        "item_content_user_id": 343074721,
+        "item_context_type": "note",
+        "item_context_type_bucket": "",
+        "item_context_timestamp": "2025-07-01T19:56:00.328Z",
+        "item_context_user_id": 343074721,
+        "item_context_user_ids": [
+          343074721
+        ],
+        "item_can_reply": true,
+        "item_is_fresh": false,
+        "item_last_impression_at": null,
+        "item_source": "db-note",
+        "retrieval_model_version": 0,
+        "item_page": null,
+        "item_page_rank": 6,
+        "impression_id": "b8b4b5bf-ff77-466a-8d5a-43ea1c970502",
+        "followed_user_count": 0,
+        "subscribed_publication_count": 0,
+        "is_following": false,
+        "is_explicitly_subscribed": false
+      }
+    },
+    {
+      "entity_key": "c-131092466",
+      "type": "comment",
+      "context": {
+        "type": "note",
+        "timestamp": "2025-07-01T16:37:43.171Z",
+        "users": [
+          {
+            "id": 343074721,
+            "name": "Angel Rodriguez Santiago",
+            "handle": "angelsant",
+            "previous_name": null,
+            "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+            "bio": "hey there! been working on data + analytics for the past 7 years. excited to share what I know!",
+            "profile_set_up_at": "2025-05-10T15:02:41.569Z",
+            "reader_installed_at": "2025-05-10T18:09:56.677Z",
+            "bestseller_tier": null,
+            "primary_publication": {
+              "id": 4980083,
+              "subdomain": "angelsant",
+              "custom_domain_optional": false,
+              "name": "Workflow Forge",
+              "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+              "author_id": 343074721,
+              "user_id": 343074721,
+              "handles_enabled": false,
+              "explicit": false,
+              "is_personal_mode": false,
+              "payments_state": "disabled",
+              "pledges_enabled": true
+            }
+          }
+        ],
+        "fallbackReason": "//TODO: create fallback reasons",
+        "fallbackUrl": null,
+        "isFresh": false,
+        "source": "db-note",
+        "retrievalModelVersion": 0,
+        "page": null,
+        "page_rank": 7
+      },
+      "publication": null,
+      "post": null,
+      "comment": {
+        "name": "Angel Rodriguez Santiago",
+        "handle": "angelsant",
+        "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+        "id": 131092466,
+        "body": "OpenAI isn’t just selling AI tools—they’re quietly becoming your biggest competitor. \n\nWhile businesses struggle to implement AI, OpenAI’s new consulting arm is poised to swoop in and steal their clients. \n\nThe real question isn’t if AI will disrupt your industry, but who will control it—you, or the company that built it?",
+        "body_json": {
+          "type": "doc",
+          "attrs": {
+            "schemaVersion": "v1"
+          },
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "OpenAI isn’t just selling AI tools—they’re quietly becoming your biggest competitor. "
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "While businesses struggle to implement AI, OpenAI’s new consulting arm is poised to swoop in and steal their clients. "
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The real question isn’t if AI will disrupt your industry, but who will control it—you, or the company that built it?"
+                }
+              ]
+            }
+          ]
+        },
+        "publication_id": null,
+        "post_id": null,
+        "user_id": 343074721,
+        "type": "feed",
+        "date": "2025-07-01T16:37:43.171Z",
+        "edited_at": null,
+        "ancestor_path": "",
+        "reply_minimum_role": "everyone",
+        "media_clip_id": null,
+        "reaction_count": 5,
+        "reactions": {
+          "❤": 5
+        },
+        "restacks": 0,
+        "restacked": false,
+        "children_count": 0,
+        "attachments": [
+          {
+            "id": "f2e6c44e-bc65-4faa-be99-df3d80cf994d",
+            "type": "post",
+            "publication": {
+              "apple_pay_disabled": false,
+              "apex_domain": null,
+              "author_id": 343074721,
+              "byline_images_enabled": true,
+              "bylines_enabled": true,
+              "chartable_token": null,
+              "community_enabled": true,
+              "copyright": "Angel Rodriguez Santiago",
+              "cover_photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/230c970e-0a72-494b-a5cd-2fa0a2acd67a_500x500.png",
+              "created_at": "2025-05-10T15:29:52.219Z",
+              "custom_domain_optional": false,
+              "custom_domain": null,
+              "default_comment_sort": "best_first",
+              "default_coupon": null,
+              "default_group_coupon": null,
+              "default_show_guest_bios": true,
+              "email_banner_url": "https://substack-post-media.s3.amazonaws.com/public/images/fa6667f7-95a0-4d56-ac93-98714e06de64_1110x220.png",
+              "email_from_name": "Angel Rodriguez from Workflow Forge",
+              "email_from": null,
+              "embed_tracking_disabled": false,
+              "explicit": false,
+              "expose_paywall_content_to_search_engines": true,
+              "fb_pixel_id": null,
+              "fb_site_verification_token": null,
+              "flagged_as_spam": false,
+              "founding_subscription_benefits": [],
+              "free_subscription_benefits": [
+                "Access to all Public Guides and Templates"
+              ],
+              "ga_pixel_id": null,
+              "google_site_verification_token": null,
+              "google_tag_manager_token": null,
+              "hero_image": null,
+              "hero_text": "Actionable automation tips for solopreneurs and creators — fresh workflows every week using tools like n8n and more.",
+              "hide_intro_subtitle": null,
+              "hide_intro_title": null,
+              "hide_podcast_feed_link": false,
+              "homepage_type": "newspaper",
+              "id": 4980083,
+              "image_thumbnails_always_enabled": false,
+              "invite_only": false,
+              "language": "en",
+              "logo_url_wide": "https://substackcdn.com/image/fetch/$s_!XYJX!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F50d4e461-48c3-4d28-8e14-6a8c88c8611e_1344x256.png",
+              "logo_url": "https://substackcdn.com/image/fetch/$s_!UJJV!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+              "minimum_group_size": 2,
+              "moderation_enabled": true,
+              "name": "Workflow Forge",
+              "paid_subscription_benefits": [
+                "Subscriber-only posts and full archive",
+                "Post comments and join the community"
+              ],
+              "parsely_pixel_id": null,
+              "payments_state": "disabled",
+              "paywall_free_trial_enabled": true,
+              "podcast_art_url": null,
+              "paid_podcast_episode_art_url": null,
+              "podcast_byline": null,
+              "podcast_description": null,
+              "podcast_enabled": false,
+              "podcast_feed_url": null,
+              "podcast_title": null,
+              "post_preview_limit": null,
+              "primary_user_id": 343074721,
+              "require_clickthrough": false,
+              "show_pub_podcast_tab": false,
+              "show_recs_on_homepage": true,
+              "subdomain": "angelsant",
+              "subscriber_invites": 0,
+              "support_email": null,
+              "theme_var_background_pop": "#FF6719",
+              "theme_var_color_links": true,
+              "theme_var_cover_bg_color": null,
+              "trial_end_override": null,
+              "twitter_pixel_id": null,
+              "type": "newsletter",
+              "post_reaction_faces_enabled": true,
+              "is_personal_mode": false,
+              "plans": null,
+              "stripe_user_id": "acct_1RNFTID14Wnwq4QJ",
+              "stripe_country": "US",
+              "stripe_publishable_key": "pk_live_51RNFTID14Wnwq4QJFnJ5WQhhjttqMa3dQTirjtZYj7LuDhKlOwxXGZgTVVnvq9DsVq61n5qD8Cj3no31QRSxfh9D004TPutLeq",
+              "stripe_platform_account": "US",
+              "automatic_tax_enabled": false,
+              "author_name": "Angel Rodriguez Santiago",
+              "author_handle": "angelsant",
+              "author_photo_url": "https://substackcdn.com/image/fetch/$s_!MGtr!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+              "author_bio": "hey there! been working on data + analytics for the past 7 years. excited to share what I know!",
+              "twitter_share_on_publish_opt_in": null,
+              "has_custom_tos": false,
+              "has_custom_privacy": false,
+              "theme": {
+                "background_pop_color": null,
+                "web_bg_color": "#292524",
+                "cover_bg_color": "#292524",
+                "publication_id": 4980083,
+                "color_links": null,
+                "font_preset_heading": "heavy_sans",
+                "font_preset_body": "mono",
+                "font_family_headings": null,
+                "font_family_body": null,
+                "font_family_ui": null,
+                "font_size_body_desktop": null,
+                "print_secondary": null,
+                "custom_css_web": null,
+                "custom_css_email": null,
+                "home_hero": "feature-media",
+                "home_posts": "list",
+                "home_show_top_posts": false,
+                "hide_images_from_list": false,
+                "home_hero_alignment": "left",
+                "home_hero_show_podcast_links": true,
+                "default_post_header_variant": null
+              },
+              "threads_v2_settings": {
+                "photo_replies_enabled": true,
+                "first_thread_email_sent_at": null,
+                "create_thread_minimum_role": "contributor",
+                "activated_at": null,
+                "reader_thread_notifications_enabled": true,
+                "boost_free_subscriber_chat_preview_enabled": true,
+                "push_suppression_enabled": false
+              },
+              "default_group_coupon_percent_off": null,
+              "pause_return_date": null,
+              "has_posts": true,
+              "has_recommendations": true,
+              "first_post_date": "2025-05-31T18:39:41.518Z",
+              "has_podcast": false,
+              "has_free_podcast": false,
+              "has_subscriber_only_podcast": false,
+              "has_community_content": true,
+              "twitter_permissions": "none",
+              "rankingDetail": "Launched a month ago",
+              "rankingDetailFreeIncluded": "Hundreds of subscribers",
+              "rankingDetailOrderOfMagnitude": 0,
+              "rankingDetailFreeIncludedOrderOfMagnitude": 100,
+              "rankingDetailFreeSubscriberCount": null,
+              "rankingDetailByLanguage": {
+                "de": {
+                  "rankingDetail": "Launched vor einem Monat",
+                  "rankingDetailFreeIncluded": "Hundreds of subscribers",
+                  "rankingDetailOrderOfMagnitude": 0,
+                  "rankingDetailFreeIncludedOrderOfMagnitude": 100,
+                  "rankingDetailFreeSubscriberCount": null,
+                  "freeSubscriberCount": null,
+                  "freeSubscriberCountOrderOfMagnitude": "137"
+                },
+                "es": {
+                  "rankingDetail": "Launched hace un mes",
+                  "rankingDetailFreeIncluded": "Hundreds of subscribers",
+                  "rankingDetailOrderOfMagnitude": 0,
+                  "rankingDetailFreeIncludedOrderOfMagnitude": 100,
+                  "rankingDetailFreeSubscriberCount": null,
+                  "freeSubscriberCount": null,
+                  "freeSubscriberCountOrderOfMagnitude": "137"
+                },
+                "fr": {
+                  "rankingDetail": "Launched il y a un mois",
+                  "rankingDetailFreeIncluded": "Hundreds of subscribers",
+                  "rankingDetailOrderOfMagnitude": 0,
+                  "rankingDetailFreeIncludedOrderOfMagnitude": 100,
+                  "rankingDetailFreeSubscriberCount": null,
+                  "freeSubscriberCount": null,
+                  "freeSubscriberCountOrderOfMagnitude": "137"
+                },
+                "pt": {
+                  "rankingDetail": "Launched 1 mês",
+                  "rankingDetailFreeIncluded": "Hundreds of subscribers",
+                  "rankingDetailOrderOfMagnitude": 0,
+                  "rankingDetailFreeIncludedOrderOfMagnitude": 100,
+                  "rankingDetailFreeSubscriberCount": null,
+                  "freeSubscriberCount": null,
+                  "freeSubscriberCountOrderOfMagnitude": "137"
+                },
+                "pt-br": {
+                  "rankingDetail": "Launched 1 mês",
+                  "rankingDetailFreeIncluded": "Hundreds of subscribers",
+                  "rankingDetailOrderOfMagnitude": 0,
+                  "rankingDetailFreeIncludedOrderOfMagnitude": 100,
+                  "rankingDetailFreeSubscriberCount": null,
+                  "freeSubscriberCount": null,
+                  "freeSubscriberCountOrderOfMagnitude": "137"
+                },
+                "it": {
+                  "rankingDetail": "Launched 1 mese",
+                  "rankingDetailFreeIncluded": "Hundreds of subscribers",
+                  "rankingDetailOrderOfMagnitude": 0,
+                  "rankingDetailFreeIncludedOrderOfMagnitude": 100,
+                  "rankingDetailFreeSubscriberCount": null,
+                  "freeSubscriberCount": null,
+                  "freeSubscriberCountOrderOfMagnitude": "137"
+                },
+                "en": {
+                  "rankingDetail": "Launched a month ago",
+                  "rankingDetailFreeIncluded": "Hundreds of subscribers",
+                  "rankingDetailOrderOfMagnitude": 0,
+                  "rankingDetailFreeIncludedOrderOfMagnitude": 100,
+                  "rankingDetailFreeSubscriberCount": null,
+                  "freeSubscriberCount": null,
+                  "freeSubscriberCountOrderOfMagnitude": "137"
+                }
+              },
+              "freeSubscriberCount": null,
+              "freeSubscriberCountOrderOfMagnitude": "137",
+              "author_bestseller_tier": 0,
+              "disable_monthly_subscriptions": false,
+              "disable_annual_subscriptions": false,
+              "hide_post_restacks": false,
+              "notes_feed_enabled": true,
+              "last_chat_post_at": null,
+              "primary_profile_name": "Angel Rodriguez Santiago",
+              "primary_profile_photo_url": "https://substackcdn.com/image/fetch/$s_!MGtr!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+              "no_follow": false,
+              "paywall_chat": "free",
+              "sections": [],
+              "multipub_migration": null,
+              "navigationBarItems": [
+                {
+                  "id": "e7994f27-ff20-4123-839d-4111a78d6f53",
+                  "publication_id": 4980083,
+                  "sibling_rank": 0,
+                  "link_title": "n8n",
+                  "link_url": "",
+                  "section_id": null,
+                  "post_id": null,
+                  "is_hidden": null,
+                  "standard_key": null,
+                  "post_tag_id": "e9b2887c-4c5c-4ba2-8419-2d53364cc0e3",
+                  "post": null,
+                  "section": null,
+                  "postTag": {
+                    "id": "e9b2887c-4c5c-4ba2-8419-2d53364cc0e3",
+                    "publication_id": 4980083,
+                    "name": "n8n",
+                    "slug": "n8n",
+                    "hidden": false
+                  }
+                }
+              ],
+              "contributors": [
+                {
+                  "name": "Angel Rodriguez Santiago",
+                  "handle": "angelsant",
+                  "role": "admin",
+                  "owner": true,
+                  "user_id": 343074721,
+                  "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+                  "bio": "hey there! been working on data + analytics for the past 7 years. excited to share what I know!"
+                }
+              ],
+              "threads_v2_enabled": true,
+              "viralGiftsConfig": {
+                "id": "02cccddb-51c7-4c50-b150-6be4ade5bd22",
+                "publication_id": 4980083,
+                "enabled": true,
+                "gifts_per_user": 5,
+                "gift_length_months": 1,
+                "send_extra_gifts": true,
+                "message": "hey there! been working on data + analytics for the past 7 years. excited to share what I know!",
+                "created_at": "2025-05-10T15:46:57.852295+00:00",
+                "updated_at": "2025-05-10T15:46:57.852295+00:00",
+                "days_til_invite": 14,
+                "send_emails": true,
+                "show_link": null,
+                "grant_email_body": null,
+                "grant_email_subject": null
+              },
+              "tier": 2,
+              "no_index": false,
+              "can_set_google_site_verification": true,
+              "can_have_sitemap": true,
+              "draft_iap_advanced_plans": [
+                {
+                  "sku": "1r3uY1nc15Beiccxpg",
+                  "publication_id": "4980083",
+                  "is_active": true,
+                  "price_base_units": 1100,
+                  "currency_alpha3": "usd",
+                  "period": "month",
+                  "created_at": "2025-05-10T15:46:19.449Z",
+                  "updated_at": "2025-05-10T15:46:19.449Z",
+                  "id": "38478",
+                  "payout_amount_base_units": 80,
+                  "alternate_currencies": {
+                    "aud": 1800,
+                    "brl": 6500,
+                    "cad": 1600,
+                    "chf": 1000,
+                    "dkk": 7500,
+                    "eur": 1000,
+                    "gbp": 900,
+                    "mxn": 21500,
+                    "nok": 11500,
+                    "nzd": 1900,
+                    "pln": 4200,
+                    "sek": 11000
+                  },
+                  "display_name": "Workflow Forge (Monthly)",
+                  "display_price": "$11"
+                },
+                {
+                  "sku": "eCNVXX4oUQdp20Rs9h",
+                  "publication_id": "4980083",
+                  "is_active": true,
+                  "price_base_units": 11000,
+                  "currency_alpha3": "usd",
+                  "period": "year",
+                  "created_at": "2025-05-10T15:46:19.463Z",
+                  "updated_at": "2025-05-10T15:46:19.463Z",
+                  "id": "38479",
+                  "payout_amount_base_units": 800,
+                  "alternate_currencies": {
+                    "aud": 17500,
+                    "brl": 62500,
+                    "cad": 15500,
+                    "chf": 9500,
+                    "dkk": 73000,
+                    "eur": 10000,
+                    "gbp": 8500,
+                    "mxn": 214000,
+                    "nok": 114500,
+                    "nzd": 19000,
+                    "pln": 41500,
+                    "sek": 107000
+                  },
+                  "display_name": "Workflow Forge (Yearly)",
+                  "display_price": "$110"
+                }
+              ],
+              "founding_plan_name_english": "Founding Member",
+              "draft_plans": [
+                {
+                  "id": "yearly80usd",
+                  "object": "plan",
+                  "active": true,
+                  "aggregate_usage": null,
+                  "amount": 8000,
+                  "amount_decimal": "8000",
+                  "billing_scheme": "per_unit",
+                  "created": 1746891872,
+                  "currency": "usd",
+                  "interval": "year",
+                  "interval_count": 1,
+                  "livemode": true,
+                  "metadata": {
+                    "substack": "yes"
+                  },
+                  "meter": null,
+                  "nickname": "$80 a year",
+                  "product": "prod_SHpEOPgld1VjYo",
+                  "tiers": null,
+                  "tiers_mode": null,
+                  "transform_usage": null,
+                  "trial_period_days": null,
+                  "usage_type": "licensed",
+                  "currency_options": {
+                    "aud": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 12500,
+                      "unit_amount_decimal": "12500"
+                    },
+                    "brl": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 44000,
+                      "unit_amount_decimal": "44000"
+                    },
+                    "cad": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 11000,
+                      "unit_amount_decimal": "11000"
+                    },
+                    "chf": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 6500,
+                      "unit_amount_decimal": "6500"
+                    },
+                    "dkk": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 51000,
+                      "unit_amount_decimal": "51000"
+                    },
+                    "eur": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 7000,
+                      "unit_amount_decimal": "7000"
+                    },
+                    "gbp": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 6000,
+                      "unit_amount_decimal": "6000"
+                    },
+                    "mxn": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 150000,
+                      "unit_amount_decimal": "150000"
+                    },
+                    "nok": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 81000,
+                      "unit_amount_decimal": "81000"
+                    },
+                    "nzd": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 13500,
+                      "unit_amount_decimal": "13500"
+                    },
+                    "pln": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 29000,
+                      "unit_amount_decimal": "29000"
+                    },
+                    "sek": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 76000,
+                      "unit_amount_decimal": "76000"
+                    },
+                    "usd": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 8000,
+                      "unit_amount_decimal": "8000"
+                    }
+                  }
+                },
+                {
+                  "id": "monthly8usd",
+                  "object": "plan",
+                  "active": true,
+                  "aggregate_usage": null,
+                  "amount": 800,
+                  "amount_decimal": "800",
+                  "billing_scheme": "per_unit",
+                  "created": 1746891872,
+                  "currency": "usd",
+                  "interval": "month",
+                  "interval_count": 1,
+                  "livemode": true,
+                  "metadata": {
+                    "substack": "yes"
+                  },
+                  "meter": null,
+                  "nickname": "$8 a month",
+                  "product": "prod_SHpEUigc5Mn24L",
+                  "tiers": null,
+                  "tiers_mode": null,
+                  "transform_usage": null,
+                  "trial_period_days": null,
+                  "usage_type": "licensed",
+                  "currency_options": {
+                    "aud": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 1300,
+                      "unit_amount_decimal": "1300"
+                    },
+                    "brl": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 4400,
+                      "unit_amount_decimal": "4400"
+                    },
+                    "cad": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 1100,
+                      "unit_amount_decimal": "1100"
+                    },
+                    "chf": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 700,
+                      "unit_amount_decimal": "700"
+                    },
+                    "dkk": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 5500,
+                      "unit_amount_decimal": "5500"
+                    },
+                    "eur": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 700,
+                      "unit_amount_decimal": "700"
+                    },
+                    "gbp": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 600,
+                      "unit_amount_decimal": "600"
+                    },
+                    "mxn": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 15000,
+                      "unit_amount_decimal": "15000"
+                    },
+                    "nok": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 8500,
+                      "unit_amount_decimal": "8500"
+                    },
+                    "nzd": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 1400,
+                      "unit_amount_decimal": "1400"
+                    },
+                    "pln": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 2900,
+                      "unit_amount_decimal": "2900"
+                    },
+                    "sek": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 8000,
+                      "unit_amount_decimal": "8000"
+                    },
+                    "usd": {
+                      "custom_unit_amount": null,
+                      "tax_behavior": "unspecified",
+                      "unit_amount": 800,
+                      "unit_amount_decimal": "800"
+                    }
+                  }
+                }
+              ],
+              "base_url": "https://angelsant.substack.com",
+              "hostname": "angelsant.substack.com",
+              "is_on_substack": false,
+              "spotify_podcast_settings": null,
+              "podcastPalette": {
+                "DarkMuted": {
+                  "population": 72,
+                  "rgb": [
+                    73,
+                    153,
+                    137
+                  ]
+                },
+                "DarkVibrant": {
+                  "population": 6013,
+                  "rgb": [
+                    4,
+                    100,
+                    84
+                  ]
+                },
+                "LightMuted": {
+                  "population": 7,
+                  "rgb": [
+                    142,
+                    198,
+                    186
+                  ]
+                },
+                "LightVibrant": {
+                  "population": 3,
+                  "rgb": [
+                    166,
+                    214,
+                    206
+                  ]
+                },
+                "Muted": {
+                  "population": 6,
+                  "rgb": [
+                    92,
+                    164,
+                    156
+                  ]
+                },
+                "Vibrant": {
+                  "population": 5,
+                  "rgb": [
+                    76,
+                    164,
+                    146
+                  ]
+                }
+              },
+              "pageThemes": {
+                "podcast": null
+              },
+              "live_subscriber_counts": false,
+              "logoPalette": {
+                "Vibrant": {
+                  "rgb": [
+                    135.59523809523813,
+                    119.40476190476188,
+                    121.4285714285714
+                  ],
+                  "population": 0
+                },
+                "DarkVibrant": {
+                  "rgb": [
+                    70.50952380952381,
+                    62.09047619047619,
+                    63.142857142857146
+                  ],
+                  "population": 0
+                },
+                "LightVibrant": {
+                  "rgb": [
+                    192.90952380952382,
+                    184.49047619047616,
+                    185.54285714285714
+                  ],
+                  "population": 0
+                },
+                "Muted": {
+                  "rgb": [
+                    134,
+                    131,
+                    132
+                  ],
+                  "population": 18
+                },
+                "DarkMuted": {
+                  "rgb": [
+                    36,
+                    28,
+                    28
+                  ],
+                  "population": 2132
+                },
+                "LightMuted": {
+                  "rgb": [
+                    196,
+                    188,
+                    189
+                  ],
+                  "population": 5
+                }
+              }
+            },
+            "post": {
+              "id": 167278092,
+              "publication_id": 4980083,
+              "title": "openai is coming to steal your clients",
+              "social_title": null,
+              "search_engine_title": null,
+              "search_engine_description": null,
+              "type": "newsletter",
+              "slug": "openai-is-coming-to-steal-your-clients",
+              "post_date": "2025-07-01T16:36:39.842Z",
+              "audience": "everyone",
+              "podcast_duration": null,
+              "video_upload_id": null,
+              "write_comment_permissions": "everyone",
+              "should_send_free_preview": false,
+              "free_unlock_required": false,
+              "default_comment_sort": null,
+              "canonical_url": "https://angelsant.substack.com/p/openai-is-coming-to-steal-your-clients",
+              "section_id": null,
+              "podcast_art_url": null,
+              "is_published": true,
+              "live_stream_id": null,
+              "restacks": 2,
+              "top_exclusions": [],
+              "pins": [],
+              "is_section_pinned": false,
+              "has_shareable_clips": false,
+              "section_slug": null,
+              "section_name": null,
+              "reactions": {
+                "❤": 4
+              },
+              "subtitle": "their new consulting arm isn’t here to help",
+              "cover_image": "https://substackcdn.com/image/fetch/$s_!4qvG!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F7b29b88c-aa2b-42cf-9852-c6b8ec9cc266_1536x1024.png",
+              "cover_image_is_square": false,
+              "cover_image_is_explicit": false,
+              "podcast_url": "",
+              "videoUpload": null,
+              "podcastFields": {
+                "post_id": 167278092,
+                "podcast_episode_number": null,
+                "podcast_season_number": null,
+                "podcast_episode_type": null,
+                "should_syndicate_to_other_feed": null,
+                "syndicate_to_section_id": null,
+                "hide_from_feed": false,
+                "free_podcast_url": null,
+                "free_podcast_duration": null
+              },
+              "podcast_upload_id": null,
+              "podcast_preview_upload_id": null,
+              "podcastUpload": null,
+              "podcastPreviewUpload": null,
+              "voiceover_upload_id": null,
+              "voiceoverUpload": null,
+              "has_voiceover": false,
+              "description": "their new consulting arm isn’t here to help",
+              "body_json": null,
+              "body_html": null,
+              "truncated_body_text": "When OpenAI launches enterprise consulting services, something fundamental shifts.",
+              "wordcount": 882,
+              "postTags": [
+                {
+                  "id": "0778f242-1b07-4b71-a960-3478039f0443",
+                  "publication_id": 4980083,
+                  "name": "consulting",
+                  "slug": "consulting",
+                  "hidden": false
+                },
+                {
+                  "id": "94751258-17aa-4364-b5b8-61c61b5b7104",
+                  "publication_id": 4980083,
+                  "name": "business",
+                  "slug": "business",
+                  "hidden": false
+                },
+                {
+                  "id": "b36fa3e3-1f99-4cfa-be8d-32d44701c36d",
+                  "publication_id": 4980083,
+                  "name": "solopreneur",
+                  "slug": "solopreneur",
+                  "hidden": false
+                },
+                {
+                  "id": "bd4cdd8a-759b-48f8-bd8c-722e44426e9e",
+                  "publication_id": 4980083,
+                  "name": "entrepreneur",
+                  "slug": "entrepreneur",
+                  "hidden": false
+                },
+                {
+                  "id": "c9c46929-5cad-4244-98c5-a133998f1166",
+                  "publication_id": 4980083,
+                  "name": "finance",
+                  "slug": "finance",
+                  "hidden": false
+                },
+                {
+                  "id": "d16f3df3-8dd3-44ed-abd9-569dc76504bf",
+                  "publication_id": 4980083,
+                  "name": "openai",
+                  "slug": "openai",
+                  "hidden": false
+                },
+                {
+                  "id": "e9f7bbcb-df2f-4063-a424-14d219ca7ab8",
+                  "publication_id": 4980083,
+                  "name": "ai",
+                  "slug": "ai",
+                  "hidden": false
+                },
+                {
+                  "id": "f3146097-05e4-4471-999d-8753e0b72049",
+                  "publication_id": 4980083,
+                  "name": "artificial intelligence",
+                  "slug": "artificial-intelligence",
+                  "hidden": false
+                }
+              ],
+              "teaser_post_eligible": true,
+              "postCountryBlocks": [],
+              "headlineTest": null,
+              "coverImagePalette": {
+                "Vibrant": {
+                  "rgb": [
+                    246,
+                    208,
+                    6
+                  ],
+                  "population": 402
+                },
+                "DarkVibrant": {
+                  "rgb": [
+                    21,
+                    74,
+                    114
+                  ],
+                  "population": 23
+                },
+                "LightVibrant": {
+                  "rgb": [
+                    251,
+                    136,
+                    172
+                  ],
+                  "population": 34
+                },
+                "Muted": {
+                  "rgb": [
+                    90,
+                    89,
+                    167
+                  ],
+                  "population": 58
+                },
+                "DarkMuted": {
+                  "rgb": [
+                    50,
+                    68,
+                    87
+                  ],
+                  "population": 8
+                },
+                "LightMuted": {
+                  "rgb": [
+                    210,
+                    202,
+                    175
+                  ],
+                  "population": 5
+                }
+              },
+              "publishedBylines": [
+                {
+                  "id": 343074721,
+                  "name": "Angel Rodriguez Santiago",
+                  "handle": "angelsant",
+                  "previous_name": null,
+                  "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+                  "bio": "hey there! been working on data + analytics for the past 7 years. excited to share what I know!",
+                  "profile_set_up_at": "2025-05-10T15:02:41.569Z",
+                  "reader_installed_at": "2025-05-10T18:09:56.677Z",
+                  "publicationUsers": [
+                    {
+                      "id": 5079901,
+                      "user_id": 343074721,
+                      "publication_id": 4980083,
+                      "role": "admin",
+                      "public": true,
+                      "is_primary": false,
+                      "publication": {
+                        "id": 4980083,
+                        "name": "Workflow Forge",
+                        "subdomain": "angelsant",
+                        "custom_domain": null,
+                        "custom_domain_optional": false,
+                        "hero_text": "Actionable automation tips for solopreneurs and creators — fresh workflows every week using tools like n8n and more.",
+                        "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+                        "author_id": 343074721,
+                        "primary_user_id": 343074721,
+                        "theme_var_background_pop": "#FF6719",
+                        "created_at": "2025-05-10T15:29:52.219Z",
+                        "email_from_name": "Angel Rodriguez from Workflow Forge",
+                        "copyright": "Angel Rodriguez Santiago",
+                        "founding_plan_name": null,
+                        "community_enabled": true,
+                        "invite_only": false,
+                        "payments_state": "disabled",
+                        "language": null,
+                        "explicit": false,
+                        "homepage_type": "newspaper",
+                        "is_personal_mode": false
+                      }
+                    }
+                  ],
+                  "is_guest": false,
+                  "bestseller_tier": null,
+                  "primary_publication": {
+                    "id": 4980083,
+                    "subdomain": "angelsant",
+                    "custom_domain_optional": false,
+                    "name": "Workflow Forge",
+                    "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+                    "author_id": 343074721,
+                    "user_id": 343074721,
+                    "handles_enabled": false,
+                    "explicit": false,
+                    "is_personal_mode": false,
+                    "payments_state": "disabled",
+                    "pledges_enabled": true
+                  }
+                }
+              ],
+              "reaction": null,
+              "reaction_count": 4,
+              "comment_count": 0,
+              "child_comment_count": 0,
+              "audio_items": [
+                {
+                  "post_id": 167278092,
+                  "voice_id": "en-US-AlloyTurboMultilingualNeural",
+                  "audio_url": "https://substack-video.s3.amazonaws.com/video_upload/post/167278092/tts/a1d63074-c7d7-425c-9c98-914215a99cdb/en-US-AlloyTurboMultilingualNeural.mp3",
+                  "type": "tts",
+                  "status": "completed"
+                }
+              ],
+              "is_geoblocked": false,
+              "hasCashtag": false
+            },
+            "postSelection": null,
+            "postSelectionTheme": null,
+            "postImageSelection": null,
+            "clipInfo": null,
+            "mediaClip": null
+          }
+        ],
+        "user_bestseller_tier": null,
+        "user_primary_publication": {
+          "id": 4980083,
+          "subdomain": "angelsant",
+          "custom_domain_optional": false,
+          "name": "Workflow Forge",
+          "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+          "author_id": 343074721,
+          "user_id": 343074721,
+          "handles_enabled": false,
+          "explicit": false,
+          "is_personal_mode": false,
+          "payments_state": "disabled",
+          "pledges_enabled": true
+        }
+      },
+      "parentComments": [],
+      "canReply": true,
+      "isMuted": false,
+      "trackingParameters": {
+        "item_primary_entity_key": "c-131092466",
+        "item_entity_key": "c-131092466",
+        "item_type": "comment",
+        "item_comment_id": 131092466,
+        "item_content_user_id": 343074721,
+        "item_context_type": "note",
+        "item_context_type_bucket": "",
+        "item_context_timestamp": "2025-07-01T16:37:43.171Z",
+        "item_context_user_id": 343074721,
+        "item_context_user_ids": [
+          343074721
+        ],
+        "item_can_reply": true,
+        "item_is_fresh": false,
+        "item_last_impression_at": null,
+        "item_source": "db-note",
+        "retrieval_model_version": 0,
+        "item_page": null,
+        "item_page_rank": 7,
+        "impression_id": "3ac10cf3-ca16-4318-872f-4caa0ae08e38",
+        "followed_user_count": 0,
+        "subscribed_publication_count": 0,
+        "is_following": false,
+        "is_explicitly_subscribed": false
+      }
+    },
+    {
+      "entity_key": "c-131020446",
+      "type": "comment",
+      "context": {
+        "type": "note",
+        "timestamp": "2025-07-01T12:54:01.813Z",
+        "users": [
+          {
+            "id": 343074721,
+            "name": "Angel Rodriguez Santiago",
+            "handle": "angelsant",
+            "previous_name": null,
+            "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+            "bio": "hey there! been working on data + analytics for the past 7 years. excited to share what I know!",
+            "profile_set_up_at": "2025-05-10T15:02:41.569Z",
+            "reader_installed_at": "2025-05-10T18:09:56.677Z",
+            "bestseller_tier": null,
+            "primary_publication": {
+              "id": 4980083,
+              "subdomain": "angelsant",
+              "custom_domain_optional": false,
+              "name": "Workflow Forge",
+              "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+              "author_id": 343074721,
+              "user_id": 343074721,
+              "handles_enabled": false,
+              "explicit": false,
+              "is_personal_mode": false,
+              "payments_state": "disabled",
+              "pledges_enabled": true
+            }
+          }
+        ],
+        "fallbackReason": "//TODO: create fallback reasons",
+        "fallbackUrl": null,
+        "isFresh": false,
+        "source": "db-note",
+        "retrievalModelVersion": 0,
+        "page": null,
+        "page_rank": 8
+      },
+      "publication": null,
+      "post": null,
+      "comment": {
+        "name": "Angel Rodriguez Santiago",
+        "handle": "angelsant",
+        "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+        "id": 131020446,
+        "body": "🧩 OpenAI Is Now a Consulting Firm\n\nOpenAI just launched its own consulting services (starting at 10m) working directly with clients to build and deploy AI solutions. Not just selling APIs anymore.\n\n🔗 Source\n\nWhat this means:\n\n🧠 For startups:\n\nYou can focus on building great user experiences. OpenAI handles the backend and fine-tuning.\n\n🏗️ For the app layer:\n\nThis speeds up real AI deployment. More startups, faster prototypes, better tooling.\n\n⚠️ For Accenture & Deloitte:\n\nBig consulting firms just got a new competitor. Why hire middlemen when OpenAI can build it with you?\n\n🤝 For partners:\n\nOpenAI isn’t going solo. It’s also partnering with firms like Capco and Reply to scale.\n\nBottom line:\n\nOpenAI is moving up the stack. \n\nThe winners? \n\nFounders who build faster, go vertical, and stay close to the customer.\n\n🔗 More notes like this:\n\nhttps://angelsant.substack.com",
+        "body_json": {
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "🧩 ",
+                  "type": "text"
+                },
+                {
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ],
+                  "text": "OpenAI Is Now a Consulting Firm",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "OpenAI just launched its own consulting services (starting at 10m) working directly with clients to build and deploy AI solutions. Not just selling APIs anymore.",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "🔗 ",
+                  "type": "text"
+                },
+                {
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "class": "note-link",
+                        "href": "https://www.theinformation.com/articles/openai-takes-page-palantir-doubles-consulting-services",
+                        "rel": "nofollow ugc noopener",
+                        "target": "_blank"
+                      }
+                    }
+                  ],
+                  "text": "https://www.theinformation.com/articles/openai-takes-page-palantir-doubles-consulting-services",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ],
+                  "text": "What this means:",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "🧠 For startups:",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "You can focus on building great user experiences. OpenAI handles the backend and fine-tuning.",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "🏗️ For the app layer:",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "This speeds up real AI deployment. More startups, faster prototypes, better tooling.",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "⚠️ For Accenture & Deloitte:",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "Big consulting firms just got a new competitor. Why hire middlemen when OpenAI can build it with you?",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "🤝 For partners:",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "OpenAI isn’t going solo. It’s also partnering with firms like Capco and Reply to scale.",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "Bottom line:",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "OpenAI is moving up the stack. ",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "The winners? ",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "Founders who build faster, go vertical, and stay close to the customer.",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "🔗 More notes like this:",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "class": "note-link",
+                        "target": "_blank",
+                        "rel": "nofollow ugc noopener",
+                        "href": "https://angelsant.substack.com"
+                      }
+                    }
+                  ],
+                  "text": "https://angelsant.substack.com",
+                  "type": "text"
+                }
+              ]
+            }
+          ],
+          "attrs": {
+            "schemaVersion": "v1"
+          },
+          "type": "doc"
+        },
+        "publication_id": null,
+        "post_id": null,
+        "user_id": 343074721,
+        "type": "feed",
+        "date": "2025-07-01T12:54:01.813Z",
+        "edited_at": null,
+        "ancestor_path": "",
+        "reply_minimum_role": "everyone",
+        "media_clip_id": null,
+        "reaction_count": 15,
+        "reactions": {
+          "❤": 15
+        },
+        "restacks": 1,
+        "restacked": false,
+        "children_count": 1,
+        "attachments": [],
+        "user_bestseller_tier": null,
+        "user_primary_publication": {
+          "id": 4980083,
+          "subdomain": "angelsant",
+          "custom_domain_optional": false,
+          "name": "Workflow Forge",
+          "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+          "author_id": 343074721,
+          "user_id": 343074721,
+          "handles_enabled": false,
+          "explicit": false,
+          "is_personal_mode": false,
+          "payments_state": "disabled",
+          "pledges_enabled": true
+        }
+      },
+      "parentComments": [],
+      "canReply": true,
+      "isMuted": false,
+      "trackingParameters": {
+        "item_primary_entity_key": "c-131020446",
+        "item_entity_key": "c-131020446",
+        "item_type": "comment",
+        "item_comment_id": 131020446,
+        "item_content_user_id": 343074721,
+        "item_context_type": "note",
+        "item_context_type_bucket": "",
+        "item_context_timestamp": "2025-07-01T12:54:01.813Z",
+        "item_context_user_id": 343074721,
+        "item_context_user_ids": [
+          343074721
+        ],
+        "item_can_reply": true,
+        "item_is_fresh": false,
+        "item_last_impression_at": null,
+        "item_source": "db-note",
+        "retrieval_model_version": 0,
+        "item_page": null,
+        "item_page_rank": 8,
+        "impression_id": "7f78cb7c-6b3e-42ab-8ad3-50d21742e948",
+        "followed_user_count": 0,
+        "subscribed_publication_count": 0,
+        "is_following": false,
+        "is_explicitly_subscribed": false
+      }
+    },
+    {
+      "entity_key": "c-131012216",
+      "type": "comment",
+      "context": {
+        "type": "note",
+        "timestamp": "2025-07-01T12:23:45.625Z",
+        "users": [
+          {
+            "id": 343074721,
+            "name": "Angel Rodriguez Santiago",
+            "handle": "angelsant",
+            "previous_name": null,
+            "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+            "bio": "hey there! been working on data + analytics for the past 7 years. excited to share what I know!",
+            "profile_set_up_at": "2025-05-10T15:02:41.569Z",
+            "reader_installed_at": "2025-05-10T18:09:56.677Z",
+            "bestseller_tier": null,
+            "primary_publication": {
+              "id": 4980083,
+              "subdomain": "angelsant",
+              "custom_domain_optional": false,
+              "name": "Workflow Forge",
+              "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+              "author_id": 343074721,
+              "user_id": 343074721,
+              "handles_enabled": false,
+              "explicit": false,
+              "is_personal_mode": false,
+              "payments_state": "disabled",
+              "pledges_enabled": true
+            }
+          }
+        ],
+        "fallbackReason": "//TODO: create fallback reasons",
+        "fallbackUrl": null,
+        "isFresh": false,
+        "source": "db-note",
+        "retrievalModelVersion": 0,
+        "page": null,
+        "page_rank": 9
+      },
+      "publication": null,
+      "post": null,
+      "comment": {
+        "name": "Angel Rodriguez Santiago",
+        "handle": "angelsant",
+        "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+        "id": 131012216,
+        "body": "📬 AI Tools for Cold Email Outreach\n\nHere are 3 AI-powered tools that make cold emailing 10× easier:\n\n✉️ Clay\n\nFind leads, enrich data, and personalize at scale\n\n🌐 https://clay.com/\n\n🧠 Instantly\n\nAI-powered cold email platform with warm-up + automation\n\n🌐 https://instantly.ai/\n\n📈 Smartlead\n\nMulti-inbox sending, smart personalization, and deliverability tools\n\n🌐 https://smartlead.ai/\n\nUse these to scale your outreach without sounding like a bot.\n\n🔗 See how I write and automate cold emails:\n\nhttps://angelsant.substack.com",
+        "body_json": {
+          "content": [
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "📬 "
+                },
+                {
+                  "type": "text",
+                  "text": "AI Tools for Cold Email Outreach",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ]
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Here are 3 AI-powered tools that make cold emailing 10× easier:"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "✉️ "
+                },
+                {
+                  "type": "text",
+                  "text": "Clay",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ]
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Find leads, enrich data, and personalize at scale"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "🌐 "
+                },
+                {
+                  "type": "text",
+                  "text": "https://clay.com/",
+                  "marks": [
+                    {
+                      "attrs": {
+                        "target": "_blank",
+                        "href": "https://clay.com/",
+                        "rel": "nofollow ugc noopener",
+                        "class": "note-link"
+                      },
+                      "type": "link"
+                    }
+                  ]
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "🧠 "
+                },
+                {
+                  "type": "text",
+                  "text": "Instantly",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ]
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "AI-powered cold email platform with warm-up + automation"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "🌐 "
+                },
+                {
+                  "type": "text",
+                  "text": "https://instantly.ai/",
+                  "marks": [
+                    {
+                      "attrs": {
+                        "href": "https://instantly.ai/",
+                        "target": "_blank",
+                        "rel": "nofollow ugc noopener",
+                        "class": "note-link"
+                      },
+                      "type": "link"
+                    }
+                  ]
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "📈 "
+                },
+                {
+                  "type": "text",
+                  "text": "Smartlead",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ]
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Multi-inbox sending, smart personalization, and deliverability tools"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "🌐 "
+                },
+                {
+                  "type": "text",
+                  "text": "https://smartlead.ai/",
+                  "marks": [
+                    {
+                      "attrs": {
+                        "target": "_blank",
+                        "href": "https://smartlead.ai/",
+                        "class": "note-link",
+                        "rel": "nofollow ugc noopener"
+                      },
+                      "type": "link"
+                    }
+                  ]
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Use these to scale your outreach without sounding like a bot."
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "🔗 See how I write and automate cold emails:"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "https://angelsant.substack.com",
+                  "marks": [
+                    {
+                      "attrs": {
+                        "rel": "nofollow ugc noopener",
+                        "target": "_blank",
+                        "href": "https://angelsant.substack.com",
+                        "class": "note-link"
+                      },
+                      "type": "link"
+                    }
+                  ]
+                }
+              ],
+              "type": "paragraph"
+            }
+          ],
+          "type": "doc",
+          "attrs": {
+            "schemaVersion": "v1"
+          }
+        },
+        "publication_id": null,
+        "post_id": null,
+        "user_id": 343074721,
+        "type": "feed",
+        "date": "2025-07-01T12:23:45.625Z",
+        "edited_at": null,
+        "ancestor_path": "",
+        "reply_minimum_role": "everyone",
+        "media_clip_id": null,
+        "reaction_count": 3,
+        "reactions": {
+          "❤": 3
+        },
+        "restacks": 0,
+        "restacked": false,
+        "children_count": 0,
+        "attachments": [],
+        "user_bestseller_tier": null,
+        "user_primary_publication": {
+          "id": 4980083,
+          "subdomain": "angelsant",
+          "custom_domain_optional": false,
+          "name": "Workflow Forge",
+          "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+          "author_id": 343074721,
+          "user_id": 343074721,
+          "handles_enabled": false,
+          "explicit": false,
+          "is_personal_mode": false,
+          "payments_state": "disabled",
+          "pledges_enabled": true
+        }
+      },
+      "parentComments": [],
+      "canReply": true,
+      "isMuted": false,
+      "trackingParameters": {
+        "item_primary_entity_key": "c-131012216",
+        "item_entity_key": "c-131012216",
+        "item_type": "comment",
+        "item_comment_id": 131012216,
+        "item_content_user_id": 343074721,
+        "item_context_type": "note",
+        "item_context_type_bucket": "",
+        "item_context_timestamp": "2025-07-01T12:23:45.625Z",
+        "item_context_user_id": 343074721,
+        "item_context_user_ids": [
+          343074721
+        ],
+        "item_can_reply": true,
+        "item_is_fresh": false,
+        "item_last_impression_at": null,
+        "item_source": "db-note",
+        "retrieval_model_version": 0,
+        "item_page": null,
+        "item_page_rank": 9,
+        "impression_id": "1eab4d0e-c4d3-4814-8a3a-14ae7606618b",
+        "followed_user_count": 0,
+        "subscribed_publication_count": 0,
+        "is_following": false,
+        "is_explicitly_subscribed": false
+      }
+    },
+    {
+      "entity_key": "c-130997716",
+      "type": "comment",
+      "context": {
+        "type": "note",
+        "timestamp": "2025-07-01T11:21:34.617Z",
+        "users": [
+          {
+            "id": 343074721,
+            "name": "Angel Rodriguez Santiago",
+            "handle": "angelsant",
+            "previous_name": null,
+            "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+            "bio": "hey there! been working on data + analytics for the past 7 years. excited to share what I know!",
+            "profile_set_up_at": "2025-05-10T15:02:41.569Z",
+            "reader_installed_at": "2025-05-10T18:09:56.677Z",
+            "bestseller_tier": null,
+            "primary_publication": {
+              "id": 4980083,
+              "subdomain": "angelsant",
+              "custom_domain_optional": false,
+              "name": "Workflow Forge",
+              "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+              "author_id": 343074721,
+              "user_id": 343074721,
+              "handles_enabled": false,
+              "explicit": false,
+              "is_personal_mode": false,
+              "payments_state": "disabled",
+              "pledges_enabled": true
+            }
+          }
+        ],
+        "fallbackReason": "//TODO: create fallback reasons",
+        "fallbackUrl": null,
+        "isFresh": false,
+        "source": "db-note",
+        "retrievalModelVersion": 0,
+        "page": null,
+        "page_rank": 10
+      },
+      "publication": null,
+      "post": null,
+      "comment": {
+        "name": "Angel Rodriguez Santiago",
+        "handle": "angelsant",
+        "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+        "id": 130997716,
+        "body": "📈 Week 4 Growth Update\n\n+46 Subscribers\n\nMain takeaway:\n\nConsistency compounds. Publishing 3 notes per day is still the best growth engine.\n\n🧠 A few insights from this week:\n\n#1 Engage with every comment\n\nIt’s not just about publishing, it’s about connecting.\n\nQuick replies build trust and keep people coming back.\n\n#2 Notes are underrated\n\nSome of mine hit 5k impressions and are still getting views weeks later.\n\nI’m publishing 3–4 daily. It works.\n\n#3 Give more than you take\n\nSharing tools, ideas, or resources in your notes makes people stop scrolling—and hit follow.\n\nWhat’s one thing that’s helped you grow your Substack? Or something you’re stuck on?\n\n---\n\nI write about publishing, growth, and automation for solopreneurs—check it out here:\n\n👉 https://angelsant.substack.com",
+        "body_json": {
+          "content": [
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "📈 "
+                },
+                {
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ],
+                  "type": "text",
+                  "text": "Week 4 Growth Update"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "+46 Subscribers"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ],
+                  "type": "text",
+                  "text": "Main takeaway:"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Consistency compounds. Publishing 3 notes per day is still the best growth engine."
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ],
+                  "type": "text",
+                  "text": "🧠 A few insights from this week:"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ],
+                  "type": "text",
+                  "text": "#1 Engage with every comment"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "It’s not just about publishing, it’s about connecting."
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Quick replies build trust and keep people coming back."
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ],
+                  "type": "text",
+                  "text": "#2 Notes are underrated"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Some of mine hit 5k impressions and are still getting views weeks later."
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "I’m publishing 3–4 daily. It works."
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ],
+                  "type": "text",
+                  "text": "#3 Give more than you take"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Sharing tools, ideas, or resources in your notes makes people stop scrolling—and hit follow."
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "What’s one thing that’s helped you grow your Substack? Or something you’re stuck on?"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "---"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "I write about publishing, growth, and automation for solopreneurs—check it out here:"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "👉 "
+                },
+                {
+                  "marks": [
+                    {
+                      "attrs": {
+                        "href": "https://angelsant.substack.com/",
+                        "class": "note-link",
+                        "target": "_blank",
+                        "rel": "nofollow ugc noopener"
+                      },
+                      "type": "link"
+                    }
+                  ],
+                  "type": "text",
+                  "text": "https://angelsant.substack.com/"
+                }
+              ],
+              "type": "paragraph"
+            }
+          ],
+          "type": "doc",
+          "attrs": {
+            "schemaVersion": "v1"
+          }
+        },
+        "publication_id": null,
+        "post_id": null,
+        "user_id": 343074721,
+        "type": "feed",
+        "date": "2025-07-01T11:21:34.617Z",
+        "edited_at": null,
+        "ancestor_path": "",
+        "reply_minimum_role": "everyone",
+        "media_clip_id": null,
+        "reaction_count": 6,
+        "reactions": {
+          "❤": 6
+        },
+        "restacks": 0,
+        "restacked": false,
+        "children_count": 1,
+        "attachments": [
+          {
+            "id": "0ab67a10-e0c2-41b4-a8f3-9d64a32466b4",
+            "type": "image",
+            "imageUrl": "https://substack-post-media.s3.amazonaws.com/public/images/c32c838c-5ee7-463b-99f4-17560ca69384_1284x1363.jpeg",
+            "imageWidth": 1284,
+            "imageHeight": 1363,
+            "explicit": false
+          }
+        ],
+        "user_bestseller_tier": null,
+        "user_primary_publication": {
+          "id": 4980083,
+          "subdomain": "angelsant",
+          "custom_domain_optional": false,
+          "name": "Workflow Forge",
+          "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+          "author_id": 343074721,
+          "user_id": 343074721,
+          "handles_enabled": false,
+          "explicit": false,
+          "is_personal_mode": false,
+          "payments_state": "disabled",
+          "pledges_enabled": true
+        }
+      },
+      "parentComments": [],
+      "canReply": true,
+      "isMuted": false,
+      "trackingParameters": {
+        "item_primary_entity_key": "c-130997716",
+        "item_entity_key": "c-130997716",
+        "item_type": "comment",
+        "item_comment_id": 130997716,
+        "item_content_user_id": 343074721,
+        "item_context_type": "note",
+        "item_context_type_bucket": "",
+        "item_context_timestamp": "2025-07-01T11:21:34.617Z",
+        "item_context_user_id": 343074721,
+        "item_context_user_ids": [
+          343074721
+        ],
+        "item_can_reply": true,
+        "item_is_fresh": false,
+        "item_last_impression_at": null,
+        "item_source": "db-note",
+        "retrieval_model_version": 0,
+        "item_page": null,
+        "item_page_rank": 10,
+        "impression_id": "9d28bb7c-556a-47b4-a3b7-6b43bd463cd5",
+        "followed_user_count": 0,
+        "subscribed_publication_count": 0,
+        "is_following": false,
+        "is_explicitly_subscribed": false
+      }
+    },
+    {
+      "entity_key": "c-130857780",
+      "type": "comment",
+      "context": {
+        "type": "note",
+        "timestamp": "2025-06-30T21:51:36.985Z",
+        "users": [
+          {
+            "id": 343074721,
+            "name": "Angel Rodriguez Santiago",
+            "handle": "angelsant",
+            "previous_name": null,
+            "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+            "bio": "hey there! been working on data + analytics for the past 7 years. excited to share what I know!",
+            "profile_set_up_at": "2025-05-10T15:02:41.569Z",
+            "reader_installed_at": "2025-05-10T18:09:56.677Z",
+            "bestseller_tier": null,
+            "primary_publication": {
+              "id": 4980083,
+              "subdomain": "angelsant",
+              "custom_domain_optional": false,
+              "name": "Workflow Forge",
+              "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+              "author_id": 343074721,
+              "user_id": 343074721,
+              "handles_enabled": false,
+              "explicit": false,
+              "is_personal_mode": false,
+              "payments_state": "disabled",
+              "pledges_enabled": true
+            }
+          }
+        ],
+        "fallbackReason": "//TODO: create fallback reasons",
+        "fallbackUrl": null,
+        "isFresh": false,
+        "source": "db-note",
+        "retrievalModelVersion": 0,
+        "page": null,
+        "page_rank": 11
+      },
+      "publication": null,
+      "post": null,
+      "comment": {
+        "name": "Angel Rodriguez Santiago",
+        "handle": "angelsant",
+        "photo_url": "https://substack-post-media.s3.amazonaws.com/public/images/66fe4c4c-3037-4990-86f2-189f665acda4_1024x1024.jpeg",
+        "id": 130857780,
+        "body": "The easier it gets to build, the harder it gets to matter.\n\nTechnology has always evolved by simplifying complexity: from physical servers to serverless, from C++ to JavaScript, from coding to prompting.\n\nEach layer made creation more accessible—but standing out became harder.\n\nSimplification didn’t mean everyone became a builder; it meant more things got built.\n\nAnd the ones who built with clarity, precision, and purpose stood out the most.\n\n📬 Subscribe for raw insights on AI, automation, and building smarter—without writing code.\n\n👉 https://angelsant.substack.com/",
+        "body_json": {
+          "attrs": {
+            "schemaVersion": "v1"
+          },
+          "content": [
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The easier it gets to build, the harder it gets to matter.",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ]
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "text": "Technology has always evolved by simplifying complexity: from physical servers to serverless, from C++ to JavaScript, from coding to prompting.",
+                  "type": "text"
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Each layer made creation more accessible—"
+                },
+                {
+                  "type": "text",
+                  "text": "but standing out became harder.",
+                  "marks": [
+                    {
+                      "type": "italic"
+                    }
+                  ]
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Simplification didn’t mean everyone became a builder; it meant more things got built."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "text": "And the ones who built with ",
+                  "type": "text"
+                },
+                {
+                  "text": "clarity",
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ]
+                },
+                {
+                  "text": ", ",
+                  "type": "text"
+                },
+                {
+                  "text": "precision",
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ]
+                },
+                {
+                  "text": ", and ",
+                  "type": "text"
+                },
+                {
+                  "text": "purpose",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ],
+                  "type": "text"
+                },
+                {
+                  "text": " stood out the most.",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "📬 Subscribe for raw insights on AI, automation, and building smarter—without writing code."
+                }
+              ],
+              "type": "paragraph"
+            },
+            {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "👉 "
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "attrs": {
+                        "rel": "nofollow ugc noopener",
+                        "class": "note-link",
+                        "target": "_blank",
+                        "href": "https://angelsant.substack.com/"
+                      },
+                      "type": "link"
+                    }
+                  ],
+                  "text": "https://angelsant.substack.com/"
+                }
+              ],
+              "type": "paragraph"
+            }
+          ],
+          "type": "doc"
+        },
+        "publication_id": null,
+        "post_id": null,
+        "user_id": 343074721,
+        "type": "feed",
+        "date": "2025-06-30T21:51:36.985Z",
+        "edited_at": "2025-06-30T21:51:45.882Z",
+        "ancestor_path": "",
+        "reply_minimum_role": "everyone",
+        "media_clip_id": null,
+        "reaction_count": 5,
+        "reactions": {
+          "❤": 5
+        },
+        "restacks": 0,
+        "restacked": false,
+        "children_count": 0,
+        "attachments": [],
+        "user_bestseller_tier": null,
+        "user_primary_publication": {
+          "id": 4980083,
+          "subdomain": "angelsant",
+          "custom_domain_optional": false,
+          "name": "Workflow Forge",
+          "logo_url": "https://substack-post-media.s3.amazonaws.com/public/images/03836e2d-7c4c-4d6c-99b3-b113fcd1220c_500x500.png",
+          "author_id": 343074721,
+          "user_id": 343074721,
+          "handles_enabled": false,
+          "explicit": false,
+          "is_personal_mode": false,
+          "payments_state": "disabled",
+          "pledges_enabled": true
+        }
+      },
+      "parentComments": [],
+      "canReply": true,
+      "isMuted": false,
+      "trackingParameters": {
+        "item_primary_entity_key": "c-130857780",
+        "item_entity_key": "c-130857780",
+        "item_type": "comment",
+        "item_comment_id": 130857780,
+        "item_content_user_id": 343074721,
+        "item_context_type": "note",
+        "item_context_type_bucket": "",
+        "item_context_timestamp": "2025-06-30T21:51:36.985Z",
+        "item_context_user_id": 343074721,
+        "item_context_user_ids": [
+          343074721
+        ],
+        "item_can_reply": true,
+        "item_is_fresh": false,
+        "item_last_impression_at": null,
+        "item_source": "db-note",
+        "retrieval_model_version": 0,
+        "item_page": null,
+        "item_page_rank": 11,
+        "impression_id": "7a0aa02f-7caa-4ef4-abea-19638708e763",
+        "followed_user_count": 0,
+        "subscribed_publication_count": 0,
+        "is_following": false,
+        "is_explicitly_subscribed": false
+      }
+    }
+  ],
+  "originalCursorTimestamp": "2025-07-03T14:09:17.278Z",
+  "nextCursor": "eyJiZWZvcmVfdGltZXN0YW1wIjoiMjAyNS0wNy0wM1QxNDowOToxNy4yNzhaIiwiZW50aXR5X2tleSI6ImMtMTMwODU3NzgwIiwicGlubmVkX2VudGl0eV9rZXkiOm51bGwsImNvbnRleHRfdGltZXN0YW1wIjoiMjAyNS0wNi0zMFQyMTo1MTozNi45ODRaIiwicHJlcGVuZGVkX3Bvc3RfaWRzIjpudWxsLCJwYWdlX251bWJlciI6MH0="
+}

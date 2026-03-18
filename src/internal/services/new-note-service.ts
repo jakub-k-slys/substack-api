@@ -1,15 +1,24 @@
+import { NoteBuilder, NoteWithLinkBuilder } from '@substack-api/domain/note-builder'
 import type { HttpClient } from '@substack-api/internal/http-client'
-import { GatewayCreateNoteResponseC } from '@substack-api/internal/types'
-import type { GatewayCreateNoteResponse } from '@substack-api/internal/types'
-import { decodeOrThrow } from '@substack-api/internal/validation'
 
+/**
+ * Service responsible for creating new notes
+ * Provides methods to instantiate note builders
+ */
 export class NewNoteService {
-  constructor(private readonly client: HttpClient) {}
+  constructor(private readonly substackClient: HttpClient) {}
 
-  async publishNote(content: string, attachment?: string): Promise<GatewayCreateNoteResponse> {
-    const body: Record<string, string> = { content }
-    if (attachment) body.attachment = attachment
-    const raw = await this.client.post<unknown>('/notes', body)
-    return decodeOrThrow(GatewayCreateNoteResponseC, raw, 'GatewayCreateNoteResponse')
+  /**
+   * Create a new note using the builder pattern
+   */
+  newNote(): NoteBuilder {
+    return new NoteBuilder(this.substackClient)
+  }
+
+  /**
+   * Create a new note with a link attachment using the builder pattern
+   */
+  newNoteWithLink(link: string): NoteWithLinkBuilder {
+    return new NoteWithLinkBuilder(this.substackClient, link)
   }
 }

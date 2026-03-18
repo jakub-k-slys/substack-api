@@ -1,11 +1,12 @@
 /**
- * Configuration interfaces for the Substack Gateway client
+ * Configuration interfaces for the Substack API client
  */
 
 export interface SubstackConfig {
-  gatewayUrl?: string // Gateway base URL (defaults to 'https://substack-gateway.vercel.app')
-  publicationUrl: string // Publication base URL sent as x-publication-url header
-  token: string // Bearer token: btoa(JSON.stringify({substack_sid, connect_sid}))
+  publicationUrl: string // Publication base URL (mandatory, e.g., 'https://yourpub.substack.com')
+  token: string // API authentication token (mandatory)
+  substackUrl?: string // Base URL for global Substack endpoints (optional, defaults to 'https://substack.com')
+  urlPrefix?: string // URL prefix for API endpoints (optional, defaults to 'api/v1/')
   perPage?: number // Default items per page for pagination (optional, defaults to 25)
   maxRequestsPerSecond?: number // Maximum API requests per second (optional, defaults to 25)
 }

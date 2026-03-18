@@ -5,7 +5,6 @@
 
 export { PostService } from '@substack-api/internal/services/post-service'
 export { NoteService } from '@substack-api/internal/services/note-service'
-export type { PaginatedNotes } from '@substack-api/internal/services/note-service'
 export { ProfileService } from '@substack-api/internal/services/profile-service'
 export { CommentService } from '@substack-api/internal/services/comment-service'
 export { FollowingService } from '@substack-api/internal/services/following-service'

@@ -1,192 +1,428 @@
 import { SubstackClient } from '@substack-api/substack-client'
-import { Profile, FullPost, Note, OwnProfile } from '@substack-api/domain'
+import { Profile, FullPost, Note, Comment, OwnProfile } from '@substack-api/domain'
 import { HttpClient } from '@substack-api/internal/http-client'
 import {
   PostService,
   NoteService,
   ProfileService,
-  ConnectivityService,
-  NewNoteService
+  CommentService,
+  FollowingService,
+  ConnectivityService
 } from '@substack-api/internal/services'
-import { makeGatewayNote } from '@test/unit/fixtures'
+import type { SubstackFullProfile } from '@substack-api/internal'
 
+// Mock the http client and services
 jest.mock('@substack-api/internal/http-client')
 jest.mock('@substack-api/internal/services')
 
-const MockPostService = PostService as jest.MockedClass<typeof PostService>
-const MockNoteService = NoteService as jest.MockedClass<typeof NoteService>
-const MockProfileService = ProfileService as jest.MockedClass<typeof ProfileService>
-const MockConnectivityService = ConnectivityService as jest.MockedClass<typeof ConnectivityService>
-const MockNewNoteService = NewNoteService as jest.MockedClass<typeof NewNoteService>
+// Mock the global fetch function
+global.fetch = jest.fn()
 
 describe('SubstackClient', () => {
   let client: SubstackClient
+  let mockPublicationClient: jest.Mocked<HttpClient>
+  let mockSubstackClient: jest.Mocked<HttpClient>
   let mockPostService: jest.Mocked<PostService>
   let mockNoteService: jest.Mocked<NoteService>
   let mockProfileService: jest.Mocked<ProfileService>
+  let mockCommentService: jest.Mocked<CommentService>
+  let mockFollowingService: jest.Mocked<FollowingService>
   let mockConnectivityService: jest.Mocked<ConnectivityService>
-  let mockNewNoteService: jest.Mocked<NewNoteService>
-
-  const gatewayConfig = {
-    gatewayUrl: 'http://localhost:5001',
-    publicationUrl: 'https://test.substack.com',
-    token: 'dummy-token'
-  }
 
   beforeEach(() => {
     jest.clearAllMocks()
-    client = new SubstackClient(gatewayConfig)
+    mockPublicationClient = new HttpClient('https://test.com', 'test') as jest.Mocked<HttpClient>
+    mockPublicationClient.get = jest.fn()
+    mockPublicationClient.post = jest.fn()
 
-    // Retrieve service instances created inside the SubstackClient constructor
-    mockPostService = MockPostService.mock.instances[0] as jest.Mocked<PostService>
-    mockNoteService = MockNoteService.mock.instances[0] as jest.Mocked<NoteService>
-    mockProfileService = MockProfileService.mock.instances[0] as jest.Mocked<ProfileService>
-    mockConnectivityService = MockConnectivityService.mock
-      .instances[0] as jest.Mocked<ConnectivityService>
-    mockNewNoteService = MockNewNoteService.mock.instances[0] as jest.Mocked<NewNoteService>
-  })
+    mockSubstackClient = new HttpClient('https://substack.com', 'test') as jest.Mocked<HttpClient>
+    mockSubstackClient.get = jest.fn()
+    mockSubstackClient.post = jest.fn()
 
-  describe('constructor', () => {
-    it('should create client instance', () => {
-      expect(client).toBeInstanceOf(SubstackClient)
+    mockPostService = new PostService(mockSubstackClient) as jest.Mocked<PostService>
+    mockPostService.getPostById = jest.fn()
+
+    mockNoteService = new NoteService(mockPublicationClient) as jest.Mocked<NoteService>
+    mockNoteService.getNoteById = jest.fn()
+
+    mockProfileService = new ProfileService(mockSubstackClient) as jest.Mocked<ProfileService>
+    mockProfileService.getOwnProfile = jest.fn()
+    mockProfileService.getProfileById = jest.fn()
+    mockProfileService.getProfileBySlug = jest.fn()
+
+    mockCommentService = new CommentService(mockPublicationClient) as jest.Mocked<CommentService>
+    mockCommentService.getCommentById = jest.fn()
+    mockCommentService.getCommentsForPost = jest.fn()
+
+    mockFollowingService = new FollowingService(
+      mockPublicationClient,
+      mockSubstackClient
+    ) as jest.Mocked<FollowingService>
+    mockFollowingService.getFollowing = jest.fn()
+
+    mockConnectivityService = new ConnectivityService(
+      mockSubstackClient
+    ) as jest.Mocked<ConnectivityService>
+    mockConnectivityService.isConnected = jest.fn()
+
+    client = new SubstackClient({
+      token: 'test-api-key',
+      publicationUrl: 'test.substack.com'
     })
-
-    it('should construct HttpClient with the provided gatewayUrl', () => {
-      jest.clearAllMocks()
-      new SubstackClient(gatewayConfig)
-      expect((HttpClient as jest.MockedClass<typeof HttpClient>).mock.calls[0][0]).toContain(
-        'localhost:5001'
-      )
-    })
-
-    it('should use default gateway URL when gatewayUrl is not provided', () => {
-      jest.clearAllMocks()
-      const { gatewayUrl: _, ...configWithoutUrl } = gatewayConfig
-      new SubstackClient(configWithoutUrl)
-      expect((HttpClient as jest.MockedClass<typeof HttpClient>).mock.calls[0][0]).toContain(
-        'substack-gateway.vercel.app'
-      )
-    })
+    // Replace the internal http clients and services with our mocks
+    ;(client as unknown as { publicationClient: HttpClient }).publicationClient =
+      mockPublicationClient
+    ;(client as unknown as { substackClient: HttpClient }).substackClient = mockSubstackClient
+    ;(client as unknown as { postService: PostService }).postService = mockPostService
+    ;(client as unknown as { noteService: NoteService }).noteService = mockNoteService
+    ;(client as unknown as { profileService: ProfileService }).profileService = mockProfileService
+    ;(client as unknown as { commentService: CommentService }).commentService = mockCommentService
+    ;(client as unknown as { followingService: FollowingService }).followingService =
+      mockFollowingService
+    ;(client as unknown as { connectivityService: ConnectivityService }).connectivityService =
+      mockConnectivityService
   })
 
   describe('testConnectivity', () => {
-    it('should return true when gateway is accessible', async () => {
+    it('should return true when API is accessible', async () => {
       mockConnectivityService.isConnected.mockResolvedValue(true)
-      expect(await client.testConnectivity()).toBe(true)
+      const result = await client.testConnectivity()
+      expect(result).toBe(true)
+      expect(mockConnectivityService.isConnected).toHaveBeenCalled()
     })
 
-    it('should return false when gateway is not accessible', async () => {
+    it('should return false when API is not accessible', async () => {
       mockConnectivityService.isConnected.mockResolvedValue(false)
-      expect(await client.testConnectivity()).toBe(false)
+      const result = await client.testConnectivity()
+      expect(result).toBe(false)
+      expect(mockConnectivityService.isConnected).toHaveBeenCalled()
     })
   })
 
   describe('ownProfile', () => {
-    it('should return OwnProfile when authenticated', async () => {
+    it('should get own profile when authenticated', async () => {
       const mockProfile = {
         id: 123,
         name: 'Test User',
         handle: 'testuser',
-        url: 'https://substack.com/@testuser',
-        avatar_url: 'https://example.com/photo.jpg'
+        photo_url: 'https://example.com/photo.jpg'
       }
       mockProfileService.getOwnProfile.mockResolvedValueOnce(mockProfile)
 
-      const result = await client.ownProfile()
-      expect(result).toBeInstanceOf(OwnProfile)
-      expect(result.id).toBe(123)
+      const ownProfile = await client.ownProfile()
+      expect(ownProfile).toBeInstanceOf(OwnProfile)
+      expect(ownProfile.id).toBe(123)
+      expect(ownProfile.name).toBe('Test User')
+      expect(mockProfileService.getOwnProfile).toHaveBeenCalled()
     })
 
-    it('should throw when authentication fails', async () => {
+    it('should throw error when authentication fails', async () => {
       mockProfileService.getOwnProfile.mockRejectedValue(new Error('Unauthorized'))
+
       await expect(client.ownProfile()).rejects.toThrow('Failed to get own profile: Unauthorized')
     })
+  })
 
-    it('should return OwnProfile with working publishNote method', async () => {
-      const mockProfile = {
+  describe('profileForId', () => {
+    it('should get profile by numeric ID', async () => {
+      const mockProfile: Partial<SubstackFullProfile> = {
         id: 123,
-        name: 'Test User',
         handle: 'testuser',
-        url: 'https://substack.com/@testuser',
-        avatar_url: 'https://example.com/photo.jpg'
+        name: 'Test User',
+        photo_url: 'https://example.com/photo.jpg'
       }
-      mockProfileService.getOwnProfile.mockResolvedValueOnce(mockProfile)
-      mockNewNoteService.publishNote = jest.fn().mockResolvedValue({ id: 42 })
+      mockProfileService.getProfileById.mockResolvedValue(mockProfile as any)
 
-      const profile = await client.ownProfile()
-      const result = await profile.publishNote('Hello world')
+      const profile = await client.profileForId(123)
+      expect(profile).toBeInstanceOf(Profile)
+      expect(mockProfileService.getProfileById).toHaveBeenCalledWith(123)
+    })
 
-      expect(mockNewNoteService.publishNote).toHaveBeenCalledWith('Hello world', undefined)
-      expect(result).toEqual({ id: 42 })
+    it('should handle API error for profileForId', async () => {
+      mockProfileService.getProfileById.mockRejectedValue(new Error('Not found'))
+
+      await expect(client.profileForId(999)).rejects.toThrow(
+        'Profile with ID 999 not found: Not found'
+      )
+    })
+
+    it('should accept large numeric IDs', async () => {
+      const mockProfile: Partial<SubstackFullProfile> = {
+        id: 9876543210,
+        handle: 'testuser',
+        name: 'Test User',
+        photo_url: 'https://example.com/photo.jpg'
+      }
+      mockProfileService.getProfileById.mockResolvedValue(mockProfile as any)
+
+      const profile = await client.profileForId(9876543210)
+      expect(profile).toBeInstanceOf(Profile)
+      expect(mockProfileService.getProfileById).toHaveBeenCalledWith(9876543210)
     })
   })
 
   describe('profileForSlug', () => {
-    it('should return Profile by slug', async () => {
-      const mockProfile = {
+    it('should get profile by slug', async () => {
+      const mockProfile: Partial<SubstackFullProfile> = {
         id: 123,
         handle: 'testuser',
         name: 'Test User',
-        url: 'https://substack.com/@testuser',
-        avatar_url: 'https://example.com/photo.jpg'
+        photo_url: 'https://example.com/photo.jpg'
       }
-      mockProfileService.getProfileBySlug.mockResolvedValue(mockProfile)
+      mockProfileService.getProfileBySlug.mockResolvedValue(mockProfile as any)
 
       const profile = await client.profileForSlug('testuser')
       expect(profile).toBeInstanceOf(Profile)
       expect(mockProfileService.getProfileBySlug).toHaveBeenCalledWith('testuser')
     })
 
-    it('should throw for empty slug', async () => {
+    it('should handle empty slug', async () => {
       await expect(client.profileForSlug('')).rejects.toThrow('Profile slug cannot be empty')
       await expect(client.profileForSlug('   ')).rejects.toThrow('Profile slug cannot be empty')
     })
 
-    it('should throw when profile not found', async () => {
+    it('should handle API error for profileForSlug', async () => {
       mockProfileService.getProfileBySlug.mockRejectedValue(new Error('Not found'))
+
       await expect(client.profileForSlug('nonexistent')).rejects.toThrow(
-        /Profile with slug.*nonexistent.*not found/
+        // eslint-disable-next-line quotes
+        "Profile with slug 'nonexistent' not found: Not found"
       )
     })
   })
 
   describe('postForId', () => {
-    it('should return FullPost by ID', async () => {
+    it('should get post by ID', async () => {
       const mockPost = {
         id: 456,
         title: 'Test Post',
-        slug: 'test-post',
-        url: 'https://example.com/test-post',
-        published_at: '2023-01-01T00:00:00Z',
-        html_body: '<p>Test body</p>'
+        slug: 'test-slug',
+        post_date: '2023-01-01T00:00:00Z',
+        canonical_url: 'https://example.com/test-post',
+        body_html: '<p>Test post body content</p>'
       }
+
+      // Mock the PostService's getPostById method
       mockPostService.getPostById.mockResolvedValueOnce(mockPost)
 
       const post = await client.postForId(456)
       expect(post).toBeInstanceOf(FullPost)
+
+      // Verify that PostService was called with the correct ID
       expect(mockPostService.getPostById).toHaveBeenCalledWith(456)
     })
 
-    it('should throw when post not found', async () => {
+    it('should handle API error for postForId', async () => {
+      // Mock PostService to throw an HTTP error
       mockPostService.getPostById.mockRejectedValueOnce(new Error('HTTP 404: Not found'))
-      await expect(client.postForId(999)).rejects.toThrow('Post with ID 999 not found')
+
+      await expect(client.postForId(999999999)).rejects.toThrow(
+        'Post with ID 999999999 not found: HTTP 404: Not found'
+      )
     })
   })
 
   describe('noteForId', () => {
-    it('should return Note by ID', async () => {
-      const mockNote = makeGatewayNote(789, 'Test note')
-      mockNoteService.getNoteById.mockResolvedValue(mockNote)
+    it('should get note by ID', async () => {
+      const mockNoteData = {
+        entity_key: '789',
+        type: 'note',
+        context: {
+          type: 'feed',
+          timestamp: '2023-01-01T00:00:00Z',
+          users: [
+            {
+              id: 123,
+              name: 'Test User',
+              handle: '',
+              photo_url: '',
+              bio: ''
+            }
+          ],
+          isFresh: false,
+          page: null,
+          page_rank: 1
+        },
+        comment: {
+          id: 789,
+          body: 'Test note',
+          type: 'feed',
+          date: '2023-01-01T00:00:00Z',
+          user_id: 123,
+          post_id: null,
+          name: 'Test User',
+          handle: '',
+          photo_url: '',
+          ancestor_path: '',
+          reply_minimum_role: 'everyone',
+          reaction_count: 0,
+          reactions: {},
+          restacks: 0,
+          restacked: false,
+          children_count: 0,
+          attachments: []
+        },
+        parentComments: [],
+        canReply: true,
+        isMuted: false,
+        trackingParameters: {
+          item_primary_entity_key: '789',
+          item_entity_key: '789',
+          item_type: 'note',
+          item_content_user_id: 123,
+          item_context_type: 'feed',
+          item_context_type_bucket: 'note',
+          item_context_timestamp: '2023-01-01T00:00:00Z',
+          item_context_user_id: 123,
+          item_context_user_ids: [123],
+          item_can_reply: true,
+          item_is_fresh: false,
+          item_last_impression_at: null,
+          item_page: null,
+          item_page_rank: 1,
+          impression_id: 'generated',
+          followed_user_count: 0,
+          subscribed_publication_count: 0,
+          is_following: false,
+          is_explicitly_subscribed: false
+        }
+      }
+      mockNoteService.getNoteById.mockResolvedValue(mockNoteData)
 
       const note = await client.noteForId(789)
       expect(note).toBeInstanceOf(Note)
-      expect(note.id).toBe(789)
+      expect(mockNoteService.getNoteById).toHaveBeenCalledWith(789)
+
+      // Verify Note properties are correctly populated
+      expect(note.id).toBe('789')
       expect(note.body).toBe('Test note')
+      expect(note.author.id).toBe(123)
+      expect(note.author.name).toBe('Test User')
     })
 
-    it('should throw when note not found', async () => {
+    it('should handle API error for noteForId', async () => {
       mockNoteService.getNoteById.mockRejectedValue(new Error('Not found'))
+
       await expect(client.noteForId(999)).rejects.toThrow('Note with ID 999 not found')
+    })
+  })
+
+  describe('commentForId', () => {
+    it('should get comment by ID', async () => {
+      const mockCommentData = {
+        id: 999,
+        body: 'Test comment',
+        created_at: '2023-01-01T00:00:00Z',
+        parent_post_id: 456,
+        author_id: 123,
+        author_name: 'Test User'
+      }
+      mockCommentService.getCommentById.mockResolvedValue(mockCommentData)
+
+      const comment = await client.commentForId(999)
+      expect(comment).toBeInstanceOf(Comment)
+      expect(mockCommentService.getCommentById).toHaveBeenCalledWith(999)
+    })
+  })
+
+  describe('URL normalization', () => {
+    beforeEach(() => {
+      jest.clearAllMocks()
+    })
+
+    it('should prepend https:// to publicationUrl without protocol', () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const clientWithoutProtocol = new SubstackClient({
+        token: 'test-api-key',
+        publicationUrl: 'iam.slys.dev'
+      })
+
+      // Verify HttpClient was constructed with normalized URLs
+      const httpClientCalls = (HttpClient as jest.MockedClass<typeof HttpClient>).mock.calls
+      expect(httpClientCalls[0][0]).toBe('https://iam.slys.dev/api/v1') // publicationClient
+      expect(httpClientCalls[1][0]).toBe('https://substack.com/api/v1') // substackClient (default)
+    })
+
+    it('should preserve https:// protocol in publicationUrl', () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const clientWithHttps = new SubstackClient({
+        token: 'test-api-key',
+        publicationUrl: 'https://iam.slys.dev'
+      })
+
+      const httpClientCalls = (HttpClient as jest.MockedClass<typeof HttpClient>).mock.calls
+      expect(httpClientCalls[0][0]).toBe('https://iam.slys.dev/api/v1')
+    })
+
+    it('should preserve http:// protocol in publicationUrl', () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const clientWithHttp = new SubstackClient({
+        token: 'test-api-key',
+        publicationUrl: 'http://localhost:3000'
+      })
+
+      const httpClientCalls = (HttpClient as jest.MockedClass<typeof HttpClient>).mock.calls
+      expect(httpClientCalls[0][0]).toBe('http://localhost:3000/api/v1')
+    })
+
+    it('should prepend https:// to substackUrl without protocol', () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const clientWithoutProtocol = new SubstackClient({
+        token: 'test-api-key',
+        publicationUrl: 'https://iam.slys.dev',
+        substackUrl: 'custom.substack.com'
+      })
+
+      const httpClientCalls = (HttpClient as jest.MockedClass<typeof HttpClient>).mock.calls
+      expect(httpClientCalls[1][0]).toBe('https://custom.substack.com/api/v1') // substackClient
+    })
+
+    it('should preserve https:// protocol in substackUrl', () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const clientWithHttps = new SubstackClient({
+        token: 'test-api-key',
+        publicationUrl: 'https://iam.slys.dev',
+        substackUrl: 'https://custom.substack.com'
+      })
+
+      const httpClientCalls = (HttpClient as jest.MockedClass<typeof HttpClient>).mock.calls
+      expect(httpClientCalls[1][0]).toBe('https://custom.substack.com/api/v1')
+    })
+
+    it('should preserve http:// protocol in substackUrl', () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const clientWithHttp = new SubstackClient({
+        token: 'test-api-key',
+        publicationUrl: 'https://iam.slys.dev',
+        substackUrl: 'http://localhost:4000'
+      })
+
+      const httpClientCalls = (HttpClient as jest.MockedClass<typeof HttpClient>).mock.calls
+      expect(httpClientCalls[1][0]).toBe('http://localhost:4000/api/v1')
+    })
+
+    it('should handle both URLs without protocol', () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const clientBothWithoutProtocol = new SubstackClient({
+        token: 'test-api-key',
+        publicationUrl: 'iam.slys.dev',
+        substackUrl: 'substack.com'
+      })
+
+      const httpClientCalls = (HttpClient as jest.MockedClass<typeof HttpClient>).mock.calls
+      expect(httpClientCalls[0][0]).toBe('https://iam.slys.dev/api/v1') // publicationClient
+      expect(httpClientCalls[1][0]).toBe('https://substack.com/api/v1') // substackClient
+    })
+
+    it('should normalize default substackUrl when not provided', () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const clientWithDefaultSubstack = new SubstackClient({
+        token: 'test-api-key',
+        publicationUrl: 'iam.slys.dev'
+      })
+
+      const httpClientCalls = (HttpClient as jest.MockedClass<typeof HttpClient>).mock.calls
+      expect(httpClientCalls[1][0]).toBe('https://substack.com/api/v1')
     })
   })
 })

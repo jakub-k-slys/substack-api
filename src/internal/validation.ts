@@ -34,3 +34,13 @@ export function decodeOrThrow<A>(
     )
   )
 }
+
+/**
+ * Safely decode data with io-ts, returning either an error or success
+ * @param codec - The io-ts codec to use for validation
+ * @param data - The raw data to validate
+ * @returns Either validation errors or the parsed data
+ */
+export function decodeEither<A>(codec: t.Type<A, unknown, unknown>, data: unknown) {
+  return codec.decode(data)
+}

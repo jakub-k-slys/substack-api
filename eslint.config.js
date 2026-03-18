@@ -18,7 +18,7 @@ export default [
     }
   },
   {
-    files: ['src/**/*.ts', 'tests/unit/**/*.ts'],
+    files: ['src/**/*.ts', 'tests/unit/**/*.test.ts'],
     languageOptions: {
       parser: tsparser,
       parserOptions: {
@@ -32,7 +32,6 @@ export default [
         RequestInit: 'readonly',
         URLSearchParams: 'readonly',
         Blob: 'readonly',
-        btoa: 'readonly',
         global: 'readonly',
         console: 'readonly',
         jest: 'readonly',
@@ -146,7 +145,6 @@ export default [
         RequestInit: 'readonly',
         URLSearchParams: 'readonly',
         Blob: 'readonly',
-        btoa: 'readonly',
         global: 'readonly',
         jest: 'readonly',
         describe: 'readonly',

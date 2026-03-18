@@ -2,7 +2,7 @@
 
 /**
  * Substack API Client Example
- *
+ * 
  * This sample demonstrates real-world usage of the substack-api library.
  * It showcases authentication, profile management, content fetching, and
  * social features like following users.
@@ -19,20 +19,17 @@ config()
  * Get API credentials from environment or user input
  */
 async function getCredentials(): Promise<{ token: string; publicationUrl: string }> {
-  const envToken = process.env.SUBSTACK_TOKEN
-  const envHostname = process.env.SUBSTACK_HOSTNAME || 'substack.com'
+  const envToken = process.env.SUBSTACK_API_KEY || process.env.E2E_API_KEY
+  const envHostname = process.env.SUBSTACK_HOSTNAME || process.env.E2E_HOSTNAME || 'substack.com'
   const envPublicationUrl = envHostname.startsWith('http') ? envHostname : `https://${envHostname}`
 
   if (envToken) {
-    console.log('✅ Using token from environment variables')
+    console.log('✅ Using API token from environment variables')
     return { token: envToken, publicationUrl: envPublicationUrl }
   }
 
-  console.log('🔑 Credentials not found in environment variables')
-  console.log('Please provide your Substack credentials:')
-  console.log(
-    '  Token: btoa(JSON.stringify({ substack_sid: "<cookie>", connect_sid: "<cookie>" }))'
-  )
+  console.log('🔑 API credentials not found in environment variables')
+  console.log('Please provide your Substack API credentials:')
 
   const rl = createInterface({
     input: process.stdin,
@@ -46,10 +43,8 @@ async function getCredentials(): Promise<{ token: string; publicationUrl: string
   }
 
   try {
-    const token = await question('Enter your token (SUBSTACK_TOKEN): ')
-    const hostname = await question(
-      'Enter your publication URL (e.g., https://yourpub.substack.com): '
-    )
+    const token = await question('Enter your Substack API token: ')
+    const hostname = await question('Enter your publication URL (e.g., https://yourpub.substack.com): ')
     const publicationUrl = hostname.startsWith('http') ? hostname : `https://${hostname}`
 
     rl.close()
@@ -71,7 +66,7 @@ async function runExample(): Promise<void> {
     const { token, publicationUrl } = await getCredentials()
 
     if (!token) {
-      console.log('❌ Token is required to run this example')
+      console.log('❌ API token is required to run this example')
       process.exit(1)
     }
 
@@ -88,7 +83,7 @@ async function runExample(): Promise<void> {
 
     if (!isConnected) {
       console.log('❌ Failed to connect to Substack API')
-      console.log('Please check your token and network connection')
+      console.log('Please check your API key and network connection')
       process.exit(1)
     }
 
@@ -120,6 +115,7 @@ async function runExample(): Promise<void> {
         console.log(
           `      Published: ${post.publishedAt ? post.publishedAt.toLocaleDateString() : 'Unknown'}`
         )
+        console.log(`      Author: ${post.author.name} (@${post.author.handle})`)
         console.log(`      Post ID: ${post.id}`)
         console.log('')
       }
@@ -160,9 +156,9 @@ async function runExample(): Promise<void> {
       console.log(`   ⚠️  Could not fetch following: ${(error as Error).message}`)
     }
 
-    // 7. Fetching a foreign profile by slug
-    console.log('\n👤 Fetching foreign profile (platformer)...')
-    const foreignProfile = await client.profileForSlug('platformer')
+    // 7. Fetching foreign profile
+    console.log('\n👤 Fetching foreign profile...')
+    const foreignProfile = await client.profileForId(343074721)
 
     console.log(`📋 Profile Information:`)
     console.log(`   Name: ${foreignProfile.name}`)
@@ -172,7 +168,7 @@ async function runExample(): Promise<void> {
       console.log(`   Bio: ${foreignProfile.bio}`)
     }
 
-    console.log('\n📝 Fetching 3 most recent notes from foreign profile...')
+    console.log('\n📝 Fetching your 3 most recent notes...')
     try {
       for await (const note of foreignProfile.notes({ limit: 3 })) {
         const preview = note.body.length > 100 ? note.body.substring(0, 97) + '...' : note.body
@@ -188,7 +184,7 @@ async function runExample(): Promise<void> {
       console.log(`   ⚠️  Could not fetch notes: ${(error as Error).message}`)
     }
 
-    console.log('\n📝 Fetching 3 most recent posts from foreign profile...')
+    console.log('\n📝 Fetching your 3 most recent posts...')
     try {
       for await (const post of foreignProfile.posts({ limit: 3 })) {
         console.log(`   "${post.title}"`)
@@ -200,6 +196,7 @@ async function runExample(): Promise<void> {
         console.log(
           `      Published: ${post.publishedAt ? post.publishedAt.toLocaleDateString() : 'Unknown'}`
         )
+        console.log(`      Author: ${post.author.name} (@${post.author.handle})`)
         console.log('')
       }
     } catch (error) {
@@ -251,37 +248,113 @@ async function runExample(): Promise<void> {
     }
 
     // 9. Creating notes (COMMENTED OUT - uncomment to test note creation)
-    /*
+/*
     console.log('\n📝 Note Creation Examples (commented out to prevent accidental publishing)')
 
-    // Example: Create a simple note using Markdown
+    // Example: Create a simple note
     console.log('\n📝 Creating a simple note...')
     try {
-      const noteResponse = await profile.publishNote(
-        'This is a test note created via the **Substack API**!\n\n' +
-          'It supports _italic text_, `code snippets`, and [external links](https://substack.com).'
-      )
+      const noteResponse = await profile
+        .newNote()
+        .paragraph()
+        .text('This is a test note created via the ')
+        .bold('Substack API')
+        .text('! 🚀')
+        .paragraph()
+        .text('It supports various formatting options like ')
+        .italic('italic text')
+        .text(', ')
+        .code('code snippets')
+        .text(', and ')
+        .link('external links', 'https://substack.com')
+        .text('.')
+        .publish()
 
       console.log(`✅ Note published successfully!`)
       console.log(`   Note ID: ${noteResponse.id}`)
+      console.log(`   Published at: ${noteResponse.date}`)
     } catch (error) {
       console.log(`   ❌ Failed to create note: ${(error as Error).message}`)
     }
+        // Example: Create a note with link attachment
+        console.log('\n🔗 Creating a note with link attachment...')
+        try {
+          const noteWithLinkResponse = await profile
+            .newNoteWithLink('https://iam.slys.dev/p/friends-bring-friends')
+            .paragraph()
+            .text('Check out the ')
+            .bold('Substack API documentation')
+            .text(' - it has everything you need to get started!')
+            .paragraph()
+            .text('Key features covered:')
+            .bulletList()
+            .item()
+            .text('Authentication and setup')
+            .item()
+            .text('Profile and content management')
+            .item()
+            .text('Social features like following users')
+            .item()
+            .text('Advanced formatting options')
+            .finish()
+            .paragraph()
+            .text('The link is automatically attached to this note. 📎')
+            .publish()
 
-    // Example: Create a note with a link attachment
-    console.log('\n📝 Creating a note with link attachment...')
-    try {
-      const noteWithLink = await profile.publishNote('Check out this article!', {
-        attachment: 'https://substack.com'
-      })
+          console.log(`✅ Note with link attachment published successfully!`)
+          console.log(`   Note ID: ${noteWithLinkResponse.id}`)
+          console.log(`   Published at: ${noteWithLinkResponse.date}`)
+          console.log(`   Attachments: ${noteWithLinkResponse.attachments?.length || 0}`)
 
-      console.log(`✅ Note with link published successfully!`)
-      console.log(`   Note ID: ${noteWithLink.id}`)
-    } catch (error) {
-      console.log(`   ❌ Failed to create note: ${(error as Error).message}`)
-    }
-    */
+        } catch (error) {
+          console.log(`   ❌ Failed to create note with link: ${(error as Error).message}`)
+        }
 
+        // Example: Create a complex formatted note
+        console.log('\n✨ Creating a complex formatted note...')
+        try {
+          const complexNoteResponse = await profile
+            .newNote()
+            .paragraph()
+            .text('🎯 ')
+            .bold('Weekly Development Update')
+            .paragraph()
+            .text('This week I focused on:')
+            .numberedList()
+            .item()
+            .bold('API Integration')
+            .text(' - Connected to ')
+            .link('Substack API', 'https://substack.com/api')
+            .item()
+            .italic('Code Quality')
+            .text(' - Added comprehensive ')
+            .code('unit tests')
+            .item()
+            .underline('Documentation')
+            .text(' - Updated README and examples')
+            .finish()
+            .paragraph()
+            .text('Next week\'s priorities:')
+            .bulletList()
+            .item()
+            .text('Performance optimization')
+            .item()
+            .text('Error handling improvements')
+            .item()
+            .text('Integration testing')
+            .finish()
+            .paragraph()
+            .text('Feel free to reach out with any questions! 💬')
+            .publish()
+
+          console.log(`✅ Complex formatted note published successfully!`)
+          console.log(`   Note ID: ${complexNoteResponse.id}`)
+          console.log(`   Content length: ${complexNoteResponse.body?.length || 0} characters`)
+
+        } catch (error) {
+          console.log(`   ❌ Failed to create complex note: ${(error as Error).message}`)
+        }
+*/
     console.log('   💡 To test note creation, uncomment the examples above')
     console.log('   ⚠️  Warning: Uncommenting will publish real notes to your Substack!')
 
@@ -291,16 +364,14 @@ async function runExample(): Promise<void> {
   } catch (error) {
     console.error('\n❌ Error running example:')
     console.error((error as Error).message)
-
-    if (
-      (error as Error).message.includes('401') ||
-      (error as Error).message.includes('Unauthorized')
-    ) {
+    
+    if ((error as Error).message.includes('401') || (error as Error).message.includes('Unauthorized')) {
       console.error('\n💡 This might be an authentication issue. Please check:')
-      console.error('   • Your token is correct')
+      console.error('   • Your API token is correct')
       console.error('   • Your publication URL is correct')
+      console.error('   • Your API token has the necessary permissions')
     }
-
+    
     process.exit(1)
   }
 }
