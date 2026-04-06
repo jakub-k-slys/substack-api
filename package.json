@@ -50,7 +50,7 @@
     "@typescript-eslint/eslint-plugin": "^8.34.1",
     "@typescript-eslint/parser": "^8.34.1",
     "dotenv": "^17.0.0",
-    "eslint": "^9.29.0",
+    "eslint": "^10.2.0",
     "eslint-plugin-prettier": "^5.5.0",
     "jest": "^30.0.0",
     "jest-junit": "^16.0.0",
