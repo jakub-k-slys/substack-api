@@ -28,7 +28,7 @@ jobs:
             - name: Install
               run: pnpm install
             - name: Semantic Release
-              uses: cycjimmy/semantic-release-action@v4
+              uses: cycjimmy/semantic-release-action@v6
               id: semantic
               with:
                   tag_format: ${version}
@@ -36,6 +36,7 @@ jobs:
                       @semantic-release/changelog@6.0.0
                       @semantic-release/npm
                       @semantic-release/git
+                      @semantic-release/github
               env:
                   GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
                   SUBSTACK_API_KEY: ${{ secrets.SUBSTACK_API_KEY }}
