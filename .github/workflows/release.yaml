@@ -27,10 +27,6 @@ jobs:
                   cache: 'pnpm'
             - name: Install
               run: pnpm install
-            - name: set NODE_AUTH_TOKEN env
-              run: echo "NODE_AUTH_TOKEN=${{ secrets.NPM_TOKEN }}" >> $GITHUB_ENV
-            - name: set NPM_TOKEN env
-              run: echo "NPM_TOKEN=${{ secrets.NPM_TOKEN }}" >> $GITHUB_ENV
             - name: Semantic Release
               uses: cycjimmy/semantic-release-action@v4
               id: semantic
@@ -42,8 +38,5 @@ jobs:
                       @semantic-release/git
               env:
                   GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
                   SUBSTACK_API_KEY: ${{ secrets.SUBSTACK_API_KEY }}
                   SUBSTACK_HOSTNAME: ${{ secrets.SUBSTACK_HOSTNAME }}
-            - name: set VERSION env
-              run: echo "VERSION=${{ steps.semantic.outputs.new_release_version }}" >> $GITHUB_ENV
