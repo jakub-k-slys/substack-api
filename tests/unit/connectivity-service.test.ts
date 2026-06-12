@@ -1,8 +1,8 @@
-import { ConnectivityService } from '@substack-api/internal/services/connectivity-service'
-import { HttpClient } from '@substack-api/internal/http-client'
+import { ConnectivityService } from '@substackular/internal/services/connectivity-service'
+import { HttpClient } from '@substackular/internal/http-client'
 
 // Mock the HttpClient
-jest.mock('@substack-api/internal/http-client')
+jest.mock('@substackular/internal/http-client')
 
 describe('ConnectivityService', () => {
   let connectivityService: ConnectivityService
@@ -10,7 +10,9 @@ describe('ConnectivityService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockSubstackClient = new HttpClient('https://test.com', 'test') as jest.Mocked<HttpClient>
+    mockSubstackClient = new HttpClient('https://test.com', {
+      substackSid: 'test'
+    }) as jest.Mocked<HttpClient>
     mockSubstackClient.put = jest.fn()
 
     connectivityService = new ConnectivityService(mockSubstackClient)

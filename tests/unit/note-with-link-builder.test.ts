@@ -1,8 +1,8 @@
-import { NoteWithLinkBuilder } from '@substack-api/domain/note-builder'
-import { HttpClient } from '@substack-api/internal/http-client'
+import { NoteWithLinkBuilder } from '@substackular/domain/note-builder'
+import { HttpClient } from '@substackular/internal/http-client'
 
 // Mock HttpClient
-jest.mock('@substack-api/internal/http-client')
+jest.mock('@substackular/internal/http-client')
 const MockHttpClient = HttpClient as jest.MockedClass<typeof HttpClient>
 
 describe('NoteWithLinkBuilder', () => {
@@ -10,10 +10,9 @@ describe('NoteWithLinkBuilder', () => {
   let builder: NoteWithLinkBuilder
 
   beforeEach(() => {
-    mockClient = new MockHttpClient(
-      'https://example.com',
-      'test-api-key'
-    ) as jest.Mocked<HttpClient>
+    mockClient = new MockHttpClient('https://example.com', {
+      substackSid: 'test-api-key'
+    }) as jest.Mocked<HttpClient>
     builder = new NoteWithLinkBuilder(mockClient, 'https://example.com/test')
   })
 

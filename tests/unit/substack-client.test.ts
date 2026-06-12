@@ -1,6 +1,6 @@
-import { SubstackClient } from '@substack-api/substack-client'
-import { Profile, FullPost, Note, Comment, OwnProfile } from '@substack-api/domain'
-import { HttpClient } from '@substack-api/internal/http-client'
+import { SubstackClient } from '@substackular/substack-client'
+import { Profile, FullPost, Note, Comment, OwnProfile } from '@substackular/domain'
+import { HttpClient } from '@substackular/internal/http-client'
 import {
   PostService,
   NoteService,
@@ -8,12 +8,12 @@ import {
   CommentService,
   FollowingService,
   ConnectivityService
-} from '@substack-api/internal/services'
-import type { SubstackFullProfile } from '@substack-api/internal'
+} from '@substackular/internal/services'
+import type { SubstackFullProfile } from '@substackular/internal'
 
 // Mock the http client and services
-jest.mock('@substack-api/internal/http-client')
-jest.mock('@substack-api/internal/services')
+jest.mock('@substackular/internal/http-client')
+jest.mock('@substackular/internal/services')
 
 // Mock the global fetch function
 global.fetch = jest.fn()
@@ -31,11 +31,15 @@ describe('SubstackClient', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockPublicationClient = new HttpClient('https://test.com', 'test') as jest.Mocked<HttpClient>
+    mockPublicationClient = new HttpClient('https://test.com', {
+      substackSid: 'test'
+    }) as jest.Mocked<HttpClient>
     mockPublicationClient.get = jest.fn()
     mockPublicationClient.post = jest.fn()
 
-    mockSubstackClient = new HttpClient('https://substack.com', 'test') as jest.Mocked<HttpClient>
+    mockSubstackClient = new HttpClient('https://substack.com', {
+      substackSid: 'test'
+    }) as jest.Mocked<HttpClient>
     mockSubstackClient.get = jest.fn()
     mockSubstackClient.post = jest.fn()
 

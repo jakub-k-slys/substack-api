@@ -1,9 +1,9 @@
-import { NoteService } from '@substack-api/internal/services/note-service'
-import { HttpClient } from '@substack-api/internal/http-client'
-import type { SubstackCommentResponse } from '@substack-api/internal'
+import { NoteService } from '@substackular/internal/services/note-service'
+import { HttpClient } from '@substackular/internal/http-client'
+import type { SubstackCommentResponse } from '@substackular/internal'
 
 // Mock the http client
-jest.mock('@substack-api/internal/http-client')
+jest.mock('@substackular/internal/http-client')
 
 describe('NoteService', () => {
   let noteService: NoteService
@@ -12,10 +12,29 @@ describe('NoteService', () => {
   beforeEach(() => {
     jest.clearAllMocks()
 
-    mockPublicationClient = new HttpClient('https://test.com', 'test') as jest.Mocked<HttpClient>
+    mockPublicationClient = new HttpClient('https://test.com', {
+      substackSid: 'test'
+    }) as jest.Mocked<HttpClient>
     mockPublicationClient.get = jest.fn()
+    mockPublicationClient.delete = jest.fn()
 
     noteService = new NoteService(mockPublicationClient)
+  })
+
+  describe('deleteNote', () => {
+    it('should delete a note via the comment endpoint', async () => {
+      mockPublicationClient.delete.mockResolvedValueOnce(undefined)
+
+      await noteService.deleteNote(123)
+
+      expect(mockPublicationClient.delete).toHaveBeenCalledWith('/comment/123')
+    })
+
+    it('should propagate errors from the HTTP client', async () => {
+      mockPublicationClient.delete.mockRejectedValueOnce(new Error('HTTP 404: Not Found'))
+
+      await expect(noteService.deleteNote(999)).rejects.toThrow('HTTP 404: Not Found')
+    })
   })
 
   describe('getNoteById', () => {

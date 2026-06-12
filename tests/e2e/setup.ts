@@ -7,15 +7,23 @@ dotenv.config()
 declare global {
   var E2E_CONFIG: {
     hasCredentials: boolean
-    token?: string
+    substackSid?: string
+    connectSid?: string
     publicationUrl?: string
   }
 
-  function getTestCredentials(): { token: string; publicationUrl?: string } | null
+  function getTestCredentials(): {
+    substackSid?: string
+    connectSid?: string
+    publicationUrl?: string
+  } | null
 }
 
 // Check for credentials but don't fail early - let individual tests handle missing credentials
-const token = process.env.SUBSTACK_API_KEY || process.env.E2E_API_KEY
+// SUBSTACK_API_KEY / E2E_API_KEY are legacy substack-api names for the substack.sid value
+const substackSid =
+  process.env.SUBSTACK_SID || process.env.SUBSTACK_API_KEY || process.env.E2E_API_KEY
+const connectSid = process.env.CONNECT_SID
 const hostname = process.env.SUBSTACK_HOSTNAME || process.env.E2E_HOSTNAME
 
 // Convert hostname to full URL if it doesn't start with http
@@ -25,10 +33,11 @@ const publicationUrl = hostname
     : `https://${hostname}`
   : undefined
 
-if (token) {
+if (substackSid || connectSid) {
   global.E2E_CONFIG = {
     hasCredentials: true,
-    token,
+    substackSid,
+    connectSid,
     publicationUrl
   }
 } else {
@@ -38,10 +47,18 @@ if (token) {
 }
 
 // Helper function to get credentials for tests
-global.getTestCredentials = (): { token: string; publicationUrl?: string } | null => {
-  if (global.E2E_CONFIG.hasCredentials && global.E2E_CONFIG.token) {
+global.getTestCredentials = (): {
+  substackSid?: string
+  connectSid?: string
+  publicationUrl?: string
+} | null => {
+  if (
+    global.E2E_CONFIG.hasCredentials &&
+    (global.E2E_CONFIG.substackSid || global.E2E_CONFIG.connectSid)
+  ) {
     return {
-      token: global.E2E_CONFIG.token,
+      substackSid: global.E2E_CONFIG.substackSid,
+      connectSid: global.E2E_CONFIG.connectSid,
       publicationUrl: global.E2E_CONFIG.publicationUrl
     }
   }

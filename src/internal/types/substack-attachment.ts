@@ -1,4 +1,4 @@
-import type { SubstackLinkMetadata } from '@substack-api/internal/types/substack-link-metadata'
+import type { SubstackLinkMetadata } from '@substackular/internal/types/substack-link-metadata'
 
 /**
  * Attachment information in flattened form

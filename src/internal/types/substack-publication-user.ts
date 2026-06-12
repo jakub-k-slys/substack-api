@@ -1,4 +1,4 @@
-import type { SubstackProfilePublication } from '@substack-api/internal/types/substack-profile-publication'
+import type { SubstackProfilePublication } from '@substackular/internal/types/substack-profile-publication'
 
 /**
  * Publication user relationship information

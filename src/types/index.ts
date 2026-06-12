@@ -3,5 +3,5 @@
  * These are the clean, stable types that users should depend on
  */
 
-export * from '@substack-api/types/domain-config'
-export * from '@substack-api/types/domain-options'
+export * from '@substackular/types/domain-config'
+export * from '@substackular/types/domain-options'

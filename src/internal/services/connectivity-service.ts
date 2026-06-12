@@ -1,4 +1,4 @@
-import type { HttpClient } from '@substack-api/internal/http-client'
+import type { HttpClient } from '@substackular/internal/http-client'
 
 /**
  * Service responsible for checking API connectivity and session validity

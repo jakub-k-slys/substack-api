@@ -1,13 +1,13 @@
-import type { SubstackPublicProfile, SubstackFullProfile } from '@substack-api/internal'
-import type { HttpClient } from '@substack-api/internal/http-client'
+import type { SubstackPublicProfile, SubstackFullProfile } from '@substackular/internal'
+import type { HttpClient } from '@substackular/internal/http-client'
 import type {
   ProfileService,
   CommentService,
   PostService,
   NoteService
-} from '@substack-api/internal/services'
-import { PreviewPost } from '@substack-api/domain/post'
-import { Note } from '@substack-api/domain/note'
+} from '@substackular/internal/services'
+import { PreviewPost } from '@substackular/domain/post'
+import { Note } from '@substackular/domain/note'
 
 /**
  * Base Profile class representing a Substack user profile (read-only)

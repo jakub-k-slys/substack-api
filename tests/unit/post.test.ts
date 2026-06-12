@@ -1,8 +1,8 @@
-import { FullPost, PreviewPost } from '@substack-api/domain/post'
-import { Comment } from '@substack-api/domain/comment'
-import { CommentService } from '@substack-api/internal/services/comment-service'
-import { PostService } from '@substack-api/internal/services/post-service'
-import type { HttpClient } from '@substack-api/internal/http-client'
+import { FullPost, PreviewPost } from '@substackular/domain/post'
+import { Comment } from '@substackular/domain/comment'
+import { CommentService } from '@substackular/internal/services/comment-service'
+import { PostService } from '@substackular/internal/services/post-service'
+import type { HttpClient } from '@substackular/internal/http-client'
 
 describe('PreviewPost Entity', () => {
   let mockPublicationClient: jest.Mocked<HttpClient>

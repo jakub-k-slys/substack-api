@@ -1,8 +1,8 @@
-import { FollowingService } from '@substack-api/internal/services/following-service'
-import { HttpClient } from '@substack-api/internal/http-client'
+import { FollowingService } from '@substackular/internal/services/following-service'
+import { HttpClient } from '@substackular/internal/http-client'
 
 // Mock the http client
-jest.mock('@substack-api/internal/http-client')
+jest.mock('@substackular/internal/http-client')
 
 describe('FollowingService', () => {
   let followingService: FollowingService
@@ -12,13 +12,14 @@ describe('FollowingService', () => {
   beforeEach(() => {
     jest.clearAllMocks()
 
-    mockPublicationClient = new HttpClient(
-      'https://test.substack.com',
-      'test'
-    ) as jest.Mocked<HttpClient>
+    mockPublicationClient = new HttpClient('https://test.substack.com', {
+      substackSid: 'test'
+    }) as jest.Mocked<HttpClient>
     mockPublicationClient.get = jest.fn()
 
-    mockSubstackClient = new HttpClient('https://substack.com', 'test') as jest.Mocked<HttpClient>
+    mockSubstackClient = new HttpClient('https://substack.com', {
+      substackSid: 'test'
+    }) as jest.Mocked<HttpClient>
     mockSubstackClient.put = jest.fn()
 
     followingService = new FollowingService(mockPublicationClient, mockSubstackClient)

@@ -1,10 +1,11 @@
-import { FullPost } from '@substack-api/domain'
-import { SubstackClient } from '@substack-api/substack-client'
+import { FullPost } from '@substackular/domain'
+import { SubstackClient } from '@substackular/substack-client'
 import axios from 'axios'
 import type { AxiosInstance } from 'axios'
 
 jest.mock('axios')
 jest.mock('axios-rate-limit', () => (instance: AxiosInstance) => instance)
+jest.mock('axios-retry', () => ({ __esModule: true, default: jest.fn() }))
 
 const mockedAxios = axios as jest.Mocked<typeof axios>
 

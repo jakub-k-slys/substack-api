@@ -1,4 +1,4 @@
-import type { NoteBodyJson } from '@substack-api/internal/types/note-body-json'
+import type { NoteBodyJson } from '@substackular/internal/types/note-body-json'
 
 export interface PublishNoteRequest {
   bodyJson: NoteBodyJson

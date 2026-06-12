@@ -1,7 +1,7 @@
-import type { SubstackNote, PaginatedSubstackNotes } from '@substack-api/internal/types'
-import { SubstackCommentResponseCodec } from '@substack-api/internal/types'
-import { decodeOrThrow } from '@substack-api/internal/validation'
-import type { HttpClient } from '@substack-api/internal/http-client'
+import type { SubstackNote, PaginatedSubstackNotes } from '@substackular/internal/types'
+import { SubstackCommentResponseCodec } from '@substackular/internal/types'
+import { decodeOrThrow } from '@substackular/internal/validation'
+import type { HttpClient } from '@substackular/internal/http-client'
 
 /**
  * Service responsible for note-related HTTP operations
@@ -71,6 +71,15 @@ export class NoteService {
       notes: response.items || [],
       nextCursor: response.nextCursor
     }
+  }
+
+  /**
+   * Delete a note by ID
+   * @param noteId - The note (comment) ID to delete
+   * @throws {Error} When the note cannot be deleted (not found, not owned by the user)
+   */
+  async deleteNote(noteId: number | string): Promise<void> {
+    await this.publicationClient.delete(`/comment/${noteId}`)
   }
 
   /**

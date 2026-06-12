@@ -1,5 +1,5 @@
-import { NoteBuilder, NoteWithLinkBuilder } from '@substack-api/domain/note-builder'
-import type { HttpClient } from '@substack-api/internal/http-client'
+import { NoteBuilder, NoteWithLinkBuilder } from '@substackular/domain/note-builder'
+import type { HttpClient } from '@substackular/internal/http-client'
 
 /**
  * Service responsible for creating new notes

@@ -4,9 +4,9 @@ import {
   PublishNoteRequest,
   PublishNoteResponse,
   PublishNoteResponseCodec
-} from '@substack-api/internal'
-import { HttpClient } from '@substack-api/internal/http-client'
-import { decodeOrThrow } from '@substack-api/internal/validation'
+} from '@substackular/internal'
+import { HttpClient } from '@substackular/internal/http-client'
+import { decodeOrThrow } from '@substackular/internal/validation'
 
 interface TextSegment {
   text: string

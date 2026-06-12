@@ -3,9 +3,9 @@ import {
   ParagraphBuilder,
   ListBuilder,
   ListItemBuilder
-} from '@substack-api/domain/note-builder'
-import type { HttpClient } from '@substack-api/internal/http-client'
-import type { PublishNoteResponse } from '@substack-api/internal'
+} from '@substackular/domain/note-builder'
+import type { HttpClient } from '@substackular/internal/http-client'
+import type { PublishNoteResponse } from '@substackular/internal'
 
 describe('NoteBuilder', () => {
   let mockPublicationClient: jest.Mocked<HttpClient>

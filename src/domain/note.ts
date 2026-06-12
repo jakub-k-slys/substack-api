@@ -1,6 +1,6 @@
-import type { SubstackNote } from '@substack-api/internal'
-import type { HttpClient } from '@substack-api/internal/http-client'
-import { Comment } from '@substack-api/domain/comment'
+import type { SubstackNote } from '@substackular/internal'
+import type { HttpClient } from '@substackular/internal/http-client'
+import { Comment } from '@substackular/domain/comment'
 
 /**
  * Note entity representing a Substack note
@@ -52,6 +52,17 @@ export class Note {
         yield new Comment(commentData, this.publicationClient)
       }
     }
+  }
+
+  /**
+   * Delete this note. Only notes belonging to the authenticated user can be deleted.
+   */
+  async delete(): Promise<void> {
+    const commentId = this.rawData.comment?.id
+    if (!commentId) {
+      throw new Error('Cannot delete note: no comment ID available')
+    }
+    await this.publicationClient.delete(`/comment/${commentId}`)
   }
 
   /**

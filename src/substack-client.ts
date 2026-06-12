@@ -1,5 +1,5 @@
-import { HttpClient } from '@substack-api/internal/http-client'
-import { Comment, FullPost, Note, OwnProfile, Profile } from '@substack-api/domain'
+import { HttpClient } from '@substackular/internal/http-client'
+import { Comment, FullPost, Note, OwnProfile, Profile } from '@substackular/domain'
 import {
   CommentService,
   ConnectivityService,
@@ -8,8 +8,8 @@ import {
   NoteService,
   PostService,
   ProfileService
-} from '@substack-api/internal/services'
-import type { SubstackConfig } from '@substack-api/types'
+} from '@substackular/internal/services'
+import type { SubstackConfig } from '@substackular/types'
 
 /**
  * Modern SubstackClient with entity-based API
@@ -47,19 +47,28 @@ export class SubstackClient {
 
     // Store configuration
     this.perPage = config.perPage || 25
-    const maxRequestsPerSecond = config.maxRequestsPerSecond || 25
+    const httpOptions = {
+      maxRequestsPerSecond: config.maxRequestsPerSecond || 25,
+      retryAttempts: config.retryAttempts
+    }
+
+    // config.token is the deprecated substack-api name for the "substack.sid" cookie value
+    const auth = {
+      substackSid: config.substackSid ?? config.token,
+      connectSid: config.connectSid
+    }
 
     // Construct full base URL for publication-specific endpoints
     const publicationBaseUrl = urlPrefix
       ? `${normalizedPublicationUrl}/${urlPrefix}`
       : normalizedPublicationUrl
-    this.publicationClient = new HttpClient(publicationBaseUrl, config.token, maxRequestsPerSecond)
+    this.publicationClient = new HttpClient(publicationBaseUrl, auth, httpOptions)
 
     // Construct full base URL for global Substack endpoints
     const substackBaseUrl = urlPrefix
       ? `${normalizedSubstackUrl}/${urlPrefix}`
       : normalizedSubstackUrl
-    this.substackClient = new HttpClient(substackBaseUrl, config.token, maxRequestsPerSecond)
+    this.substackClient = new HttpClient(substackBaseUrl, auth, httpOptions)
 
     // Initialize services
     this.postService = new PostService(this.substackClient)

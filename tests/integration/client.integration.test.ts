@@ -1,5 +1,5 @@
-import { SubstackClient } from '@substack-api/substack-client'
-import { Profile, OwnProfile, Comment, FullPost } from '@substack-api/domain'
+import { SubstackClient } from '@substackular/substack-client'
+import { Profile, OwnProfile, Comment, FullPost } from '@substackular/domain'
 import { get } from 'http'
 
 describe('SubstackClient Integration Tests', () => {

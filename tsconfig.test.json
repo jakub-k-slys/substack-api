@@ -1,10 +1,12 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true,
     "types": ["jest", "node"],
     "paths": {
-      "@substack-api/*": ["src/*"],
-      "@test/*": ["tests/*"]
+      "@substackular/*": ["./src/*"],
+      "@test/*": ["./tests/*"]
     }
   },
   "include": ["src/**/*", "tests/**/*"],

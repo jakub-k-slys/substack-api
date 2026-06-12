@@ -1,4 +1,4 @@
-import { SubstackClient } from '@substack-api/substack-client'
+import { SubstackClient } from '@substackular/substack-client'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 

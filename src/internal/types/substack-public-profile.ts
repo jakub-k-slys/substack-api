@@ -1,8 +1,8 @@
-import type { SubstackUser } from '@substack-api/internal/types/substack-user'
-import type { SubstackPublicationBase } from '@substack-api/internal/types/substack-publication-base'
-import type { SubstackUserLink } from '@substack-api/internal/types/substack-user-link'
-import type { SubstackPublicationUser } from '@substack-api/internal/types/substack-publication-user'
-import type { SubstackProfileSubscription } from '@substack-api/internal/types/substack-profile-subscription'
+import type { SubstackUser } from '@substackular/internal/types/substack-user'
+import type { SubstackPublicationBase } from '@substackular/internal/types/substack-publication-base'
+import type { SubstackUserLink } from '@substackular/internal/types/substack-user-link'
+import type { SubstackPublicationUser } from '@substackular/internal/types/substack-publication-user'
+import type { SubstackProfileSubscription } from '@substackular/internal/types/substack-profile-subscription'
 
 export interface SubstackPublicProfile extends SubstackUser {
   tos_accepted_at?: string | null

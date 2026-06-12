@@ -1,9 +1,9 @@
-import { PostService } from '@substack-api/internal/services/post-service'
-import { HttpClient } from '@substack-api/internal/http-client'
-import type { SubstackFullPost, SubstackPreviewPost } from '@substack-api/internal'
+import { PostService } from '@substackular/internal/services/post-service'
+import { HttpClient } from '@substackular/internal/http-client'
+import type { SubstackFullPost, SubstackPreviewPost } from '@substackular/internal'
 
 // Mock the http client
-jest.mock('@substack-api/internal/http-client')
+jest.mock('@substackular/internal/http-client')
 
 describe('PostService', () => {
   let postService: PostService
@@ -13,13 +13,14 @@ describe('PostService', () => {
   beforeEach(() => {
     jest.clearAllMocks()
 
-    mockSubstackClient = new HttpClient('https://substack.com', 'test') as jest.Mocked<HttpClient>
+    mockSubstackClient = new HttpClient('https://substack.com', {
+      substackSid: 'test'
+    }) as jest.Mocked<HttpClient>
     mockSubstackClient.get = jest.fn()
 
-    mockPublicationClient = new HttpClient(
-      'https://test.substack.com',
-      'test'
-    ) as jest.Mocked<HttpClient>
+    mockPublicationClient = new HttpClient('https://test.substack.com', {
+      substackSid: 'test'
+    }) as jest.Mocked<HttpClient>
     mockPublicationClient.get = jest.fn()
 
     postService = new PostService(mockSubstackClient)

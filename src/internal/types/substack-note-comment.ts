@@ -1,5 +1,5 @@
-import type { SubstackAttachment } from '@substack-api/internal/types/substack-attachment'
-import type { SubstackPublication } from '@substack-api/internal/types/substack-publication'
+import type { SubstackAttachment } from '@substackular/internal/types/substack-attachment'
+import type { SubstackPublication } from '@substackular/internal/types/substack-publication'
 
 export interface SubstackNoteComment {
   name: string

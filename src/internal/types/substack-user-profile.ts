@@ -1,5 +1,5 @@
 import * as t from 'io-ts'
-import { SubstackProfileItemContextCodec } from '@substack-api/internal/types/substack-profile-item-context'
+import { SubstackProfileItemContextCodec } from '@substackular/internal/types/substack-profile-item-context'
 
 /**
  * Minimal codec for user profile feed - only validates the context.users array

@@ -1,7 +1,7 @@
-import { OwnProfile } from '@substack-api/domain/own-profile'
-import { Note } from '@substack-api/domain/note'
-import { Profile } from '@substack-api/domain/profile'
-import { NoteBuilder, NoteWithLinkBuilder } from '@substack-api/domain/note-builder'
+import { OwnProfile } from '@substackular/domain/own-profile'
+import { Note } from '@substackular/domain/note'
+import { Profile } from '@substackular/domain/profile'
+import { NoteBuilder, NoteWithLinkBuilder } from '@substackular/domain/note-builder'
 import {
   ProfileService,
   PostService,
@@ -9,9 +9,9 @@ import {
   CommentService,
   FollowingService,
   NewNoteService
-} from '@substack-api/internal/services'
-import type { SubstackFullProfile } from '@substack-api/internal'
-import type { HttpClient } from '@substack-api/internal/http-client'
+} from '@substackular/internal/services'
+import type { SubstackFullProfile } from '@substackular/internal'
+import type { HttpClient } from '@substackular/internal/http-client'
 
 describe('OwnProfile Entity', () => {
   let mockProfileData: SubstackFullProfile
@@ -21,6 +21,7 @@ describe('OwnProfile Entity', () => {
   let mockNoteService: jest.Mocked<NoteService>
   let mockFollowingService: jest.Mocked<FollowingService>
   let mockNewNoteService: jest.Mocked<NewNoteService>
+  let mockClient: jest.Mocked<HttpClient>
   let ownProfile: OwnProfile
 
   beforeEach(() => {
@@ -33,9 +34,10 @@ describe('OwnProfile Entity', () => {
     } as SubstackFullProfile
 
     // Mock the legacy client
-    const mockClient = {
+    mockClient = {
       get: jest.fn(),
       post: jest.fn(),
+      delete: jest.fn(),
       request: jest.fn()
     } as unknown as jest.Mocked<HttpClient>
 
@@ -341,6 +343,68 @@ describe('OwnProfile Entity', () => {
     // Verify that Profile instances are created correctly
     expect(followingList[0]).toBeInstanceOf(Profile)
     expect(followingList[1]).toBeInstanceOf(Profile)
+  })
+
+  describe('publishNote()', () => {
+    it('should publish markdown as a note via the feed endpoint', async () => {
+      mockClient.post.mockResolvedValueOnce({ id: 999, date: '2026-01-01T00:00:00Z' })
+
+      const response = await ownProfile.publishNote('Hello **world**')
+
+      expect(mockNewNoteService.newNote).toHaveBeenCalled()
+      expect(mockClient.post).toHaveBeenCalledWith(
+        '/comment/feed/',
+        expect.objectContaining({
+          bodyJson: expect.objectContaining({
+            content: [
+              {
+                type: 'paragraph',
+                content: [
+                  { type: 'text', text: 'Hello ' },
+                  { type: 'text', text: 'world', marks: [{ type: 'bold' }] }
+                ]
+              }
+            ]
+          })
+        })
+      )
+      expect(response.id).toBe(999)
+    })
+
+    it('should use the link builder when an attachmentUrl is given', async () => {
+      mockClient.post
+        .mockResolvedValueOnce({ id: 'attachment-uuid', type: 'link' })
+        .mockResolvedValueOnce({ id: 1000, date: '2026-01-01T00:00:00Z' })
+
+      await ownProfile.publishNote('Check this out', {
+        attachmentUrl: 'https://example.com/post'
+      })
+
+      expect(mockNewNoteService.newNoteWithLink).toHaveBeenCalledWith('https://example.com/post')
+      expect(mockClient.post).toHaveBeenCalledWith('/comment/attachment/', {
+        url: 'https://example.com/post',
+        type: 'link'
+      })
+      expect(mockClient.post).toHaveBeenCalledWith(
+        '/comment/feed/',
+        expect.objectContaining({ attachmentIds: ['attachment-uuid'] })
+      )
+    })
+
+    it('should reject empty markdown without calling the API', async () => {
+      await expect(ownProfile.publishNote('')).rejects.toThrow('Note body cannot be empty')
+      expect(mockClient.post).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('deleteNote()', () => {
+    it('should delegate to the note service', async () => {
+      mockNoteService.deleteNote = jest.fn().mockResolvedValueOnce(undefined)
+
+      await ownProfile.deleteNote(456)
+
+      expect(mockNoteService.deleteNote).toHaveBeenCalledWith(456)
+    })
   })
 
   describe('notes()', () => {

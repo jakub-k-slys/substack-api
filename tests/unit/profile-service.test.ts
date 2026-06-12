@@ -1,9 +1,9 @@
-import { ProfileService } from '@substack-api/internal/services/profile-service'
-import { HttpClient } from '@substack-api/internal/http-client'
-import type { SubstackFullProfile } from '@substack-api/internal'
+import { ProfileService } from '@substackular/internal/services/profile-service'
+import { HttpClient } from '@substackular/internal/http-client'
+import type { SubstackFullProfile } from '@substackular/internal'
 
 // Mock the http client
-jest.mock('@substack-api/internal/http-client')
+jest.mock('@substackular/internal/http-client')
 
 describe('ProfileService', () => {
   let profileService: ProfileService
@@ -12,7 +12,9 @@ describe('ProfileService', () => {
   beforeEach(() => {
     jest.clearAllMocks()
 
-    mockPublicationClient = new HttpClient('https://test.com', 'test') as jest.Mocked<HttpClient>
+    mockPublicationClient = new HttpClient('https://test.com', {
+      substackSid: 'test'
+    }) as jest.Mocked<HttpClient>
     mockPublicationClient.get = jest.fn()
 
     profileService = new ProfileService(mockPublicationClient)
