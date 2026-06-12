@@ -12,13 +12,14 @@ describe('FollowingService', () => {
   beforeEach(() => {
     jest.clearAllMocks()
 
-    mockPublicationClient = new HttpClient(
-      'https://test.substack.com',
-      { substackSid: 'test' }
-    ) as jest.Mocked<HttpClient>
+    mockPublicationClient = new HttpClient('https://test.substack.com', {
+      substackSid: 'test'
+    }) as jest.Mocked<HttpClient>
     mockPublicationClient.get = jest.fn()
 
-    mockSubstackClient = new HttpClient('https://substack.com', { substackSid: 'test' }) as jest.Mocked<HttpClient>
+    mockSubstackClient = new HttpClient('https://substack.com', {
+      substackSid: 'test'
+    }) as jest.Mocked<HttpClient>
     mockSubstackClient.put = jest.fn()
 
     followingService = new FollowingService(mockPublicationClient, mockSubstackClient)

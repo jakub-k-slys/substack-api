@@ -1,11 +1,16 @@
 declare global {
   var E2E_CONFIG: {
     hasCredentials: boolean
-    token?: string
+    substackSid?: string
+    connectSid?: string
     publicationUrl?: string
   }
 
-  function getTestCredentials(): { token: string; publicationUrl?: string } | null
+  function getTestCredentials(): {
+    substackSid?: string
+    connectSid?: string
+    publicationUrl?: string
+  } | null
 }
 
 export {}

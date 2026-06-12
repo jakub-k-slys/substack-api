@@ -12,10 +12,9 @@ describe('CommentService', () => {
   beforeEach(() => {
     jest.clearAllMocks()
 
-    mockPublicationClient = new HttpClient(
-      'https://test.substack.com',
-      { substackSid: 'test' }
-    ) as jest.Mocked<HttpClient>
+    mockPublicationClient = new HttpClient('https://test.substack.com', {
+      substackSid: 'test'
+    }) as jest.Mocked<HttpClient>
     mockPublicationClient.get = jest.fn()
 
     commentService = new CommentService(mockPublicationClient)

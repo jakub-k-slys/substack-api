@@ -1,7 +1,8 @@
 import { Profile } from '@substackular/domain/profile'
 import { Note } from '@substackular/domain/note'
 import { NoteBuilder, NoteWithLinkBuilder } from '@substackular/domain/note-builder'
-import type { SubstackFullProfile } from '@substackular/internal'
+import { parseMarkdownNote } from '@substackular/internal/markdown'
+import type { SubstackFullProfile, PublishNoteResponse } from '@substackular/internal'
 import type { HttpClient } from '@substackular/internal/http-client'
 import type {
   ProfileService,
@@ -52,6 +53,25 @@ export class OwnProfile extends Profile {
    */
   newNoteWithLink(link: string): NoteWithLinkBuilder {
     return this.newNoteService.newNoteWithLink(link)
+  }
+
+  /**
+   * Publish a note from a Markdown string.
+   *
+   * Supports **bold**, *italic*, `code`, [text](url) links, # headings
+   * (rendered bold), and -/1. lists. Blocks are separated by blank lines.
+   * Pass options.attachmentUrl to attach a link preview card.
+   */
+  async publishNote(
+    markdown: string,
+    options: { attachmentUrl?: string } = {}
+  ): Promise<PublishNoteResponse> {
+    const paragraphs = parseMarkdownNote(markdown)
+    const seed: NoteBuilder = options.attachmentUrl
+      ? this.newNoteService.newNoteWithLink(options.attachmentUrl)
+      : this.newNoteService.newNote()
+    const builder = paragraphs.reduce<NoteBuilder>((b, p) => b.addParagraph(p), seed)
+    return builder.publish()
   }
 
   /**

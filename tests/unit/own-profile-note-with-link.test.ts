@@ -93,10 +93,9 @@ describe('OwnProfile - newNoteWithLink', () => {
   } as any
 
   beforeEach(() => {
-    mockClient = new MockHttpClient(
-      'https://example.com',
-      { substackSid: 'test-api-key' }
-    ) as jest.Mocked<HttpClient>
+    mockClient = new MockHttpClient('https://example.com', {
+      substackSid: 'test-api-key'
+    }) as jest.Mocked<HttpClient>
     mockProfileService = new MockProfileService(mockClient) as jest.Mocked<ProfileService>
     mockPostService = new MockPostService(mockClient) as jest.Mocked<PostService>
     mockNoteService = new MockNoteService(mockClient) as jest.Mocked<NoteService>

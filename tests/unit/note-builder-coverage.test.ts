@@ -35,10 +35,9 @@ describe('NoteBuilder - Coverage Tests', () => {
   let builder: NoteBuilder
 
   beforeEach(() => {
-    mockClient = new MockHttpClient(
-      'https://example.com',
-      { substackSid: 'test-api-key' }
-    ) as jest.Mocked<HttpClient>
+    mockClient = new MockHttpClient('https://example.com', {
+      substackSid: 'test-api-key'
+    }) as jest.Mocked<HttpClient>
     builder = new NoteBuilder(mockClient)
   })
 

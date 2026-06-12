@@ -3,7 +3,8 @@
  */
 
 export interface RequiredEnvVars {
-  token: string
+  substackSid?: string
+  connectSid?: string
   publicationUrl: string
 }
 
@@ -12,21 +13,25 @@ export interface RequiredEnvVars {
  * @throws Error with descriptive message if required variables are missing
  */
 export function validateE2ECredentials(): RequiredEnvVars {
-  const token = process.env.SUBSTACK_API_KEY
-  const hostname = process.env.SUBSTACK_HOSTNAME
+  // SUBSTACK_API_KEY / E2E_API_KEY are legacy substack-api names for the substack.sid value
+  const substackSid =
+    process.env.SUBSTACK_SID || process.env.SUBSTACK_API_KEY || process.env.E2E_API_KEY
+  const connectSid = process.env.CONNECT_SID
+  const hostname = process.env.SUBSTACK_HOSTNAME || process.env.E2E_HOSTNAME
 
-  if (!token || !hostname) {
+  if ((!substackSid && !connectSid) || !hostname) {
     throw new Error(`
-❌ Missing required Substack credentials. Set SUBSTACK_API_KEY and SUBSTACK_HOSTNAME.
+❌ Missing required Substack credentials. Set SUBSTACK_SID and/or CONNECT_SID, plus SUBSTACK_HOSTNAME.
 
 Required environment variables:
-- SUBSTACK_API_KEY: Your Substack API key (required)
-- SUBSTACK_HOSTNAME: Your Substack hostname (optional)
+- SUBSTACK_SID: Value of your "substack.sid" cookie (this and/or CONNECT_SID)
+- CONNECT_SID: Value of your "connect.sid" cookie (this and/or SUBSTACK_SID)
+- SUBSTACK_HOSTNAME: Your Substack hostname (e.g. yoursite.substack.com)
 
 You can set these variables:
-1. In your environment: export SUBSTACK_API_KEY=your-key-here
+1. In your environment: export SUBSTACK_SID=your-cookie-value
 2. In a .env file in the project root (copy from .env.example)
-3. Alternative names: E2E_API_KEY, E2E_HOSTNAME
+3. Legacy names also accepted: SUBSTACK_API_KEY / E2E_API_KEY (treated as SUBSTACK_SID)
 
 For more information, see tests/e2e/README.md
 `)
@@ -36,7 +41,8 @@ For more information, see tests/e2e/README.md
   const publicationUrl = hostname.startsWith('http') ? hostname : `https://${hostname}`
 
   return {
-    token,
+    substackSid,
+    connectSid,
     publicationUrl
   }
 }

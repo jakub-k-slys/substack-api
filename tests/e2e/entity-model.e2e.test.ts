@@ -6,10 +6,11 @@ describe('SubstackClient Entity Model E2E', () => {
   let client: SubstackClient
 
   beforeAll(() => {
-    const { token, publicationUrl } = validateE2ECredentials()
+    const { substackSid, connectSid, publicationUrl } = validateE2ECredentials()
     client = new SubstackClient({
-      token: token,
-      publicationUrl: publicationUrl
+      substackSid,
+      connectSid,
+      publicationUrl
     })
   })
 

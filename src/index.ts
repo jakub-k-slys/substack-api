@@ -1,5 +1,7 @@
 export { SubstackClient } from '@substackular/substack-client'
 export { SubstackApiError, SubstackAuthError } from '@substackular/errors'
+export { parseMarkdownNote } from '@substackular/internal/markdown'
+export type { MarkdownParagraph } from '@substackular/internal/markdown'
 export type { SubstackAuth, HttpClientOptions } from '@substackular/internal/http-client'
 export {
   Profile,
