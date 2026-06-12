@@ -1,5 +1,5 @@
-import { FullPost } from '@substack-api/domain'
-import { SubstackClient } from '@substack-api/substack-client'
+import { FullPost } from '@substackular/domain'
+import { SubstackClient } from '@substackular/substack-client'
 import axios from 'axios'
 import type { AxiosInstance } from 'axios'
 

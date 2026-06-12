@@ -1,6 +1,6 @@
-import { OwnProfile } from '@substack-api/domain/own-profile'
-import { NoteWithLinkBuilder } from '@substack-api/domain/note-builder'
-import { HttpClient } from '@substack-api/internal/http-client'
+import { OwnProfile } from '@substackular/domain/own-profile'
+import { NoteWithLinkBuilder } from '@substackular/domain/note-builder'
+import { HttpClient } from '@substackular/internal/http-client'
 import {
   ProfileService,
   PostService,
@@ -8,11 +8,11 @@ import {
   FollowingService,
   CommentService,
   NewNoteService
-} from '@substack-api/internal/services'
+} from '@substackular/internal/services'
 
 // Mock dependencies
-jest.mock('@substack-api/internal/http-client')
-jest.mock('@substack-api/internal/services')
+jest.mock('@substackular/internal/http-client')
+jest.mock('@substackular/internal/services')
 
 const MockHttpClient = HttpClient as jest.MockedClass<typeof HttpClient>
 const MockProfileService = ProfileService as jest.MockedClass<typeof ProfileService>
@@ -109,11 +109,11 @@ describe('OwnProfile - newNoteWithLink', () => {
 
     // Setup mock implementations for NewNoteService methods
     mockNewNoteService.newNote = jest.fn().mockImplementation(() => {
-      const { NoteBuilder } = jest.requireActual('@substack-api/domain/note-builder')
+      const { NoteBuilder } = jest.requireActual('@substackular/domain/note-builder')
       return new NoteBuilder(mockClient)
     })
     mockNewNoteService.newNoteWithLink = jest.fn().mockImplementation((link: string) => {
-      const { NoteWithLinkBuilder } = jest.requireActual('@substack-api/domain/note-builder')
+      const { NoteWithLinkBuilder } = jest.requireActual('@substackular/domain/note-builder')
       return new NoteWithLinkBuilder(mockClient, link)
     })
 

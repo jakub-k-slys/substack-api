@@ -8,7 +8,7 @@
  * social features like following users.
  */
 
-import { SubstackClient } from '@substack-api'
+import { SubstackClient } from '@substackular'
 import { config } from 'dotenv'
 import { createInterface } from 'readline'
 

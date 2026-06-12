@@ -1,5 +1,5 @@
-import type { SubstackComment } from '@substack-api/internal'
-import type { HttpClient } from '@substack-api/internal/http-client'
+import type { SubstackComment } from '@substackular/internal'
+import type { HttpClient } from '@substackular/internal/http-client'
 
 /**
  * Comment entity representing a comment on a post or note

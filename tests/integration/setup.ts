@@ -228,7 +228,8 @@ function mapUrlToSampleFile(url: string): string | null {
     'users/282291554': 'user/282291554/profile',
     'users/254824415': 'user/282291554/profile', // Map the subscription user_id to existing profile
     'reader/feed/profile/282291554': 'reader/feed/profile/282291554',
-    'profile/posts': 'profile/posts?profile_user_id=27968736&limit=50',
+    // Fixture filename uses '--' in place of '?' so it is valid on Windows
+    'profile/posts': 'profile/posts--profile_user_id=27968736&limit=50',
     'feed/following': 'feed/following',
     'reader/comment/131648795': 'reader/comment/131648795',
     'posts/by-id/167180194': 'posts/by-id/167180194'

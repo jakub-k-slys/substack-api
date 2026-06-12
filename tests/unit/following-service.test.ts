@@ -1,8 +1,8 @@
-import { FollowingService } from '@substack-api/internal/services/following-service'
-import { HttpClient } from '@substack-api/internal/http-client'
+import { FollowingService } from '@substackular/internal/services/following-service'
+import { HttpClient } from '@substackular/internal/http-client'
 
 // Mock the http client
-jest.mock('@substack-api/internal/http-client')
+jest.mock('@substackular/internal/http-client')
 
 describe('FollowingService', () => {
   let followingService: FollowingService

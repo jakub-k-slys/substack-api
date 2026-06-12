@@ -1,5 +1,5 @@
 import * as t from 'io-ts'
-import { HandleTypeCodec } from '@substack-api/internal/types/handle-type'
+import { HandleTypeCodec } from '@substackular/internal/types/handle-type'
 
 export const PotentialHandleCodec = t.type({
   id: t.string,

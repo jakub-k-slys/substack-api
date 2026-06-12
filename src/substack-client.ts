@@ -1,5 +1,5 @@
-import { HttpClient } from '@substack-api/internal/http-client'
-import { Comment, FullPost, Note, OwnProfile, Profile } from '@substack-api/domain'
+import { HttpClient } from '@substackular/internal/http-client'
+import { Comment, FullPost, Note, OwnProfile, Profile } from '@substackular/domain'
 import {
   CommentService,
   ConnectivityService,
@@ -8,8 +8,8 @@ import {
   NoteService,
   PostService,
   ProfileService
-} from '@substack-api/internal/services'
-import type { SubstackConfig } from '@substack-api/types'
+} from '@substackular/internal/services'
+import type { SubstackConfig } from '@substackular/types'
 
 /**
  * Modern SubstackClient with entity-based API

@@ -1,9 +1,9 @@
-import { CommentService } from '@substack-api/internal/services/comment-service'
-import { HttpClient } from '@substack-api/internal/http-client'
-import type { SubstackComment, SubstackCommentResponse } from '@substack-api/internal'
+import { CommentService } from '@substackular/internal/services/comment-service'
+import { HttpClient } from '@substackular/internal/http-client'
+import type { SubstackComment, SubstackCommentResponse } from '@substackular/internal'
 
 // Mock the http client
-jest.mock('@substack-api/internal/http-client')
+jest.mock('@substackular/internal/http-client')
 
 describe('CommentService', () => {
   let commentService: CommentService

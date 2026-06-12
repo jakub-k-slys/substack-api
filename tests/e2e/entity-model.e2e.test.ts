@@ -1,5 +1,5 @@
-import { SubstackClient } from '@substack-api/substack-client'
-import { PreviewPost, Profile, Comment } from '@substack-api/domain'
+import { SubstackClient } from '@substackular/substack-client'
+import { PreviewPost, Profile, Comment } from '@substackular/domain'
 import { validateE2ECredentials } from '@test/e2e/checkEnv'
 
 describe('SubstackClient Entity Model E2E', () => {

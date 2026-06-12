@@ -7,8 +7,8 @@ import {
   SubstackFullPostCodec,
   SubstackCommentCodec,
   SubstackCommentResponseCodec
-} from '@substack-api/internal/types'
-import { decodeOrThrow, decodeEither } from '@substack-api/internal/validation'
+} from '@substackular/internal/types'
+import { decodeOrThrow, decodeEither } from '@substackular/internal/validation'
 import { isLeft, isRight } from 'fp-ts/Either'
 
 describe('io-ts validation codecs', () => {

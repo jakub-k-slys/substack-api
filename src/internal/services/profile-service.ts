@@ -1,11 +1,11 @@
-import type { HttpClient } from '@substack-api/internal/http-client'
+import type { HttpClient } from '@substackular/internal/http-client'
 import {
   SubstackFullProfileCodec,
   SubstackUserProfileCodec,
   PotentialHandlesCodec
-} from '@substack-api/internal/types'
-import type { SubstackFullProfile } from '@substack-api/internal/types'
-import { decodeOrThrow } from '@substack-api/internal/validation'
+} from '@substackular/internal/types'
+import type { SubstackFullProfile } from '@substackular/internal/types'
+import { decodeOrThrow } from '@substackular/internal/validation'
 
 /**
  * Service responsible for profile-related HTTP operations

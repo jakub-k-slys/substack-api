@@ -1,5 +1,5 @@
-import type { HttpClient } from '@substack-api/internal/http-client'
-import { SubscriberLists } from '@substack-api/internal/types/subscriber-lists'
+import type { HttpClient } from '@substackular/internal/http-client'
+import { SubscriberLists } from '@substackular/internal/types/subscriber-lists'
 import { isLeft } from 'fp-ts/Either'
 import { PathReporter } from 'io-ts/PathReporter'
 

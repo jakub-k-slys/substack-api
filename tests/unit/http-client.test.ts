@@ -1,4 +1,4 @@
-import { HttpClient } from '@substack-api/internal/http-client'
+import { HttpClient } from '@substackular/internal/http-client'
 import axios from 'axios'
 import type { AxiosInstance } from 'axios'
 

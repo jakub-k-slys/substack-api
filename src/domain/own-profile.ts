@@ -1,8 +1,8 @@
-import { Profile } from '@substack-api/domain/profile'
-import { Note } from '@substack-api/domain/note'
-import { NoteBuilder, NoteWithLinkBuilder } from '@substack-api/domain/note-builder'
-import type { SubstackFullProfile } from '@substack-api/internal'
-import type { HttpClient } from '@substack-api/internal/http-client'
+import { Profile } from '@substackular/domain/profile'
+import { Note } from '@substackular/domain/note'
+import { NoteBuilder, NoteWithLinkBuilder } from '@substackular/domain/note-builder'
+import type { SubstackFullProfile } from '@substackular/internal'
+import type { HttpClient } from '@substackular/internal/http-client'
 import type {
   ProfileService,
   PostService,
@@ -10,7 +10,7 @@ import type {
   FollowingService,
   CommentService,
   NewNoteService
-} from '@substack-api/internal/services'
+} from '@substackular/internal/services'
 
 /**
  * OwnProfile extends Profile with write capabilities for the authenticated user

@@ -1,5 +1,5 @@
-import type { SubstackPublicationBase } from '@substack-api/internal/types/substack-publication-base'
-import type { SubstackUser } from '@substack-api/internal/types/substack-user'
+import type { SubstackPublicationBase } from '@substackular/internal/types/substack-publication-base'
+import type { SubstackUser } from '@substackular/internal/types/substack-user'
 
 /**
  * Extended publication information for profile contexts

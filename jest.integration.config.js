@@ -12,7 +12,7 @@ export default {
   roots: ['<rootDir>/tests/integration'],
   testMatch: ['**/*.integration.test.ts'],
   moduleNameMapper: {
-    '^@substack-api/(.*)$': '<rootDir>/src/$1',
+    '^@substackular/(.*)$': '<rootDir>/src/$1',
     '^@test/(.*)$': '<rootDir>/tests/$1'
   },
   setupFilesAfterEnv: ['<rootDir>/tests/integration/setup.ts'],

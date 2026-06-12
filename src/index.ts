@@ -1,4 +1,4 @@
-export { SubstackClient } from '@substack-api/substack-client'
+export { SubstackClient } from '@substackular/substack-client'
 export {
   Profile,
   OwnProfile,
@@ -11,7 +11,7 @@ export {
   ParagraphBuilder,
   ListBuilder,
   ListItemBuilder
-} from '@substack-api/domain'
+} from '@substackular/domain'
 
 export type {
   SubstackConfig,
@@ -20,6 +20,6 @@ export type {
   PostsIteratorOptions,
   CommentsIteratorOptions,
   NotesIteratorOptions
-} from '@substack-api/types'
+} from '@substackular/types'
 
-export type { TextSegment, ListItem, List } from '@substack-api/domain'
+export type { TextSegment, ListItem, List } from '@substackular/domain'

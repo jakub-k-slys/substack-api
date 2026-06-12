@@ -1,12 +1,12 @@
-import { Profile } from '@substack-api/domain/profile'
-import { PreviewPost, Note } from '@substack-api/domain'
+import { Profile } from '@substackular/domain/profile'
+import { PreviewPost, Note } from '@substackular/domain'
 import {
   ProfileService,
   PostService,
   NoteService,
   CommentService
-} from '@substack-api/internal/services'
-import type { HttpClient } from '@substack-api/internal/http-client'
+} from '@substackular/internal/services'
+import type { HttpClient } from '@substackular/internal/http-client'
 
 describe('Profile Entity', () => {
   let mockPublicationClient: jest.Mocked<HttpClient>

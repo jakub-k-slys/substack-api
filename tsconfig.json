@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
-    "target": "es2018",
-    "module": "commonjs",
+    "target": "es2020",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "ignoreDeprecations": "6.0",
     "declaration": true,
     "outDir": "./dist",
     "rootDir": "./src",
@@ -9,11 +11,9 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
-    "baseUrl": ".",
     "paths": {
-      "@substack-api": ["src/index"],
-      "@substack-api/*": ["src/*"]
+      "@substackular": ["./src/index"],
+      "@substackular/*": ["./src/*"]
     }
   },
   "include": ["src/**/*"],

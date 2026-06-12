@@ -1,6 +1,6 @@
-import type { SubstackNote } from '@substack-api/internal'
-import type { HttpClient } from '@substack-api/internal/http-client'
-import { Comment } from '@substack-api/domain/comment'
+import type { SubstackNote } from '@substackular/internal'
+import type { HttpClient } from '@substackular/internal/http-client'
+import { Comment } from '@substackular/domain/comment'
 
 /**
  * Note entity representing a Substack note

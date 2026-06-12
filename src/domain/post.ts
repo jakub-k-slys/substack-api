@@ -1,7 +1,7 @@
-import type { SubstackFullPost, SubstackPreviewPost } from '@substack-api/internal'
-import type { HttpClient } from '@substack-api/internal/http-client'
-import type { CommentService, PostService } from '@substack-api/internal/services'
-import { Comment } from '@substack-api/domain/comment'
+import type { SubstackFullPost, SubstackPreviewPost } from '@substackular/internal'
+import type { HttpClient } from '@substackular/internal/http-client'
+import type { CommentService, PostService } from '@substackular/internal/services'
+import { Comment } from '@substackular/domain/comment'
 
 /**
  * Post interface defining the common contract for all post types

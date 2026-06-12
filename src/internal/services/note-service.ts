@@ -1,7 +1,7 @@
-import type { SubstackNote, PaginatedSubstackNotes } from '@substack-api/internal/types'
-import { SubstackCommentResponseCodec } from '@substack-api/internal/types'
-import { decodeOrThrow } from '@substack-api/internal/validation'
-import type { HttpClient } from '@substack-api/internal/http-client'
+import type { SubstackNote, PaginatedSubstackNotes } from '@substackular/internal/types'
+import { SubstackCommentResponseCodec } from '@substackular/internal/types'
+import { decodeOrThrow } from '@substackular/internal/validation'
+import type { HttpClient } from '@substackular/internal/http-client'
 
 /**
  * Service responsible for note-related HTTP operations

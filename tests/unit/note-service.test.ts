@@ -1,9 +1,9 @@
-import { NoteService } from '@substack-api/internal/services/note-service'
-import { HttpClient } from '@substack-api/internal/http-client'
-import type { SubstackCommentResponse } from '@substack-api/internal'
+import { NoteService } from '@substackular/internal/services/note-service'
+import { HttpClient } from '@substackular/internal/http-client'
+import type { SubstackCommentResponse } from '@substackular/internal'
 
 // Mock the http client
-jest.mock('@substack-api/internal/http-client')
+jest.mock('@substackular/internal/http-client')
 
 describe('NoteService', () => {
   let noteService: NoteService

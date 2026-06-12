@@ -1,7 +1,7 @@
-import type { SubstackFullPost, SubstackPreviewPost } from '@substack-api/internal/types'
-import { SubstackFullPostCodec, SubstackPreviewPostCodec } from '@substack-api/internal/types'
-import { decodeOrThrow } from '@substack-api/internal/validation'
-import type { HttpClient } from '@substack-api/internal/http-client'
+import type { SubstackFullPost, SubstackPreviewPost } from '@substackular/internal/types'
+import { SubstackFullPostCodec, SubstackPreviewPostCodec } from '@substackular/internal/types'
+import { decodeOrThrow } from '@substackular/internal/validation'
+import type { HttpClient } from '@substackular/internal/http-client'
 
 /**
  * Service responsible for post-related HTTP operations

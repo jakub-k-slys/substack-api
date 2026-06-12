@@ -1,7 +1,7 @@
-import { OwnProfile } from '@substack-api/domain/own-profile'
-import { Note } from '@substack-api/domain/note'
-import { Profile } from '@substack-api/domain/profile'
-import { NoteBuilder, NoteWithLinkBuilder } from '@substack-api/domain/note-builder'
+import { OwnProfile } from '@substackular/domain/own-profile'
+import { Note } from '@substackular/domain/note'
+import { Profile } from '@substackular/domain/profile'
+import { NoteBuilder, NoteWithLinkBuilder } from '@substackular/domain/note-builder'
 import {
   ProfileService,
   PostService,
@@ -9,9 +9,9 @@ import {
   CommentService,
   FollowingService,
   NewNoteService
-} from '@substack-api/internal/services'
-import type { SubstackFullProfile } from '@substack-api/internal'
-import type { HttpClient } from '@substack-api/internal/http-client'
+} from '@substackular/internal/services'
+import type { SubstackFullProfile } from '@substackular/internal'
+import type { HttpClient } from '@substackular/internal/http-client'
 
 describe('OwnProfile Entity', () => {
   let mockProfileData: SubstackFullProfile

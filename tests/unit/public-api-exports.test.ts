@@ -6,31 +6,31 @@
 describe('Public API Exports', () => {
   it('should export NoteBuilder from main package', async () => {
     // Test that NoteBuilder can be imported from the main package entry point
-    const { NoteBuilder } = await import('@substack-api/index')
+    const { NoteBuilder } = await import('@substackular/index')
     expect(NoteBuilder).toBeDefined()
     expect(typeof NoteBuilder).toBe('function')
   })
 
   it('should export ParagraphBuilder from main package', async () => {
-    const { ParagraphBuilder } = await import('@substack-api/index')
+    const { ParagraphBuilder } = await import('@substackular/index')
     expect(ParagraphBuilder).toBeDefined()
     expect(typeof ParagraphBuilder).toBe('function')
   })
 
   it('should export ListBuilder from main package', async () => {
-    const { ListBuilder } = await import('@substack-api/index')
+    const { ListBuilder } = await import('@substackular/index')
     expect(ListBuilder).toBeDefined()
     expect(typeof ListBuilder).toBe('function')
   })
 
   it('should export ListItemBuilder from main package', async () => {
-    const { ListItemBuilder } = await import('@substack-api/index')
+    const { ListItemBuilder } = await import('@substackular/index')
     expect(ListItemBuilder).toBeDefined()
     expect(typeof ListItemBuilder).toBe('function')
   })
 
   it('should allow creating NoteBuilder instance', async () => {
-    const { NoteBuilder } = await import('@substack-api/index')
+    const { NoteBuilder } = await import('@substackular/index')
 
     // Mock HttpClient since NoteBuilder requires it
     const mockPublicationClient = {
@@ -47,7 +47,7 @@ describe('Public API Exports', () => {
   it('should allow type imports for content types', async () => {
     // This test validates that TypeScript types can be imported
     // The import itself is sufficient to verify the types are exported
-    const module = await import('@substack-api/index')
+    const module = await import('@substackular/index')
 
     // We can't directly test types at runtime, but we can verify
     // that the module exports exist and can be used in type annotations
