@@ -12,7 +12,7 @@ describe('NoteWithLinkBuilder', () => {
   beforeEach(() => {
     mockClient = new MockHttpClient(
       'https://example.com',
-      'test-api-key'
+      { substackSid: 'test-api-key' }
     ) as jest.Mocked<HttpClient>
     builder = new NoteWithLinkBuilder(mockClient, 'https://example.com/test')
   })

@@ -10,7 +10,7 @@ describe('ConnectivityService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockSubstackClient = new HttpClient('https://test.com', 'test') as jest.Mocked<HttpClient>
+    mockSubstackClient = new HttpClient('https://test.com', { substackSid: 'test' }) as jest.Mocked<HttpClient>
     mockSubstackClient.put = jest.fn()
 
     connectivityService = new ConnectivityService(mockSubstackClient)

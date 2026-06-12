@@ -55,6 +55,13 @@ export class OwnProfile extends Profile {
   }
 
   /**
+   * Delete one of the authenticated user's notes by ID
+   */
+  async deleteNote(noteId: number | string): Promise<void> {
+    await this.noteService.deleteNote(noteId)
+  }
+
+  /**
    * Get users that the authenticated user follows
    */
   async *following(options: { limit?: number } = {}): AsyncIterable<Profile> {

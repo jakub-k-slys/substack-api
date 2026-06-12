@@ -74,6 +74,15 @@ export class NoteService {
   }
 
   /**
+   * Delete a note by ID
+   * @param noteId - The note (comment) ID to delete
+   * @throws {Error} When the note cannot be deleted (not found, not owned by the user)
+   */
+  async deleteNote(noteId: number | string): Promise<void> {
+    await this.publicationClient.delete(`/comment/${noteId}`)
+  }
+
+  /**
    * Get notes for a profile with cursor-based pagination
    * @param profileId - The profile user ID
    * @param options - Pagination options with optional cursor

@@ -11,6 +11,7 @@ describe('Note Entity', () => {
     mockPublicationClient = {
       get: jest.fn(),
       post: jest.fn(),
+      delete: jest.fn(),
       request: jest.fn()
     } as unknown as jest.Mocked<HttpClient>
 
@@ -378,6 +379,16 @@ describe('Note Entity', () => {
 
       expect(comments).toHaveLength(1)
       expect(comments[0].body).toBe('Valid comment')
+    })
+  })
+
+  describe('delete()', () => {
+    it('should delete the note via the comment endpoint', async () => {
+      mockPublicationClient.delete.mockResolvedValueOnce(undefined)
+
+      await note.delete()
+
+      expect(mockPublicationClient.delete).toHaveBeenCalledWith('/comment/789')
     })
   })
 

@@ -1,4 +1,6 @@
 export { SubstackClient } from '@substackular/substack-client'
+export { SubstackApiError, SubstackAuthError } from '@substackular/errors'
+export type { SubstackAuth, HttpClientOptions } from '@substackular/internal/http-client'
 export {
   Profile,
   OwnProfile,

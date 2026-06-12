@@ -12,7 +12,7 @@ describe('ProfileService', () => {
   beforeEach(() => {
     jest.clearAllMocks()
 
-    mockPublicationClient = new HttpClient('https://test.com', 'test') as jest.Mocked<HttpClient>
+    mockPublicationClient = new HttpClient('https://test.com', { substackSid: 'test' }) as jest.Mocked<HttpClient>
     mockPublicationClient.get = jest.fn()
 
     profileService = new ProfileService(mockPublicationClient)

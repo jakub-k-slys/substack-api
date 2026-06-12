@@ -31,11 +31,11 @@ describe('SubstackClient', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockPublicationClient = new HttpClient('https://test.com', 'test') as jest.Mocked<HttpClient>
+    mockPublicationClient = new HttpClient('https://test.com', { substackSid: 'test' }) as jest.Mocked<HttpClient>
     mockPublicationClient.get = jest.fn()
     mockPublicationClient.post = jest.fn()
 
-    mockSubstackClient = new HttpClient('https://substack.com', 'test') as jest.Mocked<HttpClient>
+    mockSubstackClient = new HttpClient('https://substack.com', { substackSid: 'test' }) as jest.Mocked<HttpClient>
     mockSubstackClient.get = jest.fn()
     mockSubstackClient.post = jest.fn()
 

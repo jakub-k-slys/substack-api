@@ -55,6 +55,17 @@ export class Note {
   }
 
   /**
+   * Delete this note. Only notes belonging to the authenticated user can be deleted.
+   */
+  async delete(): Promise<void> {
+    const commentId = this.rawData.comment?.id
+    if (!commentId) {
+      throw new Error('Cannot delete note: no comment ID available')
+    }
+    await this.publicationClient.delete(`/comment/${commentId}`)
+  }
+
+  /**
    * Like this note
    */
   async like(): Promise<void> {

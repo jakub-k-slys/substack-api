@@ -14,7 +14,7 @@ describe('CommentService', () => {
 
     mockPublicationClient = new HttpClient(
       'https://test.substack.com',
-      'test'
+      { substackSid: 'test' }
     ) as jest.Mocked<HttpClient>
     mockPublicationClient.get = jest.fn()
 

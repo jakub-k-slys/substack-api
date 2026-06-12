@@ -12,10 +12,27 @@ describe('NoteService', () => {
   beforeEach(() => {
     jest.clearAllMocks()
 
-    mockPublicationClient = new HttpClient('https://test.com', 'test') as jest.Mocked<HttpClient>
+    mockPublicationClient = new HttpClient('https://test.com', { substackSid: 'test' }) as jest.Mocked<HttpClient>
     mockPublicationClient.get = jest.fn()
+    mockPublicationClient.delete = jest.fn()
 
     noteService = new NoteService(mockPublicationClient)
+  })
+
+  describe('deleteNote', () => {
+    it('should delete a note via the comment endpoint', async () => {
+      mockPublicationClient.delete.mockResolvedValueOnce(undefined)
+
+      await noteService.deleteNote(123)
+
+      expect(mockPublicationClient.delete).toHaveBeenCalledWith('/comment/123')
+    })
+
+    it('should propagate errors from the HTTP client', async () => {
+      mockPublicationClient.delete.mockRejectedValueOnce(new Error('HTTP 404: Not Found'))
+
+      await expect(noteService.deleteNote(999)).rejects.toThrow('HTTP 404: Not Found')
+    })
   })
 
   describe('getNoteById', () => {
