@@ -12,12 +12,21 @@ jobs:
         strategy:
             fail-fast: false
         steps:
+            - name: Mint a GitHub App installation token
+              # Short-lived, scoped App token instead of a long-lived PAT. Also
+              # bypasses GITHUB_TOKEN loop-prevention so the tag/release events
+              # fan out to any downstream workflows.
+              uses: actions/create-github-app-token@v3
+              id: app-token
+              with:
+                  client-id: ${{ secrets.CLIENT_ID }}
+                  private-key: ${{ secrets.APP_PRIVATE_KEY }}
             - uses: actions/checkout@v4
               with:
                   persist-credentials: false
                   fetch-depth: 0
                   ref: ${{ github.ref_name }}
-                  token: ${{ secrets.GH_ACCESS_TOKEN }}
+                  token: ${{ steps.app-token.outputs.token }}
             - uses: pnpm/action-setup@v4
               with:
                   version: 10
@@ -38,6 +47,6 @@ jobs:
                       @semantic-release/git
                       @semantic-release/github
               env:
-                  GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
+                  GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
                   SUBSTACK_API_KEY: ${{ secrets.SUBSTACK_API_KEY }}
                   SUBSTACK_HOSTNAME: ${{ secrets.SUBSTACK_HOSTNAME }}
