@@ -34,6 +34,10 @@ jobs:
               with:
                   node-version: 20
                   cache: 'pnpm'
+            - name: Upgrade npm for OIDC trusted publishing
+              # node 20 ships npm 10.x; npm >= 11.5.1 is required for the
+              # `npm publish` step to complete OIDC trusted publishing.
+              run: npm install -g npm@latest
             - name: Install
               run: pnpm install
             - name: Semantic Release
