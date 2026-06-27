@@ -6,34 +6,10 @@ permissions:
     pull-requests: write
 
 jobs:
-    auto-approve:
-        name: Approve PR
-        runs-on: ubuntu-latest
-        if: github.actor == 'dependabot[bot]'
-        steps:
-            - name: Mint a GitHub App installation token
-              uses: actions/create-github-app-token@v3
-              id: app-token
-              with:
-                  client-id: ${{ secrets.CLIENT_ID }}
-                  private-key: ${{ secrets.APP_PRIVATE_KEY }}
-            - name: Dependabot metadata
-              id: metadata
-              uses: dependabot/fetch-metadata@v3
-              with:
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-            - name: Approve a PR
-              run: gh pr review --approve "$PR_URL"
-              env:
-                  PR_URL: ${{ github.event.pull_request.html_url }}
-                  GH_TOKEN: ${{ steps.app-token.outputs.token }}
-
     auto-merge:
-        name: Merge PR
-        needs:
-            - auto-approve
+        name: Approve and merge PR
         runs-on: ubuntu-latest
-        if: github.actor == 'dependabot[bot]'
+        if: github.event.pull_request.user.login == 'dependabot[bot]'
         steps:
             - name: Mint a GitHub App installation token
               uses: actions/create-github-app-token@v3
@@ -41,13 +17,9 @@ jobs:
               with:
                   client-id: ${{ secrets.CLIENT_ID }}
                   private-key: ${{ secrets.APP_PRIVATE_KEY }}
-            - name: Dependabot metadata
-              id: metadata
-              uses: dependabot/fetch-metadata@v3
+            - name: Approve and enable auto-merge
+              uses: fastify/github-action-merge-dependabot@v3
               with:
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-            - name: Enable auto-merge for Dependabot PRs
-              run: gh pr merge --auto --squash "$PR_URL"
-              env:
-                  PR_URL: ${{ github.event.pull_request.html_url }}
-                  GH_TOKEN: ${{ steps.app-token.outputs.token }}
+                  github-token: ${{ steps.app-token.outputs.token }}
+                  merge-method: merge
+                  use-github-auto-merge: true
